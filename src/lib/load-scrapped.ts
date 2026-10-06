@@ -7,7 +7,8 @@ import {
   likedButScrappedFromDb,
   type ScrappedPageResult,
 } from "./scrapped";
-import { getLikedTrackUris, getSpotifyAccessToken } from "./spotify";
+import { getSpotifyAccessToken } from "./spotify";
+import { cachedLikedTrackUris } from "./spotify/api-lab-snapshot";
 
 export async function loadScrappedPage(
   year: number = SCRAPPED_YEAR,
@@ -34,14 +35,9 @@ export async function loadScrappedPage(
 
     const token = await getSpotifyAccessToken();
     if (token) {
-      try {
-        const likedUris = await getLikedTrackUris();
-        report.likedConnected = true;
-        report.likedButScrapped = likedButScrappedFromDb(db, year, likedUris);
-      } catch {
-        report.likedConnected = true;
-        report.likedButScrapped = [];
-      }
+      const likedUris = cachedLikedTrackUris();
+      report.likedConnected = likedUris.length > 0;
+      report.likedButScrapped = likedButScrappedFromDb(db, year, likedUris);
     }
 
     db.close();

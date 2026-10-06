@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ApiScrappedDeck } from "@/components/scrapped/ApiScrappedDeck";
+import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
+import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
 import { loadScrappedApiLab } from "@/lib/load-scrapped-api-lab";
 
 export const dynamic = "force-dynamic";
@@ -38,14 +40,29 @@ export default async function ApiScrappedPage() {
     );
   }
 
-  if (result.kind === "error") {
+  if (result.kind === "needs_fetch" || result.kind === "error") {
     return (
       <div className="animate-rise space-y-5">
         <p className="font-mono text-sm text-ring">API</p>
         <h1 className="font-heading text-[clamp(2.5rem,7vw,3.75rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
           API Scrapped
         </h1>
-        <p className="max-w-md text-sm text-warn">{result.message}</p>
+        <p className="max-w-md text-[1.05rem] leading-relaxed text-muted-foreground">
+          {result.message}
+        </p>
+        {result.retryAfterSeconds ? (
+          <SpotifyRateLimitWait
+            message={result.message}
+            retryAfterSeconds={result.retryAfterSeconds}
+            quotaExceeded={result.quotaExceeded}
+            className="max-w-md text-sm text-warn"
+          />
+        ) : (
+          <SpotifyLabFetchForm
+            next="/scrapped/api"
+            label="Load from Spotify"
+          />
+        )}
         <Link
           href="/scrapped/lab"
           className="text-foreground underline-offset-2 hover:underline"

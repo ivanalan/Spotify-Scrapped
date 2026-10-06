@@ -3,6 +3,8 @@ export { spotifyRedirectUri } from "./redirect";
 export {
   SpotifyApiError,
   getSpotifyAccessToken,
+  getSpotifyCooldown,
+  getSpotifyCooldownRemainingSec,
   getSpotifyConnection,
   spotifyFetch,
   getSpotifyProfile,

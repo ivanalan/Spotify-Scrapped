@@ -39,7 +39,9 @@ function getApiSlideSoundtrackUri(
   const leftLong = cardById(report, "left-long-run");
   const leftLongArtists = cardById(report, "left-long-artists");
   const fallen = cardById(report, "fallen-rotation");
+  const secondChance = cardById(report, "second-chance");
   const lead = trackUri(leftLong?.items[0]) ?? trackUri(fallen?.items[0]);
+  const reunion = trackUri(secondChance?.items[0]) ?? lead;
 
   switch (slideIndex) {
     case 0:
@@ -52,12 +54,10 @@ function getApiSlideSoundtrackUri(
       // Song credited to the top artist who left the long run.
       return trackUri(leftLongArtists?.items[0]) ?? lead;
     case 6:
-      return trackUri(fallen?.items[0]) ?? lead;
     case 7:
-      return trackUri(fallen?.items[1]) ?? lead;
     case 8:
-      // Share recap — keep the lead so audio doesn’t jump at the end.
-      return lead;
+      // Soft-launch hero through wrap-up — keep the reunion track playing.
+      return reunion;
     default:
       return null;
   }
@@ -81,11 +81,11 @@ export function ApiScrappedDeck({ report }: Props) {
   const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
   const leftLongArtists = cardById(report, "left-long-artists");
-  const fallenRotation = cardById(report, "fallen-rotation");
-  const artistsBack = cardById(report, "artists-back");
+  const secondChance = cardById(report, "second-chance");
 
   const topSong = leftLongSongs?.items[0] ?? null;
   const topArtist = leftLongArtists?.items[0] ?? null;
+  const reunionSong = secondChance?.items[0] ?? null;
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -268,31 +268,42 @@ export function ApiScrappedDeck({ report }: Props) {
         {/* 6 */}
         <StorySlide
           index="06"
-          title="Benched this month"
-          blurb="Six-month starters who didn’t make the 4-week roster. Not cut — just riding the pine."
+          title="The soft launch reunion"
+          blurb="An old multi-year favorite that skipped the 6-month era and slid back into your 4-week tops. We don’t have to talk about it."
           active={active === 6}
-          footer={
-            (fallenRotation?.items.length ?? 0) === 0
-              ? "Nobody got benched. Coach is feeling soft."
-              : undefined
-          }
         >
-          <RankBars items={metricBars(fallenRotation?.items ?? [])} />
+          {reunionSong ? (
+            <div className="space-y-4">
+              <p className="font-heading text-[clamp(2.25rem,7vw,3.5rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
+                {reunionSong.label}
+              </p>
+              <p className="text-lg text-muted-foreground">
+                {reunionSong.sublabel ?? "—"}
+              </p>
+              <p className="font-mono text-sm tabular-nums text-warn">
+                {reunionSong.detail}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No reunions on the calendar. For now.
+            </p>
+          )}
         </StorySlide>
 
-        {/* 7 — user list item 8 */}
+        {/* 7 */}
         <StorySlide
           index="07"
-          title="The soft launch reunion"
-          blurb="Old multi-year favorites who skipped the 6-month era and slid back into your 4-week tops. We don’t have to talk about it."
+          title="The reunion setlist"
+          blurb="More comebacks from the long run — or old likes — that are back in your 4-week tops after a gap."
           active={active === 7}
           footer={
-            (artistsBack?.items.length ?? 0) === 0
-              ? "No reunions on the calendar. For now."
+            (secondChance?.items.length ?? 0) === 0
+              ? "Empty setlist. The soft launch stayed soft."
               : undefined
           }
         >
-          <RankBars items={metricBars(artistsBack?.items ?? [])} />
+          <RankBars items={metricBars(secondChance?.items ?? [])} />
         </StorySlide>
 
         {/* 8 — shareable recap */}
