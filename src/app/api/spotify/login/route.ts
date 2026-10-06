@@ -8,7 +8,7 @@ export async function GET() {
   res.cookies.set("spotify_oauth_state", state, {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: (process.env.AUTH_URL ?? "").startsWith("https://"),
     path: "/",
     maxAge: 600,
   });

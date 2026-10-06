@@ -13,7 +13,7 @@ import {
 } from "./spotify";
 import {
   readApiLabSnapshot,
-  writeApiLabSnapshot,
+  type StoredApiLabSnapshot,
 } from "./spotify/api-lab-snapshot";
 import {
   getSavedTracksDetailed,
@@ -25,6 +25,7 @@ export type ScrappedApiLabResult =
   | {
       kind: "ready";
       report: ScrappedApiReport;
+      stored?: StoredApiLabSnapshot;
       retryAfterSeconds?: number;
       quotaExceeded?: boolean;
     }
@@ -66,14 +67,20 @@ function errorResult(err: unknown): Extract<ScrappedApiLabResult, { kind: "error
   };
 }
 
-function reportFromSnapshot(
+async function reportFromSnapshot(
   year: number,
-): Extract<ScrappedApiLabResult, { kind: "ready" }> | null {
-  const stored = readApiLabSnapshot();
+  userId?: string,
+): Promise<Extract<ScrappedApiLabResult, { kind: "ready" }> | null> {
+  const stored = await readApiLabSnapshot(userId);
   if (!stored) return null;
-  const report = buildScrappedApiReport(stored.snap, year);
+  // Prefer the sealed report (cookie / per-user file). Rebuild only if an older
+  // shape somehow still has raw snap fields (shouldn't after migrate).
+  const report = stored.report;
+  if (!report || report.year !== year) {
+    return null;
+  }
   report.fetchedAt = stored.fetchedAt;
-  return { kind: "ready", report, ...cooldownFields() };
+  return { kind: "ready", report, stored, ...cooldownFields() };
 }
 
 export async function loadScrappedApiLab(
@@ -88,13 +95,14 @@ export async function loadScrappedApiLab(
     };
   }
 
-  const cached = reportFromSnapshot(year);
+  const connection = await getSpotifyConnection();
+  const cached = await reportFromSnapshot(year, connection.userId);
   if (cached) return cached;
 
   return {
     kind: "needs_fetch",
     message:
-      "Load tops and Liked Songs from Spotify once. Reloads use a local snapshot and do not spend quota.",
+      "Load tops and Liked Songs from Spotify once. Reloads use a saved snapshot and do not spend quota.",
     ...cooldownFields(),
   };
 }
@@ -112,20 +120,20 @@ export async function fetchAndStoreScrappedApiLab(
     };
   }
 
+  const connection = await getSpotifyConnection();
   const cooldown = getSpotifyCooldown();
   if (cooldown.remainingSec > 0) {
     return (
-      reportFromSnapshot(year) ?? {
+      (await reportFromSnapshot(year, connection.userId)) ?? {
         kind: "needs_fetch",
         message:
-          "Load tops and Liked Songs from Spotify once. Reloads use a local snapshot and do not spend quota.",
+          "Load tops and Liked Songs from Spotify once. Reloads use a saved snapshot and do not spend quota.",
         ...cooldownFields(),
       }
     );
   }
 
   try {
-    const connection = await getSpotifyConnection();
     let lastError: Error | null = null;
     const absorb = <T>(p: Promise<T>, fallback: T) =>
       p.catch((err: unknown) => {
@@ -162,7 +170,10 @@ export async function fetchAndStoreScrappedApiLab(
       0;
 
     if (!hasData && lastError) {
-      return reportFromSnapshot(year) ?? errorResult(lastError);
+      return (
+        (await reportFromSnapshot(year, connection.userId)) ??
+        errorResult(lastError)
+      );
     }
 
     const snap = {
@@ -176,16 +187,25 @@ export async function fetchAndStoreScrappedApiLab(
       liked,
     };
     const fetchedAt = new Date().toISOString();
-    writeApiLabSnapshot({
-      fetchedAt,
-      userId: connection.userId,
-      snap,
-    });
-
     const report = buildScrappedApiReport(snap, year);
     report.fetchedAt = fetchedAt;
-    return { kind: "ready", report };
+
+    const likedUris: string[] = [];
+    for (const row of liked) {
+      if (row.track?.uri) likedUris.push(row.track.uri);
+    }
+
+    const stored: StoredApiLabSnapshot = {
+      fetchedAt,
+      userId: connection.userId,
+      report,
+      likedUris,
+    };
+
+    return { kind: "ready", report, stored };
   } catch (err) {
-    return reportFromSnapshot(year) ?? errorResult(err);
+    return (
+      (await reportFromSnapshot(year, connection.userId)) ?? errorResult(err)
+    );
   }
 }
