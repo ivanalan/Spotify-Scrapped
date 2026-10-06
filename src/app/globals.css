@@ -1,26 +1,227 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/* Latin-only faces — full package index.css references missing *-all-*.woff files under Turbopack. */
+@import "@fontsource-variable/fustat/wght.css";
+@import "@fontsource/gentium-book-basic/latin-400.css";
+@import "@fontsource/gentium-book-basic/latin-700.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:is(.dark *));
+
+/* Portfolio “Dark Anysphere” tokens — same palette/fonts as ivanalan.github.io */
+:root,
+.dark {
+  --background: oklch(18.561% 0.00161 197.742);
+  --secondary: oklch(24.705% 0.01511 285.224);
+  --muted: oklch(0.311 0 0);
+  --foreground: oklch(96.946% 0.00318 15.308);
+  --muted-foreground: oklch(76.092% 0.01027 273.305);
+  --border: oklch(0.919 0 0 / 7%);
+  --ring: oklch(0.638 0.177 252.2);
+  --radius: 0.625rem;
+
+  --card: var(--secondary);
+  --card-foreground: var(--foreground);
+  --popover: var(--secondary);
+  --popover-foreground: var(--foreground);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --secondary-foreground: var(--foreground);
+  --accent: oklch(0.311 0 0);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.65 0.2 25);
+  --input: oklch(0.919 0 0 / 12%);
+
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: var(--secondary);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--ring);
+  --sidebar-primary-foreground: var(--foreground);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* App aliases used by existing pages */
+  --paper: var(--background);
+  --paper-deep: var(--secondary);
+  --ink: var(--foreground);
+  --ink-soft: var(--muted-foreground);
+  --line: var(--border);
+  --surface: var(--secondary);
+  --warn: oklch(0.78 0.12 75);
+  --warn-soft: oklch(0.3 0.04 75);
+
+  --duration-fast: 150ms;
+  --duration-move: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
+  --font-heading: "Gentium Book Basic", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Fustat Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--ring) 35%, transparent);
+    color: var(--foreground);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-rise {
+    animation: rise var(--duration-move) var(--ease-out) both;
+  }
+
+  .animate-rise-delay-1 {
+    animation: rise var(--duration-move) var(--ease-out) 80ms both;
+  }
+
+  .animate-rise-delay-2 {
+    animation: rise var(--duration-move) var(--ease-out) 160ms both;
+  }
+
+  .animate-rule {
+    transform-origin: left;
+    animation: rule-draw var(--duration-move) var(--ease-out) 120ms both;
+  }
+
+  .pressable {
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .pressable:active {
+    transform: scale(0.992);
+  }
+
+  .chevron-nudge {
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .group:hover .chevron-nudge {
+    transform: translateX(2px);
+    color: var(--ring);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-rise-delay-1,
+  .animate-rise-delay-2,
+  .animate-rule {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,0 +1,72 @@
+# Spotify Web API integration
+
+OAuth for **Scrapped API Lab** and Liked-Songs enrichment on export Scrapped.
+
+Uses a small custom OAuth flow (not Auth.js) so the redirect URI is identical on authorize and token exchange — required by Spotify.
+
+## Setup
+
+1. Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
+2. Add redirect URI (**exact** — Spotify rejects `localhost`):
+
+   ```
+   http://127.0.0.1:3000/api/spotify/callback
+   ```
+
+   Remove any older `/api/auth/callback/spotify` or `localhost` URIs.
+
+3. Copy Client ID / Secret into `.env.local` (see `.env.example`):
+
+   ```bash
+   AUTH_SECRET=          # openssl rand -base64 32
+   AUTH_SPOTIFY_ID=
+   AUTH_SPOTIFY_SECRET=
+   AUTH_URL=http://127.0.0.1:3000
+   ```
+
+4. Run `npm run dev`, open [http://127.0.0.1:3000](http://127.0.0.1:3000), click **Connect Spotify**.
+
+Confirm the URI with `GET /api/spotify/debug-auth`.
+
+## What’s in the repo
+
+| Piece | Path |
+|-------|------|
+| OAuth authorize / token | [`src/lib/spotify/oauth.ts`](../src/lib/spotify/oauth.ts) |
+| Encrypted session cookie | [`src/lib/spotify/session.ts`](../src/lib/spotify/session.ts) |
+| API helpers | [`src/lib/spotify/client.ts`](../src/lib/spotify/client.ts) |
+| Tops / recent / liked / playlists | [`src/lib/spotify/listening.ts`](../src/lib/spotify/listening.ts) |
+| Routes | `/api/spotify/login`, `/callback`, `/logout`, `/me` |
+| API Lab | `/scrapped/lab` → [`src/lib/load-scrapped-api-lab.ts`](../src/lib/load-scrapped-api-lab.ts) |
+
+### Using the client (server-only)
+
+```ts
+import {
+  getSpotifyProfile,
+  getTopTracks,
+  getRecentlyPlayed,
+  getSavedTracksDetailed,
+  spotifyFetch,
+} from "@/lib/spotify";
+
+const profile = await getSpotifyProfile();
+const short = await getTopTracks("short_term");
+const recent = await getRecentlyPlayed();
+const liked = await getSavedTracksDetailed();
+```
+
+## Scopes
+
+See `SPOTIFY_SCOPES` in [`src/lib/spotify/scopes.ts`](../src/lib/spotify/scopes.ts). Reconnect after changing scopes.
+
+## Limits (API Lab)
+
+- `recently-played`: ~50 completed plays total; skips are not returned.
+- `top/tracks` & `top/artists`: affinity ranks for short / medium / long windows — not calendar-year play counts.
+- True skip / `ms_played` analytics still require the Extended Streaming History export (`/scrapped`).
+
+## Caveats
+
+- Prefer `GET /tracks/{id}` over batch endpoints (restricted on many new apps).
+- Never commit `.env.local` or tokens.
