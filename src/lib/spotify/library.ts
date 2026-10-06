@@ -1,4 +1,8 @@
-import { getSpotifyConnection, spotifyFetch } from "./client";
+import {
+  getSpotifyConnection,
+  getSpotifyCooldownRemainingSec,
+  spotifyFetch,
+} from "./client";
 
 const LIKED_URI_TTL_MS = 5 * 60_000;
 
@@ -26,6 +30,13 @@ export async function getLikedTrackUris(maxPages = 40): Promise<string[]> {
     Date.now() < likedUriCache.expiresAt
   ) {
     return likedUriCache.uris;
+  }
+
+  if (getSpotifyCooldownRemainingSec() > 0) {
+    if (likedUriCache && likedUriCache.userId === userId) {
+      return likedUriCache.uris;
+    }
+    return [];
   }
 
   const uris: string[] = [];

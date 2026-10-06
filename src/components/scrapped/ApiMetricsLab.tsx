@@ -3,14 +3,32 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { RankBars } from "@/components/scrapped/visuals/RankBars";
+import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
+import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
 import type { ApiMetricCard, ScrappedApiReport } from "@/lib/scrapped-api";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 type Props =
-  | { kind: "ready"; report: ScrappedApiReport }
+  | {
+      kind: "ready";
+      report: ScrappedApiReport;
+      retryAfterSeconds?: number;
+      quotaExceeded?: boolean;
+    }
   | { kind: "needs_auth"; message: string }
-  | { kind: "error"; message: string };
+  | {
+      kind: "needs_fetch";
+      message: string;
+      retryAfterSeconds?: number;
+      quotaExceeded?: boolean;
+    }
+  | {
+      kind: "error";
+      message: string;
+      retryAfterSeconds?: number;
+      quotaExceeded?: boolean;
+    };
 
 function MetricCardView({
   card,
@@ -136,10 +154,29 @@ export function ApiMetricsLab(props: Props) {
         </div>
       ) : null}
 
+      {props.kind === "needs_fetch" ? (
+        <div className="animate-rise-delay-1 space-y-4 border-y border-border py-8">
+          <p className="max-w-xl text-sm text-muted-foreground">{props.message}</p>
+          {props.retryAfterSeconds ? (
+            <SpotifyRateLimitWait
+              message={props.message}
+              retryAfterSeconds={props.retryAfterSeconds}
+              quotaExceeded={props.quotaExceeded}
+              className="text-sm text-warn"
+            />
+          ) : (
+            <SpotifyLabFetchForm next="/scrapped/lab" label="Load from Spotify" />
+          )}
+        </div>
+      ) : null}
+
       {props.kind === "error" ? (
-        <p className="animate-rise-delay-1 border-y border-border py-6 text-sm text-warn">
-          {props.message}
-        </p>
+        <SpotifyRateLimitWait
+          message={props.message}
+          retryAfterSeconds={props.retryAfterSeconds}
+          quotaExceeded={props.quotaExceeded}
+          className="animate-rise-delay-1 border-y border-border py-6 text-sm text-warn"
+        />
       ) : null}
 
       {props.kind === "ready" ? (
@@ -170,11 +207,25 @@ export function ApiMetricsLab(props: Props) {
             {props.report.profileName
               ? `${props.report.profileName} · `
               : null}
-            fetched {props.report.fetchedAt.slice(0, 19).replace("T", " ")} UTC
+            snapshot {props.report.fetchedAt.slice(0, 19).replace("T", " ")} UTC
             · artists {props.report.summary.shortArtistCount}/
             {props.report.summary.mediumArtistCount}/
             {props.report.summary.longArtistCount} (4 weeks / 6 months / years)
           </p>
+
+          {props.retryAfterSeconds ? (
+            <SpotifyRateLimitWait
+              message="Spotify cooldown is still active. This page is the saved snapshot."
+              retryAfterSeconds={props.retryAfterSeconds}
+              quotaExceeded={props.quotaExceeded}
+              className="text-sm text-warn"
+            />
+          ) : (
+            <SpotifyLabFetchForm
+              next="/scrapped/lab"
+              label="Refresh from Spotify"
+            />
+          )}
 
           <div className="animate-rise-delay-2 space-y-3">
             <Input

@@ -67,9 +67,6 @@ export function getSlideSoundtrackUri(
   const secondChance = asTrackUri(
     report.secondChanceHeroes[0]?.spotify_track_uri,
   );
-  const likedScrapped = asTrackUri(
-    report.likedButScrapped[0]?.spotify_track_uri,
-  );
   const abandoned = report.abandonedArtists[0]?.artist_name;
 
   switch (slideIndex) {
@@ -82,8 +79,8 @@ export function getSlideSoundtrackUri(
     case 5:
       return trackForArtist(report, abandoned) ?? topSkipped;
     case 6:
-      return likedScrapped ?? topSkipped;
     case 7:
+      // Liked-but-scrapped starts the second-chance track so it is already playing on 07.
       return secondChance ?? finished ?? topSkipped;
     case 8:
     case 9:
