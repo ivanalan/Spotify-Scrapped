@@ -1,0 +1,16 @@
+---
+description: Spotify streaming history data invariants for this project
+alwaysApply: true
+---
+
+# Spotify data rules
+
+- Read [docs/DATA.md](docs/DATA.md) and [AGENTS.md](AGENTS.md) before changing ingest or analytics.
+- `ts` is the stream **end** time (UTC). Derive start as `ts - ms_played`.
+- Never commit, log, or render `ip_addr`. Strip it at ingest.
+- Do not use `skipped` alone for historical skips — it is unreliable before ~2022. Combine with `reason_end` (`fwdbtn`, `endplay`, `backbtn`) and short `ms_played`.
+- Prefer `sum(ms_played)` over raw play counts for rankings and Scrapped export features.
+- Music entity key: `spotify_track_uri` (fallback title + artist).
+- Keep `data/raw/` and `data/processed/` gitignored.
+- Spotify Web API is for Scrapped API Lab + Liked enrichment — use `src/lib/spotify` server-side only; never expose access tokens to the client. Setup: [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md).
+- Export history remains the source of truth for skips on `/scrapped`. API Lab uses tops/library proxies only.
