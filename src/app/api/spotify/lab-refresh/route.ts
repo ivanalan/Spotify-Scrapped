@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchAndStoreScrappedApiLab } from "@/lib/load-scrapped-api-lab";
+import { attachApiLabSnapshotCookies } from "@/lib/spotify/api-lab-snapshot";
 
 const ALLOWED_NEXT = new Set(["/scrapped/api", "/scrapped/lab"]);
 
@@ -8,11 +9,29 @@ export async function POST(request: Request) {
   const raw = String(form.get("next") ?? "/scrapped/lab");
   const next = ALLOWED_NEXT.has(raw) ? raw : "/scrapped/lab";
 
-  await fetchAndStoreScrappedApiLab();
+  const result = await fetchAndStoreScrappedApiLab();
 
   const base = (process.env.AUTH_URL ?? "http://127.0.0.1:3000").replace(
     /\/$/,
     "",
   );
-  return NextResponse.redirect(`${base}${next}`, { status: 303 });
+
+  if (result.kind === "ready" && result.stored) {
+    const res = NextResponse.redirect(`${base}${next}`, { status: 303 });
+    await attachApiLabSnapshotCookies(res, result.stored);
+    return res;
+  }
+
+  if (result.kind === "needs_auth") {
+    return NextResponse.redirect(`${base}/api/spotify/login`, { status: 303 });
+  }
+
+  const params = new URLSearchParams();
+  if (result.kind === "error") {
+    params.set("spotify_error", result.message.slice(0, 180));
+  }
+  const qs = params.toString();
+  return NextResponse.redirect(`${base}${next}${qs ? `?${qs}` : ""}`, {
+    status: 303,
+  });
 }

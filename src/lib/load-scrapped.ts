@@ -35,7 +35,7 @@ export async function loadScrappedPage(
 
     const token = await getSpotifyAccessToken();
     if (token) {
-      const likedUris = cachedLikedTrackUris();
+      const likedUris = await cachedLikedTrackUris();
       report.likedConnected = likedUris.length > 0;
       report.likedButScrapped = likedButScrappedFromDb(db, year, likedUris);
     }

@@ -17,7 +17,7 @@ export type SpotifySession = {
 const cookieOptions = {
   httpOnly: true,
   sameSite: "lax" as const,
-  secure: false,
+  secure: (process.env.AUTH_URL ?? "").startsWith("https://"),
   path: "/",
   maxAge: 60 * 60 * 24 * 30,
 };
