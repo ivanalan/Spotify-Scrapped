@@ -33,7 +33,10 @@ export async function getLikedTrackUris(maxPages = 40): Promise<string[]> {
   }
 
   if (getSpotifyCooldownRemainingSec() > 0) {
-    return likedUriCache?.userId === userId ? likedUriCache.uris : [];
+    if (likedUriCache && likedUriCache.userId === userId) {
+      return likedUriCache.uris;
+    }
+    return [];
   }
 
   const uris: string[] = [];
