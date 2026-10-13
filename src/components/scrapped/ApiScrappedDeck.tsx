@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import {
   useCallback,
   useEffect,
@@ -71,13 +71,12 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
   const [active, setActive] = useState(0);
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
-  const [pausedHold, setPausedHold] = useState(false);
   const [soundOn, setSoundOn] = useState(initialSoundOn);
   const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
     null,
   );
   const reduceMotion = useReducedMotion();
-  const paused = pausedSticky || pausedHold;
+  const paused = pausedSticky;
 
   const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
@@ -235,7 +234,6 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     visitKey,
     sceneCount: SLIDE_COUNT,
     beatCounts: API_SCRAPPED_BEAT_COUNTS,
-    holdActive: active >= FINALE_INDEX,
     paused,
     reduceMotion,
     activeFillRef,
@@ -251,6 +249,10 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     }
   }, [active, visitKey]);
 
+  const togglePaused = useCallback(() => {
+    setPausedSticky((p) => !p);
+  }, []);
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
@@ -259,7 +261,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
 
       if (e.key === " ") {
         e.preventDefault();
-        setPausedSticky((p) => !p);
+        togglePaused();
         return;
       }
       if (e.key === "r" || e.key === "R") {
@@ -274,11 +276,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo]);
-
-  const holdPause = useCallback((down: boolean) => {
-    setPausedHold(down);
-  }, []);
+  }, [goTo, togglePaused]);
 
   const soundtrackUri = getApiSlideSoundtrackUri(
     report,
@@ -303,17 +301,13 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
   return (
     <div
       className="wrapped-story relative"
-      onPointerDown={(e) => {
-        if (e.button !== 0) return;
+      onClick={(e) => {
         const t = e.target as HTMLElement | null;
         if (t?.closest("a, button, input, textarea, select, [role='button']")) {
           return;
         }
-        holdPause(true);
+        togglePaused();
       }}
-      onPointerUp={() => holdPause(false)}
-      onPointerLeave={() => holdPause(false)}
-      onPointerCancel={() => holdPause(false)}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 md:px-5">
         <div className="flex gap-1" aria-hidden>
@@ -347,7 +341,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
               size="icon"
               variant="default"
               aria-label={pausedSticky ? "Resume story" : "Pause story"}
-              onClick={() => setPausedSticky((p) => !p)}
+              onClick={togglePaused}
               className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
             >
               <Icon
@@ -615,72 +609,33 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
           />
         )}
 
-        {/* 10 — share finale (holds; user advances) */}
+        {/* 10 — share finale */}
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
           className="relative flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full min-w-full shrink-0 snap-start snap-always flex-col items-center justify-center bg-[var(--wrapped-canvas)] px-6 py-20 text-[var(--wrapped-ink)] md:px-10"
           aria-hidden={active !== FINALE_INDEX}
         >
-          <div className="relative z-10 flex w-full max-w-xl flex-col items-center gap-5">
-            <motion.p
-              className="text-center font-sans text-[clamp(1.75rem,5vw,2.5rem)] font-extrabold tracking-[-0.03em]"
-              initial={false}
-              animate={
-                active === FINALE_INDEX
-                  ? { opacity: 1, y: 0 }
-                  : {
-                      opacity: reduceMotion ? 0.85 : 0,
-                      y: reduceMotion ? 0 : 14,
-                    }
-              }
-              transition={{ duration: reduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
-            >
-              That’s your Scrapped.
-            </motion.p>
-            <motion.p
-              className="max-w-sm text-center text-[1.05rem] leading-relaxed text-[var(--wrapped-muted)]"
-              initial={false}
-              animate={
-                active === FINALE_INDEX
-                  ? { opacity: 1, y: 0 }
-                  : {
-                      opacity: reduceMotion ? 0.85 : 0,
-                      y: reduceMotion ? 0 : 14,
-                    }
-              }
-              transition={{
-                duration: reduceMotion ? 0 : 0.5,
-                delay: active === FINALE_INDEX && !reduceMotion ? 0.14 : 0,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              Screenshot the receipt. Soft-launch the chaos.
-            </motion.p>
+          <div className="relative z-10 flex w-full max-w-xl flex-col items-center">
             <ShareRecapCard
               year={report.year}
-              title="Scrapped"
-              subtitle="Songs you ghosted · artists on sabbatical"
-              leftLabel="Left on read"
-              rightLabel="On sabbatical"
-              tagline="Taste is a situationship."
-              brandLine="Scrapped · Anti-Wrapped"
-              variant="receipt"
+              variant="minimal"
               active={active === FINALE_INDEX}
-              skipped={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
+              leftLabel="On sabbatical"
+              rightLabel="Left on read"
+              heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
+              heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+              skipped={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
+                id: item.id,
+                title: item.label,
+                artist: item.detail ?? "—",
+              }))}
+              stayed={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
                 id: item.id,
                 title: item.label,
                 artist: item.sublabel ?? "—",
               }))}
-              stayed={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
-                id: item.id,
-                title: item.label,
-                artist: item.detail,
-              }))}
             />
-            <p className="text-center text-sm text-[var(--wrapped-muted)]">
-              Affinity windows only — not true skips
-            </p>
           </div>
         </section>
       </div>
