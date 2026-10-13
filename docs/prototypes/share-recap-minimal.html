@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scrapped — Share finale (minimal)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --canvas: #f4f2ec;
+      --ink: #141414;
+      --muted: #6b6b66;
+      --panel: #ddd9ce;
+      --phone-w: 320px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: #e8e6df;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .note {
+      max-width: 320px;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .card {
+      width: var(--phone-w);
+      aspect-ratio: 9 / 16;
+      background: var(--canvas);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 22px 28px;
+      box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.35);
+    }
+
+    .visual {
+      flex: 0 0 auto;
+      aspect-ratio: 1;
+      width: 100%;
+      margin-bottom: 28px;
+      overflow: hidden;
+      background: var(--panel);
+      display: grid;
+      place-items: center;
+    }
+
+    .visual span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      padding: 0 16px;
+      line-height: 1.35;
+    }
+
+    .lists {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .col h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    .col ol {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .col li {
+      display: grid;
+      grid-template-columns: 1.1rem 1fr;
+      gap: 0.35rem;
+      align-items: baseline;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .col .rank {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: inherit;
+    }
+
+    .col .name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <article class="card" aria-label="Scrapped share recap">
+      <div class="visual">
+        <span>hero = user API<br />#1 On sabbatical imageUrl</span>
+      </div>
+
+      <div class="lists">
+        <section class="col" aria-labelledby="artists-h">
+          <h2 id="artists-h">On sabbatical</h2>
+          <ol>
+            <li><span class="rank">1</span><span class="name">Underworld</span></li>
+            <li><span class="rank">2</span><span class="name">Four Tet</span></li>
+            <li><span class="rank">3</span><span class="name">Floating Points</span></li>
+            <li><span class="rank">4</span><span class="name">Caribou</span></li>
+            <li><span class="rank">5</span><span class="name">Burial</span></li>
+          </ol>
+        </section>
+
+        <section class="col" aria-labelledby="songs-h">
+          <h2 id="songs-h">Left on read</h2>
+          <ol>
+            <li><span class="rank">1</span><span class="name">Born Slippy</span></li>
+            <li><span class="rank">2</span><span class="name">Two Thousand and Seventeen</span></li>
+            <li><span class="rank">3</span><span class="name">LesAlpx</span></li>
+            <li><span class="rank">4</span><span class="name">Can't Do Without You</span></li>
+            <li><span class="rank">5</span><span class="name">Archangel</span></li>
+          </ol>
+        </section>
+      </div>
+    </article>
+    <p class="note">
+      Production: <code>ShareRecapCard</code> variant <code>minimal</code> —
+      <code>heroImageUrl={topArtist.imageUrl}</code> from Spotify Web API.
+    </p>
+  </div>
+</body>
+</html>

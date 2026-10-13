@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type ShareRecapTrack = {
@@ -23,8 +24,15 @@ type Props = {
   tagline?: string;
   brandLine?: string;
   active?: boolean;
-  /** Industrial receipt look for API Wrapped deck. */
-  variant?: "default" | "receipt";
+  /**
+   * `default` — Plus share card.
+   * `receipt` — industrial API look.
+   * `minimal` — art + two equal columns (API story finale).
+   */
+  variant?: "default" | "receipt" | "minimal";
+  /** Hero art for `minimal` — typically #1 On sabbatical from the user’s API. */
+  heroImageUrl?: string | null;
+  heroAlt?: string;
   className?: string;
 };
 
@@ -112,6 +120,39 @@ function TrackList({
   );
 }
 
+function MinimalColumn({
+  label,
+  tracks,
+}: {
+  label: string;
+  tracks: ShareRecapTrack[];
+}) {
+  return (
+    <div>
+      <p className="mb-3 text-[0.72rem] font-bold tracking-[0.02em] text-[var(--wrapped-ink)]">
+        {label}
+      </p>
+      {tracks.length === 0 ? (
+        <p className="text-sm text-[var(--wrapped-muted)]">Nothing here.</p>
+      ) : (
+        <ol className="flex flex-col gap-[0.55rem]">
+          {tracks.map((track, i) => (
+            <li
+              key={track.id}
+              className="grid min-w-0 grid-cols-[1.1rem_1fr] items-baseline gap-[0.35rem] text-[0.92rem] font-bold leading-[1.15] tracking-[-0.02em] text-[var(--wrapped-ink)]"
+            >
+              <span className="tabular-nums font-semibold text-[var(--wrapped-muted)]">
+                {i + 1}
+              </span>
+              <span className="truncate">{track.title}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 /** Portrait share card — screenshot like Wrapped’s closing slide. */
 export function ShareRecapCard({
   year,
@@ -126,14 +167,49 @@ export function ShareRecapCard({
   brandLine = "Scrapped · Anti-Wrapped",
   active = false,
   variant = "default",
+  heroImageUrl = null,
+  heroAlt = "",
   className,
 }: Props) {
   const receipt = variant === "receipt";
+  const minimal = variant === "minimal";
   const resolvedSubtitle =
     subtitle ??
     (skipCount != null
       ? `${skipCount.toLocaleString()} skips · taste under revision`
       : "Taste under revision");
+
+  if (minimal) {
+    return (
+      <div
+        className={cn(
+          "relative mx-auto w-full max-w-[20rem] overflow-hidden bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)]",
+          active ? "opacity-100" : "opacity-55",
+          className,
+        )}
+      >
+        <div className="relative flex aspect-[9/16] max-h-[min(72dvh,40rem)] flex-col px-5 pb-7 pt-7 sm:px-6">
+          <div className="relative mb-7 aspect-square w-full shrink-0 overflow-hidden bg-[var(--wrapped-panel)]">
+            {heroImageUrl ? (
+              <Image
+                src={heroImageUrl}
+                alt={heroAlt}
+                fill
+                sizes="320px"
+                className="object-cover"
+                priority={active}
+              />
+            ) : null}
+          </div>
+
+          <div className="grid min-h-0 flex-1 grid-cols-2 gap-4 sm:gap-5">
+            <MinimalColumn label={leftLabel} tracks={skipped} />
+            <MinimalColumn label={rightLabel} tracks={stayed} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 type EmbedController = {
   loadUri: (uri: string) => void;
   play: () => void;
+  /** Resume from the last pause (unlike play(), which may restart). */
+  resume: () => void;
   pause: () => void;
   restart: () => void;
   destroy: () => void;
@@ -160,6 +162,8 @@ export function DeckSoundtrack({
   const enabledRef = useRef(false);
   const activeUriRef = useRef<string | null>(null);
   const playingUriRef = useRef<string | null>(null);
+  /** True after we pause() while a URI was active — next enable should resume(). */
+  const needsResumeRef = useRef(false);
 
   const [apiReady, setApiReady] = useState(false);
   const [uncontrolledEnabled, setUncontrolledEnabled] = useState(false);
@@ -271,6 +275,7 @@ export function DeckSoundtrack({
             syncPlayback(
               poolRef,
               playingUriRef,
+              needsResumeRef,
               activeUriRef.current,
               enabledRef.current,
               setVisibleUri,
@@ -308,6 +313,7 @@ export function DeckSoundtrack({
           syncPlayback(
             poolRef,
             playingUriRef,
+            needsResumeRef,
             activeUriRef.current,
             enabledRef.current,
             setVisibleUri,
@@ -321,6 +327,7 @@ export function DeckSoundtrack({
     syncPlayback(
       poolRef,
       playingUriRef,
+      needsResumeRef,
       uri,
       enabled,
       setVisibleUri,
@@ -329,12 +336,19 @@ export function DeckSoundtrack({
 
   function turnOn() {
     setEnabled(true);
-    syncPlayback(poolRef, playingUriRef, uri, true, setVisibleUri);
+    syncPlayback(
+      poolRef,
+      playingUriRef,
+      needsResumeRef,
+      uri,
+      true,
+      setVisibleUri,
+    );
   }
 
   function turnOff() {
     setEnabled(false);
-    playingUriRef.current = null;
+    if (playingUriRef.current) needsResumeRef.current = true;
     for (const entry of poolRef.current.values()) {
       entry.controller.pause();
       entry.host.className =
@@ -400,10 +414,12 @@ export function DeckSoundtrack({
 /**
  * Play the active URI if its controller is ready; otherwise keep the previous
  * track going so slide changes don't open a silent gap.
+ * Same-URI pause/unmute uses resume() so position is preserved.
  */
 function syncPlayback(
   poolRef: MutableRefObject<Map<string, PoolEntry>>,
   playingUriRef: MutableRefObject<string | null>,
+  needsResumeRef: MutableRefObject<boolean>,
   activeUri: string | null,
   enabled: boolean,
   setVisibleUri: (uri: string | null) => void,
@@ -411,12 +427,13 @@ function syncPlayback(
   const pool = poolRef.current;
 
   if (!enabled) {
+    if (playingUriRef.current) needsResumeRef.current = true;
     for (const entry of pool.values()) {
       entry.controller.pause();
       entry.host.className =
         "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
     }
-    playingUriRef.current = null;
+    // Keep playingUriRef so the next enable can resume() mid-track.
     setVisibleUri(null);
     return;
   }
@@ -428,6 +445,7 @@ function syncPlayback(
         "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
     }
     playingUriRef.current = null;
+    needsResumeRef.current = false;
     setVisibleUri(null);
     return;
   }
@@ -457,6 +475,10 @@ function syncPlayback(
     setVisibleUri(activeUri);
     next.host.className =
       "absolute inset-0 w-full overflow-hidden opacity-100 pointer-events-auto";
+    if (needsResumeRef.current) {
+      needsResumeRef.current = false;
+      next.controller.resume();
+    }
     return;
   }
 
@@ -469,6 +491,7 @@ function syncPlayback(
 
   next.host.className =
     "absolute inset-0 w-full overflow-hidden opacity-100 pointer-events-auto";
+  needsResumeRef.current = false;
   next.controller.play();
   playingUriRef.current = activeUri;
   setVisibleUri(activeUri);
