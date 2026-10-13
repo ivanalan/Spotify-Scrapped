@@ -17,6 +17,8 @@ export { getLikedTrackUris } from "./library";
 export {
   getTopTracks,
   getTopArtists,
+  getArtistSampleTracks,
+  getArtistTopTracks,
   getRecentlyPlayed,
   getSavedTracksDetailed,
   getPlaylistSnapshots,

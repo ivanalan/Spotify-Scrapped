@@ -1,25 +1,23 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
+import { ProductMain, ProductNavShell } from "@/components/ProductChrome";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Spotify Scrapped",
+  title: "Scrapped",
   description:
-    "Anti-Wrapped for skips and songs that didn’t stick — export Scrapped plus an API-only metrics lab.",
+    "Scrapped is your anti-wrapped. Songs you hated and artists you skipped.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={cn("dark h-full antialiased")}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <Nav />
-        <main
-          id="main"
-          className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 md:px-8 md:py-24"
-        >
-          {children}
-        </main>
+        <ProductNavShell>
+          <Nav />
+        </ProductNavShell>
+        <ProductMain>{children}</ProductMain>
       </body>
     </html>
   );

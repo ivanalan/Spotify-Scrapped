@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { chevronDownOutline, chevronUpOutline } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
 import {
+  collectSoundtrackUris,
   DeckSoundtrack,
   getSlideSoundtrackUri,
 } from "@/components/scrapped/DeckSoundtrack";
@@ -89,9 +90,16 @@ export function ScrappedDeck({ report }: Props) {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== " ") return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        goTo(0);
+        return;
+      }
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== " ") return;
       e.preventDefault();
       const delta = e.key === "ArrowUp" ? -1 : 1;
       goTo(activeRef.current + delta);
@@ -101,6 +109,14 @@ export function ScrappedDeck({ report }: Props) {
   }, []);
 
   const soundtrackUri = getSlideSoundtrackUri(report, active);
+  const soundtrackPreload = useMemo(
+    () =>
+      collectSoundtrackUris(
+        (i) => getSlideSoundtrackUri(report, i),
+        SLIDE_COUNT,
+      ),
+    [report],
+  );
 
   return (
     <div className="relative">
@@ -110,7 +126,7 @@ export function ScrappedDeck({ report }: Props) {
       >
         <StorySlide
           index="00"
-          title="Spotify Scrapped"
+          title="Scrapped Plus"
           blurb={`Anti-Wrapped for ${summary.year} — the skips, the almosts, and the songs that earned a rematch.`}
           active={active === 0}
           footer={
@@ -121,7 +137,7 @@ export function ScrappedDeck({ report }: Props) {
                 href="/scrapped/lab"
                 className="text-foreground underline-offset-2 hover:underline"
               >
-                Metrics lab
+                Scrapped Lab
               </Link>
             </>
           }
@@ -363,13 +379,13 @@ export function ScrappedDeck({ report }: Props) {
               href="/scrapped/lab"
               className="text-foreground underline-offset-2 hover:underline"
             >
-              API metrics lab →
+              Scrapped Lab →
             </Link>
           </p>
         </section>
       </div>
 
-      <DeckSoundtrack uri={soundtrackUri} />
+      <DeckSoundtrack uri={soundtrackUri} preloadUris={soundtrackPreload} />
 
       <div className="pointer-events-none absolute inset-y-0 right-3 flex flex-col items-center justify-center gap-2 md:right-5">
         <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-full border border-border bg-background/80 px-2 py-3 backdrop-blur-sm">

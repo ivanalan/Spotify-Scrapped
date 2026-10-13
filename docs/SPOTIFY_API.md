@@ -1,6 +1,6 @@
 # Spotify Web API integration
 
-OAuth for **Scrapped API Lab** and Liked-Songs enrichment on export Scrapped.
+OAuth for **Scrapped**, **Scrapped Lab**, and Liked-Songs enrichment on **Scrapped Plus**.
 
 Uses a small custom OAuth flow (not Auth.js) so the redirect URI is identical on authorize and token exchange — required by Spotify.
 
@@ -37,7 +37,8 @@ Confirm the URI with `GET /api/spotify/debug-auth`.
 | API helpers | [`src/lib/spotify/client.ts`](../src/lib/spotify/client.ts) |
 | Tops / recent / liked / playlists | [`src/lib/spotify/listening.ts`](../src/lib/spotify/listening.ts) |
 | Routes | `/api/spotify/login`, `/callback`, `/logout`, `/me` |
-| API Lab | `/scrapped/lab` → [`src/lib/load-scrapped-api-lab.ts`](../src/lib/load-scrapped-api-lab.ts) |
+| Scrapped (API deck) | `/scrapped` → [`src/lib/load-scrapped-api-lab.ts`](../src/lib/load-scrapped-api-lab.ts) |
+| Scrapped Lab | `/scrapped/lab` → same loader |
 
 ### Using the client (server-only)
 
@@ -53,18 +54,18 @@ import {
 const profile = await getSpotifyProfile();
 const short = await getTopTracks("short_term");
 const recent = await getRecentlyPlayed();
-const liked = await getSavedTracksDetailed();
+const { tracks: liked, total: likedTotal } = await getSavedTracksDetailed();
 ```
 
 ## Scopes
 
 See `SPOTIFY_SCOPES` in [`src/lib/spotify/scopes.ts`](../src/lib/spotify/scopes.ts). Reconnect after changing scopes.
 
-## Limits (API Lab)
+## Limits (Scrapped / Scrapped Lab)
 
 - `recently-played`: ~50 completed plays total; skips are not returned.
 - `top/tracks` & `top/artists`: affinity ranks for short / medium / long windows — not calendar-year play counts.
-- True skip / `ms_played` analytics still require the Extended Streaming History export (`/scrapped`).
+- True skip / `ms_played` analytics still require the Extended Streaming History export (`/scrapped/plus`).
 
 ## Caveats
 

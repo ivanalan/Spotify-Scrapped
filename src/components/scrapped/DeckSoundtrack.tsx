@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
 import { volumeHighOutline, volumeMuteOutline } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
 import type { ScrappedReport } from "@/lib/scrapped";
@@ -10,9 +16,21 @@ type EmbedController = {
   loadUri: (uri: string) => void;
   play: () => void;
   pause: () => void;
+  restart: () => void;
   destroy: () => void;
-  addListener: (event: string, cb: () => void) => void;
+  addListener: (event: string, cb: (...args: unknown[]) => void) => void;
 };
+
+type PlaybackUpdateEvent = {
+  data?: {
+    isPaused?: boolean;
+    duration?: number;
+    position?: number;
+  };
+};
+
+/** Restart when the embed sample ends so the deck soundtrack can run the full story. */
+const END_RESTART_MS = 400;
 
 type IFrameAPI = {
   createController: (
@@ -25,6 +43,14 @@ type IFrameAPI = {
 type SpotifyWindow = Window & {
   onSpotifyIframeApiReady?: (api: IFrameAPI) => void;
   __spotifyIframeApi?: IFrameAPI;
+};
+
+type PoolEntry = {
+  uri: string;
+  controller: EmbedController;
+  host: HTMLElement;
+  /** Spotify embed finished loading this URI. */
+  ready: boolean;
 };
 
 const SCRIPT_SRC = "https://open.spotify.com/embed/iframe-api/v1";
@@ -91,22 +117,75 @@ export function getSlideSoundtrackUri(
   }
 }
 
+/** Unique soundtrack URIs across a deck (for warm-up). */
+export function collectSoundtrackUris(
+  getUri: (slideIndex: number) => string | null,
+  slideCount: number,
+): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (let i = 0; i < slideCount; i++) {
+    const uri = getUri(i);
+    if (!uri || seen.has(uri)) continue;
+    seen.add(uri);
+    out.push(uri);
+  }
+  return out;
+}
+
 type Props = {
   uri: string | null;
+  /** Other act URIs to warm so slide switches can play a ready controller. */
+  preloadUris?: readonly (string | null | undefined)[];
   className?: string;
+  /** Controlled playback on/off. Uncontrolled when omitted. */
+  enabled?: boolean;
+  onEnabledChange?: (enabled: boolean) => void;
+  /** Hide the floating Sound on / Mute pill (e.g. when chrome has its own control). */
+  showToggle?: boolean;
 };
 
-export function DeckSoundtrack({ uri, className }: Props) {
-  const shellRef = useRef<HTMLDivElement>(null);
-  const controllerRef = useRef<EmbedController | null>(null);
+export function DeckSoundtrack({
+  uri,
+  preloadUris = [],
+  className,
+  enabled: enabledProp,
+  onEnabledChange,
+  showToggle = true,
+}: Props) {
+  const poolShellRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<IFrameAPI | null>(null);
-  const creatingRef = useRef(false);
+  const poolRef = useRef<Map<string, PoolEntry>>(new Map());
+  const creatingRef = useRef<Set<string>>(new Set());
   const enabledRef = useRef(false);
+  const activeUriRef = useRef<string | null>(null);
+  const playingUriRef = useRef<string | null>(null);
+
   const [apiReady, setApiReady] = useState(false);
-  const [controllerReady, setControllerReady] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [uncontrolledEnabled, setUncontrolledEnabled] = useState(false);
+  const [poolTick, setPoolTick] = useState(0);
+  const [visibleUri, setVisibleUri] = useState<string | null>(null);
+
+  const controlled = enabledProp !== undefined;
+  const enabled = controlled ? enabledProp : uncontrolledEnabled;
+
+  function setEnabled(next: boolean) {
+    onEnabledChange?.(next);
+    if (!controlled) setUncontrolledEnabled(next);
+  }
 
   enabledRef.current = enabled;
+  activeUriRef.current = uri;
+
+  // Stable set of act URIs to warm (order sorted so the warm effect stays quiet).
+  const wantedUris = useMemo(() => {
+    const seen = new Set<string>();
+    for (const candidate of [...preloadUris, uri]) {
+      const next = asTrackUri(candidate ?? null);
+      if (next) seen.add(next);
+    }
+    return [...seen].sort();
+  }, [uri, preloadUris]);
 
   useEffect(() => {
     const win = window as SpotifyWindow;
@@ -137,72 +216,135 @@ export function DeckSoundtrack({ uri, className }: Props) {
 
     return () => {
       cancelled = true;
-      controllerRef.current?.destroy();
-      controllerRef.current = null;
+      for (const entry of poolRef.current.values()) {
+        entry.controller.destroy();
+      }
+      poolRef.current.clear();
+      creatingRef.current.clear();
     };
   }, []);
 
+  // Warm a controller per unique act URI as soon as the IFrame API is ready.
   useEffect(() => {
-    if (!apiReady || controllerRef.current || creatingRef.current || !uri) {
-      return;
-    }
+    if (!apiReady) return;
     const api = apiRef.current;
-    const shell = shellRef.current;
+    const shell = poolShellRef.current;
     if (!api || !shell) return;
 
-    // createController replaces the host node — use a fresh child each time.
-    shell.replaceChildren();
-    const host = document.createElement("div");
-    shell.appendChild(host);
-    creatingRef.current = true;
+    for (const trackUri of wantedUris) {
+      if (poolRef.current.has(trackUri) || creatingRef.current.has(trackUri)) {
+        continue;
+      }
 
-    let cancelled = false;
-    api.createController(
-      host,
-      { uri, width: "100%", height: 80 },
-      (controller) => {
-        creatingRef.current = false;
-        if (cancelled) {
-          controller.destroy();
-          return;
-        }
-        controllerRef.current = controller;
-        setControllerReady(true);
-        if (enabledRef.current) controller.play();
-      },
-    );
+      // Stable wrapper — createController replaces its target node with an iframe.
+      const mount = document.createElement("div");
+      mount.dataset.spotifyUri = trackUri;
+      mount.className =
+        "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
+      const target = document.createElement("div");
+      mount.appendChild(target);
+      shell.appendChild(mount);
+      creatingRef.current.add(trackUri);
 
-    return () => {
-      cancelled = true;
-      if (!controllerRef.current) creatingRef.current = false;
-    };
-  }, [apiReady, uri]);
+      api.createController(
+        target,
+        { uri: trackUri, width: "100%", height: 80 },
+        (controller) => {
+          creatingRef.current.delete(trackUri);
+          if (!poolShellRef.current?.contains(mount)) {
+            controller.destroy();
+            return;
+          }
+
+          const entry: PoolEntry = {
+            uri: trackUri,
+            controller,
+            host: mount,
+            ready: false,
+          };
+          poolRef.current.set(trackUri, entry);
+
+          const markReady = () => {
+            if (entry.ready) return;
+            entry.ready = true;
+            setPoolTick((n) => n + 1);
+            syncPlayback(
+              poolRef,
+              playingUriRef,
+              activeUriRef.current,
+              enabledRef.current,
+              setVisibleUri,
+            );
+          };
+
+          controller.addListener("ready", markReady);
+          // Some embeds are slow/noisy with `ready`; don't block forever.
+          window.setTimeout(markReady, 2000);
+
+          // Preview samples (~30s) end mid-deck; loop while this URI is still the act.
+          // Some embeds pause at duration; others snap position back to 0.
+          let lastPlayingPosition = 0;
+          controller.addListener("playback_update", (raw) => {
+            const event = raw as PlaybackUpdateEvent;
+            const { isPaused, duration = 0, position = 0 } = event.data ?? {};
+            if (!isPaused) {
+              lastPlayingPosition = position;
+              return;
+            }
+            if (!enabledRef.current) return;
+            if (activeUriRef.current !== trackUri) return;
+            if (playingUriRef.current !== trackUri) return;
+            if (duration <= 0) return;
+            const pausedAtEnd = position >= duration - END_RESTART_MS;
+            const resetAfterEnd =
+              lastPlayingPosition >= duration - END_RESTART_MS &&
+              position <= END_RESTART_MS;
+            if (!pausedAtEnd && !resetAfterEnd) return;
+            lastPlayingPosition = 0;
+            controller.restart();
+          });
+
+          setPoolTick((n) => n + 1);
+          syncPlayback(
+            poolRef,
+            playingUriRef,
+            activeUriRef.current,
+            enabledRef.current,
+            setVisibleUri,
+          );
+        },
+      );
+    }
+  }, [apiReady, wantedUris]);
 
   useEffect(() => {
-    const controller = controllerRef.current;
-    if (!controller || !controllerReady || !enabled) return;
-    if (!uri) {
-      controller.pause();
-      return;
-    }
-    controller.loadUri(uri);
-    controller.play();
-  }, [uri, enabled, controllerReady]);
+    syncPlayback(
+      poolRef,
+      playingUriRef,
+      uri,
+      enabled,
+      setVisibleUri,
+    );
+  }, [uri, enabled, poolTick]);
 
   function turnOn() {
     setEnabled(true);
-    const controller = controllerRef.current;
-    if (!controller || !uri) return;
-    controller.loadUri(uri);
-    controller.play();
+    syncPlayback(poolRef, playingUriRef, uri, true, setVisibleUri);
   }
 
   function turnOff() {
     setEnabled(false);
-    controllerRef.current?.pause();
+    playingUriRef.current = null;
+    for (const entry of poolRef.current.values()) {
+      entry.controller.pause();
+      entry.host.className =
+        "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
+    }
+    setVisibleUri(null);
   }
 
-  const canEnable = controllerReady && uri != null;
+  const canEnable = apiReady && uri != null && wantedUris.length > 0;
+  const activeReady = uri ? poolRef.current.get(uri)?.ready === true : false;
 
   return (
     <div
@@ -211,36 +353,41 @@ export function DeckSoundtrack({ uri, className }: Props) {
         className,
       )}
     >
-      <div className="pointer-events-auto">
-        {enabled ? (
-          <button
-            type="button"
-            onClick={turnOff}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs text-foreground backdrop-blur-sm transition-colors duration-[var(--duration-fast)] hover:border-ring"
-            aria-label="Mute soundtrack"
-          >
-            <Icon icon={volumeHighOutline} className="h-3.5 w-3.5 text-warn" />
-            Mute
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={turnOn}
-            disabled={!canEnable}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs text-foreground backdrop-blur-sm transition-colors duration-[var(--duration-fast)] hover:border-ring disabled:opacity-40"
-            aria-label="Enable soundtrack"
-          >
-            <Icon icon={volumeMuteOutline} className="h-3.5 w-3.5" />
-            Sound on
-          </button>
-        )}
-      </div>
+      {showToggle ? (
+        <div className="pointer-events-auto">
+          {enabled ? (
+            <button
+              type="button"
+              onClick={turnOff}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs text-foreground backdrop-blur-sm transition-colors duration-[var(--duration-fast)] hover:border-ring"
+              aria-label="Mute soundtrack"
+            >
+              <Icon icon={volumeHighOutline} className="h-3.5 w-3.5 text-warn" />
+              Mute
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={turnOn}
+              disabled={!canEnable}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs text-foreground backdrop-blur-sm transition-colors duration-[var(--duration-fast)] hover:border-ring disabled:opacity-40"
+              aria-label="Enable soundtrack"
+            >
+              <Icon icon={volumeMuteOutline} className="h-3.5 w-3.5" />
+              Sound on
+              {uri && !activeReady ? (
+                <span className="text-muted-foreground">…</span>
+              ) : null}
+            </button>
+          )}
+        </div>
+      ) : null}
 
       <div
-        ref={shellRef}
+        ref={poolShellRef}
         className={cn(
-          "pointer-events-auto w-full overflow-hidden rounded-md transition-[opacity,transform] duration-[var(--duration-move)] ease-[var(--ease-out)]",
-          enabled
+          "pointer-events-auto relative h-20 w-full overflow-hidden rounded-md transition-[opacity,transform] duration-[var(--duration-move)] ease-[var(--ease-out)]",
+          enabled && visibleUri
             ? "translate-y-0 opacity-100"
             : "pointer-events-none absolute h-20 w-full -translate-y-1 opacity-0",
         )}
@@ -248,4 +395,81 @@ export function DeckSoundtrack({ uri, className }: Props) {
       />
     </div>
   );
+}
+
+/**
+ * Play the active URI if its controller is ready; otherwise keep the previous
+ * track going so slide changes don't open a silent gap.
+ */
+function syncPlayback(
+  poolRef: MutableRefObject<Map<string, PoolEntry>>,
+  playingUriRef: MutableRefObject<string | null>,
+  activeUri: string | null,
+  enabled: boolean,
+  setVisibleUri: (uri: string | null) => void,
+) {
+  const pool = poolRef.current;
+
+  if (!enabled) {
+    for (const entry of pool.values()) {
+      entry.controller.pause();
+      entry.host.className =
+        "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
+    }
+    playingUriRef.current = null;
+    setVisibleUri(null);
+    return;
+  }
+
+  if (!activeUri) {
+    for (const entry of pool.values()) {
+      entry.controller.pause();
+      entry.host.className =
+        "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
+    }
+    playingUriRef.current = null;
+    setVisibleUri(null);
+    return;
+  }
+
+  const next = pool.get(activeUri);
+  if (!next) {
+    // New act URI still mounting — keep current audio; warm effect + poolTick
+    // will re-enter syncPlayback once the controller exists.
+    return;
+  }
+
+  if (!next.ready) {
+    // Keep whatever is already playing until the target embed is warm.
+    const playing = playingUriRef.current
+      ? pool.get(playingUriRef.current)
+      : null;
+    if (playing && playing.uri !== activeUri) {
+      setVisibleUri(playing.uri);
+      playing.host.className =
+        "absolute inset-0 w-full overflow-hidden opacity-100 pointer-events-auto";
+      return;
+    }
+    // First start (or same URI still warming): try play anyway.
+  }
+
+  if (playingUriRef.current === activeUri) {
+    setVisibleUri(activeUri);
+    next.host.className =
+      "absolute inset-0 w-full overflow-hidden opacity-100 pointer-events-auto";
+    return;
+  }
+
+  for (const entry of pool.values()) {
+    if (entry.uri === activeUri) continue;
+    entry.controller.pause();
+    entry.host.className =
+      "absolute inset-0 w-full overflow-hidden opacity-0 pointer-events-none";
+  }
+
+  next.host.className =
+    "absolute inset-0 w-full overflow-hidden opacity-100 pointer-events-auto";
+  next.controller.play();
+  playingUriRef.current = activeUri;
+  setVisibleUri(activeUri);
 }

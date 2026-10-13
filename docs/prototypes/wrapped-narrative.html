@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spotify Wrapped — Narrative Prototype (2023–2025)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --panel: #121216;
+      --ink: #f4f4f0;
+      --muted: #8a8a92;
+      --line: #2a2a32;
+      --phone-w: 320px;
+      --phone-h: 640px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Bricolage Grotesque", system-ui, sans-serif;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, #1a1a24 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 90% 80%, #14181a 0%, transparent 50%),
+        var(--bg);
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) 1fr;
+      gap: 0;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .brand span {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .note {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .years { display: flex; flex-direction: column; gap: 8px; }
+
+    .years button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      padding: 14px 14px 12px;
+      cursor: pointer;
+      font: inherit;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    .years button:hover { border-color: #555; }
+
+    .years button[aria-selected="true"] {
+      border-color: var(--year-accent, #1ed760);
+      background: color-mix(in srgb, var(--year-accent, #1ed760) 12%, transparent);
+    }
+
+    .years .y {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+    }
+
+    .years .t {
+      display: block;
+      margin-top: 2px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .beat-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-height: 42vh;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .beat-list button {
+      appearance: none;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.78rem;
+      text-align: left;
+      padding: 7px 8px;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      border-left: 2px solid transparent;
+    }
+
+    .beat-list button:hover { color: var(--ink); }
+
+    .beat-list button[aria-current="true"] {
+      color: var(--ink);
+      border-left-color: var(--year-accent, #1ed760);
+      background: color-mix(in srgb, var(--year-accent, #1ed760) 8%, transparent);
+    }
+
+    .beat-list .n {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem;
+      opacity: 0.7;
+      padding-top: 2px;
+    }
+
+    main {
+      display: grid;
+      place-items: center;
+      padding: 32px 24px 48px;
+      position: relative;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 36px;
+      border: 1px solid #3a3a44;
+      background: #000;
+      box-shadow:
+        0 0 0 8px #16161c,
+        0 40px 80px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 22px;
+      background: #0a0a0c;
+      border-radius: 14px;
+      z-index: 5;
+    }
+
+    .progress {
+      position: absolute;
+      top: 40px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      gap: 3px;
+      z-index: 4;
+    }
+
+    .progress i {
+      flex: 1;
+      height: 2.5px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress i::after {
+      content: "";
+      display: block;
+      height: 100%;
+      width: 0;
+      background: #fff;
+      transition: width 220ms ease;
+    }
+
+    .progress i.done::after { width: 100%; }
+    .progress i.active::after { width: 55%; }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      padding: 72px 22px 28px;
+      display: none;
+      flex-direction: column;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .screen.active { display: flex; }
+
+    .setup {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 12px;
+      max-width: 26ch;
+      line-height: 1.4;
+    }
+
+    .reveal {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.045em;
+      line-height: 0.95;
+    }
+
+    .reveal.xl { font-size: clamp(2.8rem, 14vw, 4.2rem); }
+    .reveal.lg { font-size: 2.15rem; }
+    .reveal.md { font-size: 1.55rem; }
+
+    .micro {
+      margin-top: 14px;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      opacity: 0.88;
+      max-width: 28ch;
+    }
+
+    .list {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list li {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .list .rank {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      opacity: 0.65;
+    }
+
+    .share-chip {
+      margin-top: auto;
+      align-self: flex-start;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .controls button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.85rem;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    .controls button:hover { border-color: #666; }
+
+    .controls .hint {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .caption {
+      max-width: 360px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .caption strong {
+      color: #c8c8d0;
+      font-weight: 600;
+    }
+
+    /* —— Year themes —— */
+    [data-year="2023"] {
+      --year-accent: #c8ff2e;
+      --y1: #1a1030;
+      --y2: #ff4d8d;
+      --y3: #7c5cff;
+      --y4: #2ee6a8;
+    }
+
+    [data-year="2024"] {
+      --year-accent: #ff6b2c;
+      --y1: #0d1f3c;
+      --y2: #ffd60a;
+      --y3: #00e5ff;
+      --y4: #ff3d81;
+    }
+
+    [data-year="2025"] {
+      --year-accent: #b8f25a;
+      --y1: #101418;
+      --y2: #5eead4;
+      --y3: #f472b6;
+      --y4: #a78bfa;
+    }
+
+    /* screen skins */
+    .skin-open-23 {
+      background:
+        linear-gradient(160deg, #1a1030 0%, #3a1860 45%, #ff4d8d 100%);
+    }
+    .skin-open-23 .reveal { color: #c8ff2e; }
+
+    .skin-vol-23 {
+      background: #c8ff2e;
+      color: #121018;
+    }
+    .skin-vol-23 .setup,
+    .skin-vol-23 .micro,
+    .skin-vol-23 .share-chip { color: #121018; opacity: 0.8; border-color: rgba(0,0,0,0.35); }
+
+    .skin-song-23 {
+      background:
+        radial-gradient(circle at 80% 20%, #ff4d8d 0%, transparent 40%),
+        #1a1030;
+    }
+
+    .skin-list-23 {
+      background: #7c5cff;
+      color: #fff;
+    }
+
+    .skin-artist-23 {
+      background: #2ee6a8;
+      color: #0a1a14;
+    }
+    .skin-artist-23 .setup,
+    .skin-artist-23 .micro { color: #0a1a14; opacity: 0.75; }
+    .skin-artist-23 .share-chip { border-color: rgba(0,0,0,0.3); color: #0a1a14; }
+
+    .skin-genre-23 {
+      background: #fff4d6;
+      color: #1a1030;
+    }
+    .skin-genre-23 .setup { color: #1a1030; }
+    .skin-genre-23 .sandwich {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .skin-genre-23 .layer {
+      padding: 12px 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 1.05rem;
+    }
+    .skin-genre-23 .layer:nth-child(1) { background: #ff4d8d; color: #fff; transform: rotate(-1.5deg); }
+    .skin-genre-23 .layer:nth-child(2) { background: #1a1030; color: #c8ff2e; transform: rotate(1deg); }
+    .skin-genre-23 .layer:nth-child(3) { background: #7c5cff; color: #fff; transform: rotate(-0.5deg); }
+
+    .skin-town-23 {
+      background:
+        linear-gradient(180deg, #0e2a4a 0%, #1a1030 100%);
+    }
+    .skin-town-23 .map-dot {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 24px 0 8px;
+      background: radial-gradient(circle at 35% 35%, #c8ff2e, #2ee6a8 55%, #1a1030 70%);
+      box-shadow: 0 0 0 8px rgba(200, 255, 46, 0.15);
+    }
+
+    .skin-me-23 {
+      background: #121018;
+      perspective: 800px;
+    }
+    .flip-card {
+      margin-top: 28px;
+      width: 100%;
+      height: 220px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      cursor: pointer;
+    }
+    .flip-card.flipped { transform: rotateY(180deg); }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border: 2px solid #c8ff2e;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      text-align: center;
+    }
+    .flip-face.back {
+      transform: rotateY(180deg);
+      background: #c8ff2e;
+      color: #121018;
+      border-color: #c8ff2e;
+    }
+    .flip-face.front { background: #1a1030; }
+    .flip-face .who {
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      letter-spacing: -0.04em;
+    }
+
+    .skin-share-23 {
+      background:
+        linear-gradient(135deg, #1a1030, #7c5cff 60%, #ff4d8d);
+    }
+    .collage {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      flex: 1;
+    }
+    .collage div {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 88px;
+    }
+    .collage span {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem;
+      opacity: 0.7;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* 2024 */
+    .skin-open-24 {
+      background: #0d1f3c;
+      background-image:
+        repeating-linear-gradient(
+          -12deg,
+          transparent,
+          transparent 18px,
+          rgba(255, 214, 10, 0.08) 18px,
+          rgba(255, 214, 10, 0.08) 19px
+        );
+    }
+    .skin-open-24 .reveal { color: #ffd60a; }
+
+    .skin-vol-24 {
+      background: #ff6b2c;
+      color: #140a06;
+    }
+    .skin-vol-24 .setup,
+    .skin-vol-24 .micro { color: #140a06; opacity: 0.8; }
+    .skin-vol-24 .share-chip { border-color: rgba(0,0,0,0.3); color: #140a06; }
+
+    .skin-song-24 {
+      background: #00e5ff;
+      color: #041418;
+    }
+    .skin-song-24 .setup,
+    .skin-song-24 .micro { color: #041418; opacity: 0.75; }
+    .skin-song-24 .share-chip { border-color: rgba(0,0,0,0.3); color: #041418; }
+
+    .skin-list-24 {
+      background: #0d1f3c;
+      color: #ffd60a;
+    }
+    .skin-list-24 .list li { color: #fff; }
+    .skin-list-24 .rank { color: #ffd60a; opacity: 1; }
+
+    .skin-artist-24 {
+      background: #ff3d81;
+      color: #fff;
+    }
+
+    .skin-evo-24 {
+      background: #140a06;
+    }
+    .phases {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .phase {
+      border-left: 4px solid var(--p, #ffd60a);
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.06);
+    }
+    .phase .name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .phase .meta {
+      margin-top: 4px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.65;
+    }
+
+    .skin-streak-24 {
+      background: #ffd60a;
+      color: #140a06;
+    }
+    .skin-streak-24 .setup,
+    .skin-streak-24 .micro { color: #140a06; opacity: 0.75; }
+    .skin-streak-24 .share-chip { border-color: rgba(0,0,0,0.3); color: #140a06; }
+
+    .skin-ai-24 {
+      background:
+        radial-gradient(ellipse at 50% 0%, #00e5ff33, transparent 55%),
+        #0d1f3c;
+    }
+    .waveform {
+      margin: 28px 0 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 56px;
+    }
+    .waveform i {
+      flex: 1;
+      background: #00e5ff;
+      border-radius: 1px;
+      animation: wave 1.2s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 60ms);
+      height: calc(20% + var(--h) * 1%);
+    }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.55); opacity: 0.7; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .skin-share-24 {
+      background: linear-gradient(160deg, #0d1f3c, #ff6b2c 70%, #ffd60a);
+      color: #fff;
+    }
+
+    /* 2025 */
+    .skin-open-25 {
+      background: #101418;
+      background-image:
+        radial-gradient(circle at 20% 30%, #5eead433 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, #f472b633 0%, transparent 40%);
+    }
+    .skin-open-25 .reveal { color: #b8f25a; }
+
+    .skin-quiz-25 {
+      background: #5eead4;
+      color: #0a1412;
+    }
+    .skin-quiz-25 .setup,
+    .skin-quiz-25 .micro { color: #0a1412; opacity: 0.75; }
+    .quiz-opts {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quiz-opts button {
+      appearance: none;
+      border: 2px solid #0a1412;
+      background: transparent;
+      color: #0a1412;
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 14px;
+      cursor: pointer;
+      letter-spacing: -0.02em;
+    }
+    .quiz-opts button.picked {
+      background: #0a1412;
+      color: #5eead4;
+    }
+
+    .skin-vol-25 {
+      background: #b8f25a;
+      color: #101418;
+    }
+    .skin-vol-25 .setup,
+    .skin-vol-25 .micro { color: #101418; opacity: 0.75; }
+    .skin-vol-25 .share-chip { border-color: rgba(0,0,0,0.3); color: #101418; }
+
+    .skin-song-25 {
+      background: #f472b6;
+      color: #1a0a12;
+    }
+    .skin-song-25 .setup,
+    .skin-song-25 .micro { color: #1a0a12; opacity: 0.8; }
+    .skin-song-25 .share-chip { border-color: rgba(0,0,0,0.3); color: #1a0a12; }
+
+    .skin-list-25 {
+      background: #101418;
+      color: #fff;
+    }
+    .skin-list-25 .rank { color: #b8f25a; opacity: 1; }
+
+    .skin-artist-25 {
+      background: #a78bfa;
+      color: #120a1a;
+    }
+    .skin-artist-25 .setup,
+    .skin-artist-25 .micro { color: #120a1a; opacity: 0.75; }
+    .skin-artist-25 .share-chip { border-color: rgba(0,0,0,0.3); color: #120a1a; }
+
+    .skin-age-25 {
+      background: #101418;
+      color: #5eead4;
+    }
+    .skin-age-25 .reveal { font-size: 5.5rem; }
+
+    .skin-sprint-25 {
+      background: #1a1020;
+    }
+    .sprint-track {
+      margin-top: 28px;
+      height: 8px;
+      background: rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .sprint-track::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 72%;
+      background: #b8f25a;
+      animation: sprint 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes sprint {
+      from { width: 18%; }
+      to { width: 88%; }
+    }
+
+    .skin-club-25 {
+      background:
+        linear-gradient(145deg, #101418 0%, #2a1838 50%, #f472b6 140%);
+    }
+    .badge {
+      margin-top: 24px;
+      width: 140px;
+      height: 140px;
+      border: 3px solid #b8f25a;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 12px;
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: #b8f25a;
+      transform: rotate(-6deg);
+    }
+
+    .skin-share-25 {
+      background: linear-gradient(180deg, #101418, #5eead4 120%);
+      color: #fff;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 860px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .beat-list { max-height: 160px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .waveform i,
+      .sprint-track::after,
+      .flip-card { animation: none; transition: none; }
+    }
+  </style>
+</head>
+<body data-year="2023">
+  <aside>
+    <div>
+      <div class="brand">
+        Wrapped Narrative
+        <span>Official beat spine · prototype</span>
+      </div>
+      <p class="note" style="margin-top: 14px">
+        Visual walkthrough of Spotify Wrapped story screens for each year (2023–2025).
+        Sample data only — mirrors the beat grammar in <code>docs/WRAPPED.md</code>.
+      </p>
+    </div>
+
+    <div class="years" role="tablist" aria-label="Wrapped year">
+      <button type="button" data-pick="2023" aria-selected="true">
+        <span class="y">2023</span>
+        <span class="t">Identity + place</span>
+      </button>
+      <button type="button" data-pick="2024" aria-selected="false">
+        <span class="y">2024</span>
+        <span class="t">Eras + AI narrators</span>
+      </button>
+      <button type="button" data-pick="2025" aria-selected="false">
+        <span class="y">2025</span>
+        <span class="t">Games + social</span>
+      </button>
+    </div>
+
+    <div>
+      <div class="note" style="margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;">
+        Story beats
+      </div>
+      <ul class="beat-list" id="beatList"></ul>
+    </div>
+  </aside>
+
+  <main>
+    <div class="stage">
+      <div class="phone" id="phone" aria-live="polite">
+        <div class="notch" aria-hidden="true"></div>
+        <div class="progress" id="progress" aria-hidden="true"></div>
+        <div id="screens"></div>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="prev">← Prev</button>
+        <button type="button" id="next">Next →</button>
+        <span class="hint">Tap edges · ← → · Space</span>
+      </div>
+      <p class="caption" id="caption"></p>
+    </div>
+  </main>
+
+  <script>
+    const YEARS = {
+      2023: {
+        theme: "Identity + place",
+        caption: "Genre sandwich, Sound Town, and Me in 2023 flip cards after the classic stats spine.",
+        slides: [
+          {
+            id: "open",
+            title: "Brand open",
+            job: "Ritual start",
+            skin: "skin-open-23",
+            html: `
+              <p class="setup">Your year on Spotify</p>
+              <h1 class="reveal xl">Wrapped<br/>2023</h1>
+              <p class="micro">One idea per card. Tap to step through the story.</p>
+              <span class="share-chip">Start</span>
+            `,
+          },
+          {
+            id: "minutes",
+            title: "Volume",
+            job: "Scale of the year",
+            skin: "skin-vol-23",
+            html: `
+              <p class="setup">You listened for</p>
+              <h1 class="reveal xl">48,291</h1>
+              <p class="micro">minutes — enough to fill a small airport layover calendar.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-song",
+            title: "#1 song",
+            job: "Single iconic answer",
+            skin: "skin-song-23",
+            html: `
+              <p class="setup">Your top song</p>
+              <h1 class="reveal lg">Midnight<br/>Oil</h1>
+              <p class="micro">Played 186 times. The one that defined the loop.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-songs",
+            title: "Top 5 songs",
+            job: "Social comparison fuel",
+            skin: "skin-list-23",
+            html: `
+              <p class="setup">Your top songs</p>
+              <h1 class="reveal md">The shortlist</h1>
+              <ol class="list">
+                <li><span class="rank">01</span> Midnight Oil</li>
+                <li><span class="rank">02</span> Neon Harbor</li>
+                <li><span class="rank">03</span> Soft Static</li>
+                <li><span class="rank">04</span> Late Reply</li>
+                <li><span class="rank">05</span> Glass Hour</li>
+              </ol>
+            `,
+          },
+          {
+            id: "top-artist",
+            title: "#1 artist",
+            job: "Loyalty / identity",
+            skin: "skin-artist-23",
+            html: `
+              <p class="setup">Your top artist</p>
+              <h1 class="reveal xl">Luna<br/>Vex</h1>
+              <p class="micro">2,410 minutes. They owned the queue.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-artists",
+            title: "Top 5 artists",
+            job: "Broader taste map",
+            skin: "skin-list-23",
+            html: `
+              <p class="setup">Your top artists</p>
+              <ol class="list" style="margin-top:28px">
+                <li><span class="rank">01</span> Luna Vex</li>
+                <li><span class="rank">02</span> Soft Circuit</li>
+                <li><span class="rank">03</span> Mira K.</li>
+                <li><span class="rank">04</span> The Afterhours</li>
+                <li><span class="rank">05</span> Pale Atlas</li>
+              </ol>
+            `,
+          },
+          {
+            id: "genres",
+            title: "Genre sandwich",
+            job: "Texture / taste stack",
+            skin: "skin-genre-23",
+            html: `
+              <p class="setup">Your genre sandwich</p>
+              <h1 class="reveal md">Stacked taste</h1>
+              <div class="sandwich">
+                <div class="layer">Hyperpop glaze</div>
+                <div class="layer">Indie R&amp;B core</div>
+                <div class="layer">Ambient base</div>
+              </div>
+            `,
+          },
+          {
+            id: "sound-town",
+            title: "Sound Town",
+            job: "Place / belonging",
+            skin: "skin-town-23",
+            html: `
+              <p class="setup">Your Sound Town</p>
+              <div class="map-dot" aria-hidden="true"></div>
+              <h1 class="reveal lg">Echo Park<br/>Drift</h1>
+              <p class="micro">A fictional neighborhood for listeners who live in late-night synth.</p>
+              <span class="tag">2023 · place beat</span>
+            `,
+          },
+          {
+            id: "me",
+            title: "Me in 2023",
+            job: "Shareable identity label",
+            skin: "skin-me-23",
+            html: `
+              <p class="setup">Me in 2023 · tap to flip</p>
+              <div class="flip-card" data-flip>
+                <div class="flip-face front">
+                  <div>
+                    <p class="setup" style="opacity:1">Who were you?</p>
+                    <p class="who">?</p>
+                  </div>
+                </div>
+                <div class="flip-face back">
+                  <div>
+                    <p class="setup" style="opacity:0.7;color:#121018">You were the</p>
+                    <p class="who">Time<br/>Traveler</p>
+                  </div>
+                </div>
+              </div>
+              <p class="micro" style="margin-top:auto">Flip earns the reveal — one playful label after the hard stats.</p>
+            `,
+          },
+          {
+            id: "share",
+            title: "Share finale",
+            job: "Portable summary",
+            skin: "skin-share-23",
+            html: `
+              <p class="setup">Your 2023 Wrapped</p>
+              <h1 class="reveal md">The year,<br/>compressed</h1>
+              <div class="collage">
+                <div><span>Minutes</span>48,291</div>
+                <div><span>Top song</span>Midnight Oil</div>
+                <div><span>Top artist</span>Luna Vex</div>
+                <div><span>Me in 2023</span>Time Traveler</div>
+              </div>
+              <span class="share-chip">Share Wrapped</span>
+            `,
+          },
+        ],
+      },
+      2024: {
+        theme: "Eras + AI narrators",
+        caption: "Music Evolution phases and AI podcast sit after artist lists — time as a second axis.",
+        slides: [
+          {
+            id: "open",
+            title: "Brand open",
+            job: "Ritual start",
+            skin: "skin-open-24",
+            html: `
+              <p class="setup">Another trip around the sun</p>
+              <h1 class="reveal xl">Wrapped<br/>2024</h1>
+              <p class="micro">You weren’t one taste all year. The story will prove it.</p>
+            `,
+          },
+          {
+            id: "minutes",
+            title: "Volume",
+            job: "Scale of the year",
+            skin: "skin-vol-24",
+            html: `
+              <p class="setup">Total listening</p>
+              <h1 class="reveal xl">52,040</h1>
+              <p class="micro">minutes. The volume beat still lands first.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-song",
+            title: "#1 song",
+            job: "Single iconic answer",
+            skin: "skin-song-24",
+            html: `
+              <p class="setup">Your top song</p>
+              <h1 class="reveal lg">Roller<br/>Season</h1>
+              <p class="micro">214 plays. Summer’s sticky chorus.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-songs",
+            title: "Top 5 songs",
+            job: "Social comparison fuel",
+            skin: "skin-list-24",
+            html: `
+              <p class="setup">Top songs</p>
+              <ol class="list">
+                <li><span class="rank">01</span> Roller Season</li>
+                <li><span class="rank">02</span> Library Soft</li>
+                <li><span class="rank">03</span> Catwalk Rain</li>
+                <li><span class="rank">04</span> Desk Lamp</li>
+                <li><span class="rank">05</span> Exit Ramp</li>
+              </ol>
+            `,
+          },
+          {
+            id: "top-artist",
+            title: "#1 artist",
+            job: "Loyalty / identity",
+            skin: "skin-artist-24",
+            html: `
+              <p class="setup">Your top artist</p>
+              <h1 class="reveal xl">Hallyu<br/>North</h1>
+              <p class="micro">They led the year — and the streak story next.</p>
+            `,
+          },
+          {
+            id: "streak",
+            title: "Top-listener streak",
+            job: "Loyalty micro-stat",
+            skin: "skin-streak-24",
+            html: `
+              <p class="setup">Among listeners of Hallyu North</p>
+              <h1 class="reveal xl">Top<br/>0.5%</h1>
+              <p class="micro">Fan leaderboard energy without leaving the artist beat.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "evolution",
+            title: "Music Evolution",
+            job: "Time arcs / phases",
+            skin: "skin-evo-24",
+            html: `
+              <p class="setup">Your Music Evolution</p>
+              <h1 class="reveal md">Three eras</h1>
+              <div class="phases">
+                <div class="phase" style="--p:#ffd60a">
+                  <div class="name">Light Academia Soft Piano Classical</div>
+                  <div class="meta">Jan – Mar · focus hours</div>
+                </div>
+                <div class="phase" style="--p:#00e5ff">
+                  <div class="name">Roller Skating Pop</div>
+                  <div class="meta">Apr – Aug · outdoor volume</div>
+                </div>
+                <div class="phase" style="--p:#ff3d81">
+                  <div class="name">Hallyu Catwalk K-pop</div>
+                  <div class="meta">Sep – Nov · main character</div>
+                </div>
+              </div>
+            `,
+          },
+          {
+            id: "ai",
+            title: "AI podcast",
+            job: "Narrated year (AI)",
+            skin: "skin-ai-24",
+            html: `
+              <p class="setup">Your AI Wrapped podcast</p>
+              <div class="waveform" aria-hidden="true">
+                ${Array.from({ length: 18 }, (_, i) =>
+                  `<i style="--i:${i};--h:${20 + ((i * 37) % 70)}"></i>`
+                ).join("")}
+              </div>
+              <h1 class="reveal md">A voice for<br/>your year</h1>
+              <p class="micro">NotebookLM-style narration — optional extras after the spine.</p>
+              <span class="tag">2024 · AI narrator beat</span>
+            `,
+          },
+          {
+            id: "share",
+            title: "Share finale",
+            job: "Portable summary",
+            skin: "skin-share-24",
+            html: `
+              <p class="setup">Your 2024 Wrapped</p>
+              <h1 class="reveal md">Eras,<br/>exported</h1>
+              <div class="collage">
+                <div><span>Minutes</span>52,040</div>
+                <div><span>Top song</span>Roller Season</div>
+                <div><span>Top artist</span>Hallyu North</div>
+                <div><span>Era 3</span>Hallyu Catwalk</div>
+              </div>
+              <span class="share-chip">Share Wrapped</span>
+            `,
+          },
+        ],
+      },
+      2025: {
+        theme: "Games + social",
+        caption: "Quiz before #1, then Clubs / roles. Party-style social stays post-story (hub), not mid-deck.",
+        slides: [
+          {
+            id: "open",
+            title: "Brand open",
+            job: "Ritual start",
+            skin: "skin-open-25",
+            html: `
+              <p class="setup">Ready when you are</p>
+              <h1 class="reveal xl">Wrapped<br/>2025</h1>
+              <p class="micro">Games first. Then the receipts. Then the club.</p>
+              <span class="tag">Speed + jump controls live in the hub</span>
+            `,
+          },
+          {
+            id: "quiz",
+            title: "Top Song Quiz",
+            job: "Interactive reveal before #1",
+            skin: "skin-quiz-25",
+            html: `
+              <p class="setup">Guess your top song</p>
+              <h1 class="reveal md">Which one<br/>won?</h1>
+              <div class="quiz-opts">
+                <button type="button" data-opt>Glass Hour</button>
+                <button type="button" data-opt data-correct>Voltage Soft</button>
+                <button type="button" data-opt>Desk Lamp</button>
+              </div>
+              <p class="micro" id="quizHint">One tap. Interaction heightens the #1 beat.</p>
+            `,
+          },
+          {
+            id: "minutes",
+            title: "Volume",
+            job: "Scale of the year",
+            skin: "skin-vol-25",
+            html: `
+              <p class="setup">You logged</p>
+              <h1 class="reveal xl">61,118</h1>
+              <p class="micro">minutes. The classic volume beat still follows the quiz.</p>
+            `,
+          },
+          {
+            id: "top-song",
+            title: "#1 song",
+            job: "Payoff after quiz",
+            skin: "skin-song-25",
+            html: `
+              <p class="setup">Your top song</p>
+              <h1 class="reveal lg">Voltage<br/>Soft</h1>
+              <p class="micro">241 plays. The quiz answer, revealed.</p>
+              <span class="share-chip">Share this story</span>
+            `,
+          },
+          {
+            id: "top-songs",
+            title: "Top 5 songs",
+            job: "Social comparison fuel",
+            skin: "skin-list-25",
+            html: `
+              <p class="setup">Top songs</p>
+              <ol class="list">
+                <li><span class="rank">01</span> Voltage Soft</li>
+                <li><span class="rank">02</span> Glass Hour</li>
+                <li><span class="rank">03</span> Cloud State</li>
+                <li><span class="rank">04</span> Full Charge</li>
+                <li><span class="rank">05</span> Soft Hearts</li>
+              </ol>
+            `,
+          },
+          {
+            id: "top-artist",
+            title: "#1 artist",
+            job: "Loyalty / identity",
+            skin: "skin-artist-25",
+            html: `
+              <p class="setup">Your top artist</p>
+              <h1 class="reveal xl">Serotonin<br/>Club</h1>
+              <p class="micro">Artist Sprint and Fan Leaderboard can hang off this beat.</p>
+            `,
+          },
+          {
+            id: "age",
+            title: "Listening Age",
+            job: "Personality micro-stat",
+            skin: "skin-age-25",
+            html: `
+              <p class="setup">Your listening age</p>
+              <h1 class="reveal">27</h1>
+              <p class="micro" style="color:#fff;opacity:0.8">Taste scored younger / older than your birth year — one number, one job.</p>
+            `,
+          },
+          {
+            id: "sprint",
+            title: "Artist Sprint",
+            job: "Time arc / burst loyalty",
+            skin: "skin-sprint-25",
+            html: `
+              <p class="setup">Artist Sprint</p>
+              <h1 class="reveal md">14-day<br/>obsession</h1>
+              <div class="sprint-track" aria-hidden="true"></div>
+              <p class="micro">Serotonin Club owned October’s second week.</p>
+              <span class="tag">2025 · time-arc beat</span>
+            `,
+          },
+          {
+            id: "club",
+            title: "Clubs + role",
+            job: "Shareable identity label",
+            skin: "skin-club-25",
+            html: `
+              <p class="setup">You joined</p>
+              <div class="badge">Cloud State<br/>Society</div>
+              <h1 class="reveal md" style="margin-top:20px">Role: Scout</h1>
+              <p class="micro">Club + role lands late — after lists, before the share collage.</p>
+            `,
+          },
+          {
+            id: "share",
+            title: "Share finale",
+            job: "Portable summary",
+            skin: "skin-share-25",
+            html: `
+              <p class="setup">Your 2025 Wrapped</p>
+              <h1 class="reveal md">Party later.<br/>Screenshot now.</h1>
+              <div class="collage">
+                <div><span>Minutes</span>61,118</div>
+                <div><span>Top song</span>Voltage Soft</div>
+                <div><span>Club</span>Cloud State</div>
+                <div><span>Role</span>Scout</div>
+              </div>
+              <span class="share-chip">Share Wrapped</span>
+            `,
+          },
+        ],
+      },
+    };
+
+    let year = "2023";
+    let index = 0;
+
+    const body = document.body;
+    const screensEl = document.getElementById("screens");
+    const progressEl = document.getElementById("progress");
+    const beatList = document.getElementById("beatList");
+    const caption = document.getElementById("caption");
+    const phone = document.getElementById("phone");
+
+    function slides() {
+      return YEARS[year].slides;
+    }
+
+    function render() {
+      body.dataset.year = year;
+      body.style.setProperty("--year-accent", getComputedStyle(body).getPropertyValue("--year-accent"));
+      caption.innerHTML = `<strong>${year} · ${YEARS[year].theme}</strong><br/>${YEARS[year].caption}`;
+
+      const list = slides();
+      screensEl.innerHTML = list
+        .map(
+          (s, i) => `
+          <article class="screen ${s.skin} ${i === index ? "active" : ""}" data-i="${i}">
+            ${s.html}
+          </article>`
+        )
+        .join("");
+
+      progressEl.innerHTML = list.map((_, i) => {
+        const cls = i < index ? "done" : i === index ? "active" : "";
+        return `<i class="${cls}"></i>`;
+      }).join("");
+
+      beatList.innerHTML = list
+        .map(
+          (s, i) => `
+          <li>
+            <button type="button" data-jump="${i}" aria-current="${i === index ? "true" : "false"}">
+              <span class="n">${String(i).padStart(2, "0")}</span>
+              <span>${s.title}<br/><span style="opacity:0.55;font-size:0.7rem">${s.job}</span></span>
+            </button>
+          </li>`
+        )
+        .join("");
+
+      document.querySelectorAll(".years button").forEach((btn) => {
+        btn.setAttribute("aria-selected", btn.dataset.pick === year ? "true" : "false");
+      });
+
+      wireInteractions();
+    }
+
+    function wireInteractions() {
+      const flip = screensEl.querySelector(".flip-card[data-flip]");
+      if (flip) {
+        flip.addEventListener("click", () => flip.classList.toggle("flipped"));
+      }
+
+      screensEl.querySelectorAll("[data-opt]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          screensEl.querySelectorAll("[data-opt]").forEach((b) => b.classList.remove("picked"));
+          btn.classList.add("picked");
+          const hint = document.getElementById("quizHint");
+          if (hint) {
+            hint.textContent = btn.hasAttribute("data-correct")
+              ? "Correct — next card is the #1 payoff."
+              : "Not that one. Try again, or advance for the reveal.";
+          }
+        });
+      });
+    }
+
+    function go(delta) {
+      const list = slides();
+      index = Math.max(0, Math.min(list.length - 1, index + delta));
+      render();
+    }
+
+    function setYear(y) {
+      year = y;
+      index = 0;
+      render();
+    }
+
+    document.querySelectorAll(".years button").forEach((btn) => {
+      btn.addEventListener("click", () => setYear(btn.dataset.pick));
+    });
+
+    document.getElementById("prev").addEventListener("click", () => go(-1));
+    document.getElementById("next").addEventListener("click", () => go(1));
+
+    beatList.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-jump]");
+      if (!btn) return;
+      index = Number(btn.dataset.jump);
+      render();
+    });
+
+    phone.addEventListener("click", (e) => {
+      if (e.target.closest("[data-flip], [data-opt], .share-chip")) return;
+      const rect = phone.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      go(x < rect.width / 2 ? -1 : 1);
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") {
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      } else if (e.key === "1") setYear("2023");
+      else if (e.key === "2") setYear("2024");
+      else if (e.key === "3") setYear("2025");
+    });
+
+    render();
+  </script>
+</body>
+</html>
