@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { fetchAndStoreScrappedApiLab } from "@/lib/load-scrapped-api-lab";
 import { attachApiLabSnapshotCookies } from "@/lib/spotify/api-lab-snapshot";
 
-const ALLOWED_NEXT = new Set(["/scrapped/api", "/scrapped/lab"]);
+const ALLOWED_NEXT = new Set(["/", "/scrapped", "/scrapped/lab"]);
 
 export async function POST(request: Request) {
   const form = await request.formData();
-  const raw = String(form.get("next") ?? "/scrapped/lab");
-  const next = ALLOWED_NEXT.has(raw) ? raw : "/scrapped/lab";
+  const raw = String(form.get("next") ?? "/");
+  const next = ALLOWED_NEXT.has(raw) ? raw : "/";
 
   const result = await fetchAndStoreScrappedApiLab();
 

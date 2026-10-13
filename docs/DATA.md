@@ -74,7 +74,7 @@ There is **no** `itemType` field. Classify by which URI/metadata fields are set.
 | Podcast / episode | `spotify_episode_uri != null` (or episode fields with null track URI) |
 | Audiobook | `audiobook_uri` or `audiobook_chapter_uri` set |
 
-**Audio vs video:** same schema. Older video files are often Canvas-style episodes; newer video files are often short music-video previews (skip-heavy). Prefer analyzing **audio** for Scrapped export features, or merge carefully.
+**Audio vs video:** same schema. Older video files are often Canvas-style episodes; newer video files are often short music-video previews (skip-heavy). Prefer analyzing **audio** for Scrapped Plus export features, or merge carefully.
 
 ---
 
@@ -113,7 +113,7 @@ Video rows are disproportionately skip-flagged (~68%); exclude or separate for m
 
 ---
 
-## 5. Export Scrapped (`/scrapped`)
+## 5. Scrapped Plus (`/scrapped/plus`)
 
 **Goal:** anti-Wrapped story from play-by-play skips for a calendar year (default 2026).
 
@@ -126,7 +126,7 @@ Implemented in `src/lib/scrapped.ts` / `src/lib/load-scrapped.ts`:
 
 Prefer `sum(ms_played)` and skip heuristics over raw play counts. Entity key: `spotify_track_uri`.
 
-**API Lab** (`/scrapped/lab`) does **not** use this export — see [SPOTIFY_API.md](SPOTIFY_API.md).
+**Scrapped** (`/scrapped`) and **Scrapped Lab** (`/scrapped/lab`) do **not** use this export — see [SPOTIFY_API.md](SPOTIFY_API.md).
 
 ---
 
@@ -143,7 +143,7 @@ Prefer `sum(ms_played)` and skip heuristics over raw play counts. Entity key: `s
 
 | Source | What it adds | Needed for |
 |--------|--------------|------------|
-| Spotify **Web API** (OAuth) | Liked Songs, tops, recently played, playlists | Export Liked join + API Lab |
+| Spotify **Web API** (OAuth) | Liked Songs, tops, recently played, playlists | Scrapped + Scrapped Lab + Plus Liked join |
 
 OAuth setup and `spotifyFetch`: **[docs/SPOTIFY_API.md](SPOTIFY_API.md)**.
 
@@ -169,4 +169,4 @@ Neither API surface replaces Extended Streaming History for lifetime play-by-pla
 | `month_artist_stats` | Monthly artist `ms_played` (+ excl-skips) |
 | `month_track_stats` | Monthly track `ms_played` (+ excl-skips) |
 
-`npm run ingest` rewrites the DB and calls `rebuildAggregates`. Export Scrapped primarily queries `plays` for the year window.
+`npm run ingest` rewrites the DB and calls `rebuildAggregates`. Scrapped Plus primarily queries `plays` for the year window.

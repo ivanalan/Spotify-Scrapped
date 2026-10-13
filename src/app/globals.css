@@ -147,6 +147,13 @@
     background: color-mix(in oklab, var(--ring) 35%, transparent);
     color: var(--foreground);
   }
+
+  /* Official ion-icon sizing/color via Tailwind utilities on the host. */
+  ion-icon {
+    display: inline-block;
+    vertical-align: middle;
+    color: inherit;
+  }
 }
 
 @keyframes rise {
@@ -224,4 +231,73 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Scrapped (API story) — conversational light story (docs/mocks) */
+.wrapped-story {
+  --wrapped-canvas: #f4f4f2;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
+  --wrapped-panel: #d9d9d4;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
+  background: var(--wrapped-canvas);
+}
+
+.wrapped-story[data-wrapped-tone="paper"],
+.wrapped-story [data-wrapped-tone="paper"] {
+  --wrapped-canvas: #f4f4f2;
+  --wrapped-panel: #dcdcd6;
+}
+
+.wrapped-story[data-wrapped-tone="cream"],
+.wrapped-story [data-wrapped-tone="cream"] {
+  --wrapped-canvas: #f3eee6;
+  --wrapped-panel: #ddd4c6;
+}
+
+.wrapped-story[data-wrapped-tone="sand"],
+.wrapped-story [data-wrapped-tone="sand"] {
+  --wrapped-canvas: #efe9df;
+  --wrapped-panel: #d8d0c3;
+}
+
+.wrapped-story[data-wrapped-tone="mist"],
+.wrapped-story [data-wrapped-tone="mist"] {
+  --wrapped-canvas: #e9eef2;
+  --wrapped-panel: #cfd8e0;
+}
+
+.wrapped-story[data-wrapped-tone="blush"],
+.wrapped-story [data-wrapped-tone="blush"] {
+  --wrapped-canvas: #f2e9e7;
+  --wrapped-panel: #ddd0cd;
+}
+
+.wrapped-story[data-wrapped-tone="sage"],
+.wrapped-story [data-wrapped-tone="sage"] {
+  --wrapped-canvas: #e8eee9;
+  --wrapped-panel: #cdd8cf;
+}
+
+.wrapped-story[data-wrapped-tone="sky"],
+.wrapped-story [data-wrapped-tone="sky"] {
+  --wrapped-canvas: #e7eef5;
+  --wrapped-panel: #ccd8e4;
+}
+
+.wrapped-story[data-wrapped-tone="slate"],
+.wrapped-story [data-wrapped-tone="slate"] {
+  --wrapped-canvas: #ececec;
+  --wrapped-panel: #d4d4d4;
+}
+
+.wrapped-story .wrapped-progress {
+  background: color-mix(in oklab, var(--wrapped-progress-track) 16%, transparent);
+}
+
+.wrapped-story .wrapped-progress-fill {
+  background: var(--wrapped-progress-fill);
 }

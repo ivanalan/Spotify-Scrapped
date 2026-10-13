@@ -15,6 +15,8 @@ export type ApiMetricItem = {
   sublabel?: string;
   detail: string;
   value: number;
+  /** Album or artist image from Spotify. */
+  imageUrl?: string | null;
 };
 
 export type ApiMetricCard = {
@@ -65,6 +67,8 @@ export type ApiListeningSnapshot = {
   mediumArtists: ApiArtist[];
   longArtists: ApiArtist[];
   liked: SavedTrack[];
+  /** Full Liked Songs library size from Spotify `total` (not the capped page fetch). */
+  likedTotal?: number;
 };
 
 function artistLine(track: ApiTrack): string {
@@ -165,6 +169,7 @@ function trackItem(
     sublabel: artistLine(track),
     detail,
     value,
+    imageUrl: track.imageUrl,
   };
 }
 
@@ -339,12 +344,27 @@ export function buildScrappedApiReport(
       means: "You keep saving them, and Spotify does not currently rank them as artists you play.",
       bar: "Number of liked tracks from that artist. Longer means more saves.",
       source: "Liked Songs + top artists (4 weeks and 6 months)",
-      items: abandonedArtists.slice(0, TOP_N).map((artist) => ({
-        id: artist.id,
-        label: artist.name,
-        detail: `${artist.count} liked tracks`,
-        value: artist.count,
-      })),
+      items: abandonedArtists.slice(0, TOP_N).map((artist) => {
+        const sample = trackByArtist(artist.id, [
+          snap.liked.map((s) => s.track),
+          snap.longTracks,
+          snap.mediumTracks,
+          snap.shortTracks,
+        ]);
+        const profile = [
+          ...snap.longArtists,
+          ...snap.mediumArtists,
+          ...snap.shortArtists,
+        ].find((a) => a.id === artist.id);
+        return {
+          id: artist.id,
+          trackId: sample?.id,
+          label: artist.name,
+          detail: `${artist.count} liked tracks`,
+          value: artist.count,
+          imageUrl: profile?.imageUrl ?? sample?.imageUrl ?? null,
+        };
+      }),
     },
     {
       id: "fallen-artists",
@@ -359,6 +379,7 @@ export function buildScrappedApiReport(
         label: artist.name,
         detail: `6-month #${rank}`,
         value: 51 - rank,
+        imageUrl: artist.imageUrl,
       })),
     },
     {
@@ -382,19 +403,34 @@ export function buildScrappedApiReport(
       bar: "How high they ranked across several years. #1 is the longest bar.",
       source: "Top artists (several years, 6 months, and 4 weeks)",
       items: leftLongArtists.slice(0, TOP_N).map(({ artist, rank }) => {
-        const sample = trackByArtist(artist.id, [
-          leftLongTracks.map(({ track }) => track),
+        // Prefer a song that isn't the #1 left-long track so the artist-act
+        // soundtrack can actually switch when the deck reaches that beat.
+        const leadSongId = leftLongTracks[0]?.track.id;
+        const pools = [
+          snap.liked.map((s) => s.track),
           snap.longTracks,
           snap.mediumTracks,
           snap.shortTracks,
-          snap.liked.map((s) => s.track),
-        ]);
+          leftLongTracks.map(({ track }) => track),
+        ];
+        let sample = trackByArtist(artist.id, pools);
+        if (sample && leadSongId && sample.id === leadSongId) {
+          const alt = pools
+            .flat()
+            .find(
+              (t) =>
+                t.id !== leadSongId &&
+                t.artists.some((a) => a.id === artist.id),
+            );
+          if (alt) sample = alt;
+        }
         return {
           id: artist.id,
           trackId: sample?.id,
           label: artist.name,
           detail: `multi-year #${rank}`,
           value: 51 - rank,
+          imageUrl: artist.imageUrl ?? sample?.imageUrl ?? null,
         };
       }),
     },
@@ -411,6 +447,7 @@ export function buildScrappedApiReport(
         label: artist.name,
         detail: `4-week #${rank} · long, skipped 6 months`,
         value: 51 - rank,
+        imageUrl: artist.imageUrl,
       })),
     },
   ];
@@ -421,7 +458,7 @@ export function buildScrappedApiReport(
     profileName: snap.profileName,
     headlines,
     summary: {
-      likedCount: snap.liked.length,
+      likedCount: snap.likedTotal ?? snap.liked.length,
       shortTrackCount: snap.shortTracks.length,
       mediumTrackCount: snap.mediumTracks.length,
       longTrackCount: snap.longTracks.length,

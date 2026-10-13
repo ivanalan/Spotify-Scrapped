@@ -17,10 +17,18 @@ export type ApiTrack = {
   duration_ms: number;
   artists: ApiArtistRef[];
   album: { name: string } | null;
+  /** Album cover URL (medium when available). */
+  imageUrl: string | null;
   /** Original id when Spotify substituted another release. */
   linkedFromId: string | null;
   /** Recording id shared across album and single releases. */
   isrc: string | null;
+};
+
+type SpotifyImage = {
+  url?: string | null;
+  width?: number | null;
+  height?: number | null;
 };
 
 type SpotifyTrackPayload = {
@@ -30,7 +38,7 @@ type SpotifyTrackPayload = {
   popularity?: number;
   duration_ms?: number;
   artists?: { id?: string | null; name?: string }[] | null;
-  album?: { name?: string } | null;
+  album?: { name?: string; images?: SpotifyImage[] | null } | null;
   linked_from?: { id?: string | null } | null;
   external_ids?: { isrc?: string | null } | null;
 };
@@ -41,6 +49,7 @@ export type ApiArtist = {
   name: string;
   popularity: number;
   genres: string[];
+  imageUrl: string | null;
 };
 
 export type SavedTrack = {
@@ -69,13 +78,23 @@ export type PlaylistSnapshot = {
 };
 
 type TopTracksPage = { items: SpotifyTrackPayload[] };
-type TopArtistsPage = { items: ApiArtist[] };
+type TopArtistsPage = {
+  items: {
+    id: string;
+    uri: string;
+    name: string;
+    popularity?: number;
+    genres?: string[];
+    images?: SpotifyImage[];
+  }[];
+};
 type RecentPage = {
   items: { played_at: string; track: SpotifyTrackPayload | null }[];
 };
 type SavedPage = {
   items: { added_at: string; track: SpotifyTrackPayload | null }[];
   next: string | null;
+  total?: number;
 };
 type PlaylistPage = {
   items: {
@@ -101,6 +120,17 @@ const MAX_LIKED_PAGES = 20;
 const MAX_PLAYLISTS = 30;
 const MAX_TRACK_PAGES_PER_PLAYLIST = 2;
 
+/** Prefer ~300px Spotify art; fall back to the largest returned. */
+function pickImageUrl(images: SpotifyImage[] | null | undefined): string | null {
+  if (!images?.length) return null;
+  const ranked = [...images]
+    .filter((img): img is SpotifyImage & { url: string } => Boolean(img.url))
+    .sort((a, b) => (b.width ?? 0) - (a.width ?? 0));
+  if (ranked.length === 0) return null;
+  const mid = ranked.find((img) => (img.width ?? 0) >= 200 && (img.width ?? 0) <= 400);
+  return (mid ?? ranked[0]).url;
+}
+
 function normalizeTrack(
   raw: SpotifyTrackPayload | null | undefined,
 ): ApiTrack | null {
@@ -116,6 +146,7 @@ function normalizeTrack(
       name: a.name ?? "",
     })),
     album: raw.album?.name ? { name: raw.album.name } : null,
+    imageUrl: pickImageUrl(raw.album?.images),
     linkedFromId: raw.linked_from?.id || null,
     isrc: raw.external_ids?.isrc || null,
   };
@@ -144,7 +175,60 @@ export async function getTopArtists(
     name: a.name,
     popularity: a.popularity ?? 0,
     genres: a.genres ?? [],
+    imageUrl: pickImageUrl(a.images),
   }));
+}
+
+/**
+ * Playable tracks for an artist when tops/likes don't credit them.
+ * Uses Search — `/artists/{id}/top-tracks` returns 403 for many apps.
+ */
+export async function getArtistSampleTracks(
+  artistId: string,
+  artistName: string,
+  limit = 5,
+): Promise<ApiTrack[]> {
+  const name = artistName.trim();
+  if (!artistId || !name) return [];
+
+  const q = encodeURIComponent(`artist:"${name}"`);
+  const res = await spotifyFetch<{
+    tracks?: { items?: SpotifyTrackPayload[] };
+  }>(`/search?q=${q}&type=track&market=US&limit=10`);
+
+  const credited = (res.tracks?.items ?? [])
+    .map(normalizeTrack)
+    .filter(
+      (t): t is ApiTrack =>
+        t != null && t.artists.some((a) => a.id === artistId),
+    );
+
+  if (credited.length > 0) return credited.slice(0, limit);
+
+  // Looser fallback when the quoted artist query is empty.
+  const looseQ = encodeURIComponent(name);
+  const loose = await spotifyFetch<{
+    tracks?: { items?: SpotifyTrackPayload[] };
+  }>(`/search?q=${looseQ}&type=track&market=US&limit=10`);
+  return (loose.tracks?.items ?? [])
+    .map(normalizeTrack)
+    .filter(
+      (t): t is ApiTrack =>
+        t != null && t.artists.some((a) => a.id === artistId),
+    )
+    .slice(0, limit);
+}
+
+/** @deprecated Use getArtistSampleTracks — top-tracks is 403 for many apps. */
+export async function getArtistTopTracks(
+  artistId: string,
+  _market = "US",
+  limit = 5,
+): Promise<ApiTrack[]> {
+  const artist = await spotifyFetch<{ name?: string }>(
+    `/artists/${encodeURIComponent(artistId)}`,
+  );
+  return getArtistSampleTracks(artistId, artist.name ?? "", limit);
 }
 
 export async function getRecentlyPlayed(limit = 50): Promise<RecentPlay[]> {
@@ -160,17 +244,19 @@ export async function getRecentlyPlayed(limit = 50): Promise<RecentPlay[]> {
   return out;
 }
 
-/** Liked Songs with `added_at` (capped page count). */
+/** Liked Songs with `added_at` (capped page count). `total` is the full library size. */
 export async function getSavedTracksDetailed(
   maxPages = MAX_LIKED_PAGES,
-): Promise<SavedTrack[]> {
+): Promise<{ tracks: SavedTrack[]; total: number }> {
   const out: SavedTrack[] = [];
   let path: string | null = "/me/tracks?limit=50";
   let pages = 0;
+  let total = 0;
 
   while (path && pages < maxPages) {
     const page: SavedPage = await spotifyFetch<SavedPage>(path);
     pages += 1;
+    if (pages === 1) total = page.total ?? 0;
     for (const item of page.items ?? []) {
       const track = normalizeTrack(item.track);
       if (!track) continue;
@@ -179,7 +265,7 @@ export async function getSavedTracksDetailed(
     path = page.next;
   }
 
-  return out;
+  return { tracks: out, total: total || out.length };
 }
 
 async function tracksInPlaylist(playlistId: string): Promise<{

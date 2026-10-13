@@ -1,25 +1,50 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { chevronDownOutline, chevronUpOutline } from "ionicons/icons";
+import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  chevronBackOutline,
+  chevronForwardOutline,
+  pauseOutline,
+  playOutline,
+  volumeHighOutline,
+  volumeMuteOutline,
+} from "ionicons/icons";
 import { Icon } from "@/components/Icon";
-import { DeckSoundtrack } from "@/components/scrapped/DeckSoundtrack";
+import {
+  collectSoundtrackUris,
+  DeckSoundtrack,
+} from "@/components/scrapped/DeckSoundtrack";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
-import { StorySlide } from "@/components/scrapped/StorySlide";
-import { RankBars } from "@/components/scrapped/visuals/RankBars";
-import type {
-  ApiMetricCard,
-  ApiMetricItem,
-  ScrappedApiReport,
-} from "@/lib/scrapped-api";
-import { cn } from "@/lib/utils";
+import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
+import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
+import { WrappedStorySlide } from "@/components/scrapped/wrapped/WrappedStorySlide";
+import { useStoryAutoplay } from "@/components/scrapped/wrapped/useStoryAutoplay";
+import { Button } from "@/components/ui/button";
+import {
+  API_SCRAPPED_BEAT_COUNTS,
+  API_SCRAPPED_SLIDE_COUNT,
+  getApiSlideSoundtrackUri,
+  needsArtistSoundtrackResolve,
+} from "@/lib/api-scrapped-soundtrack";
+import type { ApiMetricCard, ScrappedApiReport } from "@/lib/scrapped-api";
 
 type Props = {
   report: ScrappedApiReport;
+  /** Set when the user accepted audio on the intro Continue. */
+  initialSoundOn?: boolean;
 };
 
-const SLIDE_COUNT = 9;
+const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
+const FINALE_INDEX = SLIDE_COUNT - 1;
 
 function cardById(
   report: ScrappedApiReport,
@@ -28,64 +53,80 @@ function cardById(
   return report.cards.find((c) => c.id === id);
 }
 
-function trackUri(item: ApiMetricItem | undefined): string | null {
-  return item?.trackId ? `spotify:track:${item.trackId}` : null;
+function likedAside(count: number): string {
+  if (count <= 0) return "Empty shelves. Bold.";
+  if (count < 80) return "A short shelf. High standards — or just getting started.";
+  if (count < 250) return "A solid pile of “I’ll listen later.”";
+  if (count < 600) return "That’s a lot of almosts waiting in the wings.";
+  return "A whole museum of maybe.";
 }
 
-function getApiSlideSoundtrackUri(
-  report: ScrappedApiReport,
-  slideIndex: number,
-): string | null {
-  const leftLong = cardById(report, "left-long-run");
-  const leftLongArtists = cardById(report, "left-long-artists");
-  const fallen = cardById(report, "fallen-rotation");
-  const secondChance = cardById(report, "second-chance");
-  const lead = trackUri(leftLong?.items[0]) ?? trackUri(fallen?.items[0]);
-  const reunion = trackUri(secondChance?.items[0]) ?? lead;
-
-  switch (slideIndex) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-      return lead;
-    case 4:
-    case 5:
-      // Song credited to the top artist who left the long run.
-      return trackUri(leftLongArtists?.items[0]) ?? lead;
-    case 6:
-    case 7:
-    case 8:
-      // Soft-launch hero through wrap-up — keep the reunion track playing.
-      return reunion;
-    default:
-      return null;
-  }
-}
-
-function metricBars(items: ApiMetricItem[]) {
-  return items.map((item) => ({
-    id: item.id,
-    trackId: item.trackId,
-    label: item.label,
-    sublabel: item.sublabel,
-    value: item.value,
-    display: item.detail,
-  }));
-}
-
-export function ApiScrappedDeck({ report }: Props) {
+export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const activeFillRef = useRef<HTMLDivElement | null>(null);
+  const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
+  /** Locks active index during programmatic prev/next so IO can't land mid-scroll. */
+  const navigatingToRef = useRef<number | null>(null);
+  const navClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(0);
+  const [visitKey, setVisitKey] = useState(0);
+  const [pausedSticky, setPausedSticky] = useState(false);
+  const [pausedHold, setPausedHold] = useState(false);
+  const [soundOn, setSoundOn] = useState(initialSoundOn);
+  const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
+    null,
+  );
+  const reduceMotion = useReducedMotion();
+  const paused = pausedSticky || pausedHold;
 
   const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
   const leftLongArtists = cardById(report, "left-long-artists");
   const secondChance = cardById(report, "second-chance");
+  const artistsBack = cardById(report, "artists-back");
 
   const topSong = leftLongSongs?.items[0] ?? null;
   const topArtist = leftLongArtists?.items[0] ?? null;
   const reunionSong = secondChance?.items[0] ?? null;
+  const ghostPercent = leftLongHeadline?.percent;
+  const likedCount = report.summary.likedCount;
+  const longCount = report.summary.longTrackCount;
+
+  const soundtrackOpts = useMemo(
+    () => ({ artistSoundtrackUri }),
+    [artistSoundtrackUri],
+  );
+
+  // Sabbatical artists often have zero tracks in tops/likes (e.g. Kendrick).
+  // Resolve a playable track client-side so artist-act scenes can switch audio.
+  useEffect(() => {
+    const need = needsArtistSoundtrackResolve(report);
+    if (!need) {
+      setArtistSoundtrackUri(null);
+      return;
+    }
+    let cancelled = false;
+    const params = new URLSearchParams({
+      id: need.artistId,
+      name: need.artistName,
+    });
+    if (need.avoidTrackId) params.set("avoid", need.avoidTrackId);
+    fetch(`/api/spotify/artist-top-track?${params}`)
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json() as Promise<{ uri?: string }>;
+      })
+      .then((body) => {
+        if (cancelled || !body?.uri) return;
+        setArtistSoundtrackUri(body.uri);
+      })
+      .catch(() => {
+        /* keep song lead */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [report]);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -96,6 +137,14 @@ export function ApiScrappedDeck({ report }: Props) {
     );
     if (slides.length === 0) return;
 
+    const clearNavLock = () => {
+      navigatingToRef.current = null;
+      if (navClearTimerRef.current) {
+        clearTimeout(navClearTimerRef.current);
+        navClearTimerRef.current = null;
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -103,282 +152,590 @@ export function ApiScrappedDeck({ report }: Props) {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (!visible) return;
         const idx = slides.indexOf(visible.target as HTMLElement);
-        if (idx >= 0) setActive(idx);
+        if (idx < 0) return;
+
+        const target = navigatingToRef.current;
+        if (target != null) {
+          // Ignore intermediate slides while scrolling back/forward.
+          if (idx !== target) return;
+          clearNavLock();
+          setActive(idx);
+          return;
+        }
+
+        if (activeRef.current === idx) return;
+        setPausedSticky(false);
+        setActive(idx);
+        setVisitKey((k) => k + 1);
       },
       { root, threshold: [0.55, 0.7] },
     );
 
     for (const slide of slides) observer.observe(slide);
-    return () => observer.disconnect();
+
+    const onScrollEnd = () => {
+      if (navigatingToRef.current == null) return;
+      const target = navigatingToRef.current;
+      clearNavLock();
+      setActive(target);
+    };
+    root.addEventListener("scrollend", onScrollEnd);
+
+    return () => {
+      observer.disconnect();
+      root.removeEventListener("scrollend", onScrollEnd);
+      if (navClearTimerRef.current) clearTimeout(navClearTimerRef.current);
+    };
   }, []);
 
-  const activeRef = useRef(0);
-  activeRef.current = active;
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
-  function goTo(index: number) {
-    const root = scrollerRef.current;
-    if (!root) return;
-    const slides = root.querySelectorAll<HTMLElement>("[data-scrapped-slide]");
-    const next = Math.min(Math.max(index, 0), slides.length - 1);
-    slides[next]?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const goTo = useCallback(
+    (index: number) => {
+      const root = scrollerRef.current;
+      if (!root) return;
+      const slides = root.querySelectorAll<HTMLElement>("[data-scrapped-slide]");
+      const next = Math.min(Math.max(index, 0), slides.length - 1);
+      const prev = activeRef.current;
+
+      setPausedSticky(false);
+
+      if (next === prev) {
+        // Re-tap current scene: replay in-scene motion from the start.
+        setVisitKey((k) => k + 1);
+        return;
+      }
+
+      navigatingToRef.current = next;
+      if (navClearTimerRef.current) clearTimeout(navClearTimerRef.current);
+      // Fallback if scrollend never fires (older Safari / interrupted scroll).
+      navClearTimerRef.current = setTimeout(() => {
+        navigatingToRef.current = null;
+      }, 900);
+
+      setActive(next);
+      setVisitKey((k) => k + 1);
+      activeRef.current = next;
+
+      slides[next]?.scrollIntoView({
+        // Instant scroll makes prev/next land on the right scene every time.
+        behavior: "auto",
+        inline: "start",
+        block: "nearest",
+      });
+    },
+    [],
+  );
+
+  const { beatIndex } = useStoryAutoplay({
+    active,
+    visitKey,
+    sceneCount: SLIDE_COUNT,
+    beatCounts: API_SCRAPPED_BEAT_COUNTS,
+    holdActive: active >= FINALE_INDEX,
+    paused,
+    reduceMotion,
+    activeFillRef,
+  });
+
+  // RAF writes transform on the active fill; React won't re-apply scaleX(0) on
+  // back because the VDOM style never changed — force-clear future segments.
+  useLayoutEffect(() => {
+    for (let i = 0; i < SLIDE_COUNT; i++) {
+      const el = fillRefs.current[i];
+      if (!el || i === active) continue;
+      el.style.transform = i < active ? "scaleX(1)" : "scaleX(0)";
+    }
+  }, [active, visitKey]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== " ") return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === " ") {
+        e.preventDefault();
+        setPausedSticky((p) => !p);
+        return;
+      }
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        goTo(0);
+        return;
+      }
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       e.preventDefault();
-      const delta = e.key === "ArrowUp" ? -1 : 1;
+      const delta = e.key === "ArrowLeft" ? -1 : 1;
       goTo(activeRef.current + delta);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [goTo]);
+
+  const holdPause = useCallback((down: boolean) => {
+    setPausedHold(down);
   }, []);
 
-  const soundtrackUri = getApiSlideSoundtrackUri(report, active);
+  const soundtrackUri = getApiSlideSoundtrackUri(
+    report,
+    active,
+    soundtrackOpts,
+  );
+  const soundtrackPreload = useMemo(
+    () =>
+      collectSoundtrackUris(
+        (i) => getApiSlideSoundtrackUri(report, i, soundtrackOpts),
+        SLIDE_COUNT,
+      ),
+    [report, soundtrackOpts],
+  );
+
+  const sceneMotion = (scene: number) => ({
+    active: active === scene,
+    beatIndex: active === scene ? beatIndex : 0,
+    replayKey: active === scene ? visitKey : 0,
+  });
 
   return (
-    <div className="relative">
+    <div
+      className="wrapped-story relative"
+      onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        const t = e.target as HTMLElement | null;
+        if (t?.closest("a, button, input, textarea, select, [role='button']")) {
+          return;
+        }
+        holdPause(true);
+      }}
+      onPointerUp={() => holdPause(false)}
+      onPointerLeave={() => holdPause(false)}
+      onPointerCancel={() => holdPause(false)}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 md:px-5">
+        <div className="flex gap-1" aria-hidden>
+          {Array.from({ length: SLIDE_COUNT }, (_, i) => {
+            const fill = i < active ? 1 : 0;
+            return (
+              <div
+                key={i}
+                className="wrapped-progress h-1 min-w-0 flex-1 overflow-hidden rounded-full"
+              >
+                <div
+                  ref={(el) => {
+                    fillRefs.current[i] = el;
+                    if (i === active) activeFillRef.current = el;
+                  }}
+                  className="wrapped-progress-fill h-full origin-left rounded-full will-change-transform"
+                  style={{ transform: `scaleX(${fill})` }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="pointer-events-none mt-3 flex items-center justify-between">
+          <p className="font-sans text-sm font-semibold tracking-tight text-[var(--wrapped-ink)]">
+            Scrapped
+          </p>
+          <div className="pointer-events-auto flex items-center gap-1.5">
+            <Button
+              type="button"
+              size="icon"
+              variant="default"
+              aria-label={pausedSticky ? "Resume story" : "Pause story"}
+              onClick={() => setPausedSticky((p) => !p)}
+              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
+            >
+              <Icon
+                icon={pausedSticky ? playOutline : pauseOutline}
+                className="size-4"
+              />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="default"
+              aria-label={soundOn ? "Mute soundtrack" : "Enable soundtrack"}
+              disabled={!soundtrackUri}
+              onClick={() => setSoundOn((on) => !on)}
+              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90 disabled:opacity-40"
+            >
+              <Icon
+                icon={soundOn ? volumeHighOutline : volumeMuteOutline}
+                className="size-4"
+              />
+            </Button>
+            <SignOutConfirmButton />
+          </div>
+        </div>
+      </div>
+
       <div
         ref={scrollerRef}
-        className="h-[calc(100dvh-3.75rem)] snap-y snap-mandatory overflow-y-auto overscroll-y-contain"
+        className="flex h-[calc(100dvh-3.75rem)] snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <StorySlide
-          index="00"
-          title="API Scrapped"
-          blurb={`Your tops, but make it a situationship recap. Live affinity windows only — no homework, no export. ${report.year}.`}
-          active={active === 0}
-          footer={
-            <>
-              {report.profileName ? `${report.profileName} · ` : null}
-              4 weeks · 6 months · several years
-              {" · "}
-              <Link
-                href="/scrapped/lab"
-                className="text-foreground underline-offset-2 hover:underline"
-              >
-                Metrics lab
-              </Link>
-            </>
+        {/* 0 — year open + thesis (paired) */}
+        <WrappedStorySlide
+          {...sceneMotion(0)}
+          tone="paper"
+          beats={[
+            {
+              headline: report.profileName ? (
+                <>
+                  {report.profileName}&rsquo;s {report.year}{" "}
+                  <span className="italic">Scrapped</span>
+                </>
+              ) : (
+                report.year
+              ),
+              subline: report.profileName ? undefined : (
+                <span className="italic">scrapped</span>
+              ),
+              align: "center",
+              display: report.profileName ? "hero" : "year",
+            },
+            {
+              headline: (
+                <>
+                  Scrapped is your <span className="italic">anti-wrapped</span>.
+                </>
+              ),
+              subline:
+                "What artists you ghosted, and which of your songs fell off. Ready?",
+              display: "hero",
+              footer: "Created by Alan Matias",
+            },
+          ]}
+        />
+
+        {/* 1 — liked volume + tops bridge (paired) */}
+        <WrappedStorySlide
+          {...sceneMotion(1)}
+          tone="sand"
+          beats={[
+            {
+              headline: `${likedCount.toLocaleString()} liked songs in your library.`,
+              subline: likedAside(likedCount),
+              display: "hero",
+            },
+            {
+              headline:
+                longCount > 0
+                  ? `and ${longCount.toLocaleString()} all-time top songs`
+                  : "and your all-time top songs",
+              subline: "But how did they hold up this year?",
+              display: "hero",
+            },
+          ]}
+        />
+
+        {/* 2 — ghost rate + #1 ghosted song (paired) */}
+        <WrappedStorySlide
+          {...sceneMotion(2)}
+          tone="blush"
+          beats={[
+            {
+              headline:
+                ghostPercent == null
+                  ? "Your all-time favorites didn’t show up."
+                  : `${ghostPercent}% of your all-time top favorites were ghosted.`,
+              subline:
+                ghostPercent == null
+                  ? "Spotify didn’t return a multi-year list this time."
+                  : "Which fell off the hardest?",
+              display: "hero",
+              footer: leftLongHeadline?.detail,
+            },
+            {
+              headline: topSong?.label ?? "Nobody to call out.",
+              subline: topSong
+                ? "Your highest multi-year favorite that isn’t in the 6-month or 4-week tops."
+                : "Wow — you actually still talk to your old favorites.",
+              aside: topSong ? "Why not give them another chance?" : undefined,
+              lead: topSong ? (
+                <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
+                  {topSong.imageUrl ? (
+                    <Image
+                      src={topSong.imageUrl}
+                      alt=""
+                      fill
+                      sizes="192px"
+                      className="object-cover"
+                      priority={active === 2}
+                    />
+                  ) : null}
+                </div>
+              ) : undefined,
+              display: "hero",
+              footer: topSong ? (
+                <span>
+                  {topSong.sublabel ?? "—"}
+                  {topSong.detail ? ` · ${topSong.detail}` : null}
+                </span>
+              ) : undefined,
+            },
+          ]}
+        />
+
+        {/* 3 — list setup */}
+        <WrappedStorySlide
+          {...sceneMotion(3)}
+          headline="Bring back the group"
+          subline="Here are your top 5 favorite songs that didn’t make it this year."
+          tone="sky"
+          display="hero"
+        />
+
+        {/* 4 — top ghosted songs */}
+        <WrappedStorySlide
+          {...sceneMotion(4)}
+          headline="Left on read"
+          subline="Multi-year favorites missing from both recent windows."
+          tone="paper"
+          display="sentence"
+        >
+          <WrappedEntityList
+            items={(leftLongSongs?.items ?? []).map((item) => ({
+              id: item.id,
+              label: item.label,
+              sublabel: item.sublabel,
+              imageUrl: item.imageUrl,
+            }))}
+            active={active === 4}
+          />
+        </WrappedStorySlide>
+
+        {/* 5 — artist act bridge */}
+        <WrappedStorySlide
+          {...sceneMotion(5)}
+          headline="Now the artists."
+          subline="Same energy — people you used to keep on repeat, then quietly stopped texting."
+          tone="cream"
+          display="hero"
+        />
+
+        {/* 6 — #1 ghosted artist */}
+        <WrappedStorySlide
+          {...sceneMotion(6)}
+          headline={topArtist?.label ?? "No missing persons."}
+          subline={
+            topArtist
+              ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
+              : "Your loyalty program is weirdly intact."
           }
-        >
-          <p className="font-heading text-3xl tracking-[-0.02em] text-warn sm:text-4xl">
-            Your algorithm has commitment issues.
-          </p>
-        </StorySlide>
-
-        {/* 1 */}
-        <StorySlide
-          index="01"
-          title="Ghosted the hall of fame"
-          blurb="How many of your multi-year top songs you haven’t texted back — missing from both the last 6 months and the last 4 weeks."
-          active={active === 1}
-          footer={leftLongHeadline?.detail}
-        >
-          <p className="font-mono text-[clamp(3.5rem,12vw,6rem)] leading-none tracking-tight text-warn tabular-nums">
-            {leftLongHeadline?.percent == null
-              ? "—"
-              : `${leftLongHeadline.percent}%`}
-          </p>
-          <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-            of your long-run favorites are currently on “seen”
-          </p>
-        </StorySlide>
-
-        {/* 2 */}
-        <StorySlide
-          index="02"
-          title="Main character, left on read"
-          blurb="Your highest multi-year favorite that isn’t in the 6-month or 4-week tops. Peak lore. Zero recent replies."
-          active={active === 2}
-        >
-          {topSong ? (
-            <div className="space-y-4">
-              <p className="font-heading text-[clamp(2.25rem,7vw,3.5rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-                {topSong.label}
-              </p>
-              <p className="text-lg text-muted-foreground">
-                {topSong.sublabel ?? "—"}
-              </p>
-              <p className="font-mono text-sm tabular-nums text-warn">
-                {topSong.detail}
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Wow — you actually still talk to your old favorites.
-            </p>
-          )}
-        </StorySlide>
-
-        {/* 3 */}
-        <StorySlide
-          index="03"
-          title="The muted group chat"
-          blurb="Multi-year top songs you quietly stopped opening. Still in the chat. Just… not checking it."
-          active={active === 3}
-          footer={
-            (leftLongSongs?.items.length ?? 0) === 0
-              ? "Nobody to mute. Suspicious loyalty."
+          aside={
+            topArtist
+              ? "They’re fine. They’re just busy not being pressed by you."
               : undefined
           }
-        >
-          <RankBars items={metricBars(leftLongSongs?.items ?? [])} />
-        </StorySlide>
+          tone="sand"
+          display="hero"
+          footer={topArtist?.detail}
+        />
 
-        {/* 4 */}
-        <StorySlide
-          index="04"
-          title="Filed a missing-person report"
-          blurb="The multi-year artist most entitled to ask where you’ve been."
-          active={active === 4}
+        {/* 7 — top ghosted artists */}
+        <WrappedStorySlide
+          {...sceneMotion(7)}
+          headline="On sabbatical (from you)"
+          subline="Multi-year top artists who slipped out of both recent windows."
+          tone="mist"
+          display="sentence"
         >
-          {topArtist ? (
-            <div className="space-y-4">
-              <p className="font-heading text-[clamp(2.5rem,8vw,4rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-                {topArtist.label}
-              </p>
-              <p className="font-mono text-sm tabular-nums text-warn">
-                {topArtist.detail}
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No missing artists. Your loyalty program is weirdly intact.
-            </p>
-          )}
-        </StorySlide>
+          <WrappedEntityList
+            items={(leftLongArtists?.items ?? []).map((item) => ({
+              id: item.id,
+              label: item.label,
+              sublabel: item.detail,
+              imageUrl: item.imageUrl,
+            }))}
+            active={active === 7}
+            empty="Empty sabbatical list. Touch grass? Or don’t."
+          />
+        </WrappedStorySlide>
 
-        {/* 5 */}
-        <StorySlide
-          index="05"
-          title="On sabbatical (from you)"
-          blurb="Multi-year top artists who slipped out of both recent windows. They’re fine. They’re just busy not being pressed by you."
-          active={active === 5}
-          footer={
-            (leftLongArtists?.items.length ?? 0) === 0
-              ? "Empty sabbatical list. Touch grass? Or don’t."
-              : undefined
-          }
-        >
-          <RankBars items={metricBars(leftLongArtists?.items ?? [])} />
-        </StorySlide>
+        {/* 8 — reunion setup */}
+        <WrappedStorySlide
+          {...sceneMotion(8)}
+          headline="Plot twist."
+          subline="Not everyone stayed ghosted. A few old favorites slid back into your last four weeks."
+          tone="blush"
+          display="hero"
+        />
 
-        {/* 6 */}
-        <StorySlide
-          index="06"
-          title="The soft launch reunion"
-          blurb="An old multi-year favorite that skipped the 6-month era and slid back into your 4-week tops. We don’t have to talk about it."
-          active={active === 6}
-        >
-          {reunionSong ? (
-            <div className="space-y-4">
-              <p className="font-heading text-[clamp(2.25rem,7vw,3.5rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-                {reunionSong.label}
-              </p>
-              <p className="text-lg text-muted-foreground">
-                {reunionSong.sublabel ?? "—"}
-              </p>
-              <p className="font-mono text-sm tabular-nums text-warn">
-                {reunionSong.detail}
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No reunions on the calendar. For now.
-            </p>
-          )}
-        </StorySlide>
+        {/* 9 — reunion reveal */}
+        {(secondChance?.items.length ?? 0) > 1 ? (
+          <WrappedStorySlide
+            {...sceneMotion(9)}
+            headline="The reunion setlist"
+            subline="Old multi-year favorites — or old likes — back in your 4-week tops after a gap."
+            tone="sage"
+            display="sentence"
+            footer={
+              artistsBack && artistsBack.items.length > 0
+                ? `${artistsBack.items.length} artists also came back this month`
+                : undefined
+            }
+          >
+            <WrappedEntityList
+              items={(secondChance?.items ?? []).slice(0, 5).map((item) => ({
+                id: item.id,
+                label: item.label,
+                sublabel: item.sublabel,
+                imageUrl: item.imageUrl,
+              }))}
+              active={active === 9}
+            />
+          </WrappedStorySlide>
+        ) : (
+          <WrappedStorySlide
+            {...sceneMotion(9)}
+            headline={reunionSong?.label ?? "No reunions on the calendar."}
+            subline={
+              reunionSong
+                ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
+                : "The soft launch stayed soft. For now."
+            }
+            aside={reunionSong ? "We don’t have to talk about it." : undefined}
+            tone="sage"
+            display="hero"
+            footer={
+              reunionSong ? (
+                <span>
+                  {reunionSong.sublabel ?? "—"}
+                  {reunionSong.detail ? ` · ${reunionSong.detail}` : null}
+                </span>
+              ) : artistsBack && artistsBack.items.length > 0 ? (
+                `${artistsBack.items.length} artists also came back this month`
+              ) : undefined
+            }
+          />
+        )}
 
-        {/* 7 */}
-        <StorySlide
-          index="07"
-          title="The reunion setlist"
-          blurb="More comebacks from the long run — or old likes — that are back in your 4-week tops after a gap."
-          active={active === 7}
-          footer={
-            (secondChance?.items.length ?? 0) === 0
-              ? "Empty setlist. The soft launch stayed soft."
-              : undefined
-          }
-        >
-          <RankBars items={metricBars(secondChance?.items ?? [])} />
-        </StorySlide>
-
-        {/* 8 — shareable recap */}
+        {/* 10 — share finale (holds; user advances) */}
         <section
           data-scrapped-slide
-          className="flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full snap-start snap-always flex-col items-center justify-center px-6 py-10 md:px-10"
-          aria-hidden={active !== 8}
+          data-wrapped-tone="slate"
+          className="relative flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full min-w-full shrink-0 snap-start snap-always flex-col items-center justify-center bg-[var(--wrapped-canvas)] px-6 py-20 text-[var(--wrapped-ink)] md:px-10"
+          aria-hidden={active !== FINALE_INDEX}
         >
-          <ShareRecapCard
-            year={report.year}
-            title="API Scrapped"
-            subtitle="Songs you ghosted · artists on sabbatical"
-            leftLabel="Left on read"
-            rightLabel="On sabbatical"
-            tagline="Taste is a situationship."
-            brandLine="API Scrapped · Anti-Wrapped"
-            active={active === 8}
-            skipped={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
-              id: item.id,
-              title: item.label,
-              artist: item.sublabel ?? "—",
-            }))}
-            stayed={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
-              id: item.id,
-              title: item.label,
-              artist: item.detail,
-            }))}
-          />
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Screenshot to soft-launch your chaos
-            {" · "}
-            <Link
-              href="/scrapped/lab"
-              className="text-foreground underline-offset-2 hover:underline"
+          <div className="relative z-10 flex w-full max-w-xl flex-col items-center gap-5">
+            <motion.p
+              className="text-center font-sans text-[clamp(1.75rem,5vw,2.5rem)] font-extrabold tracking-[-0.03em]"
+              initial={false}
+              animate={
+                active === FINALE_INDEX
+                  ? { opacity: 1, y: 0 }
+                  : {
+                      opacity: reduceMotion ? 0.85 : 0,
+                      y: reduceMotion ? 0 : 14,
+                    }
+              }
+              transition={{ duration: reduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
-              API metrics lab →
-            </Link>
-          </p>
+              That’s your Scrapped.
+            </motion.p>
+            <motion.p
+              className="max-w-sm text-center text-[1.05rem] leading-relaxed text-[var(--wrapped-muted)]"
+              initial={false}
+              animate={
+                active === FINALE_INDEX
+                  ? { opacity: 1, y: 0 }
+                  : {
+                      opacity: reduceMotion ? 0.85 : 0,
+                      y: reduceMotion ? 0 : 14,
+                    }
+              }
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                delay: active === FINALE_INDEX && !reduceMotion ? 0.14 : 0,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              Screenshot the receipt. Soft-launch the chaos.
+            </motion.p>
+            <ShareRecapCard
+              year={report.year}
+              title="Scrapped"
+              subtitle="Songs you ghosted · artists on sabbatical"
+              leftLabel="Left on read"
+              rightLabel="On sabbatical"
+              tagline="Taste is a situationship."
+              brandLine="Scrapped · Anti-Wrapped"
+              variant="receipt"
+              active={active === FINALE_INDEX}
+              skipped={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
+                id: item.id,
+                title: item.label,
+                artist: item.sublabel ?? "—",
+              }))}
+              stayed={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
+                id: item.id,
+                title: item.label,
+                artist: item.detail,
+              }))}
+            />
+            <p className="text-center text-sm text-[var(--wrapped-muted)]">
+              Affinity windows only — not true skips
+            </p>
+          </div>
         </section>
       </div>
 
-      <DeckSoundtrack uri={soundtrackUri} />
+      <DeckSoundtrack
+        uri={soundtrackUri}
+        preloadUris={soundtrackPreload}
+        enabled={soundOn && !paused}
+        showToggle={false}
+        className="z-30"
+      />
 
-      <div className="pointer-events-none absolute inset-y-0 right-3 flex flex-col items-center justify-center gap-2 md:right-5">
-        <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-full border border-border bg-background/80 px-2 py-3 backdrop-blur-sm">
-          <button
+      <button
+        type="button"
+        aria-label="Previous slide"
+        disabled={active <= 0}
+        onClick={() => goTo(active - 1)}
+        className="absolute inset-y-0 left-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
+      />
+      <button
+        type="button"
+        aria-label="Next slide"
+        disabled={active >= FINALE_INDEX}
+        onClick={() => goTo(active + 1)}
+        className="absolute inset-y-0 right-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
+      />
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex items-center justify-center gap-3">
+        <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--wrapped-ink)]/15 bg-[var(--wrapped-canvas)]/90 px-3 py-2 backdrop-blur-sm">
+          <Button
             type="button"
+            size="icon-sm"
+            variant="ghost"
             onClick={() => goTo(active - 1)}
             disabled={active <= 0}
-            className="pressable text-muted-foreground disabled:opacity-30"
+            className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
             aria-label="Previous slide"
           >
-            <Icon icon={chevronUpOutline} className="h-4 w-4" />
-          </button>
-          {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={cn(
-                "h-1.5 w-1.5 rounded-full transition-colors duration-[var(--duration-fast)]",
-                i === active ? "bg-warn" : "bg-muted-foreground/40",
-              )}
-            />
-          ))}
-          <button
+            <Icon icon={chevronBackOutline} className="size-4" />
+          </Button>
+          <span className="min-w-[3.5rem] text-center font-mono text-xs tabular-nums text-[var(--wrapped-muted)]">
+            {String(active + 1).padStart(2, "0")} /{" "}
+            {String(SLIDE_COUNT).padStart(2, "0")}
+          </span>
+          <Button
             type="button"
+            size="icon-sm"
+            variant="ghost"
             onClick={() => goTo(active + 1)}
-            disabled={active >= SLIDE_COUNT - 1}
-            className="pressable text-muted-foreground disabled:opacity-30"
+            disabled={active >= FINALE_INDEX}
+            className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
             aria-label="Next slide"
           >
-            <Icon icon={chevronDownOutline} className="h-4 w-4" />
-          </button>
+            <Icon icon={chevronForwardOutline} className="size-4" />
+          </Button>
         </div>
       </div>
     </div>

@@ -114,9 +114,9 @@ export function ApiMetricsLab(props: Props) {
   return (
     <div className="space-y-10">
       <header className="animate-rise space-y-4">
-        <p className="font-mono text-sm text-ring">Lab · API only</p>
+        <p className="font-mono text-sm text-ring">Scrapped Lab · API only</p>
         <h1 className="max-w-[16ch] font-heading text-[clamp(2.5rem,7vw,3.75rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-          Scrapped API lab
+          Scrapped Lab
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
           Songs and artists that fell out of rotation, came back, or stayed
@@ -127,13 +127,13 @@ export function ApiMetricsLab(props: Props) {
             href="/scrapped"
             className="text-foreground underline-offset-2 hover:underline"
           >
-            ← Export Scrapped
+            ← Scrapped
           </Link>
           <Link
-            href="/scrapped/api"
+            href="/scrapped/plus"
             className="text-foreground underline-offset-2 hover:underline"
           >
-            API Scrapped deck →
+            Scrapped Plus →
           </Link>
           <span className="text-muted-foreground">
             Windows: 4 weeks · 6 months · several years. Each list is five.
