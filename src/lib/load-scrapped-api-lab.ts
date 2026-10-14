@@ -100,6 +100,14 @@ function errorResult(err: unknown): Extract<ScrappedApiLabResult, { kind: "error
   };
 }
 
+/** Pre-art snapshots omit imageUrl; sealed cookies can't be backfilled without a refetch. */
+function reportMissingArt(report: ScrappedApiReport): boolean {
+  const songs = report.cards.find((c) => c.id === "left-long-run");
+  const items = songs?.items ?? [];
+  if (items.length === 0) return false;
+  return items.every((item) => !item.imageUrl);
+}
+
 async function reportFromSnapshot(
   year: number,
   userId?: string,
@@ -110,6 +118,9 @@ async function reportFromSnapshot(
   // shape somehow still has raw snap fields (shouldn't after migrate).
   const report = stored.report;
   if (!report || report.year !== year) {
+    return null;
+  }
+  if (reportMissingArt(report)) {
     return null;
   }
   report.fetchedAt = stored.fetchedAt;

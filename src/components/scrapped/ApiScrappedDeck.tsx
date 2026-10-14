@@ -19,10 +19,6 @@ import {
   volumeMuteOutline,
 } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
-import {
-  collectSoundtrackUris,
-  DeckSoundtrack,
-} from "@/components/scrapped/DeckSoundtrack";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
 import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
@@ -31,16 +27,28 @@ import { useStoryAutoplay } from "@/components/scrapped/wrapped/useStoryAutoplay
 import { Button } from "@/components/ui/button";
 import {
   API_SCRAPPED_BEAT_COUNTS,
+  API_SCRAPPED_SCENE_MS,
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
-  needsArtistSoundtrackResolve,
 } from "@/lib/api-scrapped-soundtrack";
 import type { ApiMetricCard, ScrappedApiReport } from "@/lib/scrapped-api";
 
 type Props = {
   report: ScrappedApiReport;
-  /** Set when the user accepted audio on the intro Continue. */
-  initialSoundOn?: boolean;
+  /** Soundtrack is hosted by ScrappedExperience (unlocked on Continue). */
+  soundOn: boolean;
+  artistSoundtrackUri?: string | null;
+  onEnableSound: () => void;
+  onDisableSound: () => void;
+  onPausedChange?: (paused: boolean) => void;
+  onSoundtrackUriChange?: (uri: string | null) => void;
+  /** Speculative hot-prime on pointerdown (no cut until navigate). */
+  onSoundtrackPrimeTo?: (uri: string | null) => void;
+  /**
+   * Cut audio to the next act before the slide changes so the incoming scene
+   * never hears both acts. No-ops when sound is off or the URI is unchanged.
+   */
+  onSoundtrackCutTo?: (uri: string | null) => Promise<void>;
 };
 
 const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
@@ -61,7 +69,17 @@ function likedAside(count: number): string {
   return "A whole museum of maybe.";
 }
 
-export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
+export function ApiScrappedDeck({
+  report,
+  soundOn,
+  artistSoundtrackUri = null,
+  onEnableSound,
+  onDisableSound,
+  onPausedChange,
+  onSoundtrackUriChange,
+  onSoundtrackPrimeTo,
+  onSoundtrackCutTo,
+}: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const activeFillRef = useRef<HTMLDivElement | null>(null);
   const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -71,10 +89,6 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
   const [active, setActive] = useState(0);
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
-  const [soundOn, setSoundOn] = useState(initialSoundOn);
-  const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
-    null,
-  );
   const reduceMotion = useReducedMotion();
   const paused = pausedSticky;
 
@@ -95,37 +109,6 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     () => ({ artistSoundtrackUri }),
     [artistSoundtrackUri],
   );
-
-  // Sabbatical artists often have zero tracks in tops/likes (e.g. Kendrick).
-  // Resolve a playable track client-side so artist-act scenes can switch audio.
-  useEffect(() => {
-    const need = needsArtistSoundtrackResolve(report);
-    if (!need) {
-      setArtistSoundtrackUri(null);
-      return;
-    }
-    let cancelled = false;
-    const params = new URLSearchParams({
-      id: need.artistId,
-      name: need.artistName,
-    });
-    if (need.avoidTrackId) params.set("avoid", need.avoidTrackId);
-    fetch(`/api/spotify/artist-top-track?${params}`)
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return res.json() as Promise<{ uri?: string }>;
-      })
-      .then((body) => {
-        if (cancelled || !body?.uri) return;
-        setArtistSoundtrackUri(body.uri);
-      })
-      .catch(() => {
-        /* keep song lead */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [report]);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -193,7 +176,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
   }, [active]);
 
   const goTo = useCallback(
-    (index: number) => {
+    async (index: number) => {
       const root = scrollerRef.current;
       if (!root) return;
       const slides = root.querySelectorAll<HTMLElement>("[data-scrapped-slide]");
@@ -206,6 +189,15 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
         // Re-tap current scene: replay in-scene motion from the start.
         setVisitKey((k) => k + 1);
         return;
+      }
+
+      // Cut audio before the slide so the incoming scene never hears both acts.
+      if (soundOn && onSoundtrackCutTo) {
+        const fromUri = getApiSlideSoundtrackUri(report, prev, soundtrackOpts);
+        const toUri = getApiSlideSoundtrackUri(report, next, soundtrackOpts);
+        if (toUri !== fromUri) {
+          await onSoundtrackCutTo(toUri);
+        }
       }
 
       navigatingToRef.current = next;
@@ -226,7 +218,22 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
         block: "nearest",
       });
     },
-    [],
+    [soundOn, onSoundtrackCutTo, report, soundtrackOpts],
+  );
+
+  /** Hot-prime on press so cutTo can resume instantly when the click commits. */
+  const primeSoundtrackFor = useCallback(
+    (index: number) => {
+      if (!soundOn || !onSoundtrackPrimeTo) return;
+      const next = Math.min(Math.max(index, 0), SLIDE_COUNT - 1);
+      const prev = activeRef.current;
+      if (next === prev) return;
+      const fromUri = getApiSlideSoundtrackUri(report, prev, soundtrackOpts);
+      const toUri = getApiSlideSoundtrackUri(report, next, soundtrackOpts);
+      if (toUri === fromUri || !toUri) return;
+      onSoundtrackPrimeTo(toUri);
+    },
+    [soundOn, onSoundtrackPrimeTo, report, soundtrackOpts],
   );
 
   const { beatIndex } = useStoryAutoplay({
@@ -234,6 +241,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     visitKey,
     sceneCount: SLIDE_COUNT,
     beatCounts: API_SCRAPPED_BEAT_COUNTS,
+    sceneDurationsMs: API_SCRAPPED_SCENE_MS,
     paused,
     reduceMotion,
     activeFillRef,
@@ -283,14 +291,14 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
     active,
     soundtrackOpts,
   );
-  const soundtrackPreload = useMemo(
-    () =>
-      collectSoundtrackUris(
-        (i) => getApiSlideSoundtrackUri(report, i, soundtrackOpts),
-        SLIDE_COUNT,
-      ),
-    [report, soundtrackOpts],
-  );
+
+  useEffect(() => {
+    onSoundtrackUriChange?.(soundtrackUri);
+  }, [soundtrackUri, onSoundtrackUriChange]);
+
+  useEffect(() => {
+    onPausedChange?.(paused);
+  }, [paused, onPausedChange]);
 
   const sceneMotion = (scene: number) => ({
     active: active === scene,
@@ -300,7 +308,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
 
   return (
     <div
-      className="wrapped-story relative"
+      className="wrapped-story relative min-h-dvh"
       onClick={(e) => {
         const t = e.target as HTMLElement | null;
         if (t?.closest("a, button, input, textarea, select, [role='button']")) {
@@ -355,7 +363,10 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
               variant="default"
               aria-label={soundOn ? "Mute soundtrack" : "Enable soundtrack"}
               disabled={!soundtrackUri}
-              onClick={() => setSoundOn((on) => !on)}
+              onClick={() => {
+                if (soundOn) onDisableSound();
+                else onEnableSound();
+              }}
               className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90 disabled:opacity-40"
             >
               <Icon
@@ -370,7 +381,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
 
       <div
         ref={scrollerRef}
-        className="flex h-[calc(100dvh-3.75rem)] snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {/* 0 — year open + thesis (paired) */}
         <WrappedStorySlide
@@ -459,7 +470,8 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
                       fill
                       sizes="192px"
                       className="object-cover"
-                      priority={active === 2}
+                      // Eager: horizontal snap + opacity enter motion break Safari lazy-load.
+                      priority
                     />
                   ) : null}
                 </div>
@@ -613,7 +625,7 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
-          className="relative flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full min-w-full shrink-0 snap-start snap-always flex-col items-center justify-center bg-[var(--wrapped-canvas)] px-6 py-20 text-[var(--wrapped-ink)] md:px-10"
+          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col items-center justify-center bg-[var(--wrapped-canvas)] px-6 py-20 text-[var(--wrapped-ink)] md:px-10"
           aria-hidden={active !== FINALE_INDEX}
         >
           <div className="relative z-10 flex w-full max-w-xl flex-col items-center">
@@ -640,26 +652,20 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
         </section>
       </div>
 
-      <DeckSoundtrack
-        uri={soundtrackUri}
-        preloadUris={soundtrackPreload}
-        enabled={soundOn && !paused}
-        showToggle={false}
-        className="z-30"
-      />
-
       <button
         type="button"
         aria-label="Previous slide"
         disabled={active <= 0}
-        onClick={() => goTo(active - 1)}
+        onPointerDown={() => primeSoundtrackFor(active - 1)}
+        onClick={() => void goTo(active - 1)}
         className="absolute inset-y-0 left-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
       />
       <button
         type="button"
         aria-label="Next slide"
         disabled={active >= FINALE_INDEX}
-        onClick={() => goTo(active + 1)}
+        onPointerDown={() => primeSoundtrackFor(active + 1)}
+        onClick={() => void goTo(active + 1)}
         className="absolute inset-y-0 right-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
       />
 
@@ -669,7 +675,8 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
             type="button"
             size="icon-sm"
             variant="ghost"
-            onClick={() => goTo(active - 1)}
+            onPointerDown={() => primeSoundtrackFor(active - 1)}
+            onClick={() => void goTo(active - 1)}
             disabled={active <= 0}
             className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
             aria-label="Previous slide"
@@ -684,7 +691,8 @@ export function ApiScrappedDeck({ report, initialSoundOn = false }: Props) {
             type="button"
             size="icon-sm"
             variant="ghost"
-            onClick={() => goTo(active + 1)}
+            onPointerDown={() => primeSoundtrackFor(active + 1)}
+            onClick={() => void goTo(active + 1)}
             disabled={active >= FINALE_INDEX}
             className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
             aria-label="Next slide"
