@@ -11,12 +11,17 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   message?: string;
-  mode: "auth" | "fetch" | "error" | "ready";
+  mode: "auth" | "fetch" | "error" | "ready" | "loading";
   displayName?: string | null;
   retryAfterSeconds?: number;
   quotaExceeded?: boolean;
   /** Ready mode: continue into the story deck. */
   onContinue?: () => void;
+  /** When false, Continue waits until the lead soundtrack embed is primed. */
+  continueEnabled?: boolean;
+  /** Soundtrack warm progress (ready gate + loading). */
+  warmReady?: number;
+  warmTotal?: number;
 };
 
 const gateCtaClass = cn(
@@ -27,6 +32,10 @@ const gateCtaClass = cn(
 const consentClass =
   "mt-4 max-w-[16rem] font-sans text-xs leading-relaxed text-[var(--wrapped-muted)]";
 
+/** Soundtrack opt-in — Continue/Start is the user gesture that unlocks audio. */
+const SOUNDTRACK_CONSENT =
+  "Continue starts the soundtrack. You can mute anytime in the story.";
+
 export function ScrappedGate({
   message,
   mode,
@@ -34,6 +43,9 @@ export function ScrappedGate({
   retryAfterSeconds,
   quotaExceeded,
   onContinue,
+  continueEnabled = true,
+  warmReady = 0,
+  warmTotal = 0,
 }: Props) {
   const connected = mode !== "auth";
   const name = displayName?.trim() || null;
@@ -80,20 +92,49 @@ export function ScrappedGate({
               Start
             </a>
             <p className={consentClass}>
-              By entering you allow audio to play and any other things a user
-              needs to accept here.
+              Connect Spotify to build your Scrapped. The next Continue starts
+              the soundtrack — mute anytime.
             </p>
           </>
         ) : mode === "ready" ? (
           <>
-            <button type="button" onClick={onContinue} className={gateCtaClass}>
-              Continue
+            <button
+              type="button"
+              onClick={onContinue}
+              disabled={!continueEnabled}
+              className={cn(
+                gateCtaClass,
+                !continueEnabled && "pointer-events-none opacity-50",
+              )}
+            >
+              {continueEnabled ? "Continue" : "Cueing…"}
             </button>
             <p className={consentClass}>
-              By entering you allow audio to play and any other things a user
-              needs to accept here.
+              {continueEnabled
+                ? SOUNDTRACK_CONSENT
+                : "Priming your soundtrack so playback starts instantly…"}
             </p>
           </>
+        ) : mode === "loading" ? (
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <p className="font-sans text-base font-semibold text-[var(--wrapped-ink)]">
+              Starting soundtrack
+            </p>
+            <p className="max-w-[16rem] font-sans text-xs leading-relaxed text-[var(--wrapped-muted)]">
+              Waiting until the first track is actually playing…
+              {warmTotal > 0 ? (
+                <span className="mt-1 block font-mono tabular-nums">
+                  {warmReady} / {warmTotal} warmed
+                </span>
+              ) : null}
+            </p>
+            <div
+              className="mt-2 h-1 w-40 overflow-hidden rounded-full bg-[var(--wrapped-ink)]/10"
+              aria-hidden
+            >
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--wrapped-ink)]" />
+            </div>
+          </div>
         ) : retryAfterSeconds ? (
           <SpotifyRateLimitWait
             message={message ?? ""}
@@ -115,8 +156,8 @@ export function ScrappedGate({
             />
             {mode === "fetch" ? (
               <p className={cn(consentClass, "mx-auto")}>
-                By entering you allow audio to play and any other things a user
-                needs to accept here.
+                Load your listening data. The following Continue starts the
+                soundtrack — mute anytime.
               </p>
             ) : null}
           </div>

@@ -24,6 +24,11 @@ export const API_SCRAPPED_BEAT_COUNTS = [
   2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
 ] as const;
 
+/** Per-scene motion length (ms). Slide 0: 3s first line → 3s thesis. */
+export const API_SCRAPPED_SCENE_MS = [
+  6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000,
+] as const;
+
 export function isArtistActSlide(slideIndex: number): boolean {
   return (ARTIST_ACT_SLIDES as readonly number[]).includes(slideIndex);
 }

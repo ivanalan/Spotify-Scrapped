@@ -197,7 +197,7 @@ export function ShareRecapCard({
                 fill
                 sizes="320px"
                 className="object-cover"
-                priority={active}
+                priority
               />
             ) : null}
           </div>

@@ -66,6 +66,8 @@ export function WrappedEntityList({
                 fill
                 sizes="56px"
                 className="object-cover"
+                // List mounts inside an opacity animation; Safari skips lazy imgs.
+                loading="eager"
               />
             ) : null}
           </span>

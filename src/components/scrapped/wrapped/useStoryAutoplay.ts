@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-/** Scene motion length — long enough for two text phases. Does not auto-advance. */
-export const STORY_SCENE_MS = 8000;
+/** Default scene motion length — long enough for two text phases. Does not auto-advance. */
+export const STORY_SCENE_MS = 6000;
+
+/** Stable fallback so the effect deps array never gains/loses a slot. */
+const NO_SCENE_DURATIONS: readonly number[] = [];
 
 type Options = {
   active: number;
@@ -12,6 +15,8 @@ type Options = {
   sceneCount: number;
   /** Beats per scene (1 = single copy block, 2 = enter/exit pair). */
   beatCounts: readonly number[];
+  /** Per-scene duration in ms; falls back to STORY_SCENE_MS. */
+  sceneDurationsMs?: readonly number[];
   /** When true, skip the progress clock (e.g. share finale). */
   holdActive?: boolean;
   paused: boolean;
@@ -29,6 +34,7 @@ export function useStoryAutoplay({
   visitKey,
   sceneCount,
   beatCounts,
+  sceneDurationsMs = NO_SCENE_DURATIONS,
   holdActive = false,
   paused,
   reduceMotion,
@@ -60,7 +66,7 @@ export function useStoryAutoplay({
     }
     if (active < 0 || active >= sceneCount) return;
 
-    const duration = STORY_SCENE_MS;
+    const duration = sceneDurationsMs?.[active] ?? STORY_SCENE_MS;
     const beats = Math.max(1, beatCounts[active] ?? 1);
     const beatWindow = duration / beats;
 
@@ -113,6 +119,7 @@ export function useStoryAutoplay({
     visitKey,
     sceneCount,
     beatCounts,
+    sceneDurationsMs,
     holdActive,
     reduceMotion,
     activeFillRef,

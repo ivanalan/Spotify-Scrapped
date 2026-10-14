@@ -237,7 +237,7 @@ export function WrappedStorySlide({
       data-scrapped-slide
       data-wrapped-tone={tone}
       className={cn(
-        "relative flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 py-24 md:px-14",
+        "relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 py-24 md:px-14",
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",
         sceneAlign === "center" ? "justify-center text-center" : "justify-center",
         className,
