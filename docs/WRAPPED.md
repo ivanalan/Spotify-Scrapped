@@ -103,7 +103,7 @@ Current export order that already follows this:
 
 Mocks in `docs/mocks/` set the voice: light solid backgrounds, no art yet, **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines — not industrial receipt chrome.
 
-Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle pairs (e.g. `3.1` → `3.2`) stay on **one scene** — headline staggers in, then subline.
+Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle→aside lines on one narrative block stay on **one scene** — each line is its own beat (reading-time paced); later lines accumulate without wiping the title.
 
 ```
 Scene 0 (2 beats, ~8s): year / Scrapped → Hey {name} + welcome
@@ -117,7 +117,7 @@ Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist
 Scene 8: Share finale (holds; no auto-advance)
 ```
 
-API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; copy enters (staggered rise/fade) then exits before the next line. Hold/space pauses. Prev/next resets and replays the target scene.
+API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses. Prev/next resets and replays the target scene.
 
 Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx`.
 

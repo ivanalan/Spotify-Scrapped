@@ -63,7 +63,7 @@ Do **not** introduce:
 Before shipping UI changes:
 
 - [ ] Slide background is a solid tint, not art/atmosphere
-- [ ] Headline + subline animate in sequence; respect `prefers-reduced-motion`
+- [ ] Headline → subline → aside are reading-timed line beats; respect `prefers-reduced-motion`
 - [ ] Empty states keep a short honest line
 - [ ] No new AI-slop patterns from the ban list
 - [ ] Copy matches the API conversational spine in WRAPPED.md

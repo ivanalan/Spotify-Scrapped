@@ -136,6 +136,12 @@ export function ApiMetricsLab(props: Props) {
           >
             Scrapped Plus →
           </Link>
+          <Link
+            href="/scrapped/art"
+            className="text-foreground underline-offset-2 hover:underline"
+          >
+            Art lab →
+          </Link>
           <span className="text-muted-foreground">
             Windows: 4 weeks · 6 months · several years. Each list is five.
             Play expands a preview under the song.
