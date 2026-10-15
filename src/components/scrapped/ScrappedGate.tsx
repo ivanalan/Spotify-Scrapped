@@ -17,6 +17,11 @@ type Props = {
   quotaExceeded?: boolean;
   /** Ready mode: continue into the story deck. */
   onContinue?: () => void;
+  /**
+   * Fire on Continue pointerdown so Spotify play() starts before click/story mount
+   * (cold embeds need that head start to feel instant).
+   */
+  onContinuePointerDown?: () => void;
   /** When false, Continue waits until the lead soundtrack embed is primed. */
   continueEnabled?: boolean;
   /** Soundtrack warm progress (ready gate + loading). */
@@ -43,6 +48,7 @@ export function ScrappedGate({
   retryAfterSeconds,
   quotaExceeded,
   onContinue,
+  onContinuePointerDown,
   continueEnabled = true,
   warmReady = 0,
   warmTotal = 0,
@@ -100,6 +106,7 @@ export function ScrappedGate({
           <>
             <button
               type="button"
+              onPointerDown={onContinuePointerDown}
               onClick={onContinue}
               disabled={!continueEnabled}
               className={cn(

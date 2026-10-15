@@ -86,25 +86,33 @@ export function ScrappedExperience({ report }: Props) {
     };
   }, [report]);
 
-  // Fallback path only: Continue before the lead was primed.
+  // Fallback if Continue raced ahead of a cold embed.
   useEffect(() => {
     if (phase !== "loading") return;
-    if (warm.leadAudible || warm.leadReady) {
+    if (warm.leadAudible) {
       setPhase("story");
       return;
     }
     const fallback = window.setTimeout(() => setPhase("story"), 3500);
     return () => window.clearTimeout(fallback);
-  }, [phase, warm.leadAudible, warm.leadReady]);
+  }, [phase, warm.leadAudible]);
 
   function enableSoundFromGesture() {
     soundtrackRef.current?.playFromUserGesture();
     setSoundOn(true);
   }
 
+  /**
+   * Spotify has no mute — arm = play until audible, pause at t=3.
+   * Continue click resume()s that buffer (“unmute”).
+   */
+  function handleContinuePointerDown() {
+    soundtrackRef.current?.armLeadFromGesture();
+  }
+
   function handleContinue() {
-    // Lead is already primed at t=3 — play() in this tap should be instant.
     enableSoundFromGesture();
+    // Enter story immediately; slide 0 copy waits ~500ms so audio can catch up.
     setPhase("story");
   }
 
@@ -118,38 +126,44 @@ export function ScrappedExperience({ report }: Props) {
 
   const started = phase === "story";
   const continueEnabled = warm.leadReady || soundtrackPreload.length === 0;
+  // Mount the deck while Cueing/Continue so play() isn't fighting a remount.
+  const deckMounted = continueEnabled || phase !== "gate";
 
   return (
     <div className="relative left-1/2 w-screen -translate-x-1/2">
-      {phase === "gate" ? (
+      {phase !== "story" ? (
         <ScrappedGate
-          mode="ready"
+          mode={phase === "loading" ? "loading" : "ready"}
           displayName={report.profileName}
-          onContinue={handleContinue}
+          onContinue={phase === "gate" ? handleContinue : undefined}
+          onContinuePointerDown={
+            phase === "gate" ? handleContinuePointerDown : undefined
+          }
           continueEnabled={continueEnabled}
           warmReady={warm.ready}
-          warmTotal={Math.max(warm.total, 1)}
+          warmTotal={Math.max(warm.total, phase === "loading" ? warm.total : 1)}
         />
-      ) : phase === "loading" ? (
-        <ScrappedGate
-          mode="loading"
-          displayName={report.profileName}
-          warmReady={warm.ready}
-          warmTotal={warm.total}
-        />
-      ) : (
-        <ApiScrappedDeck
-          report={report}
-          soundOn={soundOn}
-          artistSoundtrackUri={artistSoundtrackUri}
-          onEnableSound={enableSoundFromGesture}
-          onDisableSound={() => setSoundOn(false)}
-          onPausedChange={setDeckPaused}
-          onSoundtrackUriChange={setSoundtrackUri}
-          onSoundtrackPrimeTo={primeSoundtrackTo}
-          onSoundtrackCutTo={cutSoundtrackTo}
-        />
-      )}
+      ) : null}
+
+      {deckMounted ? (
+        <div
+          className={started ? undefined : "hidden"}
+          aria-hidden={!started}
+        >
+          <ApiScrappedDeck
+            report={report}
+            soundOn={soundOn}
+            artistSoundtrackUri={artistSoundtrackUri}
+            onEnableSound={enableSoundFromGesture}
+            onDisableSound={() => setSoundOn(false)}
+            onPausedChange={setDeckPaused}
+            onSoundtrackUriChange={setSoundtrackUri}
+            onSoundtrackPrimeTo={primeSoundtrackTo}
+            onSoundtrackCutTo={cutSoundtrackTo}
+            held={!started}
+          />
+        </div>
+      ) : null}
 
       {/* Mounted on the gate so Continue can unlock a warm embed in-gesture. */}
       <DeckSoundtrack

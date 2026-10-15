@@ -3,6 +3,7 @@
 import {
   forwardRef,
   useEffect,
+  useEffectEvent,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -17,6 +18,14 @@ import { cn } from "@/lib/utils";
 /** Call from a click handler so Safari/Chrome allow Spotify embed playback. */
 export type DeckSoundtrackHandle = {
   playFromUserGesture: () => void;
+  /**
+   * Gate-only: play the lead until audible, then pause near START_AT_SEC.
+   * Spotify has no mute — this is the “pre-roll then unmute” stand-in.
+   * Call from Continue pointerdown; playFromUserGesture resume()s the hot buffer.
+   */
+  armLeadFromGesture: () => void;
+  /** Sync read — true when the lead URI has produced audio (not React-warm lag). */
+  isLeadAudible: () => boolean;
   /**
    * Speculatively start the next act, then pause it once audible so the
    * current track stays solo. Call from pointerdown; follow with cutTo on navigate.
@@ -306,6 +315,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const needsResumeRef = useRef(false);
     /** Continue tapped before the embed was warm — play on the next ready tick. */
     const pendingGesturePlayRef = useRef(false);
+    /**
+     * Gate arm: play→pause hot-prime while sound is still “off”.
+     * Spotify has no mute; pause near START_AT_SEC is the unmute stand-in.
+     */
+    const armingLeadRef = useRef(false);
     /** Per-URI loop high-water + cooldown (shared across act/twin slots). */
     const loopStateRef = useRef<
       Map<
@@ -441,35 +455,44 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       clearLoopCutoverTimer();
     }
 
-    function runSync(targetUri: string | null, isEnabled: boolean) {
-      if (targetUri) ensureTwinUri(targetUri);
-      syncPlayback(
-        poolRef,
-        loopTwinRef,
-        playingUriRef,
-        playingSlotRef,
-        incomingUriRef,
-        incomingLoopSlotRef,
-        needsResumeRef,
-        syncGenRef,
-        enforceTimersRef,
-        cutoverTimerRef,
-        targetUri,
-        isEnabled,
-        setVisibleUri,
-        resolveCutWaiters,
-        () => {
-          playingSlotRef.current = "act";
-          incomingLoopSlotRef.current = null;
-          clearLoopCutoverTimer();
-          loopTwinHotRef.current = false;
-          actSlotHotRef.current = false;
-        },
-      );
-    }
+    const runSync = useEffectEvent(
+      (targetUri: string | null, isEnabled: boolean) => {
+        if (targetUri) ensureTwinUri(targetUri);
+        syncPlayback(
+          poolRef,
+          loopTwinRef,
+          playingUriRef,
+          playingSlotRef,
+          incomingUriRef,
+          incomingLoopSlotRef,
+          needsResumeRef,
+          syncGenRef,
+          enforceTimersRef,
+          cutoverTimerRef,
+          targetUri,
+          isEnabled,
+          setVisibleUri,
+          resolveCutWaiters,
+          () => {
+            playingSlotRef.current = "act";
+            incomingLoopSlotRef.current = null;
+            clearLoopCutoverTimer();
+            loopTwinHotRef.current = false;
+            actSlotHotRef.current = false;
+          },
+        );
+      },
+    );
 
     /** Slot-aware: act URI allowed for act switch / prime / owning act slot. */
     function isActPlaybackAllowed(trackUri: string): boolean {
+      // Gate arm may run before soundOn — still allow the lead chirp→pause.
+      if (
+        armingLeadRef.current &&
+        primingUriRef.current === trackUri
+      ) {
+        return true;
+      }
       if (!enabledRef.current) return false;
       if (primingUriRef.current === trackUri) return true;
       if (incomingUriRef.current === trackUri) return true;
@@ -517,7 +540,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
      */
     function tryFinishPrime(trackUri: string) {
       if (primingUriRef.current !== trackUri) return false;
-      // cutTo took over — let tryCutover own this audible event.
+      // cutTo / Continue took over — let tryCutover / live play own this audible event.
       if (
         aheadUriRef.current === trackUri ||
         incomingUriRef.current === trackUri
@@ -531,6 +554,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       entry.controller.seek(START_AT_SEC);
       entry.host.className = HOST_IDLE;
       primingUriRef.current = null;
+      armingLeadRef.current = false;
       hotPrimedUriRef.current = trackUri;
       if (incomingUriRef.current === trackUri) incomingUriRef.current = null;
       return true;
@@ -750,7 +774,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       );
     }
 
-    function attachEntryListeners(entry: PoolEntry) {
+    const attachEntryListeners = useEffectEvent((entry: PoolEntry) => {
       const { controller, slot } = entry;
       const trackUriFor = () => entry.uri;
 
@@ -901,7 +925,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         if (!pausedAtEnd && !resetAfterEnd) return;
         beginLoopCutover(trackUri);
       });
-    }
+    });
 
     const [apiReady, setApiReady] = useState(false);
     const [uncontrolledEnabled, setUncontrolledEnabled] = useState(false);
@@ -920,20 +944,103 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     activeUriRef.current = uri;
 
     useImperativeHandle(ref, () => ({
+      armLeadFromGesture() {
+        const target = asTrackUri(activeUriRef.current);
+        if (!target) return;
+        if (hotPrimedUriRef.current === target) return;
+        if (playingUriRef.current === target) return;
+        if (primingUriRef.current === target) return;
+
+        const entry = poolRef.current.get(target);
+        if (!entry?.ready) return;
+
+        // Spotify has no mute — play until audible, then pause at the hook.
+        armingLeadRef.current = true;
+        primingUriRef.current = target;
+        entry.host.className = HOST_WARM;
+        entry.controller.seek(START_AT_SEC);
+        entry.controller.play();
+      },
       playFromUserGesture() {
         pendingGesturePlayRef.current = true;
         enabledRef.current = true;
         needsResumeRef.current = false;
         clearSwitchTimer();
-        committedUriRef.current = activeUriRef.current;
+        const target = activeUriRef.current;
+        committedUriRef.current = target;
         setEnabled(true);
-        runSync(committedUriRef.current, true);
+
+        // Already owning audio (e.g. pointerdown already started play).
+        if (target && playingUriRef.current === target) {
+          pendingGesturePlayRef.current = false;
+          armingLeadRef.current = false;
+          const live =
+            playingSlotRef.current === "loop"
+              ? loopTwinRef.current?.uri === target
+                ? loopTwinRef.current
+                : null
+              : poolRef.current.get(target);
+          if (live) {
+            live.host.className = HOST_LIVE;
+            setVisibleUri(target);
+            return;
+          }
+        }
+
+        // Hot-primed lead: resume() is near-instant vs cold play().
+        if (target && hotPrimedUriRef.current === target) {
+          const entry = poolRef.current.get(target);
+          if (entry?.ready) {
+            hotPrimedUriRef.current = null;
+            armingLeadRef.current = false;
+            primingUriRef.current = null;
+            playingUriRef.current = target;
+            playingSlotRef.current = "act";
+            incomingUriRef.current = null;
+            entry.host.className = HOST_LIVE;
+            entry.controller.resume();
+            pauseOthersExceptUri(target);
+            ensureTwinUri(target);
+            setVisibleUri(target);
+            pendingGesturePlayRef.current = false;
+            return;
+          }
+        }
+
+        // Arm still buffering — promote to live play (don't pause on audible).
         if (
-          activeUriRef.current &&
-          playingUriRef.current === activeUriRef.current
+          target &&
+          armingLeadRef.current &&
+          primingUriRef.current === target
         ) {
+          const entry = poolRef.current.get(target);
+          armingLeadRef.current = false;
+          primingUriRef.current = null;
+          if (entry) {
+            playingUriRef.current = target;
+            playingSlotRef.current = "act";
+            incomingUriRef.current = null;
+            entry.host.className = HOST_LIVE;
+            // play() already in flight from arm — nudge in case it stalled.
+            entry.controller.play();
+            pauseOthersExceptUri(target);
+            ensureTwinUri(target);
+            setVisibleUri(target);
+            pendingGesturePlayRef.current = false;
+            return;
+          }
+        }
+
+        armingLeadRef.current = false;
+        runSync(target, true);
+        if (target && playingUriRef.current === target) {
           pendingGesturePlayRef.current = false;
         }
+      },
+      isLeadAudible() {
+        const lead = asTrackUri(activeUriRef.current);
+        if (!lead) return true;
+        return poolRef.current.get(lead)?.audible === true;
       },
       primeTo(nextUri: string | null) {
         const target = asTrackUri(nextUri);
@@ -1054,6 +1161,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }, [uri, preloadUris]);
 
     const warmState = useMemo((): SoundtrackWarmState => {
+      // poolTick re-reads poolRef/creatingRef when embed readiness changes.
+      void poolTick;
       const lead = asTrackUri(uri);
       const leadEntry = lead ? poolRef.current.get(lead) : undefined;
       const leadReady = lead ? leadEntry?.ready === true : true;
@@ -1105,6 +1214,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     useEffect(() => {
       const win = window as SpotifyWindow;
       let cancelled = false;
+      const pool = poolRef.current;
+      const creating = creatingRef.current;
 
       function captureApi(api: IFrameAPI) {
         if (cancelled) return;
@@ -1136,11 +1247,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         clearCutoverTimer();
         clearLoopCutoverTimer();
         clearAllEndTimers();
-        for (const entry of poolRef.current.values()) {
+        for (const entry of pool.values()) {
           entry.controller.destroy();
         }
-        poolRef.current.clear();
-        creatingRef.current.clear();
+        pool.clear();
+        creating.clear();
         loopTwinRef.current?.controller.destroy();
         loopTwinRef.current = null;
         loopTwinCreatingRef.current = false;
@@ -1259,9 +1370,21 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         incomingUriRef.current = null;
         incomingLoopSlotRef.current = null;
         aheadUriRef.current = null;
+        committedUriRef.current = uri;
+
+        // Gate arm / parked hot prime must survive soundOn=false — runSync(false)
+        // would pause the buffer we're about to resume() on Continue.
+        if (armingLeadRef.current) {
+          setVisibleUri(null);
+          return;
+        }
+        if (hotPrimedUriRef.current && playingUriRef.current == null) {
+          setVisibleUri(null);
+          return;
+        }
+
         primingUriRef.current = null;
         hotPrimedUriRef.current = null;
-        committedUriRef.current = uri;
         runSync(uri, false);
         return;
       }
@@ -1326,6 +1449,9 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }, [uri, enabled]);
 
     useEffect(() => {
+      // Don't let readiness ticks pause an in-flight gate arm / parked prime.
+      if (armingLeadRef.current) return;
+      if (hotPrimedUriRef.current && !enabledRef.current) return;
       runSync(committedUriRef.current, enabledRef.current);
     }, [poolTick]);
 
@@ -1344,6 +1470,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
     function turnOff() {
       pendingGesturePlayRef.current = false;
+      armingLeadRef.current = false;
       clearSwitchTimer();
       clearEnforceTimers();
       clearCutoverTimer();
