@@ -38,6 +38,13 @@ type Props = {
   beatIndex?: number;
   /** Remount key so revisiting a scene replays enter motion. */
   replayKey?: number;
+  /**
+   * Extra delay before copy enters (seconds). Used on the open slide so the
+   * soundtrack can catch up while the canvas sits empty.
+   */
+  copyEnterDelaySec?: number;
+  /** Soft blur-in on copy (open slide). Ignored when reduced-motion. */
+  copyBlurIn?: boolean;
   className?: string;
   /** Multi-beat scene (same canvas; text enters then exits). */
   beats?: WrappedStoryBeat[];
@@ -55,23 +62,28 @@ type Props = {
 const enterEase = [0.22, 1, 0.36, 1] as const;
 const exitEase = [0.4, 0, 1, 1] as const;
 
-const beatContainer = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.04,
+function beatContainerVariants(delayChildren: number) {
+  return {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.14,
+        delayChildren,
+      },
     },
-  },
-  exit: {
-    transition: {
-      staggerChildren: 0.05,
-      staggerDirection: -1 as const,
+    exit: {
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1 as const,
+      },
     },
-  },
-};
+  };
+}
 
-function lineVariants(reduceMotion: boolean | null) {
+function lineVariants(
+  reduceMotion: boolean | null,
+  options: { blurIn: boolean },
+) {
   if (reduceMotion) {
     return {
       hidden: { opacity: 0 },
@@ -80,17 +92,24 @@ function lineVariants(reduceMotion: boolean | null) {
     };
   }
   return {
-    hidden: { opacity: 0, y: 28, scale: 0.97 },
+    hidden: {
+      opacity: 0,
+      y: 28,
+      scale: 0.97,
+      ...(options.blurIn ? { filter: "blur(12px)" } : null),
+    },
     show: {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.55, ease: enterEase },
+      ...(options.blurIn ? { filter: "blur(0px)" } : null),
+      transition: { duration: options.blurIn ? 0.7 : 0.55, ease: enterEase },
     },
     exit: {
       opacity: 0,
       y: -20,
       scale: 0.99,
+      ...(options.blurIn ? { filter: "blur(8px)" } : null),
       transition: { duration: 0.38, ease: exitEase },
     },
   };
@@ -99,13 +118,20 @@ function lineVariants(reduceMotion: boolean | null) {
 function BeatBody({
   beat,
   reduceMotion,
+  delayChildren,
+  blurIn,
 }: {
   beat: WrappedStoryBeat;
   reduceMotion: boolean | null;
+  delayChildren: number;
+  blurIn: boolean;
 }) {
   const align = beat.align ?? "start";
   const display = beat.display ?? "sentence";
-  const variants = lineVariants(reduceMotion);
+  const variants = lineVariants(reduceMotion, { blurIn });
+  const container = beatContainerVariants(
+    reduceMotion ? 0 : delayChildren,
+  );
 
   return (
     <motion.div
@@ -114,7 +140,7 @@ function BeatBody({
         align === "center" ? "items-center" : "items-stretch",
         beat.children || beat.lead ? "gap-8" : "gap-5",
       )}
-      variants={beatContainer}
+      variants={container}
       initial="hidden"
       animate="show"
       exit="exit"
@@ -196,6 +222,8 @@ export function WrappedStorySlide({
   active = false,
   beatIndex = 0,
   replayKey = 0,
+  copyEnterDelaySec = 0.04,
+  copyBlurIn = false,
   className,
   beats,
   headline,
@@ -231,6 +259,9 @@ export function WrappedStorySlide({
   );
   const current = resolvedBeats[safeIndex]!;
   const sceneAlign = current.align ?? align;
+  // Only hold the first beat of a scene for soundtrack catch-up.
+  const delayChildren =
+    safeIndex === 0 ? copyEnterDelaySec : 0.04;
 
   return (
     <section
@@ -250,6 +281,8 @@ export function WrappedStorySlide({
             key={`${replayKey}-${safeIndex}`}
             beat={current}
             reduceMotion={reduceMotion}
+            delayChildren={delayChildren}
+            blurIn={copyBlurIn && safeIndex === 0}
           />
         ) : null}
       </AnimatePresence>

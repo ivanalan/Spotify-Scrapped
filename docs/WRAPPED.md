@@ -121,6 +121,8 @@ API deck plays like Stories for *in-scene* motion: progress segments fill leftâ†
 
 Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails â€” keep the beat.
 
+**API slide copy brief:** edit [`docs/STORY_SCRIPT.md`](STORY_SCRIPT.md), then sync into `ApiScrappedDeck.tsx`. The markdown is the planning source of truth; the component is the implementation (not imported at runtime).
+
 ---
 
 ## 4. Year themes (what to learn, not copy)

@@ -49,10 +49,17 @@ type Props = {
    * never hears both acts. No-ops when sound is off or the URI is unchanged.
    */
   onSoundtrackCutTo?: (uri: string | null) => Promise<void>;
+  /**
+   * Freeze scene progress while premounted under the gate so Continue can
+   * reveal a warm deck without remounting on the same gesture as play().
+   */
+  held?: boolean;
 };
 
 const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
+/** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
+const INTRO_COPY_DELAY_SEC = 0.5;
 
 function cardById(
   report: ScrappedApiReport,
@@ -79,6 +86,7 @@ export function ApiScrappedDeck({
   onSoundtrackUriChange,
   onSoundtrackPrimeTo,
   onSoundtrackCutTo,
+  held = false,
 }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const activeFillRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +98,29 @@ export function ApiScrappedDeck({
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
   const reduceMotion = useReducedMotion();
-  const paused = pausedSticky;
+  // Open-slide gate: derive from session key vs async unlock (no sync setState in effects).
+  const introSessionKey = held || active !== 0 ? null : String(visitKey);
+  const [introUnlockedFor, setIntroUnlockedFor] = useState<string | null>(null);
+  const introGate =
+    introSessionKey != null && introUnlockedFor !== introSessionKey;
+  const paused = pausedSticky || held || introGate;
+  const activeRef = useRef(active);
+
+  // Match open-slide copy delay so the progress bar doesn't run on empty canvas.
+  useEffect(() => {
+    if (introSessionKey == null) return;
+    const key = introSessionKey;
+    const id = window.setTimeout(
+      () => setIntroUnlockedFor(key),
+      INTRO_COPY_DELAY_SEC * 1000,
+    );
+    return () => window.clearTimeout(id);
+  }, [introSessionKey]);
+
+  // Latest active for IO / keyboard / goTo — sync in effect only (not during render).
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
@@ -170,18 +200,13 @@ export function ApiScrappedDeck({
     };
   }, []);
 
-  const activeRef = useRef(active);
-  useEffect(() => {
-    activeRef.current = active;
-  }, [active]);
-
   const goTo = useCallback(
     async (index: number) => {
       const root = scrollerRef.current;
       if (!root) return;
       const slides = root.querySelectorAll<HTMLElement>("[data-scrapped-slide]");
       const next = Math.min(Math.max(index, 0), slides.length - 1);
-      const prev = activeRef.current;
+      const prev = navigatingToRef.current ?? activeRef.current;
 
       setPausedSticky(false);
 
@@ -209,7 +234,6 @@ export function ApiScrappedDeck({
 
       setActive(next);
       setVisitKey((k) => k + 1);
-      activeRef.current = next;
 
       slides[next]?.scrollIntoView({
         // Instant scroll makes prev/next land on the right scene every time.
@@ -226,7 +250,7 @@ export function ApiScrappedDeck({
     (index: number) => {
       if (!soundOn || !onSoundtrackPrimeTo) return;
       const next = Math.min(Math.max(index, 0), SLIDE_COUNT - 1);
-      const prev = activeRef.current;
+      const prev = navigatingToRef.current ?? activeRef.current;
       if (next === prev) return;
       const fromUri = getApiSlideSoundtrackUri(report, prev, soundtrackOpts);
       const toUri = getApiSlideSoundtrackUri(report, next, soundtrackOpts);
@@ -297,27 +321,21 @@ export function ApiScrappedDeck({
   }, [soundtrackUri, onSoundtrackUriChange]);
 
   useEffect(() => {
-    onPausedChange?.(paused);
-  }, [paused, onPausedChange]);
+    // Report user pause only — `held` must not mute the soundtrack on reveal.
+    onPausedChange?.(pausedSticky);
+  }, [pausedSticky, onPausedChange]);
 
+  // While held under the gate, keep slides inactive so enter motion only
+  // starts once on Continue (not once hidden + again after a visitKey bump).
   const sceneMotion = (scene: number) => ({
-    active: active === scene,
-    beatIndex: active === scene ? beatIndex : 0,
-    replayKey: active === scene ? visitKey : 0,
+    active: !held && active === scene,
+    beatIndex: !held && active === scene ? beatIndex : 0,
+    replayKey: !held && active === scene ? visitKey : 0,
   });
 
   return (
-    <div
-      className="wrapped-story relative min-h-dvh"
-      onClick={(e) => {
-        const t = e.target as HTMLElement | null;
-        if (t?.closest("a, button, input, textarea, select, [role='button']")) {
-          return;
-        }
-        togglePaused();
-      }}
-    >
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 md:px-5">
+    <div className="wrapped-story relative min-h-dvh">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
         <div className="flex gap-1" aria-hidden>
           {Array.from({ length: SLIDE_COUNT }, (_, i) => {
             const fill = i < active ? 1 : 0;
@@ -383,10 +401,11 @@ export function ApiScrappedDeck({
         ref={scrollerRef}
         className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {/* 0 — year open + thesis (paired) */}
+        {/* 0 — year open + thesis (paired). Copy delayed so Continue audio can catch up. */}
         <WrappedStorySlide
           {...sceneMotion(0)}
           tone="paper"
+          copyEnterDelaySec={INTRO_COPY_DELAY_SEC}
           beats={[
             {
               headline: report.profileName ? (
@@ -411,6 +430,7 @@ export function ApiScrappedDeck({
               ),
               subline:
                 "What artists you ghosted, and which of your songs fell off. Ready?",
+              align: "center",
               display: "hero",
               footer: "Created by Alan Matias",
             },
@@ -652,13 +672,17 @@ export function ApiScrappedDeck({
         </section>
       </div>
 
+      {/*
+        Stories-style tap targets above slide copy (z-10) / motion layers.
+        Chrome stays higher (z-40) so pause / mute / sign-out still win.
+      */}
       <button
         type="button"
         aria-label="Previous slide"
         disabled={active <= 0}
         onPointerDown={() => primeSoundtrackFor(active - 1)}
         onClick={() => void goTo(active - 1)}
-        className="absolute inset-y-0 left-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
+        className="absolute inset-y-0 left-0 z-30 w-[30%] select-none disabled:pointer-events-none"
       />
       <button
         type="button"
@@ -666,10 +690,10 @@ export function ApiScrappedDeck({
         disabled={active >= FINALE_INDEX}
         onPointerDown={() => primeSoundtrackFor(active + 1)}
         onClick={() => void goTo(active + 1)}
-        className="absolute inset-y-0 right-0 z-[5] w-[18%] disabled:pointer-events-none md:w-[14%]"
+        className="absolute inset-y-0 right-0 z-30 w-[70%] select-none disabled:pointer-events-none"
       />
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex items-center justify-center gap-3">
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-40 flex items-center justify-center gap-3">
         <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--wrapped-ink)]/15 bg-[var(--wrapped-canvas)]/90 px-3 py-2 backdrop-blur-sm">
           <Button
             type="button"
