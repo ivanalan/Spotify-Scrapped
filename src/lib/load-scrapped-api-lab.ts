@@ -3,6 +3,7 @@ import "server-only";
 import {
   SCRAPPED_API_YEAR,
   buildScrappedApiReport,
+  ensureApiReportSummary,
   type ScrappedApiReport,
 } from "./scrapped-api";
 import {
@@ -24,34 +25,46 @@ import {
 } from "./spotify/listening";
 
 /**
- * Ensure #1 sabbatical artist has a playable trackId that differs from the
- * #1 left-long song — otherwise artist-act slides keep the same soundtrack URI.
+ * Ensure sabbatical artists (#1 and #2) have playable trackIds distinct from
+ * the #1 left-long song — otherwise artist-act slides keep the same URI.
  */
 async function ensureArtistActSoundtrack(
   report: ScrappedApiReport,
 ): Promise<boolean> {
   const songs = report.cards.find((c) => c.id === "left-long-run");
   const artists = report.cards.find((c) => c.id === "left-long-artists");
-  const lead = artists?.items[0];
-  if (!lead?.label) return false;
+  if (!artists?.items.length) return false;
 
   const avoidId = songs?.items[0]?.trackId ?? null;
-  if (lead.trackId && lead.trackId !== avoidId) return false;
-
   const cooldown = getSpotifyCooldown();
   if (cooldown.remainingSec > 0) return false;
 
-  try {
-    const samples = await getArtistSampleTracks(lead.id, lead.label, 5);
-    const sample =
-      samples.find((t) => t.id !== avoidId) ?? samples[0] ?? null;
-    if (!sample) return false;
-    lead.trackId = sample.id;
-    if (!lead.imageUrl) lead.imageUrl = sample.imageUrl;
-    return true;
-  } catch {
-    return false;
+  let changed = false;
+  const used = new Set<string>();
+  if (avoidId) used.add(avoidId);
+
+  for (const lead of artists.items.slice(0, 2)) {
+    if (!lead?.label) continue;
+    if (lead.trackId && !used.has(lead.trackId)) {
+      used.add(lead.trackId);
+      continue;
+    }
+
+    try {
+      const samples = await getArtistSampleTracks(lead.id, lead.label, 5);
+      const sample =
+        samples.find((t) => !used.has(t.id)) ?? samples[0] ?? null;
+      if (!sample) continue;
+      lead.trackId = sample.id;
+      if (!lead.imageUrl) lead.imageUrl = sample.imageUrl;
+      used.add(sample.id);
+      changed = true;
+    } catch {
+      /* keep existing sample */
+    }
   }
+
+  return changed;
 }
 
 export type ScrappedApiLabResult =
@@ -113,27 +126,32 @@ async function reportFromSnapshot(
   userId?: string,
 ): Promise<Extract<ScrappedApiLabResult, { kind: "ready" }> | null> {
   const stored = await readApiLabSnapshot(userId);
-  if (!stored) return null;
-  // Prefer the sealed report (cookie / per-user file). Rebuild only if an older
-  // shape somehow still has raw snap fields (shouldn't after migrate).
-  const report = stored.report;
-  if (!report || report.year !== year) {
+  if (!stored?.report) return null;
+  try {
+    // Prefer the sealed report (cookie / per-user file). Rebuild only if an older
+    // shape somehow still has raw snap fields (shouldn't after migrate).
+    const report = ensureApiReportSummary(stored.report);
+    if (!report || report.year !== year) {
+      return null;
+    }
+    if (reportMissingArt(report)) {
+      return null;
+    }
+    report.fetchedAt = stored.fetchedAt;
+
+    // Older snapshots often reuse the #1 song as the artist sample (or omit
+    // trackId). Patch in-memory so /scrapped can switch audio without a
+    // full lab refresh; persist when we can.
+    if (await ensureArtistActSoundtrack(report)) {
+      stored.report = report;
+      await writeApiLabSnapshot(stored);
+    }
+
+    // Omit `stored` from the page result — Lab UI only needs `report`.
+    return { kind: "ready", report, ...cooldownFields() };
+  } catch {
     return null;
   }
-  if (reportMissingArt(report)) {
-    return null;
-  }
-  report.fetchedAt = stored.fetchedAt;
-
-  // Older snapshots often reuse the #1 song as the artist sample (or omit
-  // trackId). Patch in-memory so /scrapped can switch audio without a
-  // full lab refresh; persist when we can.
-  if (await ensureArtistActSoundtrack(report)) {
-    stored.report = report;
-    await writeApiLabSnapshot(stored);
-  }
-
-  return { kind: "ready", report, stored, ...cooldownFields() };
 }
 
 export async function loadScrappedApiLab(
@@ -209,7 +227,8 @@ export async function fetchAndStoreScrappedApiLab(
       absorb(getTopArtists("short_term"), []),
       absorb(getTopArtists("medium_term"), []),
       absorb(getTopArtists("long_term"), []),
-      absorb(getSavedTracksDetailed(4), { tracks: [], total: 0 }),
+      // Full Liked Songs library (paginated) — needed for liked-this-year + one-save metrics.
+      absorb(getSavedTracksDetailed(), { tracks: [], total: 0 }),
     ]);
     const liked = likedPage.tracks;
 
@@ -258,6 +277,9 @@ export async function fetchAndStoreScrappedApiLab(
       report,
       likedUris,
     };
+
+    // Persist to disk so local refreshes aren't cookie-only.
+    await writeApiLabSnapshot(stored);
 
     return { kind: "ready", report, stored };
   } catch (err) {

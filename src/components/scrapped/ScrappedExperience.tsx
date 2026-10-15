@@ -13,6 +13,7 @@ import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
   needsArtistSoundtrackResolve,
+  needsSecondArtistSoundtrackResolve,
 } from "@/lib/api-scrapped-soundtrack";
 import type { ScrappedApiReport } from "@/lib/scrapped-api";
 
@@ -22,6 +23,26 @@ type Props = {
 
 type Phase = "gate" | "loading" | "story";
 
+async function fetchArtistTrackUri(need: {
+  artistId: string;
+  artistName: string;
+  avoidTrackId: string | null;
+}): Promise<string | null> {
+  const params = new URLSearchParams({
+    id: need.artistId,
+    name: need.artistName,
+  });
+  if (need.avoidTrackId) params.set("avoid", need.avoidTrackId);
+  try {
+    const res = await fetch(`/api/spotify/artist-top-track?${params}`);
+    if (!res.ok) return null;
+    const body = (await res.json()) as { uri?: string };
+    return body?.uri ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function ScrappedExperience({ report }: Props) {
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
   const [phase, setPhase] = useState<Phase>("gate");
@@ -30,6 +51,9 @@ export function ScrappedExperience({ report }: Props) {
   const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
     null,
   );
+  const [artistSoundtrackUri2, setArtistSoundtrackUri2] = useState<
+    string | null
+  >(null);
   const [warm, setWarm] = useState<SoundtrackWarmState>({
     ready: 0,
     total: 0,
@@ -39,8 +63,8 @@ export function ScrappedExperience({ report }: Props) {
   });
 
   const soundtrackOpts = useMemo(
-    () => ({ artistSoundtrackUri }),
-    [artistSoundtrackUri],
+    () => ({ artistSoundtrackUri, artistSoundtrackUri2 }),
+    [artistSoundtrackUri, artistSoundtrackUri2],
   );
 
   const [soundtrackUri, setSoundtrackUri] = useState<string | null>(() =>
@@ -56,31 +80,33 @@ export function ScrappedExperience({ report }: Props) {
     [report, soundtrackOpts],
   );
 
-  // Warm artist-act audio on the gate (before Continue) when tops/likes lack a track.
+  // Warm artist-act audio on the gate when tops/likes lack distinct samples.
   useEffect(() => {
-    const need = needsArtistSoundtrackResolve(report);
-    if (!need) {
-      setArtistSoundtrackUri(null);
-      return;
-    }
     let cancelled = false;
-    const params = new URLSearchParams({
-      id: need.artistId,
-      name: need.artistName,
-    });
-    if (need.avoidTrackId) params.set("avoid", need.avoidTrackId);
-    fetch(`/api/spotify/artist-top-track?${params}`)
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return res.json() as Promise<{ uri?: string }>;
-      })
-      .then((body) => {
-        if (cancelled) return;
-        if (body?.uri) setArtistSoundtrackUri(body.uri);
-      })
-      .catch(() => {
-        /* keep song lead */
-      });
+    const need1 = needsArtistSoundtrackResolve(report);
+    const need2 = needsSecondArtistSoundtrackResolve(report);
+
+    if (!need1) setArtistSoundtrackUri(null);
+    if (!need2) setArtistSoundtrackUri2(null);
+
+    void (async () => {
+      let resolved1: string | null = null;
+      if (need1) {
+        resolved1 = await fetchArtistTrackUri(need1);
+        if (!cancelled && resolved1) setArtistSoundtrackUri(resolved1);
+      }
+      if (need2) {
+        const uri = await fetchArtistTrackUri({
+          ...need2,
+          avoidTrackId:
+            need2.avoidTrackId ??
+            resolved1?.replace(/^spotify:track:/, "") ??
+            null,
+        });
+        if (!cancelled && uri) setArtistSoundtrackUri2(uri);
+      }
+    })();
+
     return () => {
       cancelled = true;
     };
@@ -154,6 +180,7 @@ export function ScrappedExperience({ report }: Props) {
             report={report}
             soundOn={soundOn}
             artistSoundtrackUri={artistSoundtrackUri}
+            artistSoundtrackUri2={artistSoundtrackUri2}
             onEnableSound={enableSoundFromGesture}
             onDisableSound={() => setSoundOn(false)}
             onPausedChange={setDeckPaused}

@@ -78,8 +78,8 @@ type PlaybackUpdateEvent = {
  * Slack is wide — playback_update is sparse (~0.5–1s).
  */
 const END_RESTART_MS = 2500;
-/** Skip quiet intros — many tracks don't hit the hook for a few seconds. */
-const START_AT_SEC = 3;
+/** Playback / loop restart offset (seconds into the track). */
+const START_AT_SEC = 0;
 /** Ignore end-detection for this long after we kick a loop (avoids seek/play thrash). */
 const LOOP_COOLDOWN_MS = 1200;
 /**

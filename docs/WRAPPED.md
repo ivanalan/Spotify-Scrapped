@@ -103,25 +103,23 @@ Current export order that already follows this:
 
 Mocks in `docs/mocks/` set the voice: light solid backgrounds, no art yet, **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines — not industrial receipt chrome.
 
+Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle pairs (e.g. `3.1` → `3.2`) stay on **one scene** — headline staggers in, then subline.
+
 ```
-Scene 0 (paired, ~8s): year open → thesis
-Scene 1 (paired, ~8s): library volume → tops bridge
-Scene 2 (paired, ~8s): ghost rate → #1 ghosted song
-Scene 3: list setup — “Bring back the group”
-Scene 4: Top 5 left-long songs
-Scene 5: artist act bridge — “Now the artists.”
-Scene 6: #1 ghosted artist
-Scene 7: Top ghosted artists
-Scene 8: reunion setup — “Plot twist.”
-Scene 9: Reunion song (+ setlist if more than one)
-Scene 10: Share finale (holds; no auto-advance)
+Scene 0 (2 beats, ~8s): year / Scrapped → Hey {name} + welcome
+Scene 1 (2 beats): liked library volume → liked this year + “Not bad for a collector.”
+Scene 2 (3 beats): all-time favorites + ghosted punchline → “one hurt more” → #1 ghosted song
+Scene 3 (2 beats): “ghost in town” setup → Top ghosted songs list
+Scene 4 (3 beats): one-hit wonders → one-like artists setup → one-save artists list
+Scene 5 (2 beats): “Now the artists” → #1 ghosted artist
+Scene 6 (2 beats): “Get the gang back together?” → Top ghosted artists list
+Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
+Scene 8: Share finale (holds; no auto-advance)
 ```
 
-API deck plays like Stories for *in-scene* motion: progress segments fill left→right over ~8s, then stop — the user advances. Paired scenes keep one canvas; copy enters (staggered rise/fade) then exits before the next line. Hold/space pauses. Prev/next resets and replays the target scene.
+API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; copy enters (staggered rise/fade) then exits before the next line. Hold/space pauses. Prev/next resets and replays the target scene.
 
-Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat.
-
-**API slide copy brief:** edit [`docs/STORY_SCRIPT.md`](STORY_SCRIPT.md), then sync into `ApiScrappedDeck.tsx`. The markdown is the planning source of truth; the component is the implementation (not imported at runtime).
+Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx`.
 
 ---
 

@@ -2,10 +2,10 @@
  * Pure soundtrack URI mapping for Scrapped (API) deck scenes.
  * Kept free of React so it can be unit-tested.
  *
- * Scene index (after pairing open/library/ghost beats):
- * 0 open (year+thesis) · 1 library · 2 ghost+#1 song · 3 list setup ·
- * 4 song list · 5 artist bridge · 6 #1 artist · 7 artist list ·
- * 8 reunion setup · 9 reunion · 10 share
+ * Scene index (1-based user slides → 0-based):
+ * 0 open (short-term #1) · 1 liked this year · 2 top ghosted song ·
+ * 3 2nd ghosted song · 4 one-like · 5 top ghosted artist ·
+ * 6 2nd ghosted artist · 7 reunion · 8 share (left-on-read / distinct)
  */
 
 import type {
@@ -14,19 +14,22 @@ import type {
   ScrappedApiReport,
 } from "@/lib/scrapped-api";
 
-export const API_SCRAPPED_SLIDE_COUNT = 11;
+export const API_SCRAPPED_SLIDE_COUNT = 9;
 
-/** 0-based indices: artist bridge → #1 → sabbatical list. */
-export const ARTIST_ACT_SLIDES = [5, 6, 7] as const;
+/** 0-based indices: #1 ghosted artist → top ghosted artists list. */
+export const ARTIST_ACT_SLIDES = [5, 6] as const;
 
-/** Beats per scene — first three are paired narrative phases on one canvas. */
+/** Beats per scene — multi-beat scenes keep one canvas. */
 export const API_SCRAPPED_BEAT_COUNTS = [
-  2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
+  2, 2, 3, 2, 3, 2, 2, 2, 1,
 ] as const;
 
-/** Per-scene motion length (ms). Slide 0: 4s first line → 4s thesis. */
+/**
+ * Per-scene motion length (ms). Open ~8s; 3-beat scenes ~9s; others ~6s.
+ * Finale (8) is unused for autoplay (user advances).
+ */
 export const API_SCRAPPED_SCENE_MS = [
-  8000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000,
+  8000, 6000, 9000, 6000, 9000, 6000, 6000, 6000, 6000,
 ] as const;
 
 export function isArtistActSlide(slideIndex: number): boolean {
@@ -56,7 +59,7 @@ function trackCreditsArtist(
   return sub.split(",").some((part) => part.trim() === name);
 }
 
-/** Song credited to the sabbatical artist — prefers their own trackId. */
+/** Song credited to a sabbatical artist — prefers their own trackId. */
 export function artistActTrackUri(
   report: ScrappedApiReport,
   artistItem: ApiMetricItem | undefined,
@@ -85,7 +88,7 @@ export function songActLeadUri(report: ScrappedApiReport): string | null {
 }
 
 /**
- * True when the report cannot supply an artist-act URI that differs from the
+ * True when #1 sabbatical artist lacks a playable track distinct from the
  * song lead (missing sample, or sample is the same track).
  */
 export function needsArtistSoundtrackResolve(
@@ -107,41 +110,177 @@ export function needsArtistSoundtrackResolve(
   };
 }
 
+/** Same for #2 ghosted artist when the report has no distinct sample. */
+export function needsSecondArtistSoundtrackResolve(
+  report: ScrappedApiReport,
+): {
+  artistId: string;
+  artistName: string;
+  avoidTrackId: string | null;
+} | null {
+  const artists = cardById(report, "left-long-artists")?.items ?? [];
+  const artist = artists[1];
+  if (!artist?.id || !artist.label) return null;
+  const lead = songActLeadUri(report);
+  const firstUri = artistActTrackUri(report, artists[0]);
+  const artistUri = artistActTrackUri(report, artist);
+  if (
+    artistUri &&
+    artistUri !== lead &&
+    artistUri !== firstUri
+  ) {
+    return null;
+  }
+  const avoid =
+    firstUri?.replace(/^spotify:track:/, "") ??
+    lead?.replace(/^spotify:track:/, "") ??
+    null;
+  return {
+    artistId: artist.id,
+    artistName: artist.label,
+    avoidTrackId: avoid,
+  };
+}
+
 export type SoundtrackOptions = {
   /** Client/server-resolved URI for the #1 sabbatical artist. */
   artistSoundtrackUri?: string | null;
+  /** Client/server-resolved URI for the #2 sabbatical artist. */
+  artistSoundtrackUri2?: string | null;
 };
+
+function idFromUri(uri: string | null | undefined): string | null {
+  if (!uri) return null;
+  const m = /^spotify:track:(.+)$/.exec(uri);
+  return m?.[1] ?? null;
+}
+
+/**
+ * Nine soundtrack URIs.
+ *
+ * Content slides are pinned first to the track shown on that slide (what you
+ * see is what you hear). Ambient slides (open / liked-year / share) fill from
+ * whatever remains so they cannot steal a hero track.
+ */
+export function getApiSlideSoundtrackUris(
+  report: ScrappedApiReport,
+  options?: SoundtrackOptions,
+): (string | null)[] {
+  const leftLong = cardById(report, "left-long-run");
+  const leftLongArtists = cardById(report, "left-long-artists");
+  const oneSave = cardById(report, "one-save-artists");
+  const secondChance = cardById(report, "second-chance");
+  const likedThisYear = cardById(report, "liked-this-year");
+  const fallen = cardById(report, "fallen-rotation");
+
+  const shortTopId = report.summary.shortTopTrackId;
+  const ghostedIds = (leftLong?.items ?? [])
+    .map((i) => i.trackId)
+    .filter((id): id is string => Boolean(id));
+  const likedYearIds = (likedThisYear?.items ?? [])
+    .map((i) => i.trackId)
+    .filter((id): id is string => Boolean(id));
+  const oneLikeIds = (oneSave?.items ?? [])
+    .map((i) => i.trackId)
+    .filter((id): id is string => Boolean(id));
+  const reunionIds = (secondChance?.items ?? [])
+    .map((i) => i.trackId)
+    .filter((id): id is string => Boolean(id));
+  const fallenIds = (fallen?.items ?? [])
+    .map((i) => i.trackId)
+    .filter((id): id is string => Boolean(id));
+
+  const artist0FromReport = artistActTrackUri(
+    report,
+    leftLongArtists?.items[0],
+  );
+  const artist1FromReport = artistActTrackUri(
+    report,
+    leftLongArtists?.items[1],
+  );
+  const artist0Id =
+    idFromUri(options?.artistSoundtrackUri) ??
+    idFromUri(artist0FromReport);
+  const artist1Id =
+    idFromUri(options?.artistSoundtrackUri2) ??
+    idFromUri(artist1FromReport);
+
+  const used = new Set<string>();
+  const out: (string | null)[] = Array.from(
+    { length: API_SCRAPPED_SLIDE_COUNT },
+    () => null,
+  );
+
+  function take(id: string | null | undefined): string | null {
+    if (!id || used.has(id)) return null;
+    used.add(id);
+    return `spotify:track:${id}`;
+  }
+
+  function takeFirst(ids: (string | null | undefined)[]): string | null {
+    for (const id of ids) {
+      const uri = take(id);
+      if (uri) return uri;
+    }
+    return null;
+  }
+
+  // --- Content pins (must match on-screen entities) ---------------------
+  // 2 — top ghosted song (e.g. Dapper)
+  out[2] = take(ghostedIds[0]);
+  // 3 — second ghosted song
+  out[3] = take(ghostedIds[1]);
+  // 5 — top ghosted artist sample
+  out[5] = take(artist0Id);
+  // 6 — second ghosted artist sample
+  out[6] = take(artist1Id);
+  // 4 — top one-like sample
+  out[4] = take(oneLikeIds[0]);
+  // 7 — top reunion song
+  out[7] = take(reunionIds[0]);
+
+  // Soft fallbacks for content slots that had no primary sample.
+  if (!out[2]) out[2] = takeFirst([...ghostedIds, ...fallenIds]);
+  if (!out[3]) out[3] = takeFirst([...ghostedIds, ...fallenIds]);
+  if (!out[5]) {
+    out[5] = takeFirst([artist0Id, ...oneLikeIds, ...ghostedIds]);
+  }
+  if (!out[6]) {
+    out[6] = takeFirst([artist1Id, artist0Id, ...oneLikeIds, ...fallenIds]);
+  }
+  if (!out[4]) out[4] = takeFirst([...oneLikeIds, ...likedYearIds]);
+  if (!out[7]) out[7] = takeFirst([...reunionIds, ...likedYearIds]);
+
+  // --- Ambient slides (never steal reserved hero tracks) ----------------
+  // 0 — user's top song right now (4-week #1)
+  out[0] = takeFirst([shortTopId, ...likedYearIds, ...fallenIds, ...ghostedIds]);
+  // 1 — a different song liked this year
+  out[1] = takeFirst([...likedYearIds, ...fallenIds, ...ghostedIds]);
+  // 8 — share / leftover left-on-read
+  out[8] = takeFirst([
+    ...ghostedIds,
+    ...fallenIds,
+    ...likedYearIds,
+    ...reunionIds,
+    shortTopId,
+  ]);
+
+  // Last resort: keep audio on empty slots (may reuse).
+  const filled = out.filter((u): u is string => Boolean(u));
+  for (let i = 0; i < out.length; i++) {
+    if (!out[i] && filled.length > 0) {
+      out[i] = filled[i % filled.length] ?? filled[0]!;
+    }
+  }
+
+  return out;
+}
 
 export function getApiSlideSoundtrackUri(
   report: ScrappedApiReport,
   slideIndex: number,
   options?: SoundtrackOptions,
 ): string | null {
-  const leftLong = cardById(report, "left-long-run");
-  const leftLongArtists = cardById(report, "left-long-artists");
-  const secondChance = cardById(report, "second-chance");
-  const lead = songActLeadUri(report);
-  const reunion = trackUri(secondChance?.items[0]) ?? lead;
-  const fromReport = artistActTrackUri(report, leftLongArtists?.items[0]);
-  const artistAct = options?.artistSoundtrackUri ?? fromReport;
-
-  switch (slideIndex) {
-    case 0:
-    case 1:
-      return lead;
-    case 2:
-    case 3:
-    case 4:
-      return trackUri(leftLong?.items[0]) ?? lead;
-    case 5:
-    case 6:
-    case 7:
-      return artistAct ?? lead;
-    case 8:
-    case 9:
-    case 10:
-      return reunion;
-    default:
-      return null;
-  }
+  if (slideIndex < 0 || slideIndex >= API_SCRAPPED_SLIDE_COUNT) return null;
+  return getApiSlideSoundtrackUris(report, options)[slideIndex] ?? null;
 }

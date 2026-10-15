@@ -4,8 +4,9 @@
  */
 
 import type { ApiArtist, ApiTrack, SavedTrack } from "./spotify/listening";
+import { SCRAPPED_API_YEAR } from "./scrapped-api-year";
 
-export const SCRAPPED_API_YEAR = 2026;
+export { SCRAPPED_API_YEAR };
 
 export type ApiMetricItem = {
   id: string;
@@ -48,12 +49,24 @@ export type ScrappedApiReport = {
   headlines: ApiHeadline[];
   summary: {
     likedCount: number;
+    /** Fetched likes with `added_at` in the Scrapped year. */
+    likedThisYearCount: number;
+    /** Fetched likes absent from all three top-track windows. */
+    likedNeverToppedCount: number;
+    /** 4-week top tracks that are also in Liked Songs. */
+    shortLikedCount: number;
+    /** 4-week tops missing from both 6-month and multi-year lists. */
+    monthOnlyTrackCount: number;
+    /** 4-week top artists missing from both longer artist windows. */
+    monthOnlyArtistCount: number;
     shortTrackCount: number;
     mediumTrackCount: number;
     longTrackCount: number;
     shortArtistCount: number;
     mediumArtistCount: number;
     longArtistCount: number;
+    /** #1 four-week top track — open-slide soundtrack. */
+    shortTopTrackId: string | null;
   };
   cards: ApiMetricCard[];
 };
@@ -185,6 +198,42 @@ function trackByArtist(
   return undefined;
 }
 
+/** Fill like-shelf summary fields missing from older sealed Lab snapshots. */
+export function ensureApiReportSummary(
+  report: ScrappedApiReport,
+): ScrappedApiReport {
+  if (!report) return report;
+  const s = report.summary ?? ({} as ScrappedApiReport["summary"]);
+  report.summary = {
+    likedCount: s.likedCount ?? 0,
+    likedThisYearCount: s.likedThisYearCount ?? 0,
+    likedNeverToppedCount: s.likedNeverToppedCount ?? 0,
+    shortLikedCount: s.shortLikedCount ?? 0,
+    shortTopTrackId: s.shortTopTrackId ?? null,
+    monthOnlyTrackCount: s.monthOnlyTrackCount ?? 0,
+    monthOnlyArtistCount: s.monthOnlyArtistCount ?? 0,
+    shortTrackCount: s.shortTrackCount ?? 0,
+    mediumTrackCount: s.mediumTrackCount ?? 0,
+    longTrackCount: s.longTrackCount ?? 0,
+    shortArtistCount: s.shortArtistCount ?? 0,
+    mediumArtistCount: s.mediumArtistCount ?? 0,
+    longArtistCount: s.longArtistCount ?? 0,
+  };
+  return report;
+}
+
+function genreTallies(artists: ApiArtist[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const artist of artists) {
+    for (const genre of artist.genres ?? []) {
+      const key = genre.trim().toLowerCase();
+      if (!key) continue;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
 export function buildScrappedApiReport(
   snap: ApiListeningSnapshot,
   year: number = SCRAPPED_API_YEAR,
@@ -198,24 +247,77 @@ export function buildScrappedApiReport(
   const mediumArtistIds = artistIdSet(snap.mediumArtists);
   const longArtistIds = artistIdSet(snap.longArtists);
   const shortIndex = trackIndex(snap.shortTracks);
+  const longIndex = trackIndex(snap.longTracks);
+  const anyTopIndex = trackIndex([
+    ...snap.shortTracks,
+    ...snap.mediumTracks,
+    ...snap.longTracks,
+  ]);
+  const likedIndex = trackIndex(snap.liked.map((s) => s.track));
+  const toppedArtistIds = new Set([
+    ...shortArtistIds,
+    ...mediumArtistIds,
+    ...longArtistIds,
+  ]);
+
+  const likedThisYear = snap.liked
+    .filter((saved) => inYear(saved.added_at, year))
+    .sort(
+      (a, b) =>
+        Date.parse(b.added_at) - Date.parse(a.added_at) ||
+        a.track.name.localeCompare(b.track.name),
+    );
+
+  const neverTopped = snap.liked
+    .filter((saved) => !sameSong(saved.track, anyTopIndex))
+    .map((saved) => ({
+      saved,
+      ageDays: daysSince(saved.added_at, now),
+    }))
+    .sort(
+      (a, b) =>
+        b.ageDays - a.ageDays ||
+        a.saved.track.name.localeCompare(b.saved.track.name),
+    );
+
+  const shortLikedTracks = snap.shortTracks.filter((track) =>
+    sameSong(track, likedIndex),
+  );
+  const shortNotLiked = snap.shortTracks
+    .map((track, i) => ({ track, rank: i + 1 }))
+    .filter(({ track }) => !sameSong(track, likedIndex));
 
   const likedByArtist = new Map<
     string,
-    { name: string; count: number; inTops: boolean }
+    {
+      name: string;
+      count: number;
+      inTops: boolean;
+      /** Oldest like for this artist (the unfinished yes for one/two-saves). */
+      oldestSaved: SavedTrack;
+    }
   >();
   for (const saved of snap.liked) {
     for (const artist of saved.track.artists) {
       if (!artist.id) continue;
-      const row = likedByArtist.get(artist.id) ?? {
-        name: artist.name,
-        count: 0,
-        inTops: false,
-      };
+      const row = likedByArtist.get(artist.id);
+      if (!row) {
+        likedByArtist.set(artist.id, {
+          name: artist.name,
+          count: 1,
+          inTops:
+            shortArtistIds.has(artist.id) || mediumArtistIds.has(artist.id),
+          oldestSaved: saved,
+        });
+        continue;
+      }
       row.count += 1;
       if (shortArtistIds.has(artist.id) || mediumArtistIds.has(artist.id)) {
         row.inTops = true;
       }
-      likedByArtist.set(artist.id, row);
+      if (Date.parse(saved.added_at) < Date.parse(row.oldestSaved.added_at)) {
+        row.oldestSaved = saved;
+      }
     }
   }
   const abandonedArtists = [...likedByArtist.entries()]
@@ -223,9 +325,113 @@ export function buildScrappedApiReport(
     .map(([id, row]) => ({ id, ...row }))
     .sort((a, b) => b.count - a.count);
 
+  const oneSaveArtists = [...likedByArtist.entries()]
+    .filter(([, row]) => row.count === 1 && !row.inTops)
+    .map(([id, row]) => ({
+      id,
+      ...row,
+      ageDays: daysSince(row.oldestSaved.added_at, now),
+    }))
+    .sort(
+      (a, b) =>
+        b.ageDays - a.ageDays || a.name.localeCompare(b.name),
+    );
+
+  const twoSaveArtists = [...likedByArtist.entries()]
+    .filter(([, row]) => row.count === 2 && !row.inTops)
+    .map(([id, row]) => ({
+      id,
+      ...row,
+      ageDays: daysSince(row.oldestSaved.added_at, now),
+    }))
+    .sort(
+      (a, b) =>
+        b.ageDays - a.ageDays || a.name.localeCompare(b.name),
+    );
+
+  /** Impulse likes in the last 90 days that never entered any top window. */
+  const recentNeverTopped = neverTopped
+    .filter(({ ageDays }) => ageDays <= 90)
+    .sort(
+      (a, b) =>
+        a.ageDays - b.ageDays ||
+        a.saved.track.name.localeCompare(b.saved.track.name),
+    );
+
+  /**
+   * Old like back in the 4-week list, but never a multi-year staple —
+   * a quiet rematch, not a years-long reunion.
+   */
+  const quietRematch = snap.liked
+    .filter((saved) => {
+      if (daysSince(saved.added_at, now) <= 365) return false;
+      if (!sameSong(saved.track, shortIndex)) return false;
+      if (sameSong(saved.track, longIndex)) return false;
+      return true;
+    })
+    .map((saved) => {
+      let rank = shortRank.get(saved.track.id);
+      if (rank == null) {
+        const i = snap.shortTracks.findIndex((t) =>
+          sameSong(saved.track, trackIndex([t])),
+        );
+        rank = i >= 0 ? i + 1 : 99;
+      }
+      return {
+        saved,
+        rank,
+        ageDays: daysSince(saved.added_at, now),
+      };
+    })
+    .sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        b.ageDays - a.ageDays ||
+        a.saved.track.name.localeCompare(b.saved.track.name),
+    );
+
+  /** Liked track never topped, but the artist is on a current top list. */
+  const deepCutSaves = neverTopped
+    .filter(({ saved }) =>
+      saved.track.artists.some((a) => a.id && toppedArtistIds.has(a.id)),
+    )
+    .sort(
+      (a, b) =>
+        b.ageDays - a.ageDays ||
+        a.saved.track.name.localeCompare(b.saved.track.name),
+    );
+
+  const monthOnlyTracks = snap.shortTracks
+    .map((track, i) => ({ track, rank: i + 1 }))
+    .filter(
+      ({ track }) => !mediumIds.has(track.id) && !longIds.has(track.id),
+    );
+
+  const monthOnlyArtists = snap.shortArtists
+    .map((artist, i) => ({ artist, rank: i + 1 }))
+    .filter(
+      ({ artist }) =>
+        !mediumArtistIds.has(artist.id) && !longArtistIds.has(artist.id),
+    );
+
+  const mediumGenres = genreTallies(snap.mediumArtists);
+  const shortGenres = genreTallies(snap.shortArtists);
+  const cooledGenres = [...mediumGenres.entries()]
+    .filter(([genre]) => !shortGenres.has(genre))
+    .map(([genre, count]) => ({ genre, count }))
+    .sort(
+      (a, b) =>
+        b.count - a.count || a.genre.localeCompare(b.genre),
+    );
+
   const fallenTracks = snap.mediumTracks
     .map((track, i) => ({ track, rank: i + 1 }))
     .filter(({ track }) => !shortIds.has(track.id));
+
+  /** Brutal drops: were in the top 10 of the half-year, gone from this month. */
+  const rankFreefall = fallenTracks
+    .filter(({ rank }) => rank <= 10)
+    .sort((a, b) => a.rank - b.rank);
 
   const fallenArtists = snap.mediumArtists
     .map((artist, i) => ({ artist, rank: i + 1 }))
@@ -236,6 +442,11 @@ export function buildScrappedApiReport(
     .filter(
       ({ track }) => !mediumIds.has(track.id) && !shortIds.has(track.id),
     );
+
+  const mainstreamGhosts = [...leftLongTracks].sort(
+    (a, b) =>
+      b.track.popularity - a.track.popularity || a.rank - b.rank,
+  );
 
   const leftLongArtists = snap.longArtists
     .map((artist, i) => ({ artist, rank: i + 1 }))
@@ -299,7 +510,67 @@ export function buildScrappedApiReport(
       (shortRank.get(a.track.id) ?? 99) - (shortRank.get(b.track.id) ?? 99),
   );
 
+  const shortLikedCount = shortLikedTracks.length;
+  const shortWhole = snap.shortTracks.length;
+
   const cards: ApiMetricCard[] = [
+    {
+      id: "liked-this-year",
+      title: "Liked this year",
+      calculated: `Liked Songs with an added date in ${year} (full library fetch). Most recently liked first.`,
+      means: "Saves you made this year — still on the shelf, whether or not they became rotation.",
+      bar: "Recency among this year’s likes. Newest like is the longest bar.",
+      source: "Liked Songs",
+      headline:
+        likedThisYear.length > 0
+          ? `${likedThisYear.length.toLocaleString()} liked in ${year}`
+          : `No likes from ${year} in your library`,
+      items: likedThisYear.slice(0, TOP_N).map((saved, i) =>
+        trackItem(
+          saved.track,
+          `liked ${saved.added_at.slice(0, 10)}`,
+          TOP_N - i,
+        ),
+      ),
+    },
+    {
+      id: "saved-never-topped",
+      title: "Saved, never topped",
+      calculated:
+        "Fetched Liked Songs that do not appear in any of your 4-week, 6-month, or multi-year top 50s (same song / recording counts). Oldest like first.",
+      means: "You hearted them, and Spotify never ranked them as a top play. The shelf that never became rotation.",
+      bar: "Days since you liked the song. Older likes get the longer bar.",
+      source: "Liked Songs + top tracks (all three windows)",
+      headline:
+        neverTopped.length > 0
+          ? `${neverTopped.length.toLocaleString()} saved likes never made a top 50`
+          : "Every fetched like shows up in at least one top window",
+      items: neverTopped.slice(0, TOP_N).map(({ saved, ageDays }) =>
+        trackItem(
+          saved.track,
+          ageDays === 0
+            ? "liked today · never topped"
+            : `liked ${ageDays.toLocaleString()}d ago · never topped`,
+          ageDays,
+        ),
+      ),
+    },
+    {
+      id: "month-already-liked",
+      title: "This month already liked",
+      calculated:
+        "Of your 4-week top 50, how many are already in Liked Songs (same song counts). The list is the ones that are not liked yet — highest 4-week rank first.",
+      means: "How much of right now was already on the shelf — and which current favorites you still haven’t saved.",
+      bar: "4-week rank among unsaved songs. Higher rank, longer bar.",
+      source: "Top tracks (4 weeks) + Liked Songs",
+      headline:
+        shortWhole > 0
+          ? `${shortLikedCount} of ${shortWhole} four-week tops are already liked`
+          : "No 4-week top list returned",
+      items: shortNotLiked.slice(0, TOP_N).map(({ track, rank }) =>
+        trackItem(track, `4-week #${rank} · not liked yet`, 51 - rank),
+      ),
+    },
     {
       id: "fallen-rotation",
       title: "Fallen from rotation",
@@ -450,6 +721,234 @@ export function buildScrappedApiReport(
         imageUrl: artist.imageUrl,
       })),
     },
+    {
+      id: "month-only-tracks",
+      title: "This month only",
+      calculated:
+        "Songs in your 4-week top 50 that are absent from both the 6-month and multi-year top 50s. Highest 4-week rank first.",
+      means: "Temporary flings — loud this month, nowhere in the longer windows.",
+      bar: "Current 4-week rank. Higher rank, longer bar.",
+      source: "Top tracks (all three windows)",
+      headline:
+        monthOnlyTracks.length > 0
+          ? `${monthOnlyTracks.length} of ${snap.shortTracks.length || 0} four-week tops are brand new`
+          : "No brand-new four-week tops",
+      items: monthOnlyTracks.slice(0, TOP_N).map(({ track, rank }) =>
+        trackItem(track, `4-week #${rank} · not in longer windows`, 51 - rank),
+      ),
+    },
+    {
+      id: "month-only-artists",
+      title: "Artists new this month",
+      calculated:
+        "Artists in your 4-week top 50 who are absent from both the 6-month and multi-year top artists. Highest 4-week rank first.",
+      means: "People you just started (or restarted hard) — not on the half-year or years-long lists.",
+      bar: "Current 4-week rank. Higher rank, longer bar.",
+      source: "Top artists (all three windows)",
+      headline:
+        monthOnlyArtists.length > 0
+          ? `${monthOnlyArtists.length} artists are new to your four-week list`
+          : "No brand-new four-week artists",
+      items: monthOnlyArtists.slice(0, TOP_N).map(({ artist, rank }) => {
+        const sample = trackByArtist(artist.id, [
+          snap.shortTracks,
+          snap.liked.map((s) => s.track),
+          snap.mediumTracks,
+          snap.longTracks,
+        ]);
+        return {
+          id: artist.id,
+          trackId: sample?.id,
+          label: artist.name,
+          detail: `4-week #${rank} · not in longer windows`,
+          value: 51 - rank,
+          imageUrl: artist.imageUrl ?? sample?.imageUrl ?? null,
+        };
+      }),
+    },
+    {
+      id: "one-save-artists",
+      title: "One-save shelf",
+      calculated:
+        "Artists with exactly one track in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest like first.",
+      means: "A single heart, no rotation — the almosts you never followed up. Longest-sitting yeses lead.",
+      bar: "Days since that one like. Older = longer bar.",
+      source: "Liked Songs + top artists (4 weeks and 6 months)",
+      headline:
+        oneSaveArtists.length > 0
+          ? `${oneSaveArtists.length.toLocaleString()} artists with a single like and no current top slot`
+          : "No one-save shelf artists in this sample",
+      items: oneSaveArtists.slice(0, TOP_N).map((artist) => {
+        const sample = artist.oldestSaved.track;
+        return {
+          id: artist.id,
+          trackId: sample.id,
+          label: artist.name,
+          detail:
+            artist.ageDays === 0
+              ? `${sample.name} · liked today`
+              : `${sample.name} · ${artist.ageDays.toLocaleString()}d on the shelf`,
+          value: artist.ageDays,
+          imageUrl: sample.imageUrl ?? null,
+        };
+      }),
+    },
+    {
+      id: "two-save-artists",
+      title: "Two-save almosts",
+      calculated:
+        "Artists with exactly two tracks in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest of the two likes first.",
+      means: "One more heart than a one-save — still no rotation. The almost-almosts.",
+      bar: "Days since the older of the two likes. Older = longer bar.",
+      source: "Liked Songs + top artists (4 weeks and 6 months)",
+      headline:
+        twoSaveArtists.length > 0
+          ? `${twoSaveArtists.length.toLocaleString()} artists with exactly two likes and no current top slot`
+          : "No two-save almosts in this sample",
+      items: twoSaveArtists.slice(0, TOP_N).map((artist) => {
+        const sample = artist.oldestSaved.track;
+        return {
+          id: artist.id,
+          trackId: sample.id,
+          label: artist.name,
+          detail:
+            artist.ageDays === 0
+              ? `2 likes · e.g. ${sample.name} · liked today`
+              : `2 likes · e.g. ${sample.name} · oldest ${artist.ageDays.toLocaleString()}d ago`,
+          value: artist.ageDays,
+          imageUrl: sample.imageUrl ?? null,
+        };
+      }),
+    },
+    {
+      id: "recent-never-topped",
+      title: "Liked recently, never topped",
+      calculated:
+        "Fetched likes from the last 90 days that do not appear in any of your 4-week, 6-month, or multi-year top 50s. Newest like first.",
+      means: "Impulse shelf — you hearted it this season and it never became rotation.",
+      bar: "Recency (newer = longer). Days since like inverted among this set.",
+      source: "Liked Songs + top tracks (all three windows)",
+      headline:
+        recentNeverTopped.length > 0
+          ? `${recentNeverTopped.length.toLocaleString()} recent likes never made a top 50`
+          : "No recent never-topped likes in this sample",
+      items: recentNeverTopped.slice(0, TOP_N).map(({ saved, ageDays }, i) =>
+        trackItem(
+          saved.track,
+          ageDays === 0
+            ? "liked today · never topped"
+            : `liked ${ageDays}d ago · never topped`,
+          TOP_N - i,
+        ),
+      ),
+    },
+    {
+      id: "rank-freefall",
+      title: "Rank freefall",
+      calculated:
+        "Songs that were in the top 10 of your 6-month list and are absent from your 4-week top 50. Highest former rank first.",
+      means: "Not a soft fade — a hard drop from the half-year podium.",
+      bar: "Former 6-month rank. #1 fall is the longest bar.",
+      source: "Top tracks (6 months and 4 weeks)",
+      headline:
+        rankFreefall.length > 0
+          ? `${rankFreefall.length} of your half-year top 10 fell out this month`
+          : "Your half-year top 10 all still show up in the four-week list",
+      items: rankFreefall.slice(0, TOP_N).map(({ track, rank }) =>
+        trackItem(
+          track,
+          longIds.has(track.id)
+            ? `was 6-month #${rank} · also multi-year`
+            : `was 6-month #${rank}`,
+          11 - rank,
+        ),
+      ),
+    },
+    {
+      id: "quiet-rematch",
+      title: "Quiet rematch",
+      calculated:
+        "Liked Songs older than a year that are back in your 4-week top 50, but are not in the multi-year top 50. Sorted by current 4-week rank.",
+      means: "A random old save woke up — not a years-long staple returning, just a quiet rematch.",
+      bar: "Current 4-week rank. Higher rank, longer bar.",
+      source: "Liked Songs + top tracks (4 weeks and several years)",
+      headline:
+        quietRematch.length > 0
+          ? `${quietRematch.length} old likes rematched without being multi-year staples`
+          : "No quiet rematches in this sample",
+      items: quietRematch.slice(0, TOP_N).map(({ saved, rank, ageDays }) =>
+        trackItem(
+          saved.track,
+          `4-week #${rank} · liked ${Math.round(ageDays / 365)}y ago`,
+          51 - rank,
+        ),
+      ),
+    },
+    {
+      id: "deep-cut-saves",
+      title: "Deep-cut saves",
+      calculated:
+        "Fetched likes that never appear in any top-track window, from artists who do appear in at least one of your top-artist windows. Oldest like first.",
+      means: "You play them — you just hearted the B-side and left it on the shelf.",
+      bar: "Days since you liked the deep cut. Older = longer bar.",
+      source: "Liked Songs + top tracks + top artists (all windows)",
+      headline:
+        deepCutSaves.length > 0
+          ? `${deepCutSaves.length.toLocaleString()} deep cuts saved from artists you still rank`
+          : "No deep-cut saves in this sample",
+      items: deepCutSaves.slice(0, TOP_N).map(({ saved, ageDays }) => {
+        const topped = saved.track.artists.find(
+          (a) => a.id && toppedArtistIds.has(a.id),
+        );
+        return trackItem(
+          saved.track,
+          topped
+            ? `liked ${ageDays.toLocaleString()}d ago · ${topped.name} still tops`
+            : `liked ${ageDays.toLocaleString()}d ago · artist still tops`,
+          ageDays,
+        );
+      }),
+    },
+    {
+      id: "mainstream-ghosts",
+      title: "Mainstream ghosts",
+      calculated:
+        "Songs from “Left the long run” re-sorted by Spotify popularity (0–100), highest first. Same membership: multi-year top, out of both shorter windows.",
+      means: "Hits you used to live with that the rest of the world still knows — and you stopped ranking.",
+      bar: "Spotify popularity score. More popular = longer bar.",
+      source: "Top tracks (several years, 6 months, and 4 weeks) + popularity",
+      headline:
+        mainstreamGhosts.length > 0
+          ? `Highest-popularity ghost: ${mainstreamGhosts[0]?.track.popularity ?? 0}/100`
+          : "No multi-year ghosts to rank by popularity",
+      items: mainstreamGhosts.slice(0, TOP_N).map(({ track, rank }) =>
+        trackItem(
+          track,
+          `popularity ${track.popularity} · was multi-year #${rank}`,
+          track.popularity,
+        ),
+      ),
+    },
+    {
+      id: "genres-cooled",
+      title: "Genres that cooled",
+      calculated:
+        "Genres tagged on your 6-month top artists that do not appear on any 4-week top artist. Most medium-window artist tags first.",
+      means: "Sounds that were in the half-year mix and dropped out of this month’s artist list.",
+      bar: "How many 6-month top artists carried that genre. More artists = longer bar.",
+      source: "Top artists (6 months and 4 weeks) · Spotify genre tags",
+      headline:
+        cooledGenres.length > 0
+          ? `${cooledGenres.length} genres cooled off this month`
+          : "No genres dropped between the half-year and four-week artist lists",
+      items: cooledGenres.slice(0, TOP_N).map(({ genre, count }) => ({
+        id: genre,
+        label: genre,
+        detail: `${count} six-month artist${count === 1 ? "" : "s"}`,
+        value: count,
+        imageUrl: null,
+      })),
+    },
   ];
 
   return {
@@ -459,12 +958,18 @@ export function buildScrappedApiReport(
     headlines,
     summary: {
       likedCount: snap.likedTotal ?? snap.liked.length,
+      likedThisYearCount: likedThisYear.length,
+      likedNeverToppedCount: neverTopped.length,
+      shortLikedCount,
+      monthOnlyTrackCount: monthOnlyTracks.length,
+      monthOnlyArtistCount: monthOnlyArtists.length,
       shortTrackCount: snap.shortTracks.length,
       mediumTrackCount: snap.mediumTracks.length,
       longTrackCount: snap.longTracks.length,
       shortArtistCount: snap.shortArtists.length,
       mediumArtistCount: snap.mediumArtists.length,
       longArtistCount: snap.longArtists.length,
+      shortTopTrackId: snap.shortTracks[0]?.id ?? null,
     },
     cards,
   };
