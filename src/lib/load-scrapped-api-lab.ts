@@ -212,6 +212,12 @@ export async function fetchAndStoreScrappedApiLab(
         return fallback;
       });
 
+    // Liked Songs is required for one-like / liked-this-year slides. Do not
+    // absorb failures into an empty library — that shipped as "no liked songs"
+    // on Vercel when the paginated fetch timed out or rate-limited.
+    const likedPage = await getSavedTracksDetailed();
+    const liked = likedPage.tracks;
+
     const [
       shortTracks,
       mediumTracks,
@@ -219,7 +225,6 @@ export async function fetchAndStoreScrappedApiLab(
       shortArtists,
       mediumArtists,
       longArtists,
-      likedPage,
     ] = await Promise.all([
       absorb(getTopTracks("short_term"), []),
       absorb(getTopTracks("medium_term"), []),
@@ -227,10 +232,7 @@ export async function fetchAndStoreScrappedApiLab(
       absorb(getTopArtists("short_term"), []),
       absorb(getTopArtists("medium_term"), []),
       absorb(getTopArtists("long_term"), []),
-      // Full Liked Songs library (paginated) — needed for liked-this-year + one-save metrics.
-      absorb(getSavedTracksDetailed(), { tracks: [], total: 0 }),
     ]);
-    const liked = likedPage.tracks;
 
     const hasData =
       shortTracks.length +

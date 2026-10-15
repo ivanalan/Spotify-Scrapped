@@ -128,7 +128,7 @@ function MinimalColumn({
   tracks: ShareRecapTrack[];
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="mb-3 text-[0.72rem] font-bold tracking-[0.02em] text-[var(--wrapped-ink)]">
         {label}
       </p>
@@ -139,12 +139,21 @@ function MinimalColumn({
           {tracks.map((track, i) => (
             <li
               key={track.id}
-              className="grid min-w-0 grid-cols-[1.1rem_1fr] items-baseline gap-[0.35rem] text-[0.92rem] font-bold leading-[1.15] tracking-[-0.02em] text-[var(--wrapped-ink)]"
+              className="grid min-w-0 grid-cols-[1.1rem_minmax(0,1fr)] items-baseline gap-[0.35rem] text-[var(--wrapped-ink)]"
             >
-              <span className="tabular-nums font-semibold text-[var(--wrapped-muted)]">
+              <span className="tabular-nums text-[0.92rem] font-semibold text-[var(--wrapped-muted)]">
                 {i + 1}
               </span>
-              <span className="truncate">{track.title}</span>
+              <span className="min-w-0">
+                <span className="block truncate text-[0.92rem] font-bold leading-[1.15] tracking-[-0.02em]">
+                  {track.title}
+                </span>
+                {track.artist ? (
+                  <span className="block truncate text-[0.7rem] font-medium leading-snug text-[var(--wrapped-muted)]">
+                    {track.artist}
+                  </span>
+                ) : null}
+              </span>
             </li>
           ))}
         </ol>
@@ -183,29 +192,28 @@ export function ShareRecapCard({
     return (
       <div
         className={cn(
-          "relative mx-auto w-full max-w-[20rem] overflow-hidden bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)]",
+          "relative mx-auto grid h-full max-h-full w-full max-w-[20rem] grid-rows-[minmax(0,1fr)_auto] gap-4 bg-[var(--wrapped-canvas)] px-4 text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)] sm:gap-5 sm:px-5",
           active ? "opacity-100" : "opacity-55",
           className,
         )}
       >
-        <div className="relative flex aspect-[9/16] max-h-[min(72dvh,40rem)] flex-col px-5 pb-7 pt-7 sm:px-6">
-          <div className="relative mb-7 aspect-square w-full shrink-0 overflow-hidden bg-[var(--wrapped-panel)]">
-            {heroImageUrl ? (
-              <Image
-                src={heroImageUrl}
-                alt={heroAlt}
-                fill
-                sizes="320px"
-                className="object-cover"
-                priority
-              />
-            ) : null}
-          </div>
+        {/* Art fills leftover height after lists — shrinks on short phones so rows 1–5 stay visible. */}
+        <div className="relative mx-auto aspect-square h-full max-h-full w-auto max-w-full min-h-0 overflow-hidden bg-[var(--wrapped-panel)]">
+          {heroImageUrl ? (
+            <Image
+              src={heroImageUrl}
+              alt={heroAlt}
+              fill
+              sizes="320px"
+              className="object-cover"
+              priority
+            />
+          ) : null}
+        </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-2 gap-4 sm:gap-5">
-            <MinimalColumn label={leftLabel} tracks={skipped} />
-            <MinimalColumn label={rightLabel} tracks={stayed} />
-          </div>
+        <div className="grid shrink-0 grid-cols-2 gap-4 sm:gap-5">
+          <MinimalColumn label={leftLabel} tracks={skipped} />
+          <MinimalColumn label={rightLabel} tracks={stayed} />
         </div>
       </div>
     );

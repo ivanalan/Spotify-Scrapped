@@ -27,12 +27,15 @@ import { WrappedStorySlide } from "@/components/scrapped/wrapped/WrappedStorySli
 import { useStoryAutoplay } from "@/components/scrapped/wrapped/useStoryAutoplay";
 import { Button } from "@/components/ui/button";
 import {
-  API_SCRAPPED_BEAT_COUNTS,
-  API_SCRAPPED_SCENE_MS,
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
 import type { ApiMetricCard, ScrappedApiReport } from "@/lib/scrapped-api";
+import {
+  storyLineBeatDurationsMs,
+  sumMs,
+  type StoryCopyLines,
+} from "@/lib/scrapped-story-motion";
 
 type Props = {
   report: ScrappedApiReport;
@@ -61,7 +64,7 @@ type Props = {
 const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
-const INTRO_COPY_DELAY_SEC = 0.5;
+const INTRO_COPY_DELAY_SEC = 0.35;
 /** Stories-style: pause progress + soundtrack after this press duration (taps stay snappy). */
 const HOLD_PAUSE_MS = 180;
 
@@ -279,12 +282,192 @@ export function ApiScrappedDeck({
     [soundOn, onSoundtrackPrimeTo, report, soundtrackOpts],
   );
 
+  /**
+   * Copy lines only — drives line-beat counts + reading-time durations.
+   * Derived entirely from `report` so React Compiler can preserve memoization
+   * (object item deps like reunionSong.label are treated as mutable).
+   */
+  const sceneCopyPlans = useMemo((): StoryCopyLines[][] => {
+    const liked = report.summary.likedCount;
+    const likedYear = report.summary.likedThisYearCount;
+    const long = report.summary.longTrackCount;
+    const ghosted = ghostedCountFromDetail(
+      report.headlines.find((h) => h.id === "left-long")?.detail,
+    );
+    const hasTopSong =
+      (cardById(report, "left-long-run")?.items.length ?? 0) > 0;
+    const hasTopArtist =
+      (cardById(report, "left-long-artists")?.items.length ?? 0) > 0;
+    const secondChanceItems =
+      cardById(report, "second-chance")?.items ?? [];
+    const isReunionList = secondChanceItems.length > 1;
+    const reunionLabel = secondChanceItems[0]?.label;
+    const hasReunionSong = Boolean(reunionLabel);
+
+    const hey = report.profileName
+      ? `Hey ${report.profileName}`
+      : "Hey there";
+    const reunionBeats: StoryCopyLines[] = isReunionList
+      ? [
+          {
+            headline: "Plot twist.",
+            subline:
+              "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+          },
+          {
+            headline: "The reunion setlist",
+            subline:
+              "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
+          },
+        ]
+      : [
+          {
+            headline: "Plot twist.",
+            subline:
+              "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+          },
+          {
+            headline: reunionLabel ?? "No reunions on the calendar.",
+            subline: hasReunionSong
+              ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
+              : "The soft launch stayed soft. For now.",
+            aside: hasReunionSong
+              ? "We don’t have to talk about it."
+              : undefined,
+          },
+        ];
+
+    return [
+      [
+        {
+          headline: `${report.year} Scrapped`,
+          subline: "Created by Alan Matias",
+        },
+        {
+          headline: hey,
+          subline:
+            "Welcome to Scrapped. Songs you hated and artists you skipped.",
+        },
+      ],
+      [
+        {
+          headline:
+            liked > 0
+              ? `You have ${liked.toLocaleString()} liked songs`
+              : "You have no liked songs",
+          subline:
+            liked > 0
+              ? "You collect songs like pokemon…"
+              : "Empty shelves. Bold.",
+        },
+        {
+          headline:
+            likedYear > 0
+              ? `and ${likedYear.toLocaleString()} of those were liked this year`
+              : "and none of those were liked this year",
+          subline: "Not bad for a collector.",
+        },
+      ],
+      [
+        {
+          headline:
+            long > 0
+              ? `You have ${long.toLocaleString()} all-time top favorites`
+              : "Your all-time favorites didn’t show up.",
+          subline:
+            long <= 0
+              ? "Spotify didn’t return a multi-year list this time."
+              : ghosted != null && ghosted > 0
+                ? `And you ghosted ${ghosted.toLocaleString()} of them. Ouch.`
+                : "And somehow you didn’t ghost them. Suspicious.",
+        },
+        { headline: "But one hurt more than the rest" },
+        {
+          headline: "Top ghosted song",
+          subline: hasTopSong
+            ? "Your highest multi-year favorite that dropped off. Why not give them another chance?"
+            : "Wow — you actually still talk to your old favorites.",
+        },
+      ],
+      [
+        {
+          headline: "But this wasn’t the only ghost in town",
+          subline: "Call the ghostbusters or something.",
+        },
+        { headline: "Top ghosted songs" },
+      ],
+      [
+        { headline: "You’ve heard of one-hit wonders" },
+        {
+          headline: "But who are your one-like artists?",
+          subline: "You liked one song from them. That’s it.",
+        },
+        { headline: "1-like artists. Oldest first." },
+      ],
+      [
+        { headline: "Now the artists" },
+        {
+          headline: "Top ghosted artist",
+          subline: hasTopArtist
+            ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
+            : "Your loyalty program is weirdly intact.",
+        },
+      ],
+      [
+        {
+          headline: "Get the gang back together?",
+          subline: "They’ll take you back",
+        },
+        { headline: "Top ghosted artists" },
+      ],
+      reunionBeats,
+      [{ headline: "Share" }],
+    ];
+  }, [report]);
+
+  const beatDurationsMs = useMemo(
+    () =>
+      sceneCopyPlans.map((beats, scene) => {
+        // Share finale: long look window; progress still fills, user advances.
+        if (scene === FINALE_INDEX) {
+          return [8000];
+        }
+        const durations = storyLineBeatDurationsMs(
+          beats,
+          scene === 0
+            ? { copyEnterDelaySec: INTRO_COPY_DELAY_SEC }
+            : undefined,
+        );
+        // List slides: hold final list beat +2s (ghosted songs, 1-like artists, ghosted artists).
+        if (
+          (scene !== 3 && scene !== 4 && scene !== 6) ||
+          durations.length === 0
+        ) {
+          return durations;
+        }
+        const padded = [...durations];
+        const last = padded.length - 1;
+        padded[last] = (padded[last] ?? 0) + 2000;
+        return padded;
+      }),
+    [sceneCopyPlans],
+  );
+  const beatCounts = useMemo(
+    () => beatDurationsMs.map((d) => d.length),
+    [beatDurationsMs],
+  );
+  const sceneDurationsMs = useMemo(
+    () => beatDurationsMs.map((d) => sumMs(d)),
+    [beatDurationsMs],
+  );
+
   const { beatIndex } = useStoryAutoplay({
     active,
     visitKey,
     sceneCount: SLIDE_COUNT,
-    beatCounts: API_SCRAPPED_BEAT_COUNTS,
-    sceneDurationsMs: API_SCRAPPED_SCENE_MS,
+    beatCounts,
+    sceneDurationsMs,
+    beatDurationsMs,
     paused,
     reduceMotion,
     activeFillRef,
@@ -497,9 +680,10 @@ export function ApiScrappedDeck({
                   <span className="italic">Scrapped</span>
                 </>
               ),
+              // Line beat (not footer) so it enters after the title, not with it.
+              subline: "Created by Alan Matias",
               align: "center",
               display: "hero",
-              footer: "Created by Alan Matias",
             },
             {
               headline: report.profileName
@@ -795,14 +979,14 @@ export function ApiScrappedDeck({
           }
         />
 
-        {/* 8 — share finale */}
+        {/* 8 — share finale — height budget leaves room for top/bottom chrome */}
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
-          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col items-center justify-center bg-[var(--wrapped-canvas)] px-6 py-20 text-[var(--wrapped-ink)] md:px-10"
+          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-5 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)] md:px-14"
           aria-hidden={active !== FINALE_INDEX}
         >
-          <div className="relative z-10 flex w-full max-w-xl flex-col items-center">
+          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-md flex-1 justify-center py-1">
             <ShareRecapCard
               year={report.year}
               variant="minimal"

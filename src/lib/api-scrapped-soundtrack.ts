@@ -19,14 +19,18 @@ export const API_SCRAPPED_SLIDE_COUNT = 9;
 /** 0-based indices: #1 ghosted artist → top ghosted artists list. */
 export const ARTIST_ACT_SLIDES = [5, 6] as const;
 
-/** Beats per scene — multi-beat scenes keep one canvas. */
+/**
+ * Fallback beats-per-scene (narrative blocks). Live deck expands each
+ * title / subtitle / aside into its own line-beat via reading-time schedules
+ * in `ApiScrappedDeck` — prefer those when wiring autoplay.
+ */
 export const API_SCRAPPED_BEAT_COUNTS = [
   2, 2, 3, 2, 3, 2, 2, 2, 1,
 ] as const;
 
 /**
- * Per-scene motion length (ms). Open ~8s; 3-beat scenes ~9s; others ~6s.
- * Finale (8) is unused for autoplay (user advances).
+ * Fallback per-scene lengths (ms). Live deck overrides with summed
+ * reading-time line-beat durations.
  */
 export const API_SCRAPPED_SCENE_MS = [
   8000, 6000, 9000, 6000, 9000, 6000, 6000, 6000, 6000,

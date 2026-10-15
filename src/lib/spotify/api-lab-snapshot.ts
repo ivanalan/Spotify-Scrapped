@@ -55,20 +55,53 @@ function legacyFsPath(): string {
   return path.join(FS_DIR, "api-lab-snapshot.json");
 }
 
-/** Drop heavy fields so sealed cookies stay under the header budget. */
+/** Deck only needs a short list per card; Lab prose is rebuilt on the next full fetch. */
+const COOKIE_ITEM_CAP = 5;
+
+/**
+ * Shrink the snapshot for sealed cookies without dropping album art.
+ *
+ * On Vercel the FS write is a no-op, so cookies are the only persistence.
+ * Nulling `imageUrl` (the old approach) fit more easily but left every cover
+ * blank in production. Drop Lab-only prose and extra rows instead.
+ */
 function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
   const report: ScrappedApiReport = {
-    ...stored.report,
+    year: stored.report.year,
+    fetchedAt: stored.report.fetchedAt,
+    profileName: stored.report.profileName,
+    headlines: stored.report.headlines.map((h) => ({
+      id: h.id,
+      percent: h.percent,
+      label: h.label,
+      detail: "",
+    })),
+    summary: stored.report.summary,
     cards: stored.report.cards.map((card) => ({
-      ...card,
-      items: card.items.map((item) => ({ ...item, imageUrl: null })),
+      id: card.id,
+      title: card.title,
+      calculated: "",
+      means: "",
+      bar: "",
+      source: "",
+      headline: card.headline,
+      items: card.items.slice(0, COOKIE_ITEM_CAP).map((item) => ({
+        id: item.id,
+        trackId: item.trackId,
+        label: item.label,
+        sublabel: item.sublabel,
+        detail: item.detail,
+        value: item.value,
+        imageUrl: item.imageUrl,
+      })),
     })),
   };
   return {
-    ...stored,
+    fetchedAt: stored.fetchedAt,
+    userId: stored.userId,
     report,
-    // Full URI list is only needed for Plus joins; keep a small sample in cookies.
-    likedUris: stored.likedUris.slice(0, 80),
+    // Plus joins can use a short sample; full URI list is disk-only locally.
+    likedUris: stored.likedUris.slice(0, 40),
   };
 }
 
@@ -191,19 +224,22 @@ export async function clearApiLabSnapshotCookies(
 
 /**
  * Attach sealed snapshot cookies when they fit the header budget.
- * Oversized payloads clear Lab cookies and rely on the FS snapshot instead.
+ * Oversized payloads clear Lab cookies and rely on the FS snapshot instead
+ * (local only — Vercel has no durable FS for this path).
+ * @returns whether cookies were written
  */
 export async function attachApiLabSnapshotCookies(
   response: NextResponse,
   stored: StoredApiLabSnapshot,
-): Promise<void> {
+): Promise<boolean> {
   const sealed = await seal(slimForCookie(stored));
   const chunks = chunkPayload(sealed);
   if (chunks.length > MAX_COOKIE_CHUNKS) {
     await clearApiLabSnapshotCookies(response);
-    return;
+    return false;
   }
   applySnapshotCookies(response, chunks);
+  return true;
 }
 
 export async function readApiLabSnapshot(
@@ -231,11 +267,12 @@ export async function readApiLabSnapshot(
 export async function writeApiLabSnapshot(
   stored: StoredApiLabSnapshot,
   response?: NextResponse,
-): Promise<void> {
+): Promise<boolean> {
   writeFsSnapshot(stored);
   if (response) {
-    await attachApiLabSnapshotCookies(response, stored);
+    return attachApiLabSnapshotCookies(response, stored);
   }
+  return true;
 }
 
 export async function cachedLikedTrackUris(userId?: string): Promise<string[]> {

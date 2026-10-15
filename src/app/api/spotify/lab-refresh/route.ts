@@ -5,6 +5,9 @@ import {
   clearApiLabSnapshotCookies,
 } from "@/lib/spotify/api-lab-snapshot";
 
+/** Liked Songs can be many sequential Spotify pages on a cold load. */
+export const maxDuration = 60;
+
 const ALLOWED_NEXT = new Set(["/", "/scrapped", "/scrapped/lab"]);
 
 export async function POST(request: Request) {
