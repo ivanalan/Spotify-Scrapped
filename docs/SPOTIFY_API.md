@@ -65,6 +65,7 @@ See `SPOTIFY_SCOPES` in [`src/lib/spotify/scopes.ts`](../src/lib/spotify/scopes.
 
 - `recently-played`: ~50 completed plays total; skips are not returned.
 - `top/tracks` & `top/artists`: affinity ranks for short / medium / long windows — not calendar-year play counts.
+- Liked Songs: paginated fetch (up to ~10k) so liked-this-year / one-save metrics see the full library, not a ~200-track sample.
 - True skip / `ms_played` analytics still require the Extended Streaming History export (`/scrapped/plus`).
 
 ## Caveats

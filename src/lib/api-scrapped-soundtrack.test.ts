@@ -4,23 +4,42 @@ import type { ScrappedApiReport } from "@/lib/scrapped-api";
 import {
   ARTIST_ACT_SLIDES,
   getApiSlideSoundtrackUri,
+  getApiSlideSoundtrackUris,
   needsArtistSoundtrackResolve,
-  songActLeadUri,
+  needsSecondArtistSoundtrackResolve,
 } from "@/lib/api-scrapped-soundtrack";
 
 function reportFixture(overrides?: {
   songTrackId?: string;
+  songTrackId2?: string;
+  songTrackId3?: string;
   artistId?: string;
   artistTrackId?: string | null;
+  artist2Id?: string;
+  artist2TrackId?: string | null;
   reunionTrackId?: string;
+  oneSaveTrackId?: string;
+  shortTopTrackId?: string;
+  likedThisYearTrackId?: string;
 }): ScrappedApiReport {
   const songTrackId = overrides?.songTrackId ?? "songLead111";
+  const songTrackId2 = overrides?.songTrackId2 ?? "songLead222";
+  const songTrackId3 = overrides?.songTrackId3 ?? "songLead333";
   const artistId = overrides?.artistId ?? "2YZyLoL8N0Wb9xBt1NhZWg"; // Kendrick
   const artistTrackId =
     overrides?.artistTrackId === undefined
       ? null
       : overrides.artistTrackId;
+  const artist2Id = overrides?.artist2Id ?? "artistTwoId";
+  const artist2TrackId =
+    overrides?.artist2TrackId === undefined
+      ? "artistTwoTrack"
+      : overrides.artist2TrackId;
   const reunionTrackId = overrides?.reunionTrackId ?? "reunion999";
+  const oneSaveTrackId = overrides?.oneSaveTrackId ?? "oneSaveTrack";
+  const shortTopTrackId = overrides?.shortTopTrackId ?? "shortTopNow";
+  const likedThisYearTrackId =
+    overrides?.likedThisYearTrackId ?? "likedYearTrack";
 
   return {
     year: 2026,
@@ -29,12 +48,18 @@ function reportFixture(overrides?: {
     headlines: [],
     summary: {
       likedCount: 0,
-      shortTrackCount: 0,
+      likedThisYearCount: 1,
+      likedNeverToppedCount: 0,
+      shortLikedCount: 0,
+      monthOnlyTrackCount: 0,
+      monthOnlyArtistCount: 0,
+      shortTrackCount: 1,
       mediumTrackCount: 0,
       longTrackCount: 50,
       shortArtistCount: 0,
       mediumArtistCount: 0,
       longArtistCount: 50,
+      shortTopTrackId,
     },
     cards: [
       {
@@ -53,6 +78,22 @@ function reportFixture(overrides?: {
             detail: "multi-year #1",
             value: 50,
           },
+          {
+            id: songTrackId2,
+            trackId: songTrackId2,
+            label: "Second Ghost",
+            sublabel: "Someone",
+            detail: "multi-year #2",
+            value: 49,
+          },
+          {
+            id: songTrackId3,
+            trackId: songTrackId3,
+            label: "Third Ghost",
+            sublabel: "Someone",
+            detail: "multi-year #3",
+            value: 48,
+          },
         ],
       },
       {
@@ -69,6 +110,48 @@ function reportFixture(overrides?: {
             label: "Kendrick Lamar",
             detail: "multi-year #1",
             value: 50,
+          },
+          {
+            id: artist2Id,
+            trackId: artist2TrackId ?? undefined,
+            label: "Second Artist",
+            detail: "multi-year #2",
+            value: 49,
+          },
+        ],
+      },
+      {
+        id: "one-save-artists",
+        title: "One-save shelf",
+        calculated: "",
+        means: "",
+        bar: "",
+        source: "",
+        items: [
+          {
+            id: "oneSaveArtist",
+            trackId: oneSaveTrackId,
+            label: "One Save Act",
+            detail: "Song Name · 100d on the shelf",
+            value: 100,
+          },
+        ],
+      },
+      {
+        id: "liked-this-year",
+        title: "Liked this year",
+        calculated: "",
+        means: "",
+        bar: "",
+        source: "",
+        items: [
+          {
+            id: likedThisYearTrackId,
+            trackId: likedThisYearTrackId,
+            label: "Year Like",
+            sublabel: "Artist",
+            detail: "liked 2026-01-01",
+            value: 10,
           },
         ],
       },
@@ -104,73 +187,87 @@ function reportFixture(overrides?: {
 }
 
 describe("getApiSlideSoundtrackUri", () => {
-  it("keeps the song lead through open + library scenes (0–1)", () => {
+  it("assigns a distinct track per slide when material allows", () => {
+    const report = reportFixture({
+      artistTrackId: "kendrickTrack",
+      artist2TrackId: "artistTwoTrack",
+    });
+    const uris = getApiSlideSoundtrackUris(report);
+    assert.equal(uris[0], "spotify:track:shortTopNow");
+    assert.equal(uris[1], "spotify:track:likedYearTrack");
+    assert.equal(uris[2], "spotify:track:songLead111");
+    assert.equal(uris[3], "spotify:track:songLead222");
+    assert.equal(uris[4], "spotify:track:oneSaveTrack");
+    assert.equal(uris[5], "spotify:track:kendrickTrack");
+    assert.equal(uris[6], "spotify:track:artistTwoTrack");
+    assert.equal(uris[7], "spotify:track:reunion999");
+    assert.equal(uris[8], "spotify:track:songLead333");
+    const unique = new Set(uris.filter(Boolean));
+    assert.equal(unique.size, 9);
+  });
+
+  it("uses the #1 ghosted song on scene 2 and the second on scene 3", () => {
     const report = reportFixture({ artistTrackId: "kendrickTrack" });
-    const lead = songActLeadUri(report);
-    for (let i = 0; i <= 1; i++) {
-      assert.equal(getApiSlideSoundtrackUri(report, i), lead);
-    }
+    assert.equal(
+      getApiSlideSoundtrackUri(report, 2),
+      "spotify:track:songLead111",
+    );
+    assert.equal(
+      getApiSlideSoundtrackUri(report, 3),
+      "spotify:track:songLead222",
+    );
   });
 
-  it("uses the #1 ghosted song through the song act (scenes 2–4)", () => {
-    const report = reportFixture({ artistTrackId: "kendrickTrack" });
-    const lead = songActLeadUri(report);
-    for (let i = 2; i <= 4; i++) {
-      assert.equal(getApiSlideSoundtrackUri(report, i), lead);
-    }
-  });
+  it("never lets open/liked slides steal the top ghosted soundtrack", () => {
+    // Reproduces: short-top missing + no liked-this-year → old logic claimed
+    // ghosted[0] for scene 0, so scene 2 played ghosted[1] (Wallows) instead
+    // of the on-screen #1 (Dapper).
+    const report = reportFixture({
+      songTrackId: "dapperAnderson",
+      songTrackId2: "callingAfterMeWallows",
+      artistTrackId: "kendrickTrack",
+    });
+    report.summary.shortTopTrackId = null;
+    report.cards = report.cards.filter((c) => c.id !== "liked-this-year");
 
-  it("does not switch on artist scenes when Kendrick has no sample track (falls back to lead)", () => {
-    const report = reportFixture({ artistTrackId: null });
-    const lead = songActLeadUri(report);
-    for (const i of ARTIST_ACT_SLIDES) {
-      assert.equal(
-        getApiSlideSoundtrackUri(report, i),
-        lead,
-        `scene ${i} should fall back to lead without artist track`,
-      );
-    }
-  });
-
-  it("switches to a Kendrick track on artist-act scenes when trackId is present", () => {
-    const kendrickTrack = "kendrickHumbling";
-    const report = reportFixture({ artistTrackId: kendrickTrack });
-    const lead = songActLeadUri(report);
-    const artistUri = `spotify:track:${kendrickTrack}`;
-    assert.notEqual(artistUri, lead);
-    for (const i of ARTIST_ACT_SLIDES) {
-      assert.equal(
-        getApiSlideSoundtrackUri(report, i),
-        artistUri,
-        `scene ${i} should play Kendrick`,
-      );
-    }
+    const uris = getApiSlideSoundtrackUris(report);
+    assert.equal(uris[2], "spotify:track:dapperAnderson");
+    assert.equal(uris[3], "spotify:track:callingAfterMeWallows");
+    // Open slide may fall back to leftover ghosted (#3), but must not claim #1
+    // before the content pin — so #1 stays on scene 2.
+    assert.notEqual(uris[0], "spotify:track:dapperAnderson");
   });
 
   it("uses a client-resolved artist URI override when the report has no sample", () => {
     const report = reportFixture({ artistTrackId: null });
     const resolved = "spotify:track:resolvedKendrick";
-    const lead = songActLeadUri(report);
-    assert.equal(getApiSlideSoundtrackUri(report, 5), lead);
-    for (const i of ARTIST_ACT_SLIDES) {
-      assert.equal(
-        getApiSlideSoundtrackUri(report, i, {
-          artistSoundtrackUri: resolved,
-        }),
-        resolved,
-      );
-    }
+    // Without override, scene 5 still gets a distinct unused track from the pool.
+    assert.ok(getApiSlideSoundtrackUri(report, 5));
+    assert.notEqual(
+      getApiSlideSoundtrackUri(report, 5),
+      getApiSlideSoundtrackUri(report, 0),
+    );
+    assert.equal(
+      getApiSlideSoundtrackUri(report, 5, {
+        artistSoundtrackUri: resolved,
+      }),
+      resolved,
+    );
   });
 
-  it("switches again at plot twist (scene 8) to the reunion track", () => {
+  it("switches at plot twist + reunion (scene 7) to the reunion track", () => {
     const report = reportFixture({
       artistTrackId: "kendrickTrack",
       reunionTrackId: "reunionSong",
     });
     assert.equal(
-      getApiSlideSoundtrackUri(report, 8),
+      getApiSlideSoundtrackUri(report, 7),
       "spotify:track:reunionSong",
     );
+  });
+
+  it("keeps ARTIST_ACT_SLIDES on scenes 5–6", () => {
+    assert.deepEqual([...ARTIST_ACT_SLIDES], [5, 6]);
   });
 });
 
@@ -197,5 +294,25 @@ describe("needsArtistSoundtrackResolve", () => {
   it("skips resolve when artist already has a distinct track", () => {
     const report = reportFixture({ artistTrackId: "otherTrack" });
     assert.equal(needsArtistSoundtrackResolve(report), null);
+  });
+});
+
+describe("needsSecondArtistSoundtrackResolve", () => {
+  it("requests resolve when #2 artist lacks a distinct track", () => {
+    const report = reportFixture({
+      artistTrackId: "kendrickTrack",
+      artist2TrackId: null,
+    });
+    const need = needsSecondArtistSoundtrackResolve(report);
+    assert.ok(need);
+    assert.equal(need.artistId, "artistTwoId");
+  });
+
+  it("skips when #2 already has a distinct track", () => {
+    const report = reportFixture({
+      artistTrackId: "kendrickTrack",
+      artist2TrackId: "artistTwoTrack",
+    });
+    assert.equal(needsSecondArtistSoundtrackResolve(report), null);
   });
 });

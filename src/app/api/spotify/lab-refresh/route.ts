@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { fetchAndStoreScrappedApiLab } from "@/lib/load-scrapped-api-lab";
-import { attachApiLabSnapshotCookies } from "@/lib/spotify/api-lab-snapshot";
+import {
+  attachApiLabSnapshotCookies,
+  clearApiLabSnapshotCookies,
+} from "@/lib/spotify/api-lab-snapshot";
 
 const ALLOWED_NEXT = new Set(["/", "/scrapped", "/scrapped/lab"]);
 
@@ -18,6 +21,8 @@ export async function POST(request: Request) {
 
   if (result.kind === "ready" && result.stored) {
     const res = NextResponse.redirect(`${base}${next}`, { status: 303 });
+    // Always clear first — old multi-chunk jars are what trigger HTTP 431.
+    await clearApiLabSnapshotCookies(res);
     await attachApiLabSnapshotCookies(res, result.stored);
     return res;
   }

@@ -120,7 +120,8 @@ export function ApiMetricsLab(props: Props) {
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
           Songs and artists that fell out of rotation, came back, or stayed
-          on the shelf. Tops and Liked Songs only.
+          on the shelf — including likes that never topped. Tops and Liked
+          Songs only.
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           <Link
@@ -208,6 +209,14 @@ export function ApiMetricsLab(props: Props) {
               ? `${props.report.profileName} · `
               : null}
             snapshot {props.report.fetchedAt.slice(0, 19).replace("T", " ")} UTC
+            · {props.report.summary.likedCount.toLocaleString()} liked
+            · {props.report.summary.likedThisYearCount.toLocaleString()} liked
+            this year ·{" "}
+            {props.report.summary.likedNeverToppedCount.toLocaleString()} never
+            topped · {props.report.summary.shortLikedCount}/
+            {props.report.summary.shortTrackCount} four-week tops already liked
+            · {props.report.summary.monthOnlyTrackCount} month-only songs
+            · {props.report.summary.monthOnlyArtistCount} month-only artists
             · artists {props.report.summary.shortArtistCount}/
             {props.report.summary.mediumArtistCount}/
             {props.report.summary.longArtistCount} (4 weeks / 6 months / years)

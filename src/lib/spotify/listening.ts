@@ -116,7 +116,8 @@ type PlaylistTracksPage = {
   next: string | null;
 };
 
-const MAX_LIKED_PAGES = 20;
+/** 50 tracks/page → up to 10k likes (covers typical libraries; stops early on `next`). */
+const MAX_LIKED_PAGES = 200;
 const MAX_PLAYLISTS = 30;
 const MAX_TRACK_PAGES_PER_PLAYLIST = 2;
 

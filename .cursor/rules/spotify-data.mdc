@@ -6,7 +6,7 @@ alwaysApply: true
 # Spotify data rules
 
 - Read [docs/DATA.md](docs/DATA.md) and [AGENTS.md](AGENTS.md) before changing ingest or analytics.
-- Before changing Scrapped deck order, slide copy, or share-card framing, read [docs/WRAPPED.md](docs/WRAPPED.md) — keep Wrapped’s beat spine; invert meaning, don’t scramble pacing. API story voice: conversational text-first (see mocks + API spine in WRAPPED.md). For `/scrapped` slide copy, read [docs/STORY_SCRIPT.md](docs/STORY_SCRIPT.md) and sync `ApiScrappedDeck.tsx` to match — do not invent copy that drifts from the script.
+- Before changing Scrapped deck order, slide copy, or share-card framing, read [docs/WRAPPED.md](docs/WRAPPED.md) — keep Wrapped’s beat spine; invert meaning, don’t scramble pacing. API story voice: conversational text-first (see mocks + API spine in WRAPPED.md). `/scrapped` slide copy lives in `ApiScrappedDeck.tsx`.
 - `ts` is the stream **end** time (UTC). Derive start as `ts - ms_played`.
 - Never commit, log, or render `ip_addr`. Strip it at ingest.
 - Do not use `skipped` alone for historical skips — it is unreliable before ~2022. Combine with `reason_end` (`fwdbtn`, `endplay`, `backbtn`) and short `ms_played`.

@@ -27,12 +27,14 @@ export function Icon({ icon, className, style, title }: IconProps) {
   }, []);
 
   return (
+    // Ionicons upgrades the custom element after paint (`md hydrated`, role).
     <ion-icon
       icon={icon}
       className={className}
       style={style}
       aria-hidden={title ? undefined : "true"}
       aria-label={title}
+      suppressHydrationWarning
     />
   );
 }

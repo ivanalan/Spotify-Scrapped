@@ -18,20 +18,36 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   className?: string;
+  /** Gate mock uses a text link; deck chrome keeps the close icon. */
+  appearance?: "icon" | "text";
 };
 
-export function SignOutConfirmButton({ className }: Props) {
+export function SignOutConfirmButton({
+  className,
+  appearance = "icon",
+}: Props) {
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={cn(
-          buttonVariants({ size: "icon", variant: "default" }),
-          "size-8 rounded-full bg-[#1c1c1c] text-[#f4f4f2] hover:bg-[#1c1c1c] hover:opacity-90",
-          className,
-        )}
+        className={
+          appearance === "text"
+            ? cn(
+                "font-sans text-sm text-[var(--wrapped-muted)] transition-opacity hover:opacity-70",
+                className,
+              )
+            : cn(
+                buttonVariants({ size: "icon", variant: "default" }),
+                "size-8 rounded-full bg-[#1c1c1c] text-[#f4f4f2] hover:bg-[#1c1c1c] hover:opacity-90",
+                className,
+              )
+        }
         aria-label="Sign out of Spotify"
       >
-        <Icon icon={closeOutline} className="size-4" />
+        {appearance === "text" ? (
+          "Sign out"
+        ) : (
+          <Icon icon={closeOutline} className="size-4" />
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent
         size="default"

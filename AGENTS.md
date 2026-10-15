@@ -20,7 +20,7 @@ Personal web app focused on **Spotify Scrapped** — an anti-Wrapped for songs t
 - **Scrapped / Scrapped Lab:** affinity windows + library timestamps — proxies for “didn’t stick,” not true skips.
 - Access tokens stay server-side (`getSpotifyAccessToken` / `spotifyFetch`).
 
-See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.md)**, **[docs/WRAPPED.md](docs/WRAPPED.md)** (Wrapped beat grammar → Scrapped narrative), and **[docs/STORY_SCRIPT.md](docs/STORY_SCRIPT.md)** (API deck copy brief → sync into `ApiScrappedDeck`).
+See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.md)**, and **[docs/WRAPPED.md](docs/WRAPPED.md)** (Wrapped beat grammar → Scrapped narrative).
 
 ## Non-goals (for now)
 
@@ -49,7 +49,6 @@ AGENTS.md
 docs/DATA.md
 docs/SPOTIFY_API.md
 docs/WRAPPED.md            # Wrapped UX → Scrapped story spine
-docs/STORY_SCRIPT.md       # API deck copy brief (edit → sync to ApiScrappedDeck)
 data/raw/                 # gitignored
 data/processed/           # gitignored
 scripts/ingest.ts

@@ -9,6 +9,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   chevronBackOutline,
@@ -38,6 +39,7 @@ type Props = {
   /** Soundtrack is hosted by ScrappedExperience (unlocked on Continue). */
   soundOn: boolean;
   artistSoundtrackUri?: string | null;
+  artistSoundtrackUri2?: string | null;
   onEnableSound: () => void;
   onDisableSound: () => void;
   onPausedChange?: (paused: boolean) => void;
@@ -60,6 +62,8 @@ const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
 const INTRO_COPY_DELAY_SEC = 0.5;
+/** Stories-style: pause progress + soundtrack after this press duration (taps stay snappy). */
+const HOLD_PAUSE_MS = 180;
 
 function cardById(
   report: ScrappedApiReport,
@@ -68,18 +72,20 @@ function cardById(
   return report.cards.find((c) => c.id === id);
 }
 
-function likedAside(count: number): string {
-  if (count <= 0) return "Empty shelves. Bold.";
-  if (count < 80) return "A short shelf. High standards — or just getting started.";
-  if (count < 250) return "A solid pile of “I’ll listen later.”";
-  if (count < 600) return "That’s a lot of almosts waiting in the wings.";
-  return "A whole museum of maybe.";
+/** Ghosted multi-year count from headline detail `"N of M"`. */
+function ghostedCountFromDetail(detail: string | undefined): number | null {
+  if (!detail) return null;
+  const match = /^(\d+)/.exec(detail);
+  if (!match) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 export function ApiScrappedDeck({
   report,
   soundOn,
   artistSoundtrackUri = null,
+  artistSoundtrackUri2 = null,
   onEnableSound,
   onDisableSound,
   onPausedChange,
@@ -97,13 +103,23 @@ export function ApiScrappedDeck({
   const [active, setActive] = useState(0);
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
+  /** Instagram-style press-and-hold on the main tap zones (not the sticky pause button). */
+  const [pressHeld, setPressHeld] = useState(false);
+  const pressRef = useRef<{
+    dir: -1 | 1;
+    pointerId: number;
+    long: boolean;
+    timer: ReturnType<typeof setTimeout> | null;
+  } | null>(null);
   const reduceMotion = useReducedMotion();
   // Open-slide gate: derive from session key vs async unlock (no sync setState in effects).
   const introSessionKey = held || active !== 0 ? null : String(visitKey);
   const [introUnlockedFor, setIntroUnlockedFor] = useState<string | null>(null);
   const introGate =
     introSessionKey != null && introUnlockedFor !== introSessionKey;
-  const paused = pausedSticky || held || introGate;
+  /** Sticky button / space + press-hold — drives chrome icon and soundtrack. */
+  const userPaused = pausedSticky || pressHeld;
+  const paused = userPaused || held || introGate;
   const activeRef = useRef(active);
 
   // Match open-slide copy delay so the progress bar doesn't run on empty canvas.
@@ -125,19 +141,22 @@ export function ApiScrappedDeck({
   const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
   const leftLongArtists = cardById(report, "left-long-artists");
+  const oneSaveArtists = cardById(report, "one-save-artists");
   const secondChance = cardById(report, "second-chance");
   const artistsBack = cardById(report, "artists-back");
 
   const topSong = leftLongSongs?.items[0] ?? null;
   const topArtist = leftLongArtists?.items[0] ?? null;
   const reunionSong = secondChance?.items[0] ?? null;
-  const ghostPercent = leftLongHeadline?.percent;
   const likedCount = report.summary.likedCount;
+  const likedThisYearCount = report.summary.likedThisYearCount;
   const longCount = report.summary.longTrackCount;
+  const ghostedCount = ghostedCountFromDetail(leftLongHeadline?.detail);
+  const reunionList = (secondChance?.items.length ?? 0) > 1;
 
   const soundtrackOpts = useMemo(
-    () => ({ artistSoundtrackUri }),
-    [artistSoundtrackUri],
+    () => ({ artistSoundtrackUri, artistSoundtrackUri2 }),
+    [artistSoundtrackUri, artistSoundtrackUri2],
   );
 
   useEffect(() => {
@@ -285,6 +304,61 @@ export function ApiScrappedDeck({
     setPausedSticky((p) => !p);
   }, []);
 
+  const clearPressHold = useCallback(() => {
+    const press = pressRef.current;
+    if (press?.timer) clearTimeout(press.timer);
+    pressRef.current = null;
+    setPressHeld(false);
+  }, []);
+
+  /** Left/right story zones: short press = navigate; hold = pause until release. */
+  const onZonePointerDown = useCallback(
+    (dir: -1 | 1, e: ReactPointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0) return;
+      // Don't steal presses meant for chrome / the visible Spotify player.
+      if (e.target !== e.currentTarget) return;
+      clearPressHold();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      pressRef.current = {
+        dir,
+        pointerId: e.pointerId,
+        long: false,
+        timer: setTimeout(() => {
+          const press = pressRef.current;
+          if (!press || press.pointerId !== e.pointerId) return;
+          press.long = true;
+          setPressHeld(true);
+        }, HOLD_PAUSE_MS),
+      };
+    },
+    [clearPressHold],
+  );
+
+  const onZonePointerUp = useCallback(
+    (e: ReactPointerEvent<HTMLButtonElement>) => {
+      const press = pressRef.current;
+      if (!press || press.pointerId !== e.pointerId) return;
+      const { dir, long } = press;
+      clearPressHold();
+      if (long) return;
+      const next = activeRef.current + dir;
+      if (next < 0 || next > FINALE_INDEX) return;
+      // Prime on tap commit (not pointerdown) so holds never chirp the next act.
+      primeSoundtrackFor(next);
+      void goTo(next);
+    },
+    [clearPressHold, goTo, primeSoundtrackFor],
+  );
+
+  const onZonePointerCancel = useCallback(
+    (e: ReactPointerEvent<HTMLButtonElement>) => {
+      const press = pressRef.current;
+      if (!press || press.pointerId !== e.pointerId) return;
+      clearPressHold();
+    },
+    [clearPressHold],
+  );
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
@@ -310,6 +384,15 @@ export function ApiScrappedDeck({
     return () => window.removeEventListener("keydown", onKey);
   }, [goTo, togglePaused]);
 
+  // Release hold if the tab hides mid-press.
+  useEffect(() => {
+    function onVis() {
+      if (document.hidden) clearPressHold();
+    }
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [clearPressHold]);
+
   const soundtrackUri = getApiSlideSoundtrackUri(
     report,
     active,
@@ -321,9 +404,9 @@ export function ApiScrappedDeck({
   }, [soundtrackUri, onSoundtrackUriChange]);
 
   useEffect(() => {
-    // Report user pause only — `held` must not mute the soundtrack on reveal.
-    onPausedChange?.(pausedSticky);
-  }, [pausedSticky, onPausedChange]);
+    // User pause (sticky or hold) mutes audio. Gate `held` must not — reveal stays warm.
+    onPausedChange?.(userPaused);
+  }, [userPaused, onPausedChange]);
 
   // While held under the gate, keep slides inactive so enter motion only
   // starts once on Continue (not once hidden + again after a visitKey bump).
@@ -366,12 +449,12 @@ export function ApiScrappedDeck({
               type="button"
               size="icon"
               variant="default"
-              aria-label={pausedSticky ? "Resume story" : "Pause story"}
+              aria-label={userPaused ? "Resume story" : "Pause story"}
               onClick={togglePaused}
               className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
             >
               <Icon
-                icon={pausedSticky ? playOutline : pauseOutline}
+                icon={userPaused ? playOutline : pauseOutline}
                 className="size-4"
               />
             </Button>
@@ -401,86 +484,89 @@ export function ApiScrappedDeck({
         ref={scrollerRef}
         className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {/* 0 — year open + thesis (paired). Copy delayed so Continue audio can catch up. */}
+        {/* 0 — year open → Hey + welcome (paired). Copy delayed for Continue audio. */}
         <WrappedStorySlide
           {...sceneMotion(0)}
           tone="paper"
           copyEnterDelaySec={INTRO_COPY_DELAY_SEC}
           beats={[
             {
-              headline: report.profileName ? (
-                <>
-                  {report.profileName}&rsquo;s {report.year}{" "}
-                  <span className="italic">Scrapped</span>
-                </>
-              ) : (
-                report.year
-              ),
-              subline: report.profileName ? undefined : (
-                <span className="italic">scrapped</span>
-              ),
-              align: "center",
-              display: report.profileName ? "hero" : "year",
-            },
-            {
               headline: (
                 <>
-                  Scrapped is your <span className="italic">anti-wrapped</span>.
+                  {report.year}{" "}
+                  <span className="italic">Scrapped</span>
                 </>
               ),
-              subline:
-                "What artists you ghosted, and which of your songs fell off. Ready?",
               align: "center",
               display: "hero",
               footer: "Created by Alan Matias",
             },
+            {
+              headline: report.profileName
+                ? `Hey ${report.profileName}`
+                : "Hey there",
+              subline:
+                "Welcome to Scrapped. Songs you hated and artists you skipped.",
+              align: "center",
+              display: "hero",
+            },
           ]}
         />
 
-        {/* 1 — liked volume + tops bridge (paired) */}
+        {/* 1 — liked volume → liked this year */}
         <WrappedStorySlide
           {...sceneMotion(1)}
           tone="sand"
           beats={[
             {
-              headline: `${likedCount.toLocaleString()} liked songs in your library.`,
-              subline: likedAside(likedCount),
+              headline:
+                likedCount > 0
+                  ? `You have ${likedCount.toLocaleString()} liked songs`
+                  : "You have no liked songs",
+              subline:
+                likedCount > 0
+                  ? "You collect songs like pokemon…"
+                  : "Empty shelves. Bold.",
               display: "hero",
             },
             {
               headline:
-                longCount > 0
-                  ? `and ${longCount.toLocaleString()} all-time top songs`
-                  : "and your all-time top songs",
-              subline: "But how did they hold up this year?",
+                likedThisYearCount > 0
+                  ? `and ${likedThisYearCount.toLocaleString()} of those were liked this year`
+                  : "and none of those were liked this year",
+              subline: "Not bad for a collector.",
               display: "hero",
             },
           ]}
         />
 
-        {/* 2 — ghost rate + #1 ghosted song (paired) */}
+        {/* 2 — favorites + ghosted → one hurt more → #1 ghosted song */}
         <WrappedStorySlide
           {...sceneMotion(2)}
           tone="blush"
           beats={[
             {
               headline:
-                ghostPercent == null
-                  ? "Your all-time favorites didn’t show up."
-                  : `${ghostPercent}% of your all-time top favorites were ghosted.`,
+                longCount > 0
+                  ? `You have ${longCount.toLocaleString()} all-time top favorites`
+                  : "Your all-time favorites didn’t show up.",
               subline:
-                ghostPercent == null
+                longCount <= 0
                   ? "Spotify didn’t return a multi-year list this time."
-                  : "Which fell off the hardest?",
+                  : ghostedCount != null && ghostedCount > 0
+                    ? `And you ghosted ${ghostedCount.toLocaleString()} of them. Ouch.`
+                    : "And somehow you didn’t ghost them. Suspicious.",
               display: "hero",
-              footer: leftLongHeadline?.detail,
             },
             {
-              headline: topSong?.label ?? "Nobody to call out.",
+              headline: "But one hurt more than the rest",
+              display: "hero",
+            },
+            {
+              headline: "Top ghosted song",
               subline: topSong
-                ? "Your highest multi-year favorite that isn’t in the 6-month or 4-week tops."
+                ? "Your highest multi-year favorite that dropped off. Why not give them another chance?"
                 : "Wow — you actually still talk to your old favorites.",
-              aside: topSong ? "Why not give them another chance?" : undefined,
               lead: topSong ? (
                 <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
                   {topSong.imageUrl ? (
@@ -499,149 +585,217 @@ export function ApiScrappedDeck({
               display: "hero",
               footer: topSong ? (
                 <span>
-                  {topSong.sublabel ?? "—"}
-                  {topSong.detail ? ` · ${topSong.detail}` : null}
+                  <span className="font-semibold text-[var(--wrapped-ink)]">
+                    {topSong.label}
+                  </span>
+                  {topSong.sublabel ? ` · ${topSong.sublabel}` : null}
                 </span>
               ) : undefined,
             },
           ]}
         />
 
-        {/* 3 — list setup */}
+        {/* 3 — ghost in town → top ghosted songs list */}
         <WrappedStorySlide
           {...sceneMotion(3)}
-          headline="Bring back the group"
-          subline="Here are your top 5 favorite songs that didn’t make it this year."
           tone="sky"
-          display="hero"
+          beats={[
+            {
+              headline: "But this wasn’t the only ghost in town",
+              subline: "Call the ghostbusters or something.",
+              display: "hero",
+            },
+            {
+              headline: "Top ghosted songs",
+              display: "sentence",
+              children: (
+                <WrappedEntityList
+                  items={(leftLongSongs?.items ?? []).map((item) => ({
+                    id: item.id,
+                    label: item.label,
+                    sublabel: item.sublabel,
+                    imageUrl: item.imageUrl,
+                  }))}
+                  active={!held && active === 3}
+                />
+              ),
+            },
+          ]}
         />
 
-        {/* 4 — top ghosted songs */}
+        {/* 4 — one-hit wonders → one-like setup → one-save list */}
         <WrappedStorySlide
           {...sceneMotion(4)}
-          headline="Left on read"
-          subline="Multi-year favorites missing from both recent windows."
-          tone="paper"
-          display="sentence"
-        >
-          <WrappedEntityList
-            items={(leftLongSongs?.items ?? []).map((item) => ({
-              id: item.id,
-              label: item.label,
-              sublabel: item.sublabel,
-              imageUrl: item.imageUrl,
-            }))}
-            active={active === 4}
-          />
-        </WrappedStorySlide>
+          tone="cream"
+          beats={[
+            {
+              headline: "You’ve heard of one-hit wonders",
+              display: "hero",
+            },
+            {
+              headline: "But who are your one-like artists?",
+              subline: "You liked one song from them. That’s it.",
+              display: "hero",
+            },
+            {
+              headline: "1-like artists. Oldest first.",
+              display: "sentence",
+              children: (
+                <WrappedEntityList
+                  items={(oneSaveArtists?.items ?? []).map((item) => ({
+                    id: item.id,
+                    label: item.label,
+                    sublabel: item.detail,
+                    imageUrl: item.imageUrl,
+                  }))}
+                  active={!held && active === 4}
+                  empty="No one-like artists in this sample. Loyal, or just indecisive?"
+                />
+              ),
+            },
+          ]}
+        />
 
-        {/* 5 — artist act bridge */}
+        {/* 5 — Now the artists → #1 ghosted artist */}
         <WrappedStorySlide
           {...sceneMotion(5)}
-          headline="Now the artists."
-          subline="Same energy — people you used to keep on repeat, then quietly stopped texting."
-          tone="cream"
-          display="hero"
+          tone="sand"
+          beats={[
+            {
+              headline: "Now the artists",
+              display: "hero",
+            },
+            {
+              headline: "Top ghosted artist",
+              subline: topArtist
+                ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
+                : "Your loyalty program is weirdly intact.",
+              lead: topArtist ? (
+                <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
+                  {topArtist.imageUrl ? (
+                    <Image
+                      src={topArtist.imageUrl}
+                      alt=""
+                      fill
+                      sizes="192px"
+                      className="object-cover"
+                      priority
+                    />
+                  ) : null}
+                </div>
+              ) : undefined,
+              display: "hero",
+              footer: topArtist ? (
+                <span>
+                  <span className="font-semibold text-[var(--wrapped-ink)]">
+                    {topArtist.label}
+                  </span>
+                  {topArtist.detail ? ` · ${topArtist.detail}` : null}
+                </span>
+              ) : undefined,
+            },
+          ]}
         />
 
-        {/* 6 — #1 ghosted artist */}
+        {/* 6 — gang back together → top ghosted artists list */}
         <WrappedStorySlide
           {...sceneMotion(6)}
-          headline={topArtist?.label ?? "No missing persons."}
-          subline={
-            topArtist
-              ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
-              : "Your loyalty program is weirdly intact."
-          }
-          aside={
-            topArtist
-              ? "They’re fine. They’re just busy not being pressed by you."
-              : undefined
-          }
-          tone="sand"
-          display="hero"
-          footer={topArtist?.detail}
+          tone="mist"
+          beats={[
+            {
+              headline: "Get the gang back together?",
+              subline: "They’ll take you back",
+              display: "hero",
+            },
+            {
+              headline: "Top ghosted artists",
+              display: "sentence",
+              children: (
+                <WrappedEntityList
+                  items={(leftLongArtists?.items ?? []).map((item) => ({
+                    id: item.id,
+                    label: item.label,
+                    sublabel: item.detail,
+                    imageUrl: item.imageUrl,
+                  }))}
+                  active={!held && active === 6}
+                  empty="Empty sabbatical list. Touch grass? Or don’t."
+                />
+              ),
+            },
+          ]}
         />
 
-        {/* 7 — top ghosted artists */}
+        {/* 7 — plot twist + reunion (combined) */}
         <WrappedStorySlide
           {...sceneMotion(7)}
-          headline="On sabbatical (from you)"
-          subline="Multi-year top artists who slipped out of both recent windows."
-          tone="mist"
-          display="sentence"
-        >
-          <WrappedEntityList
-            items={(leftLongArtists?.items ?? []).map((item) => ({
-              id: item.id,
-              label: item.label,
-              sublabel: item.detail,
-              imageUrl: item.imageUrl,
-            }))}
-            active={active === 7}
-            empty="Empty sabbatical list. Touch grass? Or don’t."
-          />
-        </WrappedStorySlide>
-
-        {/* 8 — reunion setup */}
-        <WrappedStorySlide
-          {...sceneMotion(8)}
-          headline="Plot twist."
-          subline="Not everyone stayed ghosted. A few old favorites slid back into your last four weeks."
-          tone="blush"
-          display="hero"
+          tone="sage"
+          beats={
+            reunionList
+              ? [
+                  {
+                    headline: "Plot twist.",
+                    subline:
+                      "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+                    display: "hero",
+                  },
+                  {
+                    headline: "The reunion setlist",
+                    subline:
+                      "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
+                    display: "sentence",
+                    footer:
+                      artistsBack && artistsBack.items.length > 0
+                        ? `${artistsBack.items.length} artists also came back this month`
+                        : undefined,
+                    children: (
+                      <WrappedEntityList
+                        items={(secondChance?.items ?? [])
+                          .slice(0, 5)
+                          .map((item) => ({
+                            id: item.id,
+                            label: item.label,
+                            sublabel: item.sublabel,
+                            imageUrl: item.imageUrl,
+                          }))}
+                        active={!held && active === 7}
+                      />
+                    ),
+                  },
+                ]
+              : [
+                  {
+                    headline: "Plot twist.",
+                    subline:
+                      "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+                    display: "hero",
+                  },
+                  {
+                    headline:
+                      reunionSong?.label ?? "No reunions on the calendar.",
+                    subline: reunionSong
+                      ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
+                      : "The soft launch stayed soft. For now.",
+                    aside: reunionSong
+                      ? "We don’t have to talk about it."
+                      : undefined,
+                    display: "hero",
+                    footer: reunionSong ? (
+                      <span>
+                        {reunionSong.sublabel ?? "—"}
+                        {reunionSong.detail
+                          ? ` · ${reunionSong.detail}`
+                          : null}
+                      </span>
+                    ) : artistsBack && artistsBack.items.length > 0 ? (
+                      `${artistsBack.items.length} artists also came back this month`
+                    ) : undefined,
+                  },
+                ]
+          }
         />
 
-        {/* 9 — reunion reveal */}
-        {(secondChance?.items.length ?? 0) > 1 ? (
-          <WrappedStorySlide
-            {...sceneMotion(9)}
-            headline="The reunion setlist"
-            subline="Old multi-year favorites — or old likes — back in your 4-week tops after a gap."
-            tone="sage"
-            display="sentence"
-            footer={
-              artistsBack && artistsBack.items.length > 0
-                ? `${artistsBack.items.length} artists also came back this month`
-                : undefined
-            }
-          >
-            <WrappedEntityList
-              items={(secondChance?.items ?? []).slice(0, 5).map((item) => ({
-                id: item.id,
-                label: item.label,
-                sublabel: item.sublabel,
-                imageUrl: item.imageUrl,
-              }))}
-              active={active === 9}
-            />
-          </WrappedStorySlide>
-        ) : (
-          <WrappedStorySlide
-            {...sceneMotion(9)}
-            headline={reunionSong?.label ?? "No reunions on the calendar."}
-            subline={
-              reunionSong
-                ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
-                : "The soft launch stayed soft. For now."
-            }
-            aside={reunionSong ? "We don’t have to talk about it." : undefined}
-            tone="sage"
-            display="hero"
-            footer={
-              reunionSong ? (
-                <span>
-                  {reunionSong.sublabel ?? "—"}
-                  {reunionSong.detail ? ` · ${reunionSong.detail}` : null}
-                </span>
-              ) : artistsBack && artistsBack.items.length > 0 ? (
-                `${artistsBack.items.length} artists also came back this month`
-              ) : undefined
-            }
-          />
-        )}
-
-        {/* 10 — share finale */}
+        {/* 8 — share finale */}
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
@@ -653,8 +807,8 @@ export function ApiScrappedDeck({
               year={report.year}
               variant="minimal"
               active={active === FINALE_INDEX}
-              leftLabel="On sabbatical"
-              rightLabel="Left on read"
+              leftLabel="Ghosted artists"
+              rightLabel="Ghosted songs"
               heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
               heroAlt={topArtist?.label ?? topSong?.label ?? ""}
               skipped={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
@@ -673,24 +827,27 @@ export function ApiScrappedDeck({
       </div>
 
       {/*
-        Stories-style tap targets above slide copy (z-10) / motion layers.
+        Stories-style tap / hold zones above slide copy (z-10) / motion layers.
+        Short press → prev/next. Hold → pause progress + soundtrack until release.
         Chrome stays higher (z-40) so pause / mute / sign-out still win.
       */}
       <button
         type="button"
         aria-label="Previous slide"
-        disabled={active <= 0}
-        onPointerDown={() => primeSoundtrackFor(active - 1)}
-        onClick={() => void goTo(active - 1)}
-        className="absolute inset-y-0 left-0 z-30 w-[30%] select-none disabled:pointer-events-none"
+        onPointerDown={(e) => onZonePointerDown(-1, e)}
+        onPointerUp={onZonePointerUp}
+        onPointerCancel={onZonePointerCancel}
+        onContextMenu={(e) => e.preventDefault()}
+        className="absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none"
       />
       <button
         type="button"
         aria-label="Next slide"
-        disabled={active >= FINALE_INDEX}
-        onPointerDown={() => primeSoundtrackFor(active + 1)}
-        onClick={() => void goTo(active + 1)}
-        className="absolute inset-y-0 right-0 z-30 w-[70%] select-none disabled:pointer-events-none"
+        onPointerDown={(e) => onZonePointerDown(1, e)}
+        onPointerUp={onZonePointerUp}
+        onPointerCancel={onZonePointerCancel}
+        onContextMenu={(e) => e.preventDefault()}
+        className="absolute inset-y-0 right-0 z-30 w-[70%] touch-manipulation select-none"
       />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-4 z-40 flex items-center justify-center gap-3">

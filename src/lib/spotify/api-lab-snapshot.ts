@@ -14,6 +14,11 @@ const COOKIE_PREFIX = "spotify_lab";
 const COOKIE_COUNT = `${COOKIE_PREFIX}_n`;
 /** Stay under typical 4KB per-cookie limits after encryption overhead. */
 const CHUNK_SIZE = 2800;
+/**
+ * Hard cap on Lab cookie chunks. Node’s default max header size is ~16KB;
+ * more than ~4 chunks of Lab cookies alone can 431 every request.
+ */
+const MAX_COOKIE_CHUNKS = 4;
 
 export type StoredApiLabSnapshot = {
   fetchedAt: string;
@@ -48,6 +53,23 @@ function fsPathFor(userId: string): string {
 
 function legacyFsPath(): string {
   return path.join(FS_DIR, "api-lab-snapshot.json");
+}
+
+/** Drop heavy fields so sealed cookies stay under the header budget. */
+function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
+  const report: ScrappedApiReport = {
+    ...stored.report,
+    cards: stored.report.cards.map((card) => ({
+      ...card,
+      items: card.items.map((item) => ({ ...item, imageUrl: null })),
+    })),
+  };
+  return {
+    ...stored,
+    report,
+    // Full URI list is only needed for Plus joins; keep a small sample in cookies.
+    likedUris: stored.likedUris.slice(0, 80),
+  };
 }
 
 async function seal(stored: StoredApiLabSnapshot): Promise<string> {
@@ -118,7 +140,7 @@ async function readCookieSnapshot(): Promise<StoredApiLabSnapshot | null> {
     const jar = await cookies();
     const nRaw = jar.get(COOKIE_COUNT)?.value;
     const n = Number(nRaw);
-    if (!Number.isFinite(n) || n < 1 || n > 40) return null;
+    if (!Number.isFinite(n) || n < 1 || n > MAX_COOKIE_CHUNKS) return null;
     let payload = "";
     for (let i = 0; i < n; i += 1) {
       const part = jar.get(`${COOKIE_PREFIX}_${i}`)?.value;
@@ -167,18 +189,35 @@ export async function clearApiLabSnapshotCookies(
   }
 }
 
-/** Attach sealed snapshot cookies to a Route Handler response (required on Vercel). */
+/**
+ * Attach sealed snapshot cookies when they fit the header budget.
+ * Oversized payloads clear Lab cookies and rely on the FS snapshot instead.
+ */
 export async function attachApiLabSnapshotCookies(
   response: NextResponse,
   stored: StoredApiLabSnapshot,
 ): Promise<void> {
-  const sealed = await seal(stored);
-  applySnapshotCookies(response, chunkPayload(sealed));
+  const sealed = await seal(slimForCookie(stored));
+  const chunks = chunkPayload(sealed);
+  if (chunks.length > MAX_COOKIE_CHUNKS) {
+    await clearApiLabSnapshotCookies(response);
+    return;
+  }
+  applySnapshotCookies(response, chunks);
 }
 
 export async function readApiLabSnapshot(
   userId?: string,
 ): Promise<StoredApiLabSnapshot | null> {
+  // Prefer disk locally — avoids 431 from fat cookie jars after Lab grew.
+  const fromFs = readFsSnapshot(userId);
+  if (fromFs) {
+    if (userId && fromFs.userId && fromFs.userId !== userId) {
+      /* fall through */
+    } else {
+      return fromFs;
+    }
+  }
   const fromCookie = await readCookieSnapshot();
   if (fromCookie) {
     if (userId && fromCookie.userId && fromCookie.userId !== userId) {
@@ -186,7 +225,7 @@ export async function readApiLabSnapshot(
     }
     return fromCookie;
   }
-  return readFsSnapshot(userId);
+  return null;
 }
 
 export async function writeApiLabSnapshot(
