@@ -16,6 +16,11 @@ light solid fills + staggered text. Narrative rules live in
 Reference mocks: [docs/mocks/](../../../docs/mocks/). Prefer implementing those
 over inventing a parallel system.
 
+**Official Wrapped motion capture (form only):** [docs/mocks/wrapped-ref/](../../../docs/mocks/wrapped-ref/)
+— keyframes + named beat index from a 2023 Wrapped screen capture. Motion grammar
+vs Scrapped today lives in [docs/WRAPPED.md §10](../../../docs/WRAPPED.md). Use it
+to match *pacing / beat spine*, never to import neon art, ribbons, or carnival fills.
+
 Also load when relevant: global `frontend-design`. Scrapped overrides on conflict.
 
 ## Locked POV — Scrapped (`/scrapped`)
@@ -27,7 +32,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Accent | Progress + chrome only — no hazard neon floods |
 | Type | Heavy sans headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”) |
 | Geometry | Soft placeholder blocks for future art; no rails, grids, or corner marks for now |
-| Motion | **Text first** — staggered line fade/rise; list rows stagger. No blob parallax |
+| Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). No blob parallax |
 
 **Emotional register:** conversational, dry, slightly merciful — same as WRAPPED.md tone.
 
@@ -70,6 +75,8 @@ Before shipping UI changes:
 
 ## When stuck
 
-1. Read [docs/WRAPPED.md](../../../docs/WRAPPED.md) for beat/tone.
+1. Read [docs/WRAPPED.md](../../../docs/WRAPPED.md) for beat/tone (and §10 for motion vs Wrapped).
 2. Open [docs/mocks/](../../../docs/mocks/) and match structure before inventing.
-3. Prefer deleting decoration over adding a second treatment.
+3. For “make motion more Wrapped,” compare [docs/mocks/wrapped-ref/named/](../../../docs/mocks/wrapped-ref/named/) to live deck timing — tighten clocks / handoffs, don’t port art.
+4. For copy vs list motion bugs, read [SCARS.md](../../../SCARS.md) and [D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md) before inventing a third path.
+5. Prefer deleting decoration over adding a second treatment.

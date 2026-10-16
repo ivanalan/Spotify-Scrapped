@@ -114,7 +114,8 @@ Scene 4 (3 beats): one-hit wonders → one-like artists setup → one-save artis
 Scene 5 (2 beats): “Now the artists” → #1 ghosted artist
 Scene 6 (2 beats): “Get the gang back together?” → Top ghosted artists list
 Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
-Scene 8: Share finale (holds; no auto-advance)
+Scene 8 (1 beat): “That was fun.” → “Same time next year?”
+Scene 9: Share finale (holds; no auto-advance)
 ```
 
 API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses. Prev/next resets and replays the target scene.
@@ -240,7 +241,82 @@ Synthesized from Spotify Newsroom (Wrapped UX 2023–2025, Me in 2023, Music Evo
 | [AGENTS.md](../AGENTS.md) | Product intent, stack, non-goals |
 | [DATA.md](DATA.md) | Export schema, skip heuristics |
 | [SPOTIFY_API.md](SPOTIFY_API.md) | OAuth + Scrapped / Lab limits |
+| [mocks/wrapped-ref/](mocks/wrapped-ref/) | **Official Wrapped 2023 motion capture** (keyframes + index) |
 | `.cursor/rules/spotify-data.mdc` | Always-on data invariants |
 | `.cursor/skills/scrapped-art-direction/` | Visual system for story decks (anti AI-slop) |
 
 When changing Scrapped Plus (export deck), also skim `src/components/scrapped/ScrappedDeck.tsx` and `DeckSoundtrack.tsx` so audio grouping still matches narrative acts.
+
+---
+
+## 10. Motion capture — Wrapped vs Scrapped today
+
+**Agents:** before changing story motion, list stagger, progress timing, or “feel more like Wrapped,” read this section and open [mocks/wrapped-ref/named/](mocks/wrapped-ref/named/). Full frame index + re-extract notes: [mocks/wrapped-ref/README.md](mocks/wrapped-ref/README.md).
+
+**Source (local, not committed):** `~/Downloads/My-Spotify-Wrapped-SnapYT.App.mp4` — ~4.5 min screen capture of **Wrapped 2023** (SnapYT player chrome visible). Stills live under `docs/mocks/wrapped-ref/`.
+
+### 10.1 What Wrapped motion does in this capture
+
+Observed grammar (form to mirror; look to invert):
+
+1. **Art-first canvas** — Full-bleed illustration / ribbon / map / character art is the hero. Copy sits *on* the art; backgrounds change color and motif per card.
+2. **Card = one idea, then cut** — Hard cuts between solid color fields. Setup lines and punchlines are often **separate cards** (e.g. feast setup → genres reveal; list bridge → top-5 list), not progressive lines on one canvas.
+3. **Dwell ~8–15s per card**, then auto-advance (Stories). User can hold/pause; many mid-deck cards also offer **Share this story**.
+4. **Numbers land as a finished block** — Hero numeral + supporting line appear together (or after a short art sting), not title → wait → subtitle → wait.
+5. **Lists** — Numbered rows with covers; rows cascade in, but chrome (decorated frame, share CTA) stays rich.
+6. **Interactive reveal** — Personality beat is tap-to-reveal (`23-tap-to-reveal` → `24-me-in-2023`), not a third copy line.
+7. **Extras Wrapped owns** — Sound Town map, artist thank-you clip, podcast CTA, playlist “Add to Library,” finale collage + Replay. Scrapped omits most of these (see §3 / §5 Don’t).
+
+Rough spine timing in this file (wall-clock ≈ filename `tNNN`):
+
+```
+0–6s     Hub → load → brand open
+10–22s   Hello → feast / genres
+48–64s   Sound Town → volume (songs) → #1 song
+72–88s   List bridge → top 5 songs → playlist CTA
+96–120s  Minutes volume → #1 artist
+130–180s Artist rank details → top 5 artists
+190–220s Artist clip → podcast
+230–260s Me-in-2023 reveal → share finale + replay
+```
+
+### 10.2 What Scrapped motion does today (`/scrapped`)
+
+Implementation: `ApiScrappedDeck.tsx` + `WrappedStorySlide.tsx` + `src/lib/scrapped-story-motion.ts` + list cascade in `src/lib/scrapped-list-motion.ts`. Visual lock: `.cursor/skills/scrapped-art-direction/`.
+
+| Axis | Wrapped (this capture) | Scrapped today |
+|------|------------------------|----------------|
+| Hero | Looping / morphing illustration | **Text**; solid tint canvas (`paper`/`cream`/…) |
+| In-scene pacing | One card, short dwell, auto next | **Line beats** on one scene: headline → subline → aside (reading-time @ ~260 wpm + enter travel) |
+| Enter motion | Art sting + copy already composed | Soft rise + fade (`titleY` 14px, ~0.32s fade / ~0.52s travel); optional blur on open |
+| Exit | Hard cut to new art | Soft fade / slight `-8px` rise; setup→list can **fade-only** so title slot doesn’t jump |
+| Progress | Stories segments; deck auto-walks | Segment fills over **scene** duration then **stops** — user advances (`useStoryAutoplay`) |
+| Lists | Numbered + covers + share chrome | Cascade default: 150ms stagger, 0.52s+ per row (`CASCADE_DEFAULTS`); +2s hold on list scenes |
+| Share | Per-card “Share this story” | Finale-first (`ShareRecapCard`); mid-deck share not primary |
+| Interaction | Tap-to-reveal personality; hold pause | Hold/space pause; no flip-card identity beat |
+| Audio | Ambient under whole story | Optional soundtrack; open slide delays copy for audio catch-up |
+
+Constants that matter when tuning “Wrapped feel” without cloning art:
+
+- `STORY_MOTION` — enter/exit distances and durations  
+- `estimateReadingMs` / `storyLineBeatDurationsMs` — how long each line holds  
+- `CASCADE_DEFAULTS` — list stagger  
+- `INTRO_COPY_DELAY_SEC` / list `+2000` hold in `ApiScrappedDeck`
+
+### 10.3 Guidance when matching Wrapped *form*
+
+**Do borrow**
+
+- Same emotional spine (open → volume → #1 → list → artists → late identity/redemption → share).  
+- Setup card → reveal card *or* our progressive lines — pick one rhythm per beat; don’t mix both on the same reveal.  
+- List cascade + numbered rows.  
+- Progress segments + hold-to-pause.  
+- Share ritual at the end (and only add mid-deck share if it stays optional).
+
+**Don’t borrow**
+
+- Neon ribbons, purple/coral carnival fields, Sound Town maps, character art, artist thank-you video.  
+- Auto-walking the whole deck without a user advance (our progress-fill-then-wait is intentional).  
+- Claiming true skips from API affinity proxies.
+
+**Closest gap vs Wrapped today:** Wrapped feels *art-led and card-cut*; Scrapped feels *text-led and line-stack*. Closing the gap means tighter reading clocks and clearer setup→punchline handoffs — not porting Wrapped art.

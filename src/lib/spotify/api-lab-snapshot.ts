@@ -19,13 +19,37 @@ const CHUNK_SIZE = 2800;
  * more than ~4 chunks of Lab cookies alone can 431 every request.
  */
 const MAX_COOKIE_CHUNKS = 4;
+/**
+ * Bump when sealed snapshots are unsafe to reuse. v2 rejects absorb-era
+ * cookies that had tops but an empty Liked Songs library (blank one-likes).
+ */
+export const API_LAB_SNAPSHOT_VERSION = 2;
 
 export type StoredApiLabSnapshot = {
   fetchedAt: string;
   userId?: string;
+  /** Missing / older than API_LAB_SNAPSHOT_VERSION → treat as absent. */
+  schemaVersion?: number;
   report: ScrappedApiReport;
   likedUris: string[];
 };
+
+/**
+ * Absorb-era Vercel bug: tops succeeded, Liked Songs failed → empty
+ * one-like / liked-this-year. Force a fresh Load instead of replaying that.
+ */
+export function isHollowLikedSnapshot(stored: StoredApiLabSnapshot): boolean {
+  if ((stored.schemaVersion ?? 0) < API_LAB_SNAPSHOT_VERSION) {
+    const summary = stored.report?.summary;
+    if (!summary) return true;
+    const tops =
+      (summary.shortTrackCount ?? 0) +
+      (summary.mediumTrackCount ?? 0) +
+      (summary.longTrackCount ?? 0);
+    if (tops > 0 && (summary.likedCount ?? 0) === 0) return true;
+  }
+  return false;
+}
 
 function secretKey(): Uint8Array {
   const secret = process.env.AUTH_SECRET;
@@ -99,6 +123,7 @@ function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
   return {
     fetchedAt: stored.fetchedAt,
     userId: stored.userId,
+    schemaVersion: stored.schemaVersion ?? API_LAB_SNAPSHOT_VERSION,
     report,
     // Plus joins can use a short sample; full URI list is disk-only locally.
     likedUris: stored.likedUris.slice(0, 40),
@@ -250,6 +275,8 @@ export async function readApiLabSnapshot(
   if (fromFs) {
     if (userId && fromFs.userId && fromFs.userId !== userId) {
       /* fall through */
+    } else if (isHollowLikedSnapshot(fromFs)) {
+      /* fall through — force a Reload so one-like slides aren't blank */
     } else {
       return fromFs;
     }
@@ -259,6 +286,7 @@ export async function readApiLabSnapshot(
     if (userId && fromCookie.userId && fromCookie.userId !== userId) {
       return null;
     }
+    if (isHollowLikedSnapshot(fromCookie)) return null;
     return fromCookie;
   }
   return null;

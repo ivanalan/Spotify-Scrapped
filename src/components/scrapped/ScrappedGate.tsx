@@ -82,38 +82,54 @@ export function ScrappedGate({
           <a href="/api/spotify/login" className={gateCtaClass}>
             Log in with Spotify
           </a>
-        ) : mode === "ready" ? (
-          <button
-            type="button"
-            onPointerDown={onContinuePointerDown}
-            onClick={onContinue}
-            disabled={!continueEnabled}
-            className={cn(
-              gateCtaClass,
-              !continueEnabled && "pointer-events-none opacity-50",
-            )}
-          >
-            {continueEnabled ? "Start" : "Cueing…"}
-          </button>
-        ) : mode === "loading" ? (
-          <div className="mt-10 flex flex-col items-center gap-3">
-            <p className="font-sans text-base font-semibold text-[var(--wrapped-ink)]">
-              Starting soundtrack
-            </p>
-            <p className="max-w-[16rem] font-sans text-xs leading-relaxed text-[var(--wrapped-muted)]">
-              Waiting until the first track is actually playing…
-              {warmTotal > 0 ? (
-                <span className="mt-1 block font-mono tabular-nums">
-                  {warmReady} / {warmTotal} warmed
-                </span>
-              ) : null}
-            </p>
-            <div
-              className="mt-2 h-1 w-40 overflow-hidden rounded-full bg-[var(--wrapped-ink)]/10"
-              aria-hidden
+        ) : mode === "ready" || mode === "loading" ? (
+          <div className="mt-10 flex w-full max-w-sm flex-col items-center">
+            <button
+              type="button"
+              onPointerDown={
+                continueEnabled && mode === "ready"
+                  ? onContinuePointerDown
+                  : undefined
+              }
+              onClick={
+                continueEnabled && mode === "ready" ? onContinue : undefined
+              }
+              disabled={!continueEnabled || mode === "loading"}
+              aria-busy={!continueEnabled || mode === "loading"}
+              className={cn(
+                gateCtaClass,
+                "mt-0",
+                (!continueEnabled || mode === "loading") &&
+                  "pointer-events-none opacity-80",
+              )}
             >
-              <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--wrapped-ink)]" />
-            </div>
+              {continueEnabled && mode === "ready" ? (
+                "Start"
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="size-4 animate-spin rounded-full border-2 border-[var(--wrapped-canvas)] border-t-transparent"
+                    aria-hidden
+                  />
+                  Loading…
+                </span>
+              )}
+            </button>
+            {!continueEnabled || mode === "loading" ? (
+              <p
+                className="mt-3 max-w-[16rem] text-center font-sans text-xs leading-relaxed text-[var(--wrapped-muted)]"
+                aria-live="polite"
+              >
+                {mode === "loading"
+                  ? "Starting soundtrack…"
+                  : "Warming the first track…"}
+                {warmTotal > 0 ? (
+                  <span className="mt-1 block font-mono tabular-nums">
+                    {warmReady} / {warmTotal}
+                  </span>
+                ) : null}
+              </p>
+            ) : null}
           </div>
         ) : retryAfterSeconds ? (
           <SpotifyRateLimitWait
@@ -133,6 +149,7 @@ export function ScrappedGate({
               next="/"
               label={mode === "fetch" ? "Start" : "Load from Spotify"}
               tone="gate"
+              autoStart={mode === "fetch"}
             />
           </div>
         )}

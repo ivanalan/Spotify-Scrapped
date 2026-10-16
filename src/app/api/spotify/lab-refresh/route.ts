@@ -5,8 +5,12 @@ import {
   clearApiLabSnapshotCookies,
 } from "@/lib/spotify/api-lab-snapshot";
 
-/** Liked Songs can be many sequential Spotify pages on a cold load. */
-export const maxDuration = 60;
+/**
+ * Liked Songs can be many sequential Spotify pages on a cold load
+ * (up to ~200 × /me/tracks). 60s was killing large libraries on Vercel
+ * and sealing empty one-like / liked-this-year slides.
+ */
+export const maxDuration = 300;
 
 const ALLOWED_NEXT = new Set(["/", "/scrapped", "/scrapped/lab"]);
 

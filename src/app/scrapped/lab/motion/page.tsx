@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Motion lab was removed — send old links to the metrics lab. */
+/** Old story-motion lab URL → list enter presets. */
 export default function StoryMotionLabRedirectPage() {
-  redirect("/scrapped/lab");
+  redirect("/scrapped/art/list");
 }

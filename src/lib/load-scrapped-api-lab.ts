@@ -13,6 +13,7 @@ import {
   getSpotifyCooldown,
 } from "./spotify";
 import {
+  API_LAB_SNAPSHOT_VERSION,
   readApiLabSnapshot,
   writeApiLabSnapshot,
   type StoredApiLabSnapshot,
@@ -217,6 +218,11 @@ export async function fetchAndStoreScrappedApiLab(
     // on Vercel when the paginated fetch timed out or rate-limited.
     const likedPage = await getSavedTracksDetailed();
     const liked = likedPage.tracks;
+    if (likedPage.total > 0 && liked.length === 0) {
+      throw new Error(
+        "Liked Songs returned empty despite a non-zero library total. Retry Load.",
+      );
+    }
 
     const [
       shortTracks,
@@ -276,6 +282,7 @@ export async function fetchAndStoreScrappedApiLab(
     const stored: StoredApiLabSnapshot = {
       fetchedAt,
       userId: connection.userId,
+      schemaVersion: API_LAB_SNAPSHOT_VERSION,
       report,
       likedUris,
     };

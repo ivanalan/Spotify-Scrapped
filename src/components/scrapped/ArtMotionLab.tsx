@@ -14,6 +14,7 @@ import { PixelStairsChrome } from "@/components/scrapped/art/chrome/PixelStairsC
 import { PixelBorderCrawlChrome } from "@/components/scrapped/art/chrome/PixelBorderCrawlChrome";
 import { PixelMosaicChrome } from "@/components/scrapped/art/chrome/PixelMosaicChrome";
 import { PixelTiltChrome } from "@/components/scrapped/art/chrome/PixelTiltChrome";
+import { BauhausTilesChrome } from "@/components/scrapped/art/chrome/BauhausTilesChrome";
 import { cn } from "@/lib/utils";
 
 type StyleId =
@@ -27,6 +28,7 @@ type StyleId =
   | "pixels-crawl"
   | "pixels-mosaic"
   | "pixels-tilt"
+  | "bauhaus-tiles"
   | "ribbons";
 
 type ContentId = "opener" | "list" | "share";
@@ -108,6 +110,19 @@ const GROUPS: { title: string; note: string; styles: StyleMeta[] }[] = [
         label: "Tilt stairs",
         technique: "Pixel stairs on perspective rails",
         when: "Bridge between slabs + pixels",
+      },
+    ],
+  },
+  {
+    title: "Bauhaus tiles",
+    note: "Flat constructivist grid — curves, diagonals, starbursts.",
+    styles: [
+      {
+        id: "bauhaus-tiles",
+        label: "Curve grid",
+        technique:
+          "Seamless square tiles with quarter-circles, diagonals, and starbursts",
+        when: "Bold full-bleed pattern when you want carnival without slabs",
       },
     ],
   },
@@ -241,6 +256,8 @@ function chromeFor(id: StyleId): ReactNode {
       return <PixelMosaicChrome />;
     case "pixels-tilt":
       return <PixelTiltChrome />;
+    case "bauhaus-tiles":
+      return <BauhausTilesChrome />;
     case "ribbons":
       return <RibbonsChrome />;
   }
@@ -272,6 +289,12 @@ export function ArtMotionLab() {
             className="text-foreground underline-offset-2 hover:underline"
           >
             ← Scrapped
+          </Link>
+          <Link
+            href="/scrapped/art/list"
+            className="text-foreground underline-offset-2 hover:underline"
+          >
+            List motion →
           </Link>
           <Link
             href="/scrapped/lab"
