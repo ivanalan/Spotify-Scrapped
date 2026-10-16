@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { isValidElement } from "react";
+import { listMotionSettleSec } from "@/lib/scrapped-list-motion";
 
 /** Soft enter / exit — transform + opacity only. */
 export const STORY_MOTION = {
@@ -18,12 +19,18 @@ export const STORY_MOTION = {
   layoutStiffness: 160,
   layoutDamping: 28,
   layoutMass: 0.85,
+  /** List beats: hold after copy enter before the next phase (ms). */
+  listTitleHoldMs: 280,
+  listFollowHoldMs: 420,
+  listSettlePadMs: 700,
 } as const;
 
 export type StoryCopyLines = {
   headline?: ReactNode;
   subline?: ReactNode;
   aside?: ReactNode;
+  /** Extra phase after copy for a numbered list / footer support block. */
+  hasSupport?: boolean;
 };
 
 /** Flatten React copy to plain text for reading-time estimates. */
@@ -53,7 +60,7 @@ export function estimateReadingMs(text: string): number {
   return Math.min(2800, Math.max(850, Math.round(raw)));
 }
 
-/** How many title / subtitle / aside beats a copy block has. */
+/** How many title / subtitle / aside beats a copy block has (no list phase). */
 export function countCopyLineBeats(beat: StoryCopyLines): number {
   let n = beat.headline != null && beat.headline !== false ? 1 : 0;
   if (beat.subline != null && beat.subline !== false) n += 1;
@@ -61,9 +68,14 @@ export function countCopyLineBeats(beat: StoryCopyLines): number {
   return Math.max(1, n);
 }
 
+/** Copy lines plus optional support (list) phase. */
+export function countBeatPhases(beat: StoryCopyLines): number {
+  return countCopyLineBeats(beat) + (beat.hasSupport ? 1 : 0);
+}
+
 export type StoryLinePhase = {
   narrativeIndex: number;
-  /** 1 = title, 2 = title+sub, 3 = title+sub+aside */
+  /** 1 = title, 2 = title+sub, 3 = title+sub+aside, then +1 for list support */
   linesVisible: number;
 };
 
@@ -73,7 +85,7 @@ export function buildStoryLinePhases(
 ): StoryLinePhase[] {
   const phases: StoryLinePhase[] = [];
   beats.forEach((beat, narrativeIndex) => {
-    const lines = countCopyLineBeats(beat);
+    const lines = countBeatPhases(beat);
     for (let linesVisible = 1; linesVisible <= lines; linesVisible += 1) {
       phases.push({ narrativeIndex, linesVisible });
     }
@@ -92,20 +104,41 @@ function lineTextAt(beat: StoryCopyLines, line: 1 | 2 | 3): string {
 /**
  * Duration for one line beat: enter motion + time to read that line.
  * First phase of a scene can add copyEnterDelaySec (intro gate).
+ * List beats use short holds, then a cascade settle phase.
  */
 export function lineBeatDurationMs(
   beat: StoryCopyLines,
   linesVisible: number,
   options?: { copyEnterDelaySec?: number; isSceneStart?: boolean },
 ): number {
+  const copyLines = countCopyLineBeats(beat);
+  const delayMs =
+    options?.isSceneStart && linesVisible === 1
+      ? (options.copyEnterDelaySec ?? 0) * 1000
+      : 0;
+
+  if (beat.hasSupport && linesVisible > copyLines) {
+    return Math.round(
+      listMotionSettleSec("cascade") * 1000 + STORY_MOTION.listSettlePadMs,
+    );
+  }
+
+  if (beat.hasSupport && linesVisible <= copyLines) {
+    const travelSec =
+      linesVisible === 1
+        ? STORY_MOTION.titleTravelSec
+        : STORY_MOTION.followTravelSec;
+    const holdMs =
+      linesVisible === 1
+        ? STORY_MOTION.listTitleHoldMs
+        : STORY_MOTION.listFollowHoldMs;
+    return Math.round(delayMs + travelSec * 1000 + holdMs);
+  }
+
   const line = Math.min(3, Math.max(1, linesVisible)) as 1 | 2 | 3;
   const travelSec =
     line === 1 ? STORY_MOTION.titleTravelSec : STORY_MOTION.followTravelSec;
   const enterMs = travelSec * 1000;
-  const delayMs =
-    options?.isSceneStart && line === 1
-      ? (options.copyEnterDelaySec ?? 0) * 1000
-      : 0;
   return Math.round(delayMs + enterMs + estimateReadingMs(lineTextAt(beat, line)));
 }
 

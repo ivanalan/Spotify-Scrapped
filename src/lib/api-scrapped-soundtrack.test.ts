@@ -13,6 +13,7 @@ function reportFixture(overrides?: {
   songTrackId?: string;
   songTrackId2?: string;
   songTrackId3?: string;
+  songTrackId4?: string;
   artistId?: string;
   artistTrackId?: string | null;
   artist2Id?: string;
@@ -25,6 +26,7 @@ function reportFixture(overrides?: {
   const songTrackId = overrides?.songTrackId ?? "songLead111";
   const songTrackId2 = overrides?.songTrackId2 ?? "songLead222";
   const songTrackId3 = overrides?.songTrackId3 ?? "songLead333";
+  const songTrackId4 = overrides?.songTrackId4 ?? "songLead444";
   const artistId = overrides?.artistId ?? "2YZyLoL8N0Wb9xBt1NhZWg"; // Kendrick
   const artistTrackId =
     overrides?.artistTrackId === undefined
@@ -93,6 +95,14 @@ function reportFixture(overrides?: {
             sublabel: "Someone",
             detail: "multi-year #3",
             value: 48,
+          },
+          {
+            id: songTrackId4,
+            trackId: songTrackId4,
+            label: "Fourth Ghost",
+            sublabel: "Someone",
+            detail: "multi-year #4",
+            value: 47,
           },
         ],
       },
@@ -202,8 +212,10 @@ describe("getApiSlideSoundtrackUri", () => {
     assert.equal(uris[6], "spotify:track:artistTwoTrack");
     assert.equal(uris[7], "spotify:track:reunion999");
     assert.equal(uris[8], "spotify:track:songLead333");
+    assert.equal(uris[9], "spotify:track:songLead444");
+    assert.equal(uris.length, 10);
     const unique = new Set(uris.filter(Boolean));
-    assert.equal(unique.size, 9);
+    assert.equal(unique.size, 10);
   });
 
   it("uses the #1 ghosted song on scene 2 and the second on scene 3", () => {

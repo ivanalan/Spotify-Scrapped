@@ -192,26 +192,31 @@ export function ShareRecapCard({
     return (
       <div
         className={cn(
-          "relative mx-auto grid h-full max-h-full w-full max-w-[20rem] grid-rows-[minmax(0,1fr)_auto] gap-4 bg-[var(--wrapped-canvas)] px-4 text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)] sm:gap-5 sm:px-5",
+          "relative mx-auto flex h-full max-h-full w-full max-w-[20rem] flex-col items-center justify-center gap-4 overflow-hidden bg-[var(--wrapped-canvas)] px-4 text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)] sm:gap-5 sm:px-5",
           active ? "opacity-100" : "opacity-55",
           className,
         )}
       >
-        {/* Art fills leftover height after lists — shrinks on short phones so rows 1–5 stay visible. */}
-        <div className="relative mx-auto aspect-square h-full max-h-full w-auto max-w-full min-h-0 overflow-hidden bg-[var(--wrapped-panel)]">
-          {heroImageUrl ? (
-            <Image
-              src={heroImageUrl}
-              alt={heroAlt}
-              fill
-              sizes="320px"
-              className="object-cover"
-              priority
-            />
-          ) : null}
+        {/*
+          Lists are shrink-0 (always fully visible). Art takes leftover height and
+          sizes as min(slot width, slot height) so it stays square as the screen shortens.
+        */}
+        <div className="relative min-h-0 w-full max-h-[20rem] flex-1 [container-type:size]">
+          <div className="absolute top-1/2 left-1/2 aspect-square w-[min(100cqw,100cqh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]">
+            {heroImageUrl ? (
+              <Image
+                src={heroImageUrl}
+                alt={heroAlt}
+                fill
+                sizes="320px"
+                className="object-cover"
+                priority
+              />
+            ) : null}
+          </div>
         </div>
 
-        <div className="grid shrink-0 grid-cols-2 gap-4 sm:gap-5">
+        <div className="grid w-full shrink-0 grid-cols-2 gap-4 sm:gap-5">
           <MinimalColumn label={leftLabel} tracks={skipped} />
           <MinimalColumn label={rightLabel} tracks={stayed} />
         </div>

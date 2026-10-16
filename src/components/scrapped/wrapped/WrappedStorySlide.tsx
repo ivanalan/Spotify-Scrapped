@@ -133,6 +133,7 @@ function beatExit(reduceMotion: boolean | null) {
   if (reduceMotion) {
     return { opacity: 0, transition: { duration: 0 } };
   }
+  // Same move-up + fade as every other story beat.
   return {
     opacity: 0,
     y: timing.exitY,
@@ -150,6 +151,8 @@ function BeatBody({
   delayChildren,
   blurIn,
   linesVisible,
+  /** Only the numbered-list beat pins to the top; setup uses the normal center. */
+  pinTop = false,
 }: {
   beat: WrappedStoryBeat;
   narrativeKey: string;
@@ -157,11 +160,14 @@ function BeatBody({
   delayChildren: number;
   blurIn: boolean;
   linesVisible: number;
+  pinTop?: boolean;
 }) {
   const align = beat.align ?? "start";
   const display = beat.display ?? "sentence";
+  const isListBeat = Boolean(beat.children);
+  // Layout springs title upward when subtitle/rows mount — same as other slides.
   const useLayout = !reduceMotion;
-  const lineCount = countCopyLineBeats(beat);
+  const copyLineCount = countCopyLineBeats(beat);
 
   // Never skip the title-only frame if the beat clock jumped during exit.
   const [shownLines, setShownLines] = useState(1);
@@ -191,8 +197,9 @@ function BeatBody({
 
   const showSubline = Boolean(beat.subline) && shownLines >= 2;
   const showAside = Boolean(beat.aside) && shownLines >= 3;
+  // List/footer is its own phase after copy — not simultaneous with the subline.
   const showSupport =
-    shownLines >= lineCount && Boolean(beat.children || beat.footer);
+    Boolean(beat.children || beat.footer) && shownLines > copyLineCount;
 
   const layoutSpring = {
     type: "spring" as const,
@@ -200,6 +207,12 @@ function BeatBody({
     damping: timing.layoutDamping,
     mass: timing.layoutMass,
   };
+
+  // Enter transitions live on `animate` (softEnter). Layout spring is scoped to
+  // `layout` only so it doesn’t steal the subtitle’s fade/rise.
+  const layoutOnlyTransition = useLayout
+    ? { layout: layoutSpring }
+    : undefined;
 
   const titleMotion = softEnter(reduceMotion, {
     y: timing.titleY,
@@ -230,12 +243,16 @@ function BeatBody({
   return (
     <motion.div
       className={cn(
-        "relative z-10 mx-auto flex w-full max-w-xl flex-col",
+        "z-10 mx-auto flex w-full max-w-xl flex-col",
+        // List beat only: top-pin without changing section justify (setup stays centered).
+        pinTop
+          ? "absolute inset-x-0 top-24 px-7 md:px-14"
+          : "relative",
         align === "center" ? "items-center" : "items-stretch",
-        beat.children || beat.lead ? "gap-8" : "gap-4",
+        isListBeat || beat.lead ? "gap-8" : "gap-4",
       )}
       layout={useLayout ? "position" : false}
-      transition={layoutSpring}
+      transition={layoutOnlyTransition}
       initial={false}
       animate={{ opacity: 1, y: 0 }}
       exit={beatExit(reduceMotion)}
@@ -252,7 +269,7 @@ function BeatBody({
 
       <motion.div
         layout={useLayout ? "position" : false}
-        transition={layoutSpring}
+        transition={layoutOnlyTransition}
         className={cn(
           "font-sans font-extrabold tracking-[-0.04em] text-[var(--wrapped-ink)]",
           display === "year" &&
@@ -275,7 +292,7 @@ function BeatBody({
           <motion.div
             key="subline"
             layout={useLayout ? "position" : false}
-            transition={layoutSpring}
+            transition={layoutOnlyTransition}
             className={cn(
               "max-w-md text-[1.05rem] leading-relaxed text-[var(--wrapped-muted)] md:text-[1.15rem]",
               align === "center" && "mx-auto w-full",
@@ -291,7 +308,7 @@ function BeatBody({
           <motion.div
             key="aside"
             layout={useLayout ? "position" : false}
-            transition={layoutSpring}
+            transition={layoutOnlyTransition}
             className={cn(
               "max-w-md text-[0.95rem] leading-relaxed text-[var(--wrapped-ink)]/75",
               align === "center" && "mx-auto w-full",
@@ -309,10 +326,11 @@ function BeatBody({
           <motion.div
             key="children"
             layout={useLayout ? "position" : false}
-            transition={layoutSpring}
+            transition={layoutOnlyTransition}
             className="min-h-0 w-full"
-            initial={supportMotion.initial}
-            animate={supportMotion.animate}
+            // Rows own cascade; wrapper only participates in layout reflow.
+            initial={isListBeat ? false : supportMotion.initial}
+            animate={isListBeat ? { opacity: 1 } : supportMotion.animate}
           >
             {beat.children}
           </motion.div>
@@ -322,7 +340,7 @@ function BeatBody({
           <motion.div
             key="footer"
             layout={useLayout ? "position" : false}
-            transition={layoutSpring}
+            transition={layoutOnlyTransition}
             className="pt-2 text-sm text-[var(--wrapped-muted)]"
             initial={supportMotion.initial}
             animate={supportMotion.animate}
@@ -385,7 +403,15 @@ export function WrappedStorySlide({
   );
 
   const phases = useMemo(
-    () => buildStoryLinePhases(resolvedBeats),
+    () =>
+      buildStoryLinePhases(
+        resolvedBeats.map((b) => ({
+          headline: b.headline,
+          subline: b.subline,
+          aside: b.aside,
+          hasSupport: Boolean(b.children || b.footer),
+        })),
+      ),
     [resolvedBeats],
   );
   const phase =
@@ -393,6 +419,7 @@ export function WrappedStorySlide({
     phases[0]!;
   const current = resolvedBeats[phase.narrativeIndex]!;
   const sceneAlign = current.align ?? align;
+  const isListBeat = Boolean(current.children);
   const enterDelay = copyEnterDelaySec ?? timing.copyEnterDelaySec;
   // Stable for a narrative block’s lifetime (key’d on narrativeIndex) so
   // advancing title → subtitle doesn’t restart the title enter.
@@ -406,6 +433,7 @@ export function WrappedStorySlide({
       className={cn(
         "relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 py-24 md:px-14",
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",
+        // Same centering as every other slide — list beat self-pins via pinTop.
         sceneAlign === "center" ? "justify-center text-center" : "justify-center",
         className,
       )}
@@ -422,6 +450,7 @@ export function WrappedStorySlide({
             delayChildren={delayChildren}
             blurIn={Boolean(copyBlurIn && beatIndex <= 0)}
             linesVisible={phase.linesVisible}
+            pinTop={isListBeat}
           />
         ) : null}
       </AnimatePresence>

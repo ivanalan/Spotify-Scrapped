@@ -47,6 +47,15 @@ export function ScrappedExperience({ report }: Props) {
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
   const [phase, setPhase] = useState<Phase>("gate");
   const [soundOn, setSoundOn] = useState(false);
+
+  // Allow a future needs_fetch visit to auto-Load again (same tab).
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem("scrapped-lab-autostart");
+    } catch {
+      /* ignore */
+    }
+  }, []);
   const [deckPaused, setDeckPaused] = useState(false);
   const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
     null,

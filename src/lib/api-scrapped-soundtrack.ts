@@ -5,7 +5,7 @@
  * Scene index (1-based user slides → 0-based):
  * 0 open (short-term #1) · 1 liked this year · 2 top ghosted song ·
  * 3 2nd ghosted song · 4 one-like · 5 top ghosted artist ·
- * 6 2nd ghosted artist · 7 reunion · 8 share (left-on-read / distinct)
+ * 6 2nd ghosted artist · 7 reunion · 8 soft close · 9 share
  */
 
 import type {
@@ -14,7 +14,7 @@ import type {
   ScrappedApiReport,
 } from "@/lib/scrapped-api";
 
-export const API_SCRAPPED_SLIDE_COUNT = 9;
+export const API_SCRAPPED_SLIDE_COUNT = 10;
 
 /** 0-based indices: #1 ghosted artist → top ghosted artists list. */
 export const ARTIST_ACT_SLIDES = [5, 6] as const;
@@ -25,7 +25,7 @@ export const ARTIST_ACT_SLIDES = [5, 6] as const;
  * in `ApiScrappedDeck` — prefer those when wiring autoplay.
  */
 export const API_SCRAPPED_BEAT_COUNTS = [
-  2, 2, 3, 2, 3, 2, 2, 2, 1,
+  2, 2, 3, 2, 3, 2, 2, 2, 1, 1,
 ] as const;
 
 /**
@@ -33,7 +33,7 @@ export const API_SCRAPPED_BEAT_COUNTS = [
  * reading-time line-beat durations.
  */
 export const API_SCRAPPED_SCENE_MS = [
-  8000, 6000, 9000, 6000, 9000, 6000, 6000, 6000, 6000,
+  8000, 6000, 9000, 6000, 9000, 6000, 6000, 6000, 5000, 8000,
 ] as const;
 
 export function isArtistActSlide(slideIndex: number): boolean {
@@ -160,11 +160,11 @@ function idFromUri(uri: string | null | undefined): string | null {
 }
 
 /**
- * Nine soundtrack URIs.
+ * Ten soundtrack URIs.
  *
  * Content slides are pinned first to the track shown on that slide (what you
- * see is what you hear). Ambient slides (open / liked-year / share) fill from
- * whatever remains so they cannot steal a hero track.
+ * see is what you hear). Ambient slides (open / liked-year / soft close /
+ * share) fill from whatever remains so they cannot steal a hero track.
  */
 export function getApiSlideSoundtrackUris(
   report: ScrappedApiReport,
@@ -260,8 +260,16 @@ export function getApiSlideSoundtrackUris(
   out[0] = takeFirst([shortTopId, ...likedYearIds, ...fallenIds, ...ghostedIds]);
   // 1 — a different song liked this year
   out[1] = takeFirst([...likedYearIds, ...fallenIds, ...ghostedIds]);
-  // 8 — share / leftover left-on-read
+  // 8 — soft close / leftover left-on-read
   out[8] = takeFirst([
+    ...ghostedIds,
+    ...fallenIds,
+    ...likedYearIds,
+    ...reunionIds,
+    shortTopId,
+  ]);
+  // 9 — share / leftover
+  out[9] = takeFirst([
     ...ghostedIds,
     ...fallenIds,
     ...likedYearIds,

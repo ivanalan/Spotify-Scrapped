@@ -146,7 +146,6 @@ export function ApiScrappedDeck({
   const leftLongArtists = cardById(report, "left-long-artists");
   const oneSaveArtists = cardById(report, "one-save-artists");
   const secondChance = cardById(report, "second-chance");
-  const artistsBack = cardById(report, "artists-back");
 
   const topSong = leftLongSongs?.items[0] ?? null;
   const topArtist = leftLongArtists?.items[0] ?? null;
@@ -318,6 +317,7 @@ export function ApiScrappedDeck({
             headline: "The reunion setlist",
             subline:
               "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
+            hasSupport: true,
           },
         ]
       : [
@@ -334,6 +334,7 @@ export function ApiScrappedDeck({
             aside: hasReunionSong
               ? "We don’t have to talk about it."
               : undefined,
+            hasSupport: hasReunionSong,
           },
         ];
 
@@ -394,7 +395,12 @@ export function ApiScrappedDeck({
           headline: "But this wasn’t the only ghost in town",
           subline: "Call the ghostbusters or something.",
         },
-        { headline: "Top ghosted songs" },
+        {
+          headline: "Top ghosted songs",
+          subline:
+            "Multi-year favorites that dropped out of your recent tops.",
+          hasSupport: true,
+        },
       ],
       [
         { headline: "You’ve heard of one-hit wonders" },
@@ -402,7 +408,12 @@ export function ApiScrappedDeck({
           headline: "But who are your one-like artists?",
           subline: "You liked one song from them. That’s it.",
         },
-        { headline: "1-like artists. Oldest first." },
+        {
+          headline: "1-like artists. Oldest first.",
+          subline:
+            "One heart each — and they never made your current tops.",
+          hasSupport: true,
+        },
       ],
       [
         { headline: "Now the artists" },
@@ -418,9 +429,20 @@ export function ApiScrappedDeck({
           headline: "Get the gang back together?",
           subline: "They’ll take you back",
         },
-        { headline: "Top ghosted artists" },
+        {
+          headline: "Top ghosted artists",
+          subline:
+            "Multi-year favorites that dropped out of your recent tops.",
+          hasSupport: true,
+        },
       ],
       reunionBeats,
+      [
+        {
+          headline: "That was fun.",
+          subline: "Same time next year?",
+        },
+      ],
       [{ headline: "Share" }],
     ];
   }, [report]);
@@ -791,6 +813,8 @@ export function ApiScrappedDeck({
             },
             {
               headline: "Top ghosted songs",
+              subline:
+                "Multi-year favorites that dropped out of your recent tops.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -823,6 +847,8 @@ export function ApiScrappedDeck({
             },
             {
               headline: "1-like artists. Oldest first.",
+              subline:
+                "One heart each — and they never made your current tops.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -893,6 +919,8 @@ export function ApiScrappedDeck({
             },
             {
               headline: "Top ghosted artists",
+              subline:
+                "Multi-year favorites that dropped out of your recent tops.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -928,10 +956,6 @@ export function ApiScrappedDeck({
                     subline:
                       "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
                     display: "sentence",
-                    footer:
-                      artistsBack && artistsBack.items.length > 0
-                        ? `${artistsBack.items.length} artists also came back this month`
-                        : undefined,
                     children: (
                       <WrappedEntityList
                         items={(secondChance?.items ?? [])
@@ -971,22 +995,34 @@ export function ApiScrappedDeck({
                           ? ` · ${reunionSong.detail}`
                           : null}
                       </span>
-                    ) : artistsBack && artistsBack.items.length > 0 ? (
-                      `${artistsBack.items.length} artists also came back this month`
                     ) : undefined,
                   },
                 ]
           }
         />
 
-        {/* 8 — share finale — height budget leaves room for top/bottom chrome */}
+        {/* 8 — soft close before share */}
+        <WrappedStorySlide
+          {...sceneMotion(8)}
+          tone="cream"
+          beats={[
+            {
+              headline: "That was fun.",
+              subline: "Same time next year?",
+              align: "center",
+              display: "hero",
+            },
+          ]}
+        />
+
+        {/* 9 — share finale — height budget leaves room for top/bottom chrome */}
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
           className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-5 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)] md:px-14"
           aria-hidden={active !== FINALE_INDEX}
         >
-          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-md flex-1 justify-center py-1">
+          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-md flex-1 items-center justify-center py-1">
             <ShareRecapCard
               year={report.year}
               variant="minimal"
@@ -1017,21 +1053,23 @@ export function ApiScrappedDeck({
       */}
       <button
         type="button"
+        tabIndex={-1}
         aria-label="Previous slide"
         onPointerDown={(e) => onZonePointerDown(-1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
         onContextMenu={(e) => e.preventDefault()}
-        className="absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none"
+        className="absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
       />
       <button
         type="button"
+        tabIndex={-1}
         aria-label="Next slide"
         onPointerDown={(e) => onZonePointerDown(1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
         onContextMenu={(e) => e.preventDefault()}
-        className="absolute inset-y-0 right-0 z-30 w-[70%] touch-manipulation select-none"
+        className="absolute inset-y-0 right-0 z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
       />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-4 z-40 flex items-center justify-center gap-3">

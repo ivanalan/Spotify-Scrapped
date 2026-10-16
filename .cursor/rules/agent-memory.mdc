@@ -1,0 +1,40 @@
+---
+description: Portable agent memory — SOUL, SCARS, decisions, contribution loop
+alwaysApply: true
+---
+
+# Agent memory
+
+The file is the memory, not the conversation. Do not rely on prior chat.
+
+## Reading list
+
+| File | Answers |
+|------|---------|
+| [AGENTS.md](AGENTS.md) | How do we work here? |
+| [SOUL.md](SOUL.md) | What must we protect? |
+| [SCARS.md](SCARS.md) | What has already hurt us? |
+| [docs/decisions/](docs/decisions/) | What did we choose, and at what cost? |
+
+Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/README.md).
+
+## Loop
+
+1. **Start** — For non-trivial work, read `SOUL.md`. If diagnosing or changing behavior that hurt before, skim `SCARS.md` and recent `D-NNN` decisions.
+2. **Plan** — Multi-step work: keep the plan in the repo when it must survive the session.
+3. **Build** — Ship docs in the **same change** as the feature/fix.
+4. **Decide** — When locking a tradeoff under uncertainty, add `docs/decisions/D-NNN-*.md` (why, displaced, cost).
+5. **Hand off** — If something non-obvious hurt, append `SCARS.md` (symptom as title). Do not leave traps only in chat.
+
+## Five rules
+
+1. Docs live in the repo; same commit as the change.
+2. Split system docs (how it works) from slice docs (what we’re proving + stop line) when you add them.
+3. One fact, one place — link; don’t restate.
+4. Scars titled with the symptom.
+5. Enforce via rules/hooks/checks, or expect drift.
+
+## Project pointers
+
+- Data / Wrapped / story spine: [spotify-data.mdc](spotify-data.mdc), [docs/WRAPPED.md](docs/WRAPPED.md)
+- Story copy vs 5-row list motion: [D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)
