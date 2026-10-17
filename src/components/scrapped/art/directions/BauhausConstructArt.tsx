@@ -1,9 +1,13 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { ContentCard } from "./carnival-palette";
+import { ContentCard } from "@/components/scrapped/art/chrome/carnival-palette";
+import {
+  contentInset,
+  isOverview,
+  type DirectionArtProps,
+} from "./types";
 
-/** Flat Bauhaus / constructivist palette from the art-lab reference. */
 const P = {
   ink: "#141414",
   teal: "#12c4b0",
@@ -15,7 +19,7 @@ const P = {
 
 const COLS = 6;
 const ROWS = 11;
-const S = 360 / COLS; // 60
+const S = 360 / COLS;
 
 type Motif =
   | "solid"
@@ -30,10 +34,6 @@ type Motif =
 
 type Cell = { m: Motif; a: string; b?: string };
 
-/**
- * Hand-authored grid so curves read as continuous flows
- * (closer to the reference than pure random tiles).
- */
 const LAYOUT: Cell[][] = [
   [
     { m: "q-br", a: P.teal, b: P.coral },
@@ -240,9 +240,10 @@ function renderCell(x: number, y: number, cell: Cell) {
   }
 }
 
-/** Full-bleed Bauhaus tile grid — curves, diagonals, starbursts. */
-export function BauhausTilesChrome() {
+/** Flat Bauhaus construct — tiles stamp in with stagger, settle. */
+export function BauhausConstructArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
+  const overview = isOverview(surface);
 
   return (
     <div className="absolute inset-0" style={{ background: P.ink }}>
@@ -251,6 +252,7 @@ export function BauhausTilesChrome() {
         viewBox={`0 0 360 ${ROWS * S}`}
         preserveAspectRatio="xMidYMid slice"
         aria-hidden
+        style={{ opacity: overview ? 1 : 0.7 }}
       >
         {LAYOUT.map((row, r) =>
           row.map((cell, c) => {
@@ -258,20 +260,37 @@ export function BauhausTilesChrome() {
             return (
               <motion.g
                 key={`${r}-${c}`}
+                initial={
+                  reduce || !overview
+                    ? { opacity: overview ? 1 : 0.65, scale: 1, rotate: 0 }
+                    : { opacity: 0, scale: 0.6, rotate: -8 }
+                }
                 animate={
                   reduce
-                    ? undefined
-                    : { opacity: [0.9, 1, 0.9] }
+                    ? { opacity: 1, scale: 1, rotate: 0 }
+                    : overview
+                      ? {
+                          opacity: [0, 1, 1, 0.85, 0],
+                          scale: [0.6, 1.05, 1, 1, 0.9],
+                          rotate: [-8, 2, 0, 0, 0],
+                        }
+                      : { opacity: 0.65, scale: 1, rotate: 0 }
                 }
+                style={{
+                  transformOrigin: `${c * S + S / 2}px ${r * S + S / 2}px`,
+                }}
                 transition={
                   reduce
-                    ? undefined
-                    : {
-                        duration: 3.4 + (index % 6) * 0.4,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: (index % 10) * 0.15,
-                      }
+                    ? { duration: 0 }
+                    : overview
+                      ? {
+                          duration: 5.2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: (index % 18) * 0.06,
+                          times: [0, 0.15, 0.3, 0.75, 1],
+                        }
+                      : { duration: 0.3 }
                 }
               >
                 {renderCell(c * S, r * S, cell)}
@@ -280,7 +299,7 @@ export function BauhausTilesChrome() {
           }),
         )}
       </svg>
-      <ContentCard inset="14%" />
+      <ContentCard inset={contentInset(surface)} />
     </div>
   );
 }

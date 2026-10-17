@@ -1504,7 +1504,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     return (
       <div
         className={cn(
-          "pointer-events-none fixed bottom-4 left-3 z-30 flex w-[min(100vw-5rem,20rem)] flex-col gap-2 md:left-5",
+          "pointer-events-none fixed bottom-4 left-1/2 z-30 flex w-[min(calc(100vw-1.5rem),20rem)] -translate-x-1/2 flex-col gap-2",
           className,
         )}
       >

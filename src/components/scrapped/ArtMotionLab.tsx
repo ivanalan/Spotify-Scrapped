@@ -3,173 +3,43 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { StoryChromeStage } from "@/components/scrapped/art/StoryChromeStage";
-import { RibbonsChrome } from "@/components/scrapped/art/chrome/RibbonsChrome";
-import { PerspectiveSlabsChrome } from "@/components/scrapped/art/chrome/PerspectiveSlabsChrome";
-import { SlabTunnelChrome } from "@/components/scrapped/art/chrome/SlabTunnelChrome";
-import { SlabRailsChrome } from "@/components/scrapped/art/chrome/SlabRailsChrome";
-import { SlabFanChrome } from "@/components/scrapped/art/chrome/SlabFanChrome";
-import { SlabGlassChrome } from "@/components/scrapped/art/chrome/SlabGlassChrome";
-import { SlabHelixChrome } from "@/components/scrapped/art/chrome/SlabHelixChrome";
-import { PixelStairsChrome } from "@/components/scrapped/art/chrome/PixelStairsChrome";
-import { PixelBorderCrawlChrome } from "@/components/scrapped/art/chrome/PixelBorderCrawlChrome";
-import { PixelMosaicChrome } from "@/components/scrapped/art/chrome/PixelMosaicChrome";
-import { PixelTiltChrome } from "@/components/scrapped/art/chrome/PixelTiltChrome";
-import { BauhausTilesChrome } from "@/components/scrapped/art/chrome/BauhausTilesChrome";
+import {
+  DIRECTIONS,
+  directionById,
+  type ArtSurface,
+  type DirectionId,
+} from "@/components/scrapped/art/directions/registry";
 import { cn } from "@/lib/utils";
 
-type StyleId =
-  | "slabs-orbit"
-  | "slabs-rails"
-  | "slabs-tunnel"
-  | "slabs-fan"
-  | "slabs-glass"
-  | "slabs-helix"
-  | "pixels-stairs"
-  | "pixels-crawl"
-  | "pixels-mosaic"
-  | "pixels-tilt"
-  | "bauhaus-tiles"
-  | "ribbons";
-
-type ContentId = "opener" | "list" | "share";
-
-type StyleMeta = {
-  id: StyleId;
-  label: string;
-  technique: string;
-  when: string;
-};
-
-const GROUPS: { title: string; note: string; styles: StyleMeta[] }[] = [
-  {
-    title: "Perspective slabs",
-    note: "Your favorite lane — fake-3D panels without WebGL.",
-    styles: [
-      {
-        id: "slabs-orbit",
-        label: "Orbit",
-        technique: "Large gradient panels tumbling in CSS perspective",
-        when: "Original slab preset — bold corner energy",
-      },
-      {
-        id: "slabs-rails",
-        label: "Rails",
-        technique: "Thick parallelogram bands wrapping the frame",
-        when: "Closest to Wrapped ribbon-as-slab frame dressing",
-      },
-      {
-        id: "slabs-tunnel",
-        label: "Tunnel",
-        technique: "Nested frames receding in Z toward the card",
-        when: "Depth cue that pulls the eye into the beat",
-      },
-      {
-        id: "slabs-fan",
-        label: "Fan deck",
-        technique: "Stacked cards fanned behind content",
-        when: "Story-as-deck metaphor; good for openers",
-      },
-      {
-        id: "slabs-glass",
-        label: "Glass",
-        technique: "Translucent overlapping panes",
-        when: "Softer carnival — color without opaque blocks",
-      },
-      {
-        id: "slabs-helix",
-        label: "Helix",
-        technique: "Thin horizontal bands twisting around the card",
-        when: "More motion density, less mass",
-      },
-    ],
-  },
-  {
-    title: "Pixel",
-    note: "Secondary lane — digital / stair language.",
-    styles: [
-      {
-        id: "pixels-stairs",
-        label: "Stairs",
-        technique: "Corner stair steps with staggered bounce",
-        when: "Classic Wrapped pixel-border corners",
-      },
-      {
-        id: "pixels-crawl",
-        label: "Border crawl",
-        technique: "Full perimeter cells pulsing in sequence",
-        when: "Living frame without filling the corners only",
-      },
-      {
-        id: "pixels-mosaic",
-        label: "Mosaic corners",
-        technique: "Irregular block clusters of mixed sizes",
-        when: "Messier, more collage than grid",
-      },
-      {
-        id: "pixels-tilt",
-        label: "Tilt stairs",
-        technique: "Pixel stairs on perspective rails",
-        when: "Bridge between slabs + pixels",
-      },
-    ],
-  },
-  {
-    title: "Bauhaus tiles",
-    note: "Flat constructivist grid — curves, diagonals, starbursts.",
-    styles: [
-      {
-        id: "bauhaus-tiles",
-        label: "Curve grid",
-        technique:
-          "Seamless square tiles with quarter-circles, diagonals, and starbursts",
-        when: "Bold full-bleed pattern when you want carnival without slabs",
-      },
-    ],
-  },
-  {
-    title: "Other",
-    note: "Kept for contrast — not the focus.",
-    styles: [
-      {
-        id: "ribbons",
-        label: "Ribbons",
-        technique: "SVG stroke ribbons with gradient drifts",
-        when: "Organic Wrapped ribbons (for A/B against slabs)",
-      },
-    ],
-  },
-];
-
-const CONTENT: { id: ContentId; label: string }[] = [
-  { id: "opener", label: "Opener" },
-  { id: "list", label: "List beat" },
+const SURFACES: { id: ArtSurface; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "story", label: "Story" },
   { id: "share", label: "Share" },
 ];
 
-function OpenerMock() {
+function OverviewMock() {
   return (
-    <div className="flex h-full flex-col px-6 py-8 text-center text-[#1c1c1c]">
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <p className="font-sans text-[clamp(1.75rem,8vw,2.5rem)] font-bold leading-none tracking-tight">
-          2026
-        </p>
-        <h1 className="mt-1 font-sans text-[clamp(1.6rem,7vw,2.25rem)] font-bold italic leading-none tracking-tight">
-          Scrapped
-        </h1>
-        <p className="mt-5 max-w-[14rem] font-sans text-sm leading-relaxed">
+    <div className="flex h-full flex-col px-5 py-7 text-left text-[#1c1c1c]">
+      <div className="flex flex-1 flex-col justify-center">
+        <p className="text-display">2026</p>
+        <h1 className="text-display mt-1 italic">Scrapped</h1>
+        <p className="text-body mt-5 max-w-[14rem]">
           Scrapped is your <span className="italic">anti-wrapped</span>. Songs
           you hated and artists you skipped.
         </p>
-        <div className="mt-8 inline-flex h-11 items-center justify-center rounded-2xl bg-[#1c1c1c] px-8 text-sm font-semibold text-white">
-          Start
+        <div className="mt-8 inline-flex h-11 max-w-[12rem] items-center justify-center rounded-2xl bg-[#1c1c1c] px-6 text-sm font-semibold text-white">
+          Continue
         </div>
+        <p className="text-caption mt-3 text-[#6b6b6b]">
+          Signed in to Spotify as You
+        </p>
       </div>
-      <p className="pb-2 font-sans text-xs text-[#6b6b6b]">Created by Alan Matias</p>
+      <p className="text-caption pb-2 text-[#6b6b6b]">Created by Alan Matias</p>
     </div>
   );
 }
 
-function ListMock() {
+function StoryMock() {
   const rows = [
     { n: "1", title: "Never again", artist: "Shelf artist" },
     { n: "2", title: "One-play wonder", artist: "Almost stuck" },
@@ -185,7 +55,10 @@ function ListMock() {
       </h2>
       <ul className="mt-6 flex-1 space-y-3">
         {rows.map((r) => (
-          <li key={r.n} className="flex items-baseline gap-3 border-b border-black/10 pb-3">
+          <li
+            key={r.n}
+            className="flex items-baseline gap-3 border-b border-black/10 pb-3"
+          >
             <span className="w-4 font-mono text-sm tabular-nums text-[#6b6b6b]">
               {r.n}
             </span>
@@ -223,65 +96,66 @@ function ShareMock() {
   );
 }
 
-function contentFor(id: ContentId): ReactNode {
+function contentFor(id: ArtSurface): ReactNode {
   switch (id) {
-    case "opener":
-      return <OpenerMock />;
-    case "list":
-      return <ListMock />;
+    case "overview":
+      return <OverviewMock />;
+    case "story":
+      return <StoryMock />;
     case "share":
       return <ShareMock />;
   }
 }
 
-function chromeFor(id: StyleId): ReactNode {
-  switch (id) {
-    case "slabs-orbit":
-      return <PerspectiveSlabsChrome />;
-    case "slabs-rails":
-      return <SlabRailsChrome />;
-    case "slabs-tunnel":
-      return <SlabTunnelChrome />;
-    case "slabs-fan":
-      return <SlabFanChrome />;
-    case "slabs-glass":
-      return <SlabGlassChrome />;
-    case "slabs-helix":
-      return <SlabHelixChrome />;
-    case "pixels-stairs":
-      return <PixelStairsChrome />;
-    case "pixels-crawl":
-      return <PixelBorderCrawlChrome />;
-    case "pixels-mosaic":
-      return <PixelMosaicChrome />;
-    case "pixels-tilt":
-      return <PixelTiltChrome />;
-    case "bauhaus-tiles":
-      return <BauhausTilesChrome />;
-    case "ribbons":
-      return <RibbonsChrome />;
-  }
-}
-
-function allStyles(): StyleMeta[] {
-  return GROUPS.flatMap((g) => g.styles);
+function DirectionThumb({
+  swatch,
+  active,
+}: {
+  swatch: { bg: string; a: string; b: string; c: string };
+  active: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative aspect-[3/4] w-full overflow-hidden rounded-lg border",
+        active ? "border-foreground ring-2 ring-foreground/30" : "border-border",
+      )}
+      style={{ background: swatch.bg }}
+    >
+      <div
+        className="absolute left-[-10%] top-[12%] h-[28%] w-[70%] rotate-[-18deg] rounded-md opacity-90"
+        style={{ background: swatch.a }}
+      />
+      <div
+        className="absolute right-[-8%] top-[38%] h-[22%] w-[55%] rotate-[12deg] rounded-md opacity-85"
+        style={{ background: swatch.b }}
+      />
+      <div
+        className="absolute bottom-[10%] left-[15%] h-[18%] w-[60%] rotate-[-6deg] rounded-full opacity-80"
+        style={{ background: swatch.c }}
+      />
+    </div>
+  );
 }
 
 export function ArtMotionLab() {
-  const [style, setStyle] = useState<StyleId>("slabs-rails");
-  const [content, setContent] = useState<ContentId>("opener");
-  const meta = allStyles().find((s) => s.id === style)!;
+  const [direction, setDirection] = useState<DirectionId>("perspective-slabs");
+  const [surface, setSurface] = useState<ArtSurface>("overview");
+  const meta = directionById(direction);
+  const Art = meta.Art;
 
   return (
     <div className="space-y-10">
       <header className="animate-rise space-y-4">
-        <p className="font-mono text-sm text-ring">Scrapped · Art motion lab</p>
-        <h1 className="max-w-[18ch] font-heading text-[clamp(2.5rem,7vw,3.75rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-          Carnival chrome
+        <p className="font-mono text-sm text-ring">Scrapped · Art direction lab</p>
+        <h1 className="max-w-[20ch] font-heading text-[clamp(2.5rem,7vw,3.75rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
+          Ten directions
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
-          Shared frame dressing around story-shaped beats. Slabs first, pixels
-          second — live deck unchanged until you promote a style.
+          Research surface — click a direction, then preview Overview (looping
+          load-in), Story, and Share. Live{" "}
+          <span className="font-mono">/scrapped</span> stays text-first until
+          you promote one.
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           <Link
@@ -305,88 +179,89 @@ export function ArtMotionLab() {
         </div>
       </header>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-start">
-        <aside className="space-y-8">
-          <div className="space-y-2">
-            <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
-              Content mock
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {CONTENT.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setContent(c.id)}
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 text-sm transition-colors",
-                    content === c.id
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border text-foreground hover:border-foreground/40",
-                  )}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {GROUPS.map((group) => (
-            <div key={group.title} className="space-y-2">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                  {group.title}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">{group.note}</p>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {group.styles.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => setStyle(s.id)}
-                    className={cn(
-                      "rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                      style === s.id
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border bg-transparent text-foreground hover:border-foreground/40",
-                    )}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+      <section className="space-y-3">
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
+          Directions
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+          {DIRECTIONS.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => setDirection(d.id)}
+              className={cn(
+                "group text-left transition-opacity",
+                direction === d.id ? "opacity-100" : "opacity-80 hover:opacity-100",
+              )}
+            >
+              <DirectionThumb
+                swatch={d.swatch}
+                active={direction === d.id}
+              />
+              <p className="mt-2 font-sans text-sm font-semibold text-foreground">
+                {d.label}
+              </p>
+            </button>
           ))}
+        </div>
+      </section>
 
-          <dl className="space-y-3 border-t border-border pt-4 text-sm">
-            <div>
-              <dt className="font-mono text-xs text-muted-foreground">
-                Technique
-              </dt>
-              <dd className="mt-1 text-foreground">{meta.technique}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-xs text-muted-foreground">When</dt>
-              <dd className="mt-1 text-muted-foreground">{meta.when}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-xs text-muted-foreground">Deps</dt>
-              <dd className="mt-1 text-foreground">motion (already in repo)</dd>
-            </div>
-          </dl>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start">
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            {SURFACES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSurface(s.id)}
+                className={cn(
+                  "rounded-lg border px-3 py-1.5 text-sm transition-colors",
+                  surface === s.id
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-foreground hover:border-foreground/40",
+                )}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-center lg:justify-start">
+            <StoryChromeStage chrome={<Art surface={surface} />}>
+              {contentFor(surface)}
+            </StoryChromeStage>
+          </div>
+        </div>
 
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Loops freeze under{" "}
-            <span className="font-mono">prefers-reduced-motion</span>. Rive still
-            reserved for a later designer-authored pass.
+        <aside className="space-y-5 rounded-2xl border border-border bg-card/40 p-5 text-sm">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Thesis
+            </p>
+            <p className="mt-2 leading-relaxed text-foreground">{meta.thesis}</p>
+          </div>
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              When
+            </p>
+            <p className="mt-2 leading-relaxed text-muted-foreground">
+              {meta.when}
+            </p>
+          </div>
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Libraries
+            </p>
+            <p className="mt-2 font-mono text-xs leading-relaxed text-foreground">
+              {meta.libs}
+            </p>
+          </div>
+          <p className="border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
+            Overview loops a load-in / transform. Story and Share quiet the same
+            system for readability. Freezes under{" "}
+            <span className="font-mono">prefers-reduced-motion</span>. Refs:{" "}
+            <span className="font-mono">docs/mocks/art-refs/</span>.
           </p>
         </aside>
-
-        <div className="flex justify-center lg:justify-start">
-          <StoryChromeStage chrome={chromeFor(style)}>
-            {contentFor(content)}
-          </StoryChromeStage>
-        </div>
       </div>
     </div>
   );

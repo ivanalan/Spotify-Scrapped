@@ -13,6 +13,7 @@ It is a ritual for songs and artists that didn’t stick: affinity dips, one-lik
 - **Data honesty** — Extended Streaming History is skip truth on Plus. Scrapped / Lab use affinity proxies only; never claim true skips from tops/library.
 - **Privacy** — Never commit, log, or render `ip_addr`.
 - **Tokens** — Spotify access tokens stay server-side.
+- **Mobile-first, responsive** — Design for the phone first, then scale. Surfaces fill the viewport (no dark letterbox gutters). Do not build desktop-centered marketing posters. See [D-002](docs/decisions/D-002-poppins-mobile-first.md).
 - **Story copy motion** — Title, subline, aside, and outro use the **same** enter/layout/exit pattern on every slide. Setup beats before a list are not special.
 - **List exception only** — The numbered 5-row entity list (`WrappedEntityList` cascade, top-pinned list beat, support phase after copy) is the sole story-motion exception. See [D-001](docs/decisions/D-001-story-copy-vs-list-motion.md).
 

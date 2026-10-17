@@ -165,7 +165,7 @@ export function ScrappedExperience({ report }: Props) {
   const deckMounted = continueEnabled || phase !== "gate";
 
   return (
-    <div className="relative left-1/2 w-screen -translate-x-1/2">
+    <div className="relative w-full">
       {phase !== "story" ? (
         <ScrappedGate
           mode={phase === "loading" ? "loading" : "ready"}

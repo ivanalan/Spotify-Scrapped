@@ -24,7 +24,7 @@ Uses a small custom OAuth flow (not Auth.js) so the redirect URI is identical on
    AUTH_URL=http://127.0.0.1:3000
    ```
 
-4. Run `npm run dev`, open [http://127.0.0.1:3000](http://127.0.0.1:3000), click **Connect Spotify**.
+4. Run `npm run dev`, open [http://127.0.0.1:3000](http://127.0.0.1:3000), click **Sign in to Spotify**.
 
 Confirm the URI with `GET /api/spotify/debug-auth`.
 

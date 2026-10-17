@@ -2,13 +2,16 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 /* Latin-only faces — full package index.css references missing *-all-*.woff files under Turbopack. */
-@import "@fontsource-variable/fustat/wght.css";
-@import "@fontsource/gentium-book-basic/latin-400.css";
-@import "@fontsource/gentium-book-basic/latin-700.css";
+@import "@fontsource/poppins/latin-400.css";
+@import "@fontsource/poppins/latin-400-italic.css";
+@import "@fontsource/poppins/latin-500.css";
+@import "@fontsource/poppins/latin-600.css";
+@import "@fontsource/poppins/latin-700.css";
+@import "@fontsource/poppins/latin-700-italic.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* Portfolio “Dark Anysphere” tokens — same palette/fonts as ivanalan.github.io */
+/* Portfolio “Dark Anysphere” palette; type is Poppins (D-002). */
 :root,
 .dark {
   --background: oklch(18.561% 0.00161 197.742);
@@ -62,9 +65,9 @@
 }
 
 @theme inline {
-  --font-heading: "Gentium Book Basic", ui-serif, Georgia, "Times New Roman", serif;
-  --font-sans: "Fustat Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-heading);
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-background: var(--background);
@@ -135,7 +138,7 @@
   h3,
   h4 {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 600;
   }
 
   :focus-visible {
@@ -231,6 +234,37 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Scrapped type roles — mobile-first scale (D-002) */
+@utility text-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 12vw, 3rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+@utility text-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 5.5vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+@utility text-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 /* Scrapped (API story) — conversational light story (docs/mocks) */

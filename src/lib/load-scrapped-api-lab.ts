@@ -163,7 +163,7 @@ export async function loadScrappedApiLab(
     return {
       kind: "needs_auth",
       message:
-        "Connect Spotify to load Scrapped metrics (top songs, top artists, and Liked Songs).",
+        "Sign in to Spotify to load Scrapped metrics (top songs, top artists, and Liked Songs).",
     };
   }
 
@@ -188,7 +188,7 @@ export async function fetchAndStoreScrappedApiLab(
     return {
       kind: "needs_auth",
       message:
-        "Connect Spotify to load Scrapped metrics (top songs, top artists, and Liked Songs).",
+        "Sign in to Spotify to load Scrapped metrics (top songs, top artists, and Liked Songs).",
     };
   }
 

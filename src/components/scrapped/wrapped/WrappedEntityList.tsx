@@ -47,7 +47,7 @@ export function WrappedEntityList({
   }
 
   return (
-    <ol className="space-y-4">
+    <ol className="space-y-8">
       {items.map((item, i) => {
         const plan = planListRowMotion(motionId, i, {
           active: true,
@@ -93,7 +93,7 @@ export function WrappedEntityList({
               {i + 1}
             </motion.span>
             <motion.span
-              className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:size-14"
+              className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:size-[4.5rem]"
               style={
                 !item.imageUrl && item.coverColor
                   ? { backgroundColor: item.coverColor }
@@ -122,7 +122,7 @@ export function WrappedEntityList({
                   src={item.imageUrl}
                   alt=""
                   fill
-                  sizes="56px"
+                  sizes="72px"
                   className="object-cover"
                   // List mounts inside an opacity animation; Safari skips lazy imgs.
                   loading="eager"

@@ -31,3 +31,11 @@ Format:
 - **Proof:** Lab remounted inactive→active and showed cascade; live slide 04 felt like subtitle + all five rows together.
 - **Avoid:** Mount the list in a separate `hasSupport` phase after copy. Plan row motion with real `initial` values when active so stagger plays on mount.
 - **Related:** [D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)
+
+## Sign-out modal has no background (transparent panel, white text)
+
+- **Not:** Missing overlay / AlertDialog broken / forgot `bg-*` class.
+- **Cause:** Dialog content is portaled outside `.wrapped-story`. Classes using `--wrapped-canvas` / `--wrapped-ink` resolve to nothing → transparent fill; title inherits light theme foreground.
+- **Proof:** Panel showed page through a thin ring; title/body were white on gray; fixed by restoring `#f4f4f2` / `#1c1c1c` hex on dialog chrome.
+- **Avoid:** On portaled UI (AlertDialog, etc.), do not rely on `--wrapped-*`. Use literal paper hex or tokens that exist on `:root`.
+- **Related:** [D-003](docs/decisions/D-003-shadcn-standard-controls.md)

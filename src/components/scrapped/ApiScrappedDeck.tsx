@@ -12,8 +12,6 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
-  chevronBackOutline,
-  chevronForwardOutline,
   pauseOutline,
   playOutline,
   volumeHighOutline,
@@ -310,30 +308,24 @@ export function ApiScrappedDeck({
       ? [
           {
             headline: "Plot twist.",
-            subline:
-              "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+            subline: "Not everyone stayed ghosted.",
           },
           {
             headline: "The reunion setlist",
-            subline:
-              "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
+            subline: "A few old favs you were loyal to",
             hasSupport: true,
           },
         ]
       : [
           {
             headline: "Plot twist.",
-            subline:
-              "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+            subline: "Not everyone stayed ghosted.",
           },
           {
             headline: reunionLabel ?? "No reunions on the calendar.",
             subline: hasReunionSong
-              ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
+              ? "A few old favs you were loyal to"
               : "The soft launch stayed soft. For now.",
-            aside: hasReunionSong
-              ? "We don’t have to talk about it."
-              : undefined,
             hasSupport: hasReunionSong,
           },
         ];
@@ -346,102 +338,106 @@ export function ApiScrappedDeck({
         },
         {
           headline: hey,
-          subline:
-            "Welcome to Scrapped. Songs you hated and artists you skipped.",
+          subline: "This is for the songs that didn’t stick.",
         },
       ],
       [
         {
           headline:
             liked > 0
-              ? `You have ${liked.toLocaleString()} liked songs`
-              : "You have no liked songs",
+              ? `${liked.toLocaleString()} songs in your Liked pile`
+              : "No songs in your Liked pile",
           subline:
             liked > 0
-              ? "You collect songs like pokemon…"
+              ? "Thats not a library, that's a storage unit"
               : "Empty shelves. Bold.",
         },
         {
           headline:
             likedYear > 0
-              ? `and ${likedYear.toLocaleString()} of those were liked this year`
-              : "and none of those were liked this year",
-          subline: "Not bad for a collector.",
+              ? `${likedYear.toLocaleString()} of them joined this year`
+              : "None of them joined this year",
+          subline:
+            likedYear > 0
+              ? "And you kept adding more..."
+              : "Quiet year for the heart button.",
         },
       ],
       [
         {
           headline:
-            long > 0
-              ? `You have ${long.toLocaleString()} all-time top favorites`
-              : "Your all-time favorites didn’t show up.",
+            long <= 0
+              ? "All time favs didn’t show up."
+              : ghosted != null && ghosted > 0
+                ? `${ghosted.toLocaleString()} all time favs got ghosted`
+                : "No all time favs got ghosted",
           subline:
             long <= 0
-              ? "Spotify didn’t return a multi-year list this time."
+              ? "Spotify didn’t return a multi year list this time."
               : ghosted != null && ghosted > 0
-                ? `And you ghosted ${ghosted.toLocaleString()} of them. Ouch.`
-                : "And somehow you didn’t ghost them. Suspicious.",
+                ? `Out of ${long.toLocaleString()}. Rough ratio.`
+                : `Out of ${long.toLocaleString()}. Suspicious.`,
         },
-        { headline: "But one hurt more than the rest" },
         {
-          headline: "Top ghosted song",
+          headline: "One of them stings most",
+        },
+        {
+          headline: "Most ghosted song",
           subline: hasTopSong
-            ? "Your highest multi-year favorite that dropped off. Why not give them another chance?"
-            : "Wow — you actually still talk to your old favorites.",
+            ? "A multi year fav that fell out of the recent rotation."
+            : "Wow — you actually still talk to your old favs.",
         },
       ],
       [
         {
-          headline: "But this wasn’t the only ghost in town",
-          subline: "Call the ghostbusters or something.",
+          headline: "It wasn’t a one ghost town",
+          subline: "A few more favs went quiet.",
         },
         {
-          headline: "Top ghosted songs",
-          subline:
-            "Multi-year favorites that dropped out of your recent tops.",
+          headline: "Your ghosted songs",
+          subline: "Multi year favs missing from your recent tops.",
           hasSupport: true,
         },
       ],
       [
-        { headline: "You’ve heard of one-hit wonders" },
+        { headline: "You’ve heard of one hit wonders." },
         {
-          headline: "But who are your one-like artists?",
-          subline: "You liked one song from them. That’s it.",
+          headline: "Meet your 1 like artists",
+          subline: "You liked a single track and never looked back.",
         },
         {
-          headline: "1-like artists. Oldest first.",
-          subline:
-            "One heart each — and they never made your current tops.",
+          headline: "1 like artists",
+          subline: "Artists with only one song saved.",
           hasSupport: true,
         },
       ],
       [
-        { headline: "Now the artists" },
         {
-          headline: "Top ghosted artist",
+          headline: "Artists you left on read.",
+          subline: "Or would it be left on listened?",
+        },
+        {
+          headline: "Top artist you left on read",
           subline: hasTopArtist
-            ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
+            ? "Highest multi year fav missing from latest activity."
             : "Your loyalty program is weirdly intact.",
         },
       ],
       [
         {
           headline: "Get the gang back together?",
-          subline: "They’ll take you back",
+          subline: "They’ll take you back.",
         },
         {
-          headline: "Top ghosted artists",
-          subline:
-            "Multi-year favorites that dropped out of your recent tops.",
+          headline: "Top artists you left on read",
+          subline: "Highest multi year favs missing from latest activity.",
           hasSupport: true,
         },
       ],
       reunionBeats,
       [
-        {
-          headline: "That was fun.",
-          subline: "Same time next year?",
-        },
+        { headline: "Thanks for sitting with the almosts." },
+        { headline: "See you when they don’t stick." },
       ],
       [{ headline: "Share" }],
     ];
@@ -711,8 +707,7 @@ export function ApiScrappedDeck({
               headline: report.profileName
                 ? `Hey ${report.profileName}`
                 : "Hey there",
-              subline:
-                "Welcome to Scrapped. Songs you hated and artists you skipped.",
+              subline: "This is for the songs that didn’t stick.",
               align: "center",
               display: "hero",
             },
@@ -727,52 +722,57 @@ export function ApiScrappedDeck({
             {
               headline:
                 likedCount > 0
-                  ? `You have ${likedCount.toLocaleString()} liked songs`
-                  : "You have no liked songs",
+                  ? `${likedCount.toLocaleString()} songs in your Liked pile`
+                  : "No songs in your Liked pile",
               subline:
                 likedCount > 0
-                  ? "You collect songs like pokemon…"
+                  ? "Thats not a library, that's a storage unit"
                   : "Empty shelves. Bold.",
               display: "hero",
             },
             {
               headline:
                 likedThisYearCount > 0
-                  ? `and ${likedThisYearCount.toLocaleString()} of those were liked this year`
-                  : "and none of those were liked this year",
-              subline: "Not bad for a collector.",
+                  ? `${likedThisYearCount.toLocaleString()} of them joined this year`
+                  : "None of them joined this year",
+              subline:
+                likedThisYearCount > 0
+                  ? "And you kept adding more..."
+                  : "Quiet year for the heart button.",
               display: "hero",
             },
           ]}
         />
 
-        {/* 2 — favorites + ghosted → one hurt more → #1 ghosted song */}
+        {/* 2 — ghosted ratio → one stings → #1 ghosted song */}
         <WrappedStorySlide
           {...sceneMotion(2)}
           tone="blush"
           beats={[
             {
               headline:
-                longCount > 0
-                  ? `You have ${longCount.toLocaleString()} all-time top favorites`
-                  : "Your all-time favorites didn’t show up.",
+                longCount <= 0
+                  ? "All time favs didn’t show up."
+                  : ghostedCount != null && ghostedCount > 0
+                    ? `${ghostedCount.toLocaleString()} all time favs got ghosted`
+                    : "No all time favs got ghosted",
               subline:
                 longCount <= 0
-                  ? "Spotify didn’t return a multi-year list this time."
+                  ? "Spotify didn’t return a multi year list this time."
                   : ghostedCount != null && ghostedCount > 0
-                    ? `And you ghosted ${ghostedCount.toLocaleString()} of them. Ouch.`
-                    : "And somehow you didn’t ghost them. Suspicious.",
+                    ? `Out of ${longCount.toLocaleString()}. Rough ratio.`
+                    : `Out of ${longCount.toLocaleString()}. Suspicious.`,
               display: "hero",
             },
             {
-              headline: "But one hurt more than the rest",
+              headline: "One of them stings most",
               display: "hero",
             },
             {
-              headline: "Top ghosted song",
+              headline: "Most ghosted song",
               subline: topSong
-                ? "Your highest multi-year favorite that dropped off. Why not give them another chance?"
-                : "Wow — you actually still talk to your old favorites.",
+                ? "A multi year fav that fell out of the recent rotation."
+                : "Wow — you actually still talk to your old favs.",
               lead: topSong ? (
                 <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
                   {topSong.imageUrl ? (
@@ -801,20 +801,19 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 3 — ghost in town → top ghosted songs list */}
+        {/* 3 — one ghost town → top ghosted songs list */}
         <WrappedStorySlide
           {...sceneMotion(3)}
           tone="sky"
           beats={[
             {
-              headline: "But this wasn’t the only ghost in town",
-              subline: "Call the ghostbusters or something.",
+              headline: "It wasn’t a one ghost town",
+              subline: "A few more favs went quiet.",
               display: "hero",
             },
             {
-              headline: "Top ghosted songs",
-              subline:
-                "Multi-year favorites that dropped out of your recent tops.",
+              headline: "Your ghosted songs",
+              subline: "Multi year favs missing from your recent tops.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -831,24 +830,23 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 4 — one-hit wonders → one-like setup → one-save list */}
+        {/* 4 — one hit wonders → 1 like setup → one-save list */}
         <WrappedStorySlide
           {...sceneMotion(4)}
           tone="cream"
           beats={[
             {
-              headline: "You’ve heard of one-hit wonders",
+              headline: "You’ve heard of one hit wonders.",
               display: "hero",
             },
             {
-              headline: "But who are your one-like artists?",
-              subline: "You liked one song from them. That’s it.",
+              headline: "Meet your 1 like artists",
+              subline: "You liked a single track and never looked back.",
               display: "hero",
             },
             {
-              headline: "1-like artists. Oldest first.",
-              subline:
-                "One heart each — and they never made your current tops.",
+              headline: "1 like artists",
+              subline: "Artists with only one song saved.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -859,26 +857,27 @@ export function ApiScrappedDeck({
                     imageUrl: item.imageUrl,
                   }))}
                   active={!held && active === 4}
-                  empty="No one-like artists in this sample. Loyal, or just indecisive?"
+                  empty="No 1 like artists in this sample. Loyal, or just indecisive?"
                 />
               ),
             },
           ]}
         />
 
-        {/* 5 — Now the artists → #1 ghosted artist */}
+        {/* 5 — left on read → #1 ghosted artist */}
         <WrappedStorySlide
           {...sceneMotion(5)}
           tone="sand"
           beats={[
             {
-              headline: "Now the artists",
+              headline: "Artists you left on read.",
+              subline: "Or would it be left on listened?",
               display: "hero",
             },
             {
-              headline: "Top ghosted artist",
+              headline: "Top artist you left on read",
               subline: topArtist
-                ? "Your highest multi-year artist who isn’t in the 6-month or 4-week tops."
+                ? "Highest multi year fav missing from latest activity."
                 : "Your loyalty program is weirdly intact.",
               lead: topArtist ? (
                 <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
@@ -907,20 +906,20 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 6 — gang back together → top ghosted artists list */}
+        {/* 6 — gang back together → top left-on-read artists list */}
         <WrappedStorySlide
           {...sceneMotion(6)}
           tone="mist"
           beats={[
             {
               headline: "Get the gang back together?",
-              subline: "They’ll take you back",
+              subline: "They’ll take you back.",
               display: "hero",
             },
             {
-              headline: "Top ghosted artists",
+              headline: "Top artists you left on read",
               subline:
-                "Multi-year favorites that dropped out of your recent tops.",
+                "Highest multi year favs missing from latest activity.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -947,14 +946,12 @@ export function ApiScrappedDeck({
               ? [
                   {
                     headline: "Plot twist.",
-                    subline:
-                      "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+                    subline: "Not everyone stayed ghosted.",
                     display: "hero",
                   },
                   {
                     headline: "The reunion setlist",
-                    subline:
-                      "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.",
+                    subline: "A few old favs you were loyal to",
                     display: "sentence",
                     children: (
                       <WrappedEntityList
@@ -974,19 +971,15 @@ export function ApiScrappedDeck({
               : [
                   {
                     headline: "Plot twist.",
-                    subline:
-                      "Not everyone stayed ghosted. A few old favorites slid back into your last four weeks.",
+                    subline: "Not everyone stayed ghosted.",
                     display: "hero",
                   },
                   {
                     headline:
                       reunionSong?.label ?? "No reunions on the calendar.",
                     subline: reunionSong
-                      ? "An old multi-year favorite — or an old like — that’s back in your 4-week tops after a gap."
+                      ? "A few old favs you were loyal to"
                       : "The soft launch stayed soft. For now.",
-                    aside: reunionSong
-                      ? "We don’t have to talk about it."
-                      : undefined,
                     display: "hero",
                     footer: reunionSong ? (
                       <span>
@@ -1001,14 +994,18 @@ export function ApiScrappedDeck({
           }
         />
 
-        {/* 8 — soft close before share */}
+        {/* 8 — soft close before share (two beats) */}
         <WrappedStorySlide
           {...sceneMotion(8)}
           tone="cream"
           beats={[
             {
-              headline: "That was fun.",
-              subline: "Same time next year?",
+              headline: "Thanks for sitting with the almosts.",
+              align: "center",
+              display: "hero",
+            },
+            {
+              headline: "See you when they don’t stick.",
               align: "center",
               display: "hero",
             },
@@ -1058,7 +1055,6 @@ export function ApiScrappedDeck({
         onPointerDown={(e) => onZonePointerDown(-1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
-        onContextMenu={(e) => e.preventDefault()}
         className="absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
       />
       <button
@@ -1068,42 +1064,8 @@ export function ApiScrappedDeck({
         onPointerDown={(e) => onZonePointerDown(1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
-        onContextMenu={(e) => e.preventDefault()}
         className="absolute inset-y-0 right-0 z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
       />
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-40 flex items-center justify-center gap-3">
-        <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--wrapped-ink)]/15 bg-[var(--wrapped-canvas)]/90 px-3 py-2 backdrop-blur-sm">
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            onPointerDown={() => primeSoundtrackFor(active - 1)}
-            onClick={() => void goTo(active - 1)}
-            disabled={active <= 0}
-            className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
-            aria-label="Previous slide"
-          >
-            <Icon icon={chevronBackOutline} className="size-4" />
-          </Button>
-          <span className="min-w-[3.5rem] text-center font-mono text-xs tabular-nums text-[var(--wrapped-muted)]">
-            {String(active + 1).padStart(2, "0")} /{" "}
-            {String(SLIDE_COUNT).padStart(2, "0")}
-          </span>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            onPointerDown={() => primeSoundtrackFor(active + 1)}
-            onClick={() => void goTo(active + 1)}
-            disabled={active >= FINALE_INDEX}
-            className="pressable text-[var(--wrapped-ink)] hover:bg-[var(--wrapped-ink)]/10 hover:text-[var(--wrapped-ink)]"
-            aria-label="Next slide"
-          >
-            <Icon icon={chevronForwardOutline} className="size-4" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

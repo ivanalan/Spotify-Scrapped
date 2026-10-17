@@ -18,36 +18,47 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   className?: string;
-  /** Gate mock uses a text link; deck chrome keeps the close icon. */
+  /** Gate uses outline Button; deck chrome keeps the close icon. */
   appearance?: "icon" | "text";
 };
+
+/**
+ * Paper tones use hex — AlertDialog portals outside `.wrapped-story`, so
+ * `--wrapped-*` vars do not resolve (transparent panel + wrong text).
+ * Global shadcn tokens are dark-theme; force ink contrast (D-003).
+ */
+const paperOutlineTone =
+  "cursor-pointer border-[#1c1c1c]/20 bg-transparent text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c]";
+
+const paperSolidTone =
+  "cursor-pointer bg-[#1c1c1c] text-[#f4f4f2] hover:!bg-[#1c1c1c] hover:!opacity-90";
 
 export function SignOutConfirmButton({
   className,
   appearance = "icon",
 }: Props) {
+  const isText = appearance === "text";
+
   return (
     <AlertDialog>
       <AlertDialogTrigger
         className={
-          appearance === "text"
+          isText
             ? cn(
-                "font-sans text-sm text-[var(--wrapped-muted)] transition-opacity hover:opacity-70",
+                buttonVariants({ variant: "outline", size: "sm" }),
+                paperOutlineTone,
                 className,
               )
             : cn(
-                buttonVariants({ size: "icon", variant: "default" }),
-                "size-8 rounded-full bg-[#1c1c1c] text-[#f4f4f2] hover:bg-[#1c1c1c] hover:opacity-90",
+                buttonVariants({ variant: "default", size: "icon" }),
+                "rounded-full",
+                paperSolidTone,
                 className,
               )
         }
         aria-label="Sign out of Spotify"
       >
-        {appearance === "text" ? (
-          "Sign out"
-        ) : (
-          <Icon icon={closeOutline} className="size-4" />
-        )}
+        {isText ? "Sign out" : <Icon icon={closeOutline} className="size-4" />}
       </AlertDialogTrigger>
       <AlertDialogContent
         size="default"
@@ -63,17 +74,19 @@ export function SignOutConfirmButton({
             connect again to restart the experience.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-none border-0 bg-transparent p-0">
-          <AlertDialogCancel
-            variant="ghost"
-            className="rounded-xl !text-[#1c1c1c] hover:!bg-[#1c1c1c]/8 hover:!text-[#1c1c1c]"
-          >
+        <AlertDialogFooter className="mx-0 mb-0 flex-row items-center justify-end gap-2 rounded-none border-0 bg-transparent p-0">
+          <AlertDialogCancel variant="outline" size="default" className={paperOutlineTone}>
             Cancel
           </AlertDialogCancel>
-          <form action="/api/spotify/logout" method="post">
+          <form
+            action="/api/spotify/logout"
+            method="post"
+            className="inline-flex items-center"
+          >
             <AlertDialogAction
               type="submit"
-              className="rounded-xl bg-[#1c1c1c] text-[#f4f4f2] hover:bg-[#1c1c1c] hover:opacity-90"
+              size="default"
+              className={paperSolidTone}
             >
               Sign out
             </AlertDialogAction>
