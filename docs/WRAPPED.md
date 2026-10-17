@@ -108,19 +108,19 @@ Mock filenames `{act}.{frame}` are **animation frames within one progress segmen
 ```
 Scene 0 (2 beats, ~8s): year / Scrapped → Hey {name} + welcome
 Scene 1 (2 beats): liked library volume → liked this year + “Not bad for a collector.”
-Scene 2 (3 beats): all-time favorites + ghosted punchline → “one hurt more” → #1 ghosted song
-Scene 3 (2 beats): “ghost in town” setup → Top ghosted songs list
-Scene 4 (3 beats): one-hit wonders → one-like artists setup → one-save artists list
+Scene 2 (3 beats): all time favs + ghosted punchline → “one stings most” → #1 ghosted song
+Scene 3 (2 beats): “one ghost town” setup → Top ghosted songs list
+Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists list
 Scene 5 (2 beats): “Now the artists” → #1 ghosted artist
 Scene 6 (2 beats): “Get the gang back together?” → Top ghosted artists list
 Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
-Scene 8 (1 beat): “That was fun.” → “Same time next year?”
+Scene 8 (2 beats): “Thanks for sitting with the almosts.” → “See you when they don’t stick.”
 Scene 9: Share finale (holds; no auto-advance)
 ```
 
 API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses. Prev/next resets and replays the target scene.
 
-Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx`.
+Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx` — handwritten lock: [D-005](decisions/D-005-handwritten-api-story-copy.md); headline style: [D-006](decisions/D-006-api-story-headline-style.md).
 
 ---
 

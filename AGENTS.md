@@ -26,6 +26,9 @@ Always-on rules: [.cursor/rules/agent-memory.mdc](.cursor/rules/agent-memory.mdc
 ## Stack
 
 - Next.js (App Router) + TypeScript + Tailwind
+- **UI primitives:** shadcn under `src/components/ui/` for standard controls (Button, AlertDialog, etc.) — [D-003](docs/decisions/D-003-shadcn-standard-controls.md)
+- **UI type:** Poppins (`@fontsource/poppins`) via `--font-sans` / `--font-heading` / `--font-display` in `src/app/globals.css`. Type roles: `text-display`, `text-title`, `text-body`, `text-caption`.
+- **Viewport:** mobile-first practices, responsive full-bleed surfaces ([D-002](docs/decisions/D-002-poppins-mobile-first.md), [SOUL.md](SOUL.md)).
 - Ionicons for icons
 - Local SQLite via `better-sqlite3` (`data/processed/history.db`) for Scrapped Plus
 - Ingest: `npm run ingest` → `scripts/ingest.ts`
@@ -58,6 +61,11 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - Music entity key: `spotify_track_uri`.
 - Spotify access tokens stay server-side.
 - Story **copy** motion is shared across slides; only the numbered 5-row list pattern is special ([D-001](docs/decisions/D-001-story-copy-vs-list-motion.md), [SOUL.md](SOUL.md)).
+- Typeface is Poppins; layouts are mobile-first and responsive full-bleed ([D-002](docs/decisions/D-002-poppins-mobile-first.md)).
+- Standard buttons/controls use shadcn (`src/components/ui/`), not hand-rolled skins ([D-003](docs/decisions/D-003-shadcn-standard-controls.md)).
+- Auth copy is **sign in** / **sign out** only — not log in/out or connect/disconnect ([D-004](docs/decisions/D-004-sign-in-sign-out-copy.md)).
+- API story deck copy is **handwritten** and locked — don’t regenerate lines casually ([D-005](docs/decisions/D-005-handwritten-api-story-copy.md)).
+- API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)).
 
 ## Layout
 

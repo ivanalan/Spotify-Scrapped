@@ -15,7 +15,7 @@ export async function AuthControls() {
         className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-1.5")}
       >
         <Icon icon={musicalNotesOutline} className="size-3.5" />
-        Connect Spotify
+        Sign in to Spotify
       </a>
     );
   }
@@ -27,7 +27,7 @@ export async function AuthControls() {
       </span>
       <Button type="submit" size="sm" variant="ghost" className="gap-1.5">
         <Icon icon={logOutOutline} className="size-3.5" />
-        Disconnect
+        Sign out
       </Button>
     </form>
   );

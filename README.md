@@ -23,7 +23,7 @@ See [AGENTS.md](AGENTS.md), [docs/DATA.md](docs/DATA.md), [docs/SPOTIFY_API.md](
    npm run ingest
    ```
 
-3. Connect Spotify for Scrapped / Scrapped Lab (and Liked join on Scrapped Plus) — copy `.env.example` → `.env.local`, add dashboard credentials, redirect URI `http://127.0.0.1:3000/api/spotify/callback` (not `localhost`), then **Connect Spotify** in the nav. Details in [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md).
+3. Sign in to Spotify for Scrapped / Scrapped Lab (and Liked join on Scrapped Plus) — copy `.env.example` → `.env.local`, add dashboard credentials, redirect URI `http://127.0.0.1:3000/api/spotify/callback` (not `localhost`), then **Sign in to Spotify** in the nav. Details in [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md).
 
 4. Run the app:
 

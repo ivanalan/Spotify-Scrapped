@@ -30,7 +30,9 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Substrate | Light solid canvas per beat (`paper` / `cream` / `mist` / `blush` / `sage` / `sky` / `sand` / `slate`) |
 | Ink | Near-black text; muted secondary |
 | Accent | Progress + chrome only — no hazard neon floods |
-| Type | Heavy sans headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”) |
+| Type | **Poppins** everywhere — heavy display headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”). Roles: `text-display` / `text-title` / `text-body` / `text-caption` ([D-002](../../../docs/decisions/D-002-poppins-mobile-first.md)) |
+| Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters) |
+| Gate | Full-bleed paper + left-aligned stack (year → Scrapped → blurb → CTA → optional logged-in caption) |
 | Geometry | Soft placeholder blocks for future art; no rails, grids, or corner marks for now |
 | Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). No blob parallax |
 
@@ -38,11 +40,12 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 
 ## Composition rules
 
-1. **One job per slide** — setup line → reveal → optional aside. No competing heroes.
-2. **Type is the graphic** — until real art lands, gray placeholders only.
-3. **Solid fills only** — soft tinted backgrounds; no gradients, orbs, hatch, or watermark numerals.
-4. **Quiet chrome** — “Scrapped” wordmark, story progress segments, info/close. Soundtrack stays secondary.
-5. **Share finale** — same light system; screenshot-legible.
+1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the paper/canvas fill the viewport (no letterbox gutters, no centered marketing posters).
+2. **One job per slide** — setup line → reveal → optional aside. No competing heroes.
+3. **Type is the graphic** — until real art lands, gray placeholders only. Prefer type-role utilities over one-off clamps.
+4. **Solid fills only** — soft tinted backgrounds; no gradients, orbs, hatch, or watermark numerals.
+5. **Quiet chrome** — “Scrapped” wordmark, story progress segments, info/close. Soundtrack stays secondary.
+6. **Share finale** — same light system; screenshot-legible.
 
 ## Hard bans (AI-design tells)
 
@@ -62,6 +65,7 @@ Do **not** introduce:
 | `/scrapped` (`wrapped-story`) | This skill — light conversational story |
 | Scrapped Plus `/scrapped/plus` | May stay editorial Anysphere until intentionally unified |
 | Scrapped Lab `/scrapped/lab` | Functional Anysphere; not a story carnival |
+| `/scrapped/art` | **Research only** — ten art directions with Overview / Story / Share mocks ([`ArtMotionLab`](../../../src/components/scrapped/ArtMotionLab.tsx), mood boards in [`docs/mocks/art-refs/`](../../../docs/mocks/art-refs/)). Does **not** change the live deck POV. Promoting a direction into `/scrapped` requires an explicit decision. |
 
 ## Implementation checklist
 

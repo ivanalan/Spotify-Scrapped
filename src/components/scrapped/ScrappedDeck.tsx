@@ -277,7 +277,7 @@ export function ScrappedDeck({ report }: Props) {
           blurb={
             report.likedConnected
               ? "You kept the heart. Your skips didn’t."
-              : "Connect Spotify to cross-check Liked Songs against this year’s skips."
+              : "Sign in to Spotify to cross-check Liked Songs against this year’s skips."
           }
           active={active === 6}
           footer={
@@ -286,7 +286,7 @@ export function ScrappedDeck({ report }: Props) {
                 href="/api/spotify/login"
                 className="text-foreground underline-offset-2 hover:underline"
               >
-                Connect Spotify
+                Sign in to Spotify
               </a>
             ) : report.likedButScrapped.length === 0 ? (
               "No liked tracks cleared the skip bar in this window."

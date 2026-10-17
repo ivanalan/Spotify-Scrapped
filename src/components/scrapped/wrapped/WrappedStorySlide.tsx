@@ -146,7 +146,6 @@ function beatExit(reduceMotion: boolean | null) {
 
 function BeatBody({
   beat,
-  narrativeKey,
   reduceMotion,
   delayChildren,
   blurIn,
@@ -155,7 +154,6 @@ function BeatBody({
   pinTop = false,
 }: {
   beat: WrappedStoryBeat;
-  narrativeKey: string;
   reduceMotion: boolean | null;
   delayChildren: number;
   blurIn: boolean;
@@ -169,31 +167,35 @@ function BeatBody({
   const useLayout = !reduceMotion;
   const copyLineCount = countCopyLineBeats(beat);
 
-  // Never skip the title-only frame if the beat clock jumped during exit.
-  const [shownLines, setShownLines] = useState(1);
-  const sawTitleOnly = useRef(false);
-  useEffect(() => {
-    setShownLines(1);
-    sawTitleOnly.current = false;
-  }, [narrativeKey]);
+  // Remount (parent key) resets this. Only delay if the beat clock jumped past
+  // the title-only frame — normal 1→2 advances follow the deck clock.
+  const [titleHoldDone, setTitleHoldDone] = useState(false);
+  const sawTitleOnlyRef = useRef(false);
   useEffect(() => {
     if (linesVisible <= 1) {
-      setShownLines(1);
-      sawTitleOnly.current = true;
+      sawTitleOnlyRef.current = true;
       return;
     }
-    if (!sawTitleOnly.current) {
-      const holdMs =
-        estimateReadingMs(plainText(beat.headline)) +
-        timing.titleTravelSec * 1000;
-      const id = window.setTimeout(() => {
-        sawTitleOnly.current = true;
-        setShownLines(linesVisible);
-      }, holdMs);
-      return () => window.clearTimeout(id);
+    if (titleHoldDone) return;
+
+    // Already showed title-only — release subtitle with the clock (no re-hold).
+    if (sawTitleOnlyRef.current) {
+      setTitleHoldDone(true);
+      return;
     }
-    setShownLines(linesVisible);
-  }, [linesVisible, beat.headline]);
+
+    // Clock jumped past title-only on this mount — hold then catch up.
+    const holdMs =
+      estimateReadingMs(plainText(beat.headline)) +
+      timing.titleTravelSec * 1000;
+    const id = window.setTimeout(() => {
+      setTitleHoldDone(true);
+    }, holdMs);
+    return () => window.clearTimeout(id);
+  }, [linesVisible, beat.headline, titleHoldDone]);
+
+  const shownLines =
+    linesVisible <= 1 || !titleHoldDone ? 1 : linesVisible;
 
   const showSubline = Boolean(beat.subline) && shownLines >= 2;
   const showAside = Boolean(beat.aside) && shownLines >= 3;
@@ -249,7 +251,8 @@ function BeatBody({
           ? "absolute inset-x-0 top-24 px-7 md:px-14"
           : "relative",
         align === "center" ? "items-center" : "items-stretch",
-        isListBeat || beat.lead ? "gap-8" : "gap-4",
+        // List: 12px title→subtitle; rows add mt-3 for 24px subtitle→list.
+        isListBeat ? "gap-3" : beat.lead ? "gap-8" : "gap-4",
       )}
       layout={useLayout ? "position" : false}
       transition={layoutOnlyTransition}
@@ -327,7 +330,7 @@ function BeatBody({
             key="children"
             layout={useLayout ? "position" : false}
             transition={layoutOnlyTransition}
-            className="min-h-0 w-full"
+            className={cn("min-h-0 w-full", isListBeat && "mt-6")}
             // Rows own cascade; wrapper only participates in layout reflow.
             initial={isListBeat ? false : supportMotion.initial}
             animate={isListBeat ? { opacity: 1 } : supportMotion.animate}
@@ -444,7 +447,6 @@ export function WrappedStorySlide({
         {active ? (
           <BeatBody
             key={`${replayKey}-${phase.narrativeIndex}`}
-            narrativeKey={`${replayKey}-${phase.narrativeIndex}`}
             beat={current}
             reduceMotion={reduceMotion}
             delayChildren={delayChildren}

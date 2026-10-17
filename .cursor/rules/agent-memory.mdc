@@ -38,3 +38,7 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 
 - Data / Wrapped / story spine: [spotify-data.mdc](spotify-data.mdc), [docs/WRAPPED.md](docs/WRAPPED.md)
 - Story copy vs 5-row list motion: [D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)
+- shadcn for standard controls: [D-003](docs/decisions/D-003-shadcn-standard-controls.md)
+- Auth copy (sign in / sign out): [D-004](docs/decisions/D-004-sign-in-sign-out-copy.md)
+- Handwritten API story copy: [D-005](docs/decisions/D-005-handwritten-api-story-copy.md)
+- API story headline style (≤6 words / favs / open compounds): [D-006](docs/decisions/D-006-api-story-headline-style.md)

@@ -156,7 +156,7 @@ export function ApiMetricsLab(props: Props) {
             href="/api/spotify/login"
             className="inline-block text-foreground underline-offset-2 hover:underline"
           >
-            Connect Spotify →
+            Sign in to Spotify →
           </a>
         </div>
       ) : null}

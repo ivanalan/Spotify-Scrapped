@@ -37,7 +37,7 @@ function SubmitButton({
       aria-busy={pending}
       className={cn(
         tone === "gate"
-          ? "h-12 w-full max-w-sm gap-2 rounded-2xl bg-[var(--wrapped-ink)] px-8 text-base font-semibold text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
+          ? "h-12 w-full gap-2 rounded-2xl bg-[var(--wrapped-ink)] px-8 text-base font-semibold text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
           : "h-auto gap-1.5 p-0 text-foreground",
         pending && tone === "gate" && "pointer-events-none opacity-80",
         className,
@@ -63,7 +63,7 @@ function GateHint() {
   const { pending } = useFormStatus();
   return (
     <p
-      className="mt-3 max-w-[16rem] text-center font-sans text-xs leading-relaxed text-[var(--wrapped-muted)]"
+      className="text-caption mt-3 w-full text-left text-[var(--wrapped-muted)]"
       aria-live="polite"
     >
       {pending
@@ -101,7 +101,7 @@ export function SpotifyLabFetchForm({
       action="/api/spotify/lab-refresh"
       method="post"
       className={
-        tone === "gate" ? "flex w-full max-w-sm flex-col items-center" : undefined
+        tone === "gate" ? "flex w-full flex-col items-stretch" : undefined
       }
     >
       <input type="hidden" name="next" value={next} />
