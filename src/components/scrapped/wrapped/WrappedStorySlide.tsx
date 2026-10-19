@@ -251,9 +251,10 @@ function BeatBody({
         // re-enables pointer-events (see children wrapper).
         pinTop ? "z-[35] pointer-events-none" : "z-10",
         // List beat only: top-pin without changing section justify (setup stays centered).
-        // bottom-24 matches slide py-24 so the list has a real height budget.
+        // top-24 matches slide py-24; bottom-0 so the scrollport can use the
+        // lower viewport (API deck has no on-stage Spotify player to clear).
         pinTop
-          ? "absolute inset-x-0 top-24 bottom-24 min-h-0 px-7 md:px-14"
+          ? "absolute inset-x-0 top-24 bottom-0 min-h-0 px-7 md:px-14"
           : "relative",
         align === "center" ? "items-center" : "items-stretch",
         // List: 12px title→subtitle; rows add mt-3 for 24px subtitle→list.

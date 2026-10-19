@@ -108,6 +108,27 @@ function daysSince(iso: string, now: Date): number {
 
 const TOP_N = 5;
 
+/**
+ * One-save rows are artist-keyed, but a collab credits every artist on the
+ * track — so the same song can appear twice (e.g. Pothole × Brettin + Jaden).
+ * Prefer unique tracks for the story/Lab list; keep oldest / earlier sort.
+ */
+function takeUniqueTrackRows<T extends { oldestSaved: { track: { id: string } } }>(
+  rows: T[],
+  n: number,
+): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const row of rows) {
+    const id = row.oldestSaved.track.id;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(row);
+    if (out.length >= n) break;
+  }
+  return out;
+}
+
 function normLabel(value: string): string {
   return value
     .toLowerCase()
@@ -238,6 +259,7 @@ export function leftLongGhostedCount(report: ScrappedApiReport): number | null {
 /**
  * Older sealed one-save rows used label=artist, detail=`${song} · …d on the shelf`
  * with no sublabel. Current shape is label=song, sublabel=artist.
+ * Also drop duplicate songs from collab credits (same trackId / label).
  */
 function migrateOneSaveArtistItems(report: ScrappedApiReport): void {
   const card = report.cards?.find((c) => c.id === "one-save-artists");
@@ -254,6 +276,13 @@ function migrateOneSaveArtistItems(report: ScrappedApiReport): void {
         ? `${artist} · liked today`
         : `${artist} · ${item.value.toLocaleString()}d ago`;
   }
+  const seen = new Set<string>();
+  card.items = card.items.filter((item) => {
+    const key = item.trackId || `label:${item.label}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** Fill like-shelf summary fields missing from older sealed Lab snapshots. */
@@ -829,7 +858,7 @@ export function buildScrappedApiReport(
       id: "one-save-artists",
       title: "One-save shelf",
       calculated:
-        "Artists with exactly one track in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest like first.",
+        "Artists with exactly one track in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest like first. List rows are unique by track so a collab does not list the same song twice.",
       means: "A single heart, no rotation — the almosts you never followed up. Longest-sitting yeses lead.",
       bar: "Days since that one like. Older = longer bar.",
       source: "Liked Songs + top artists (4 weeks and 6 months)",
@@ -837,7 +866,7 @@ export function buildScrappedApiReport(
         oneSaveArtists.length > 0
           ? `${oneSaveArtists.length.toLocaleString()} artists with a single like and no current top slot`
           : "No one-save shelf artists in this sample",
-      items: oneSaveArtists.slice(0, TOP_N).map((artist) => {
+      items: takeUniqueTrackRows(oneSaveArtists, TOP_N).map((artist) => {
         const sample = artist.oldestSaved.track;
         return {
           id: artist.id,
