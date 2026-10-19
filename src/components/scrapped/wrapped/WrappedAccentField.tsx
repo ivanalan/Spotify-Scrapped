@@ -1,15 +1,14 @@
 "use client";
 
-/** Kept for imports; conversational deck uses solid slide fills only. */
+/** Orbit Cascade tones — see D-007 / scrapped-card-palette. */
 export type WrappedSlideTone =
-  | "paper"
-  | "mist"
-  | "sand"
-  | "blush"
-  | "sage"
-  | "sky"
-  | "cream"
-  | "slate";
+  | "ink"
+  | "orchid"
+  | "ember"
+  | "mango"
+  | "gold"
+  | "teal"
+  | "rose";
 
 type Props = {
   tone: WrappedSlideTone;

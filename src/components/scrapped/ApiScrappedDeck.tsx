@@ -22,6 +22,7 @@ import {
 import { Icon } from "@/components/Icon";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
+import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
 import { WrappedStorySlide } from "@/components/scrapped/wrapped/WrappedStorySlide";
 import { useStoryAutoplay } from "@/components/scrapped/wrapped/useStoryAutoplay";
@@ -30,6 +31,7 @@ import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
+import { SLIDE_ART_PATTERN, slideTone } from "@/lib/scrapped-card-palette";
 import {
   leftLongGhostedCount,
   type ApiMetricCard,
@@ -650,8 +652,33 @@ export function ApiScrappedDeck({
     replayKey: !held && active === scene ? visitKey : 0,
   });
 
+  const orbitChrome = (scene: number) => {
+    const pattern = SLIDE_ART_PATTERN[scene];
+    if (!pattern || pattern === "share") return undefined;
+    // Volume scene: 2 narrative beats × (headline+subline) → joined beat at phase ≥ 2
+    const tide =
+      pattern === "volume" && !held && active === scene && beatIndex >= 2
+        ? "high"
+        : "low";
+    return (
+      <ScrappedOrbitArt
+        slideIndex={scene}
+        pattern={pattern}
+        active={!held && active === scene}
+        replayKey={!held && active === scene ? visitKey : 0}
+        tide={tide}
+      />
+    );
+  };
+
+  // Chrome (wordmark / progress / controls) follows the active slide’s theme.
+  const chromeTone = slideTone(active);
+
   return (
-    <div className="wrapped-story relative min-h-dvh">
+    <div
+      className="wrapped-story relative min-h-dvh"
+      data-wrapped-tone={chromeTone}
+    >
       <div className="pointer-events-none absolute inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
         <div className="flex gap-1" aria-hidden>
           {Array.from({ length: SLIDE_COUNT }, (_, i) => {
@@ -721,7 +748,8 @@ export function ApiScrappedDeck({
         {/* 0 — year open → Hey + welcome (paired). Copy delayed for Continue audio. */}
         <WrappedStorySlide
           {...sceneMotion(0)}
-          tone="paper"
+          tone={slideTone(0)}
+          chrome={orbitChrome(0)}
           copyEnterDelaySec={INTRO_COPY_DELAY_SEC}
           beats={[
             {
@@ -750,7 +778,8 @@ export function ApiScrappedDeck({
         {/* 1 — liked volume → liked this year */}
         <WrappedStorySlide
           {...sceneMotion(1)}
-          tone="sand"
+          tone={slideTone(1)}
+          chrome={orbitChrome(1)}
           beats={[
             {
               headline:
@@ -780,7 +809,8 @@ export function ApiScrappedDeck({
         {/* 2 — ghosted ratio → one stings → #1 ghosted song */}
         <WrappedStorySlide
           {...sceneMotion(2)}
-          tone="blush"
+          tone={slideTone(2)}
+          chrome={orbitChrome(2)}
           beats={[
             {
               headline:
@@ -837,7 +867,8 @@ export function ApiScrappedDeck({
         {/* 3 — one ghost town → top ghosted songs list */}
         <WrappedStorySlide
           {...sceneMotion(3)}
-          tone="sky"
+          tone={slideTone(3)}
+          chrome={orbitChrome(3)}
           beats={[
             {
               headline: "It wasn’t a one ghost town",
@@ -866,7 +897,8 @@ export function ApiScrappedDeck({
         {/* 4 — one hit wonders → 1 like setup → one-save list */}
         <WrappedStorySlide
           {...sceneMotion(4)}
-          tone="cream"
+          tone={slideTone(4)}
+          chrome={orbitChrome(4)}
           beats={[
             {
               headline: "You’ve heard of 1 hit wonders.",
@@ -920,7 +952,8 @@ export function ApiScrappedDeck({
         {/* 5 — left on read → #1 ghosted artist */}
         <WrappedStorySlide
           {...sceneMotion(5)}
-          tone="sand"
+          tone={slideTone(5)}
+          chrome={orbitChrome(5)}
           beats={[
             {
               headline: "Artists you left on read.",
@@ -962,7 +995,8 @@ export function ApiScrappedDeck({
         {/* 6 — gang back together → top left-on-read artists list */}
         <WrappedStorySlide
           {...sceneMotion(6)}
-          tone="mist"
+          tone={slideTone(6)}
+          chrome={orbitChrome(6)}
           beats={[
             {
               headline: "Get the gang back together?",
@@ -993,7 +1027,8 @@ export function ApiScrappedDeck({
         {/* 7 — plot twist + reunion (combined) */}
         <WrappedStorySlide
           {...sceneMotion(7)}
-          tone="sage"
+          tone={slideTone(7)}
+          chrome={orbitChrome(7)}
           beats={
             reunionList
               ? [
@@ -1050,7 +1085,8 @@ export function ApiScrappedDeck({
         {/* 8 — soft close before share (two beats) */}
         <WrappedStorySlide
           {...sceneMotion(8)}
-          tone="cream"
+          tone={slideTone(8)}
+          chrome={orbitChrome(8)}
           beats={[
             {
               headline: "Thanks for sitting with the almosts.",
@@ -1068,7 +1104,7 @@ export function ApiScrappedDeck({
         {/* 9 — share finale — height budget leaves room for top/bottom chrome */}
         <section
           data-scrapped-slide
-          data-wrapped-tone="slate"
+          data-wrapped-tone={slideTone(9)}
           className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-8 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)]"
           aria-hidden={active !== FINALE_INDEX}
         >

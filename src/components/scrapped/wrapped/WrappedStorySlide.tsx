@@ -17,15 +17,15 @@ import {
 } from "@/lib/scrapped-story-motion";
 import { cn } from "@/lib/utils";
 
+/** Orbit Cascade tones (D-007). Legacy paper/* remain in CSS for Gate/labs only. */
 export type WrappedSlideTone =
-  | "paper"
-  | "mist"
-  | "sand"
-  | "blush"
-  | "sage"
-  | "sky"
-  | "cream"
-  | "slate";
+  | "ink"
+  | "orchid"
+  | "ember"
+  | "mango"
+  | "gold"
+  | "teal"
+  | "rose";
 
 export type WrappedStoryBeat = {
   /** Large conversational line (or year / name). */
@@ -61,6 +61,8 @@ type Props = {
   copyEnterDelaySec?: number;
   /** Soft blur-in on copy (open slide). Ignored when reduced-motion. */
   copyBlurIn?: boolean;
+  /** Peripheral Orbit Cascade art — behind copy, pointer-events none. */
+  chrome?: ReactNode;
   className?: string;
   /** Multi-beat scene (same canvas; text enters then exits). */
   beats?: WrappedStoryBeat[];
@@ -245,7 +247,7 @@ function BeatBody({
   return (
     <motion.div
       className={cn(
-        "mx-auto flex w-full max-w-xl flex-col",
+        "relative z-10 mx-auto flex w-full max-w-xl flex-col",
         // List beat: sit above deck tap zones (z-30). pointer-events-none so
         // title/empty areas still pass taps through; only the list scrollport
         // re-enables pointer-events (see children wrapper).
@@ -372,12 +374,13 @@ function BeatBody({
 }
 
 export function WrappedStorySlide({
-  tone = "paper",
+  tone = "ink",
   active = false,
   beatIndex = 0,
   replayKey = 0,
   copyEnterDelaySec,
   copyBlurIn = false,
+  chrome,
   className,
   beats,
   headline,
@@ -457,6 +460,11 @@ export function WrappedStorySlide({
       )}
       aria-hidden={!active}
     >
+      {chrome ? (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          {chrome}
+        </div>
+      ) : null}
       {/* initial plays: BeatBody only mounts while active, so each scene gets enter. */}
       <AnimatePresence mode="wait">
         {active ? (

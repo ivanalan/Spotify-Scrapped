@@ -66,6 +66,7 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - Auth copy is **sign in** / **sign out** only — not log in/out or connect/disconnect ([D-004](docs/decisions/D-004-sign-in-sign-out-copy.md)).
 - API story deck copy is **handwritten** and locked — don’t regenerate lines casually ([D-005](docs/decisions/D-005-handwritten-api-story-copy.md)).
 - API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)).
+- API deck look: Orbit Cascade palette + peripheral ovals / volume ocean ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)); each story is dark or light — deck chrome follows the active slide.
 
 ## Layout
 

@@ -50,7 +50,7 @@ export function WrappedEntityList({
   return (
     // Natural height inside a sized @container parent so rows can overflow and
     // scroll instead of flex-shrinking away. Preferred gap (cqh) is what phones use.
-    <ol className="flex w-full flex-col gap-[clamp(0.5rem,7cqh,2.5rem)]">
+    <ol className="flex w-full flex-col gap-[clamp(0.5rem,5.5cqh,2.5rem)]">
         {items.map((item, i) => {
           const plan = planListRowMotion(motionId, i, {
             active: true,

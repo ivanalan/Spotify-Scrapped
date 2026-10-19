@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 type Props = {
   next: "/" | "/scrapped" | "/scrapped/lab";
   label: string;
-  /** `gate` = primary CTA on the light landing; default is inline link for Lab. */
+  /** `gate` = primary CTA on the Orbit landing; default is inline link for Lab. */
   tone?: "link" | "gate";
   /** Kick off Load once on mount (gate fetch) so Start is a loading indicator. */
   autoStart?: boolean;
