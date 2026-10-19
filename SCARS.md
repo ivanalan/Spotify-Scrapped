@@ -16,6 +16,14 @@ Format:
 
 ---
 
+## Numbered entity list is not scrollable on the live deck
+
+- **Not:** Missing `overflow-y-auto` on the list wrapper, or covers/gaps alone causing the clip.
+- **Cause:** List region used `z-[35]` inside BeatBody’s `z-10` stacking context, while Stories tap zones sit at `z-30` on the deck root — so every vertical pan hit prev/next instead of the scrollport. Horizontal scroller also uses `overflow-y-hidden`, so clipped rows had nowhere to go.
+- **Proof:** Ghosted songs list cut off the 5th row; swipe on the list did not scroll. Labs scrolled because they have no overlay tap zones.
+- **Avoid:** On list beats, elevate BeatBody above tap zones (`z-[35]`) with `pointer-events-none`, and only re-enable `pointer-events-auto` on the list scrollport so title/empty areas still pass taps through.
+- **Related:** `WrappedStorySlide.tsx`, `ApiScrappedDeck.tsx` tap zones
+
 ## Title jumps (or stays put) when the subtitle appears on list setup slides
 
 - **Not:** The soundtrack, the slide copy wording, or cascade row timing alone. Not “the list beat’s title at the top.”
