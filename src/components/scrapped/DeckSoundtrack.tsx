@@ -32,8 +32,14 @@ export type DeckSoundtrackHandle = {
    */
   primeTo: (uri: string | null) => void;
   /**
+   * Abort an in-flight speculative prime (and any hot-primed next act).
+   * Call when a press becomes a hold or is cancelled so the chirp does not linger.
+   */
+  cancelPrime: () => void;
+  /**
    * Make uri exclusively own audio (resumes a hot prime when possible) and
-   * resolve when the cut is done. Await before changing slides.
+   * resolve when the cut is done. Fire alongside the slide change — do not
+   * block story advance on this promise.
    */
   cutTo: (uri: string | null) => Promise<void>;
 };
@@ -302,7 +308,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const cutoverTimerRef = useRef<number | null>(null);
     const loopCutoverTimerRef = useRef<number | null>(null);
     /**
-     * Audio advanced ahead of the slide `uri` prop (cutTo before setActive).
+     * Audio advanced ahead of / alongside the slide `uri` prop (cutTo + setActive).
      * While set, the uri effect must not sync back to the outgoing slide.
      */
     const aheadUriRef = useRef<string | null>(null);
@@ -1096,6 +1102,32 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         primingUriRef.current = target;
         entry.host.className = HOST_WARM;
         entry.controller.play();
+      },
+      cancelPrime() {
+        const targets = new Set<string>();
+        if (primingUriRef.current) targets.add(primingUriRef.current);
+        if (
+          hotPrimedUriRef.current &&
+          hotPrimedUriRef.current !== playingUriRef.current
+        ) {
+          targets.add(hotPrimedUriRef.current);
+        }
+        primingUriRef.current = null;
+        if (
+          hotPrimedUriRef.current &&
+          targets.has(hotPrimedUriRef.current)
+        ) {
+          hotPrimedUriRef.current = null;
+        }
+        for (const uri of targets) {
+          if (uri === playingUriRef.current) continue;
+          if (incomingUriRef.current === uri) continue;
+          const entry = poolRef.current.get(uri);
+          if (!entry) continue;
+          entry.controller.pause();
+          entry.controller.seek(START_AT_SEC);
+          entry.host.className = HOST_IDLE;
+        }
       },
       cutTo(nextUri: string | null) {
         const target = asTrackUri(nextUri);

@@ -151,6 +151,10 @@ export function ScrappedExperience({ report }: Props) {
     soundtrackRef.current?.primeTo(uri);
   }
 
+  function cancelSoundtrackPrime() {
+    soundtrackRef.current?.cancelPrime();
+  }
+
   function cutSoundtrackTo(uri: string | null) {
     return soundtrackRef.current?.cutTo(uri) ?? Promise.resolve();
   }
@@ -191,6 +195,7 @@ export function ScrappedExperience({ report }: Props) {
             onPausedChange={setDeckPaused}
             onSoundtrackUriChange={setSoundtrackUri}
             onSoundtrackPrimeTo={primeSoundtrackTo}
+            onSoundtrackCancelPrime={cancelSoundtrackPrime}
             onSoundtrackCutTo={cutSoundtrackTo}
             held={!started}
             pauseApiRef={pauseApiRef}
