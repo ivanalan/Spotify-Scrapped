@@ -13,7 +13,7 @@ import {
   GradOrb,
   type FunkyShareKind,
 } from "./FunkyShapes";
-import { ListFrame } from "./PeripheralMotifs";
+import { GhostedListFrame, ListFrame } from "./PeripheralMotifs";
 import { ArtistOrbitOvals } from "@/components/scrapped/orbit/ArtistOrbitOvals";
 import {
   EMBER_FIELD_GRADIENT,
@@ -155,7 +155,15 @@ export function OrbitCascadeArt({
           <ArtistOrbitOvals freeze={!!reduce} />
         )}
 
-        {pattern === "list" && (
+        {pattern === "list" && slideIndex === 3 && (
+          <GhostedListFrame
+            accent={spec.accent}
+            accent2={spec.accent2}
+            animate={freeze || reduce ? "none" : "soft"}
+          />
+        )}
+
+        {pattern === "list" && slideIndex !== 3 && (
           <ListFrame
             accent={spec.accent}
             accent2={spec.accent2}

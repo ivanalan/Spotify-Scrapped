@@ -33,9 +33,9 @@ export const SLIDE_SWATCH: CardSwatch[] = [
   "ink", // 0 intro
   "ember", // 1 volume (ocean)
   "orchid", // 2 ghosted favs / #1 song
-  "gold", // 3 list
+  "ink", // 3 ghosted songs list — sky/grass/ghosts (D-010)
   "teal", // 4 list
-  "rose", // 5 #1 artist
+  "ink", // 5 #1 artist (orchid ladder on ink)
   "ink", // 6 list
   "mango", // 7 reunion
   "orchid", // 8 soft close
@@ -85,22 +85,38 @@ export const INTRO_STAR = {
 } as const;
 
 /**
- * #1 artist orbit — prototype kit A (D-008).
+ * #1 artist orbit — prototype kit F (D-008), ink-lean contrast retune.
  * Center-aligned eccentric ovals; opaque linear gradients; independent spin.
- * Canvas stays rose (`CARD_PALETTE.rose`); bottom wash darkens the mid-band.
+ * Canvas is ink (`CARD_PALETTE.ink`); deep orchid cascade (no near-white / hot magenta).
  */
-export const ARTIST_ORBIT_A = {
+export const ARTIST_ORBIT = {
   cx: 180,
   cy: 275,
-  wash: "#8A1238",
+  wash: "#0A0810",
+  /** Wash rect top in viewBox Y; gradient mid stop % + opacity. */
+  washY: 360,
+  washMid: 35,
+  washMidOpacity: 0.88,
   /** Inner → outer. Painted outer-first so inner sits on top. */
   rings: [
-    { rx: 68, ry: 68, from: "#FFE66D", to: "#FF9F1C", dur: 26, reverse: false },
-    { rx: 105, ry: 92, from: "#FF9F1C", to: "#F05A3D", dur: 38, reverse: true },
-    { rx: 145, ry: 108, from: "#F05A3D", to: "#C9185B", dur: 50, reverse: false },
-    { rx: 185, ry: 128, from: "#C9185B", to: "#8A1238", dur: 47, reverse: true },
-    { rx: 225, ry: 150, from: "#8A1238", to: "#4A0A22", dur: 59, reverse: false },
+    { rx: 68, ry: 68, from: "#9B4DE8", to: "#7A3CC8", dur: 26, reverse: false },
+    { rx: 105, ry: 92, from: "#7A3CC8", to: "#6B21A8", dur: 38, reverse: true },
+    { rx: 145, ry: 108, from: "#6B21A8", to: "#4C1D95", dur: 50, reverse: false },
+    { rx: 185, ry: 128, from: "#4C1D95", to: "#3B0764", dur: 47, reverse: true },
+    { rx: 225, ry: 150, from: "#3B0764", to: "#1A0A2E", dur: 59, reverse: false },
   ],
+} as const;
+
+/**
+ * Ghosted songs list clouds (D-010) — tweak here.
+ * Scales are × classic list cloud sizes (lane A 1.15 / lane B 0.78).
+ * `yOffset` is viewBox px down from the sky baseline (positive = lower).
+ */
+export const GHOSTED_LIST_CLOUDS = {
+  /** 1 = original list cloud size; 0.75 = three-quarters. */
+  scale: 0.75,
+  /** Positive nudges the strip down toward the headline. */
+  yOffset: 10,
 } as const;
 
 export type SlideArtPattern =
@@ -163,7 +179,7 @@ export const SLIDE_ACCENTS: Record<
   2: { accent: "#FFE66D", accent2: "#5EEAD4" },
   3: { accent: "#5C1A7A", accent2: "#F05A3D" },
   4: { accent: "#ffe66d", accent2: "#ff6b9d" },
-  5: { accent: "#ffe66d", accent2: "#F05A3D" },
+  5: { accent: "#C9A0F5", accent2: "#6B21A8" },
   6: { accent: "#ff4d8d", accent2: "#ffe66d" },
   7: { accent: "#1B2A6B", accent2: "#ffe66d" },
   8: { accent: "#ff4d8d", accent2: "#ffe66d" },

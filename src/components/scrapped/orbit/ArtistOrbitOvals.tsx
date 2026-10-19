@@ -2,17 +2,18 @@
 
 import { useId } from "react";
 import { motion } from "motion/react";
-import { ARTIST_ORBIT_A } from "@/lib/scrapped-card-palette";
+import { ARTIST_ORBIT } from "@/lib/scrapped-card-palette";
 
 /**
- * #1 artist chrome — D-008 kit A.
+ * #1 artist chrome — D-008 kit F (orchid ladder spin).
  * Center-aligned eccentric ovals, opaque gradients, independent slow spin.
  */
 export function ArtistOrbitOvals({ freeze }: { freeze: boolean }) {
   const uid = useId();
-  const { cx, cy, wash, rings } = ARTIST_ORBIT_A;
+  const { cx, cy, wash, washY, washMid, washMidOpacity, rings } = ARTIST_ORBIT;
   // Outer first so larger disks sit behind the inner ones.
   const paintOrder = [...rings].reverse();
+  const washHeight = 640 - washY;
 
   return (
     <g>
@@ -39,7 +40,11 @@ export function ArtistOrbitOvals({ freeze }: { freeze: boolean }) {
         })}
         <linearGradient id={`${uid}-wash`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={wash} stopOpacity={0} />
-          <stop offset="40%" stopColor={wash} stopOpacity={0.85} />
+          <stop
+            offset={`${washMid}%`}
+            stopColor={wash}
+            stopOpacity={washMidOpacity}
+          />
           <stop offset="100%" stopColor={wash} stopOpacity={1} />
         </linearGradient>
       </defs>
@@ -72,7 +77,13 @@ export function ArtistOrbitOvals({ freeze }: { freeze: boolean }) {
           </motion.g>
         );
       })}
-      <rect x={0} y={400} width={360} height={240} fill={`url(#${uid}-wash)`} />
+      <rect
+        x={0}
+        y={washY}
+        width={360}
+        height={washHeight}
+        fill={`url(#${uid}-wash)`}
+      />
     </g>
   );
 }

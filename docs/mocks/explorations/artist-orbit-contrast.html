@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Artist orbit — contrast retunes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #0e0c12;
+      --panel: #16141c;
+      --ink: #f5f5f5;
+      --muted: #9a94a4;
+      --field: #12101a;
+      --wash: #0a0810;
+      --phone-w: 280px;
+      --phone-h: 560px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Poppins, system-ui, sans-serif;
+      background: var(--page);
+      color: var(--ink);
+      padding: 28px 24px 80px;
+    }
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .lede {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 42rem;
+      margin: 0 0 10px;
+    }
+    .lede code {
+      font-size: 0.78em;
+      background: #1c1824;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #e0b8ff;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 18px 0 22px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid #333344;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .toolbar button.on {
+      border-color: #c9a0f5;
+      color: #e0b8ff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #2a2433;
+      border-radius: 14px;
+      padding: 12px 12px 14px;
+    }
+    .card.pick {
+      border-color: #7dd3c0;
+      box-shadow: 0 0 0 1px #7dd3c0;
+    }
+    .card-head {
+      margin-bottom: 10px;
+      min-height: 4.2rem;
+    }
+    .card-head strong {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 650;
+      margin-bottom: 3px;
+    }
+    .card-head span {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.58rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #8a8494;
+      border: 1px solid #333344;
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+    .badge.shipped { color: #e8c96a; border-color: #5a4a28; }
+    .badge.rec { color: #7dd3c0; border-color: #2a4a44; }
+    .phone {
+      position: relative;
+      width: var(--phone-w);
+      height: var(--phone-h);
+      margin: 0 auto;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--field);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    }
+    .phone svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .ring {
+      transform-box: view-box;
+      transform-origin: 180px 275px;
+      animation: spin var(--dur, 40s) linear infinite;
+      animation-direction: var(--dir, normal);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    body.reduce .ring { animation: none !important; }
+
+    .chrome {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      color: #f5f5f5;
+      padding: 16px 16px 0;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .dots { display: flex; gap: 5px; }
+    .dots i {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1.5px solid rgba(245, 245, 245, 0.45);
+      display: grid; place-items: center;
+      font-style: normal; font-size: 0.5rem; opacity: 0.85;
+    }
+    .progress {
+      display: flex; gap: 3px; margin-top: 10px;
+    }
+    .progress b {
+      flex: 1; height: 2px; border-radius: 1px;
+      background: rgba(245, 245, 245, 0.22);
+    }
+    .progress b.on { background: rgba(245, 245, 245, 0.88); }
+
+    .photo {
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+      width: 36%;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      background: linear-gradient(145deg, #3a3a44, #1e1e26);
+      box-shadow: 0 0 0 2.5px rgba(245, 245, 245, 0.2);
+      z-index: 2;
+    }
+    .copy {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16%;
+      z-index: 3;
+    }
+    .copy h2 {
+      margin: 0;
+      font-size: 1.28rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: #f5f5f5;
+    }
+    .copy p {
+      margin: 10px 0 0;
+      font-size: 0.78rem;
+      font-weight: 500;
+      line-height: 1.35;
+      color: color-mix(in oklab, #f5f5f5 90%, transparent);
+    }
+    .swatches {
+      display: flex;
+      gap: 4px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .swatches i {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .note {
+      margin-top: 28px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      max-width: 48rem;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <h1>Artist orbit — contrast retunes</h1>
+  <p class="lede">
+    #1 artist beat (D-008 kit F). Same geometry &amp; copy; only ladder stops + wash change.
+    Goal: keep orchid DNA, make headline + muted subline readable over the mid band.
+    Tokens today: <code>ARTIST_ORBIT</code> in <code>scrapped-card-palette.ts</code>.
+  </p>
+  <div class="toolbar">
+    <button type="button" id="toggle-spin" class="on">Spin on</button>
+    <span>Open this file in a browser — pick a card, then we can ship that retune.</span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="note">
+    Shipped: <strong>F — Ink-lean</strong>. Reload <code>/scrapped</code> on the #1 artist beat to verify.
+  </p>
+
+  <script>
+    const FIELD = "#12101A";
+    const WASH = "#0A0810";
+    const CX = 180;
+    const CY = 275;
+
+    /** Shared ring sizes / motion — matches ARTIST_ORBIT. */
+    const GEO = [
+      { rx: 68, ry: 68, dur: 26, reverse: false },
+      { rx: 105, ry: 92, dur: 38, reverse: true },
+      { rx: 145, ry: 108, dur: 50, reverse: false },
+      { rx: 185, ry: 128, dur: 47, reverse: true },
+      { rx: 225, ry: 150, dur: 59, reverse: false },
+    ];
+
+    const VARIANTS = [
+      {
+        id: "current",
+        title: "A — Prior bright ladder",
+        blurb: "Near-white lilac → hot magenta on the inner two rings. Type fights the disks.",
+        badge: null,
+        badgeLabel: "",
+        wash: { y: 400, mid: 40, midOp: 0.85 },
+        stops: [
+          ["#FBEAFF", "#E070FF"],
+          ["#E070FF", "#C9A0F5"],
+          ["#C9A0F5", "#9B4DE8"],
+          ["#9B4DE8", "#6B21A8"],
+          ["#6B21A8", "#3B0764"],
+        ],
+      },
+      {
+        id: "deepen",
+        title: "B — Deepen inner ladder",
+        blurb: "Drop #FBEAFF / crush hot pink. Inners start at mid orchid; outer cascade unchanged.",
+        badge: null,
+        wash: { y: 400, mid: 40, midOp: 0.85 },
+        stops: [
+          ["#C9A0F5", "#9B4DE8"],
+          ["#9B4DE8", "#7A3CC8"],
+          ["#8A3CD6", "#6B21A8"],
+          ["#6B21A8", "#4A148C"],
+          ["#4A148C", "#2E1065"],
+        ],
+      },
+      {
+        id: "wash",
+        title: "C — Higher ink wash",
+        blurb: "Keep bright rings; pull the bottom fade up so copy sits on darker ink sooner.",
+        badge: null,
+        wash: { y: 280, mid: 28, midOp: 0.92 },
+        stops: [
+          ["#FBEAFF", "#E070FF"],
+          ["#E070FF", "#C9A0F5"],
+          ["#C9A0F5", "#9B4DE8"],
+          ["#9B4DE8", "#6B21A8"],
+          ["#6B21A8", "#3B0764"],
+        ],
+      },
+      {
+        id: "both",
+        title: "D — Both (deepen + wash)",
+        blurb: "Darker inners + earlier wash. Alt if F feels too quiet.",
+        badge: null,
+        badgeLabel: "",
+        wash: { y: 300, mid: 32, midOp: 0.9 },
+        stops: [
+          ["#C9A0F5", "#9B4DE8"],
+          ["#9B4DE8", "#7A3CC8"],
+          ["#8A3CD6", "#6B21A8"],
+          ["#6B21A8", "#4A148C"],
+          ["#4A148C", "#2E1065"],
+        ],
+      },
+      {
+        id: "soft-mid",
+        title: "E — Soft mid crush",
+        blurb: "Keep a hint of lilac (not white); cool the magenta stop to orchid. Milder than B.",
+        badge: null,
+        wash: { y: 400, mid: 40, midOp: 0.85 },
+        stops: [
+          ["#E8D4F8", "#C9A0F5"],
+          ["#C070E8", "#A862E8"],
+          ["#A862E8", "#8A3CD6"],
+          ["#8A3CD6", "#6B21A8"],
+          ["#6B21A8", "#3B0764"],
+        ],
+      },
+      {
+        id: "ink-lean",
+        title: "F — Ink-lean ladder",
+        blurb: "Whole cascade shifts toward deep purple. Quietest — almost intro-disk range only.",
+        badge: "shipped",
+        badgeLabel: "Shipped",
+        wash: { y: 360, mid: 35, midOp: 0.88 },
+        stops: [
+          ["#9B4DE8", "#7A3CC8"],
+          ["#7A3CC8", "#6B21A8"],
+          ["#6B21A8", "#4C1D95"],
+          ["#4C1D95", "#3B0764"],
+          ["#3B0764", "#1A0A2E"],
+        ],
+      },
+    ];
+
+    function phoneSvg(v, uid) {
+      const defs = [];
+      GEO.forEach((g, i) => {
+        const [a, b] = v.stops[i];
+        const angle = i * 28 * (Math.PI / 180);
+        const x1 = 0.5 - 0.5 * Math.cos(angle);
+        const y1 = 0.5 - 0.5 * Math.sin(angle);
+        const x2 = 0.5 + 0.5 * Math.cos(angle);
+        const y2 = 0.5 + 0.5 * Math.sin(angle);
+        defs.push(`
+          <linearGradient id="${uid}-r${i}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+            <stop offset="0%" stop-color="${a}"/>
+            <stop offset="100%" stop-color="${b}"/>
+          </linearGradient>`);
+      });
+      const w = v.wash;
+      defs.push(`
+        <linearGradient id="${uid}-wash" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${WASH}" stop-opacity="0"/>
+          <stop offset="${w.mid}%" stop-color="${WASH}" stop-opacity="${w.midOp}"/>
+          <stop offset="100%" stop-color="${WASH}" stop-opacity="1"/>
+        </linearGradient>`);
+
+      // Outer first
+      const ellipses = [...GEO]
+        .map((g, i) => ({ g, i }))
+        .reverse()
+        .map(({ g, i }) => {
+          const dir = g.reverse ? "reverse" : "normal";
+          return `
+            <g class="ring" style="--dur:${g.dur}s;--dir:${dir}">
+              <ellipse cx="${CX}" cy="${CY}" rx="${g.rx}" ry="${g.ry}" fill="url(#${uid}-r${i})"/>
+            </g>`;
+        })
+        .join("");
+
+      const washH = 640 - w.y;
+      return `
+        <svg viewBox="0 0 360 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="360" height="640" fill="${FIELD}"/>
+          <defs>${defs.join("")}</defs>
+          ${ellipses}
+          <rect x="0" y="${w.y}" width="360" height="${washH}" fill="url(#${uid}-wash)"/>
+        </svg>`;
+    }
+
+    function card(v) {
+      const uid = v.id;
+      const badge = v.badge
+        ? `<span class="badge ${v.badge}">${v.badgeLabel}</span>`
+        : `<span class="badge">Variant</span>`;
+      const swatchHtml = v.stops
+        .map(([a]) => `<i style="background:${a}"></i>`)
+        .join("");
+      return `
+        <article class="card" data-id="${v.id}" tabindex="0">
+          <div class="card-head">
+            <strong>${v.title}</strong>
+            <span>${v.blurb}</span>
+            ${badge}
+          </div>
+          <div class="phone">
+            ${phoneSvg(v, uid)}
+            <div class="chrome">
+              <div class="top">
+                <span>Scrapped</span>
+                <span class="dots"><i>i</i><i>×</i></span>
+              </div>
+              <div class="progress">
+                <b></b><b></b><b></b><b></b><b></b><b class="on"></b><b></b><b></b><b></b>
+              </div>
+            </div>
+            <div class="photo" aria-hidden="true"></div>
+            <div class="copy">
+              <h2>Artists you left on read.</h2>
+              <p>Or would it be left on listened?</p>
+            </div>
+          </div>
+          <div class="swatches" title="Inner → outer from-stops">${swatchHtml}</div>
+        </article>`;
+    }
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = VARIANTS.map(card).join("");
+
+    grid.addEventListener("click", (e) => {
+      const el = e.target.closest(".card");
+      if (!el) return;
+      grid.querySelectorAll(".card").forEach((c) => c.classList.remove("pick"));
+      el.classList.add("pick");
+    });
+
+    document.getElementById("toggle-spin").addEventListener("click", (e) => {
+      const btn = e.currentTarget;
+      document.body.classList.toggle("reduce");
+      const on = !document.body.classList.contains("reduce");
+      btn.classList.toggle("on", on);
+      btn.textContent = on ? "Spin on" : "Spin off";
+    });
+  </script>
+</body>
+</html>
