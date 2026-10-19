@@ -53,9 +53,11 @@ type Props = {
   onSoundtrackUriChange?: (uri: string | null) => void;
   /** Speculative hot-prime on pointerdown (no cut until navigate). */
   onSoundtrackPrimeTo?: (uri: string | null) => void;
+  /** Abort speculative prime when a press becomes a hold or is cancelled. */
+  onSoundtrackCancelPrime?: () => void;
   /**
-   * Cut audio to the next act before the slide changes so the incoming scene
-   * never hears both acts. No-ops when sound is off or the URI is unchanged.
+   * Cut audio to the next act in parallel with the slide change. No-ops when
+   * sound is off or the URI is unchanged. Do not await before setActive.
    */
   onSoundtrackCutTo?: (uri: string | null) => Promise<void>;
   /**
@@ -101,6 +103,7 @@ export function ApiScrappedDeck({
   onPausedChange,
   onSoundtrackUriChange,
   onSoundtrackPrimeTo,
+  onSoundtrackCancelPrime,
   onSoundtrackCutTo,
   held = false,
   pauseApiRef,
@@ -229,7 +232,7 @@ export function ApiScrappedDeck({
   }, []);
 
   const goTo = useCallback(
-    async (index: number) => {
+    (index: number) => {
       const root = scrollerRef.current;
       if (!root) return;
       const slides = root.querySelectorAll<HTMLElement>("[data-scrapped-slide]");
@@ -244,12 +247,12 @@ export function ApiScrappedDeck({
         return;
       }
 
-      // Cut audio before the slide so the incoming scene never hears both acts.
+      // Cut audio in parallel — never block the story on Spotify cutover.
       if (soundOn && onSoundtrackCutTo) {
         const fromUri = getApiSlideSoundtrackUri(report, prev, soundtrackOpts);
         const toUri = getApiSlideSoundtrackUri(report, next, soundtrackOpts);
         if (toUri !== fromUri) {
-          await onSoundtrackCutTo(toUri);
+          void onSoundtrackCutTo(toUri);
         }
       }
 
@@ -273,7 +276,7 @@ export function ApiScrappedDeck({
     [soundOn, onSoundtrackCutTo, report, soundtrackOpts],
   );
 
-  /** Hot-prime on press so cutTo can resume instantly when the click commits. */
+  /** Hot-prime on pointerdown so cutTo can resume when the tap commits. */
   const primeSoundtrackFor = useCallback(
     (index: number) => {
       if (!soundOn || !onSoundtrackPrimeTo) return;
@@ -287,6 +290,10 @@ export function ApiScrappedDeck({
     },
     [soundOn, onSoundtrackPrimeTo, report, soundtrackOpts],
   );
+
+  const cancelSoundtrackPrime = useCallback(() => {
+    onSoundtrackCancelPrime?.();
+  }, [onSoundtrackCancelPrime]);
 
   /**
    * Copy lines only — drives line-beat counts + reading-time durations.
@@ -538,6 +545,11 @@ export function ApiScrappedDeck({
       if (e.target !== e.currentTarget) return;
       clearPressHold();
       e.currentTarget.setPointerCapture(e.pointerId);
+      const next = activeRef.current + dir;
+      // Prime early so cutTo can resume hot when the tap commits.
+      if (next >= 0 && next <= FINALE_INDEX) {
+        primeSoundtrackFor(next);
+      }
       pressRef.current = {
         dir,
         pointerId: e.pointerId,
@@ -546,11 +558,13 @@ export function ApiScrappedDeck({
           const press = pressRef.current;
           if (!press || press.pointerId !== e.pointerId) return;
           press.long = true;
+          // Hold = pause, not navigate — kill the speculative next-act chirp.
+          cancelSoundtrackPrime();
           setPressHeld(true);
         }, HOLD_PAUSE_MS),
       };
     },
-    [clearPressHold],
+    [clearPressHold, primeSoundtrackFor, cancelSoundtrackPrime],
   );
 
   const onZonePointerUp = useCallback(
@@ -562,20 +576,19 @@ export function ApiScrappedDeck({
       if (long) return;
       const next = activeRef.current + dir;
       if (next < 0 || next > FINALE_INDEX) return;
-      // Prime on tap commit (not pointerdown) so holds never chirp the next act.
-      primeSoundtrackFor(next);
-      void goTo(next);
+      goTo(next);
     },
-    [clearPressHold, goTo, primeSoundtrackFor],
+    [clearPressHold, goTo],
   );
 
   const onZonePointerCancel = useCallback(
     (e: ReactPointerEvent<HTMLButtonElement>) => {
       const press = pressRef.current;
       if (!press || press.pointerId !== e.pointerId) return;
+      cancelSoundtrackPrime();
       clearPressHold();
     },
-    [clearPressHold],
+    [clearPressHold, cancelSoundtrackPrime],
   );
 
   useEffect(() => {
@@ -606,11 +619,13 @@ export function ApiScrappedDeck({
   // Release hold if the tab hides mid-press.
   useEffect(() => {
     function onVis() {
-      if (document.hidden) clearPressHold();
+      if (!document.hidden) return;
+      cancelSoundtrackPrime();
+      clearPressHold();
     }
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
-  }, [clearPressHold]);
+  }, [clearPressHold, cancelSoundtrackPrime]);
 
   const soundtrackUri = getApiSlideSoundtrackUri(
     report,
