@@ -11,7 +11,9 @@ On **wide** viewports, Orbit Cascade chrome uses **corner-pinned motif layers** 
 
 On **phone** viewports, most patterns keep the legacy full-slide `MotifStage` (`viewBox 0 0 360 640` + `preserveAspectRatio="xMidYMid slice"`).
 
-**Intro exception:** orchid disks and pointed star use `MotifCornerOrigin` on every viewport — disk center on the **top-left** corner, star center on the **bottom-right** corner (viewport corners, not viewBox-approximate coords).
+**Pin exceptions (every viewport):**
+- **Intro** — orchid disks + pointed star via `MotifCornerOrigin` (disk center → TL, star center → BR)
+- **Soft close** — double pill bookend via `MotifPin` top-center + bottom-center (`CloseBookendChrome`). MotifStage `slice` crops the mirrored bottom stack on tall phones.
 
 Phone wins whenever `(max-width: 480px)` **or** `(max-aspect-ratio: 3/4)`. SSR and first paint default to the phone path.
 
@@ -25,8 +27,8 @@ Mobile is protected by a **separate render path**, not by hoping pin math matche
 
 | Axis | Choice |
 |------|--------|
-| Phone path | Legacy `MotifStage` for non-intro; intro uses `MotifCornerOrigin` (disk center → TL, star center → BR) |
-| Wide path | Same intro pins; `MotifMeetStage` (song/artist); `MotifPin` (volume/list/reunion/close) |
+| Phone path | Legacy `MotifStage` for non-exception patterns; intro + soft close use pins (see above) |
+| Wide path | Same intro / close pins; `MotifMeetStage` (song/artist); `MotifPin` (volume/list/reunion) |
 | Breakpoint | Phone if `max-width: 480px` **or** `max-aspect-ratio: 3/4` |
 | Sizing | Motif boxes from short side (`min(100vw, 100dvh)`); mid band stays clear |
 | Motifs | Reuse ShapeKit / Funky / List / ArtistOrbit components — do not redraw |

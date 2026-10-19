@@ -8,7 +8,7 @@ export async function Nav() {
       <div className="mx-auto flex max-w-3xl items-baseline justify-between gap-6 px-6 py-4 md:px-8">
         <Link
           href="/"
-          className="font-heading text-lg tracking-[-0.02em] text-foreground"
+          className="font-heading text-lg italic tracking-[-0.02em] text-foreground"
         >
           Scrapped
         </Link>

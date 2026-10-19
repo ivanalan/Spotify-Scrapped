@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
+import { SHARE_FINALE_KIT as SF } from "@/lib/scrapped-card-palette";
 import { cn } from "@/lib/utils";
 
 export type ShareRecapTrack = {
@@ -35,6 +37,71 @@ type Props = {
   heroAlt?: string;
   className?: string;
 };
+
+/** Blob ghost — same path as D-010 perimeter ghosts. */
+function blobPath() {
+  return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+}
+
+/**
+ * Two wash ghosts framing the album art (TL + BR) — D-014 kit J8.
+ * Positions/sizes from SHARE_FINALE_KIT (explore lock).
+ */
+function ShareFinaleGhosts({ active }: { active?: boolean }) {
+  const reduce = useReducedMotion();
+  const freeze = Boolean(reduce || !active);
+  const g = SF.ghosts;
+  const slots = [
+    { ...g.tl, delay: 0 },
+    { ...g.br, delay: g.phaseSec },
+  ] as const;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[2] overflow-hidden"
+      style={{ opacity: g.opacity }}
+      aria-hidden
+    >
+      {slots.map((s, i) => (
+        <motion.div
+          key={i}
+          className="absolute"
+          style={{
+            left: `${s.xPct}%`,
+            top: `${s.yPct}%`,
+            width: s.sizePx,
+            height: s.sizePx,
+          }}
+          initial={false}
+          animate={
+            freeze
+              ? { y: 0, rotate: -2 }
+              : {
+                  y: [0, -g.bobPx, -g.bobPx * 0.35, 0],
+                  rotate: [-2 * g.wiggle, 3 * g.wiggle, -1 * g.wiggle, -2 * g.wiggle],
+                }
+          }
+          transition={
+            freeze
+              ? undefined
+              : {
+                  duration: g.durationSec,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: -s.delay,
+                }
+          }
+        >
+          <svg viewBox="0 0 64 64" className="size-full overflow-visible">
+            <path d={blobPath()} fill={SF.ghostFill} />
+            <circle cx={24} cy={26} r={3.2} fill={SF.ghostEye} />
+            <circle cx={40} cy={26} r={3.2} fill={SF.ghostEye} />
+          </svg>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 function TrackList({
   label,
@@ -120,9 +187,12 @@ function TrackList({
   );
 }
 
-/** Locked from finale tune: 0.93rem / lh 1.3 / single-line truncate. */
+/**
+ * Minimal share type — size from `--share-type-size` (D-012 density).
+ * Fallback 0.93rem matches the pre-inset tune.
+ */
 const MINIMAL_TYPE =
-  "font-sans text-[0.93rem] leading-[1.3] tracking-[-0.01em] text-[var(--wrapped-ink)]";
+  "font-sans text-[length:var(--share-type-size,0.93rem)] leading-[1.3] tracking-[-0.01em] text-[var(--wrapped-ink)]";
 
 function MinimalColumn({
   label,
@@ -133,7 +203,12 @@ function MinimalColumn({
 }) {
   return (
     <div className="min-w-0">
-      <p className={cn(MINIMAL_TYPE, "mb-5 truncate font-bold")}>
+      <p
+        className={cn(
+          MINIMAL_TYPE,
+          "mb-[var(--share-list-label-gap,1.25rem)] truncate font-bold",
+        )}
+      >
         {label}
       </p>
       {tracks.length === 0 ? (
@@ -146,7 +221,9 @@ function MinimalColumn({
           Nothing here.
         </p>
       ) : (
-        <ol className="flex flex-col gap-4">
+        <ol
+          className="flex flex-col gap-[var(--share-list-row-gap,1.1rem)]"
+        >
           {tracks.map((track, i) => (
             <li
               key={track.id}
@@ -198,17 +275,34 @@ export function ShareRecapCard({
     return (
       <div
         className={cn(
-          "relative mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)]",
+          "relative mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)]",
           active ? "opacity-100" : "opacity-55",
           className,
         )}
+        style={{
+          background: SF.cardBg,
+          color: SF.cardInk,
+          // Override nested tone tokens so lists/hero panel match teal kit.
+          ["--wrapped-ink" as string]: SF.cardInk,
+          ["--wrapped-panel" as string]: SF.cardPanel,
+        }}
       >
         {/*
-          Wrapped-like share finale: 44% header, art at 63% of that band,
-          single-line dual columns (locked from finale tune).
+          Inset share finale (D-012 IA + D-014 kit J8): teal card, framing
+          ghosts, MyScrapped.com. Density from --share-* on the deck host.
         */}
-        <header className="relative flex h-[44%] w-full shrink-0 items-center justify-center [container-type:size]">
-          <div className="absolute top-1/2 left-1/2 aspect-square w-[min(63cqw,63cqh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]">
+        <ShareFinaleGhosts active={active} />
+        <header
+          className="relative z-[1] flex w-full shrink-0 items-center justify-center [container-type:size]"
+          style={{ height: "var(--share-hero-band, 44%)" }}
+        >
+          <div
+            className="absolute top-1/2 left-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]"
+            style={{
+              width:
+                "min(var(--share-hero-size, 63%), var(--share-hero-size, 63%))",
+            }}
+          >
             {heroImageUrl ? (
               <Image
                 src={heroImageUrl}
@@ -222,10 +316,30 @@ export function ShareRecapCard({
           </div>
         </header>
 
-        <div className="grid min-h-0 w-full flex-1 grid-cols-2 content-start gap-x-1.5 px-0 pt-0">
+        <div
+          className="relative z-[1] grid min-h-0 w-full flex-1 grid-cols-2 content-start pt-0"
+          style={{
+            columnGap: "var(--share-list-col-gap, 0.375rem)",
+            paddingInline: "var(--share-list-pad-x, 0px)",
+            paddingBottom: "0px",
+          }}
+        >
           <MinimalColumn label={leftLabel} tracks={skipped} />
           <MinimalColumn label={rightLabel} tracks={stayed} />
         </div>
+
+        <footer
+          className="relative z-[1] shrink-0 text-center font-semibold tracking-[-0.01em]"
+          style={{
+            paddingInline: "var(--share-list-pad-x, 0px)",
+            paddingBottom: "var(--share-list-pad-y, 0px)",
+            paddingTop: "10px",
+            fontSize: "0.68rem",
+            color: SF.cardMuted,
+          }}
+        >
+          {SF.brandLine}
+        </footer>
       </div>
     );
   }

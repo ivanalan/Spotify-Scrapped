@@ -18,7 +18,8 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 |------|--------|
 | Palette | `ink · orchid · ember · mango · gold · teal · rose` — see `src/lib/scrapped-card-palette.ts` |
 | Intro | Ink field + orchid concentric oval ladder |
-| Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches. Ghosted songs list (slide 3) is ink again with sky/grass/ghosts — [D-010](D-010-ghosted-list-sky-grass-ghosts.md) |
+| Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches. Ghosted songs list (slide 3) is ink again with sky/grass/ghosts — [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + funky accents; bookends grow in. Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
+| Soft close | Teal field · funky pink→gold pills · larger MotifPin bookends inset toward mid copy · slow grow+rotate enter (~2.6s) — [D-009](D-009-responsive-motif-pins.md) pins |
 | Ghosted spiral | Orchid field; gold→aqua GradOrbs on a perimeter-biased spiral; slow in-place cascade then drift |
 | Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year” |
 | Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |

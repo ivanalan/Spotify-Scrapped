@@ -1096,6 +1096,11 @@ export function ConcentricDisks({
   );
 }
 
+/** Stable SVG coord string — avoids SSR/client float / scientific-notation drift. */
+function svgCoord(n: number): string {
+  return n.toFixed(3);
+}
+
 /** n-pointed star polygon (default 7) — outer tip radius `r`, inner notch `r * innerRatio`. */
 export function pointedStarPoints(
   cx: number,
@@ -1110,7 +1115,7 @@ export function pointedStarPoints(
     const angle = (Math.PI * i) / points - Math.PI / 2;
     const radius = i % 2 === 0 ? r : r * innerRatio;
     pts.push(
-      `${cx + Math.cos(angle) * radius},${cy + Math.sin(angle) * radius}`,
+      `${svgCoord(cx + Math.cos(angle) * radius)},${svgCoord(cy + Math.sin(angle) * radius)}`,
     );
   }
   return pts.join(" ");

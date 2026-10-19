@@ -9,6 +9,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
 } from "react";
@@ -16,6 +17,7 @@ import {
   heart,
   pauseOutline,
   playOutline,
+  refreshOutline,
   volumeHighOutline,
   volumeMuteOutline,
 } from "ionicons/icons";
@@ -31,7 +33,12 @@ import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
-import { SLIDE_ART_PATTERN, slideTone } from "@/lib/scrapped-card-palette";
+import {
+  SHARE_FINALE_DENSITY as D,
+  SLIDE_ART_PATTERN,
+  slideTone,
+} from "@/lib/scrapped-card-palette";
+import { shareCardImage } from "@/lib/share-card-export";
 import {
   leftLongGhostedCount,
   type ApiMetricCard,
@@ -113,12 +120,15 @@ export function ApiScrappedDeck({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const activeFillRef = useRef<HTMLDivElement | null>(null);
   const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+  const shareExportInFlightRef = useRef(false);
   /** Locks active index during programmatic prev/next so IO can't land mid-scroll. */
   const navigatingToRef = useRef<number | null>(null);
   const navClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(0);
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
+  const [shareExportBusy, setShareExportBusy] = useState(false);
   /** Instagram-style press-and-hold on the main tap zones (not the sticky pause button). */
   const [pressHeld, setPressHeld] = useState(false);
   const pressRef = useRef<{
@@ -433,7 +443,7 @@ export function ApiScrappedDeck({
           subline: "Or would it be left on listened?",
         },
         {
-          headline: "Top artist you left on read",
+          headline: "Top artist left on read",
           subline: hasTopArtist
             ? "Highest multi year fav missing from latest activity."
             : "Your loyalty program is weirdly intact.",
@@ -654,8 +664,9 @@ export function ApiScrappedDeck({
 
   const orbitChrome = (scene: number) => {
     const pattern = SLIDE_ART_PATTERN[scene];
-    if (!pattern || pattern === "share") return undefined;
+    if (!pattern) return undefined;
     // Volume scene: 2 narrative beats × (headline+subline) → joined beat at phase ≥ 2
+    // Share (D-014): intro disks + star on ink stage behind the inset card.
     const tide =
       pattern === "volume" && !held && active === scene && beatIndex >= 2
         ? "high"
@@ -673,6 +684,46 @@ export function ApiScrappedDeck({
 
   // Chrome (wordmark / progress / controls) follows the active slide’s theme.
   const chromeTone = slideTone(active);
+
+  const onShareFinale = useCallback(async () => {
+    const node = shareCardRef.current;
+    if (!node || shareExportInFlightRef.current) return;
+    shareExportInFlightRef.current = true;
+    setShareExportBusy(true);
+    try {
+      await shareCardImage(node, {
+        fileName: `myscrapped-${report.year}.png`,
+      });
+    } catch {
+      // Capture / share failed — no toast surface yet. AbortError is handled inside.
+    } finally {
+      shareExportInFlightRef.current = false;
+      setShareExportBusy(false);
+    }
+  }, [report.year]);
+
+  const onReplayFromBeginning = useCallback(() => {
+    goTo(0);
+  }, [goTo]);
+
+  const shareFinaleStyle = useMemo(
+    () =>
+      ({
+        "--share-hero-band": `${D.heroBandPct}%`,
+        "--share-hero-size": `${D.heroSizePct}%`,
+        "--share-list-col-gap": `${D.listColGapPx}px`,
+        "--share-list-row-gap": `${D.listRowGapRem}rem`,
+        "--share-list-pad-x": `${D.listPadXPx}px`,
+        "--share-list-pad-y": `${D.listPadYPx}px`,
+        "--share-list-label-gap": "1.25rem",
+        "--share-type-size": `${D.typeRem}rem`,
+        "--share-card-radius": `${D.radiusPx}px`,
+        paddingTop: `calc(3.5rem + ${D.bodyTopPx}px)`,
+        paddingBottom: `${D.bodyBottomPx}px`,
+        paddingInline: `${D.gutterPx}px`,
+      }) as CSSProperties,
+    [],
+  );
 
   return (
     <div
@@ -702,7 +753,7 @@ export function ApiScrappedDeck({
         </div>
 
         <div className="pointer-events-none mt-3 flex items-center justify-between">
-          <p className="font-sans text-sm font-semibold tracking-tight text-[var(--wrapped-ink)]">
+          <p className="font-sans text-sm font-semibold italic tracking-tight text-[var(--wrapped-ink)]">
             Scrapped
           </p>
           <div className="pointer-events-auto flex items-center gap-1.5">
@@ -962,7 +1013,7 @@ export function ApiScrappedDeck({
               display: "hero",
             },
             {
-              headline: "Top artist you left on read",
+              headline: "Top artist left on read",
               subline: topArtist
                 ? "Highest multi year fav missing from latest activity."
                 : "Your loyalty program is weirdly intact.",
@@ -1103,34 +1154,78 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 9 — share finale — height budget leaves room for top/bottom chrome */}
+        {/* 9 — share finale — ink stage + intro chrome + teal card (D-012 / D-014) */}
         <section
           data-scrapped-slide
           data-wrapped-tone={slideTone(9)}
-          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-8 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)]"
+          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]"
+          style={shareFinaleStyle}
           aria-hidden={active !== FINALE_INDEX}
         >
-          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col">
-            <ShareRecapCard
-              year={report.year}
-              variant="minimal"
-              active={active === FINALE_INDEX}
-              leftLabel="Ghosted artists"
-              rightLabel="Ghosted songs"
-              heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
-              heroAlt={topArtist?.label ?? topSong?.label ?? ""}
-              skipped={(leftLongArtists?.items ?? []).slice(0, 5).map((item) => ({
-                id: item.id,
-                title: item.label,
-                artist: item.detail ?? "—",
-              }))}
-              stayed={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
-                id: item.id,
-                title: item.label,
-                artist: item.sublabel ?? "—",
-              }))}
-              className="min-h-0 flex-1"
-            />
+          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+            {orbitChrome(9)}
+          </div>
+          <div
+            className="relative z-10 mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"
+            style={{ gap: `${D.cardActionsGapPx}px` }}
+          >
+            <div
+              ref={shareCardRef}
+              className="relative min-h-0 flex-1 overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+              style={{ borderRadius: "var(--share-card-radius, 12px)" }}
+            >
+              <ShareRecapCard
+                year={report.year}
+                variant="minimal"
+                active={active === FINALE_INDEX}
+                leftLabel="Ghosted artists"
+                rightLabel="Ghosted songs"
+                heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
+                heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+                skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
+                  (item) => ({
+                    id: item.id,
+                    title: item.label,
+                    artist: item.detail ?? "—",
+                  }),
+                )}
+                stayed={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
+                  id: item.id,
+                  title: item.label,
+                  artist: item.sublabel ?? "—",
+                }))}
+                className="min-h-0 h-full flex-1"
+              />
+            </div>
+
+            <div
+              className="relative z-40 flex shrink-0 flex-col"
+              style={{ gap: `${D.actionsGapPx}px` }}
+            >
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-auto w-full rounded-full border-0 bg-[#f5f5f5] font-bold text-[#1c1c1c] hover:bg-[#f5f5f5]/90 disabled:opacity-70"
+                style={{ paddingBlock: `${D.sharePadYPx}px` }}
+                disabled={shareExportBusy}
+                aria-busy={shareExportBusy}
+                onClick={() => void onShareFinale()}
+              >
+                {shareExportBusy ? "Sharing…" : "Share"}
+              </Button>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 py-1.5 text-[0.82rem] font-semibold text-[var(--wrapped-ink)] opacity-90 transition-opacity hover:opacity-100"
+                onClick={onReplayFromBeginning}
+              >
+                <Icon
+                  icon={refreshOutline}
+                  className="size-[1.125rem] shrink-0"
+                  aria-hidden
+                />
+                Replay from beginning
+              </button>
+            </div>
           </div>
         </section>
       </div>
@@ -1139,6 +1234,7 @@ export function ApiScrappedDeck({
         Stories-style tap / hold zones above slide copy (z-10) / motion layers.
         Short press → prev/next. Hold → pause progress + soundtrack until release.
         Chrome stays higher (z-40) so pause / mute / sign-out still win.
+        Finale: leave bottom clear so Share / Replay receive taps.
       */}
       <button
         type="button"
@@ -1147,7 +1243,11 @@ export function ApiScrappedDeck({
         onPointerDown={(e) => onZonePointerDown(-1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
-        className="absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+        className={
+          active === FINALE_INDEX
+            ? "absolute top-0 bottom-36 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            : "absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+        }
       />
       <button
         type="button"
@@ -1156,7 +1256,11 @@ export function ApiScrappedDeck({
         onPointerDown={(e) => onZonePointerDown(1, e)}
         onPointerUp={onZonePointerUp}
         onPointerCancel={onZonePointerCancel}
-        className="absolute inset-y-0 right-0 z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+        className={
+          active === FINALE_INDEX
+            ? "absolute top-0 bottom-36 left-[30%] z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            : "absolute inset-y-0 left-[30%] z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+        }
       />
     </div>
   );

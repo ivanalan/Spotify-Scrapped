@@ -100,7 +100,7 @@ export function OrbitCascadeArt({
       style={{ background: canvas }}
     >
       <MotifStage>
-        {pattern === "intro" && (
+        {(pattern === "intro" || pattern === "share") && (
           <>
             <ConcentricDisks
               cx={-10}

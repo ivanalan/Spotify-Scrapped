@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soft close — motion exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #0e0c12;
+      --panel: #16141c;
+      --border: #2a2433;
+      --ink-ui: #f0ebe6;
+      --muted: #9a94a4;
+      --accent-ui: #c9a0f5;
+
+      /* Slide 8 defaults — teal field, funky pink→gold accents */
+      --field: #1A7A6E;
+      --ink: #f5f5f5;
+      --muted-copy: color-mix(in oklab, #f5f5f5 90%, transparent);
+      --a: #ff4d8d;
+      --b: #ffe66d;
+
+      --phone-w: 360px;
+      --phone-h: 720px;
+      --motion-scale: 1;
+      --enter-dur: 0.9s;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Poppins, system-ui, sans-serif;
+      background: var(--page);
+      color: var(--ink-ui);
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) minmax(300px, var(--phone-w)) 1fr;
+      gap: 28px;
+      padding: 28px;
+      min-height: 100vh;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .lede {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 0 0 18px;
+    }
+    .lede code {
+      font-size: 0.78em;
+      background: #1c1824;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #e0b8ff;
+    }
+
+    .panel { display: flex; flex-direction: column; gap: 14px; }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px 14px;
+      margin: 0;
+    }
+    legend {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a8278;
+      padding: 0 6px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    button.chip {
+      appearance: none;
+      border: 1px solid #3a3344;
+      background: #18141f;
+      color: #ebe4dc;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 7px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    button.chip:hover { border-color: #6a5f78; }
+    button.chip[aria-pressed="true"] {
+      background: #2a2235;
+      border-color: var(--accent-ui);
+      color: #f5f0ff;
+    }
+
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .swatch[aria-pressed="true"] {
+      border-color: #fff;
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    label.slider {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px 12px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 10px;
+      align-items: center;
+    }
+    label.slider span.val {
+      font-variant-numeric: tabular-nums;
+      color: #d4cfc8;
+    }
+    input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      accent-color: var(--accent-ui);
+    }
+
+    .note {
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    /* —— Live stage —— */
+    .stage-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: sticky;
+      top: 28px;
+    }
+    .stage-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .stage-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+      min-height: 2.6em;
+    }
+    .stage-meta strong { color: #ebe4dc; font-weight: 600; }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      max-width: 100%;
+      border-radius: 28px;
+      position: relative;
+      background: var(--field);
+      color: var(--ink);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 24px 64px rgba(0, 0, 0, 0.55);
+      isolation: isolate;
+    }
+
+    .art {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Match production CloseBookendChrome — pin stacks to edges (slice crops bottom). */
+    .art .pin-top,
+    .art .pin-bot {
+      position: absolute;
+      left: 15%;
+      width: 70%;
+      height: 32%;
+      overflow: visible;
+    }
+    .art .pin-top { top: 0; transform-origin: center top; }
+    .art .pin-bot { bottom: 0; transform-origin: center bottom; }
+    .art .pin-mid {
+      position: absolute;
+      inset: 0;
+    }
+    .art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .chrome {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 14px;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      opacity: 0.85;
+    }
+    .chrome-btns { display: flex; gap: 6px; }
+    .chrome-btns span {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--ink) 10%, transparent);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+    }
+    .progress {
+      position: absolute;
+      top: 48px;
+      left: 18px;
+      right: 18px;
+      z-index: 3;
+      display: flex;
+      gap: 3px;
+      height: 3px;
+    }
+    .progress i {
+      flex: 1;
+      border-radius: 2px;
+      background: color-mix(in oklab, var(--ink) 22%, transparent);
+    }
+    .progress i.on {
+      background: color-mix(in oklab, var(--ink) 75%, transparent);
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 72px 28px 48px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .headline {
+      font-size: clamp(1.55rem, 5.2vw, 1.9rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin: 0;
+      max-width: 14ch;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    .phone[data-beat="0"] .headline.b0,
+    .phone[data-beat="1"] .headline.b1 {
+      animation: copy-in calc(0.55s / var(--motion-scale)) cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .phone[data-beat="0"] .headline.b1,
+    .phone[data-beat="1"] .headline.b0 {
+      display: none;
+    }
+
+    @keyframes copy-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* —— Kit gallery —— */
+    .gallery-head {
+      margin-bottom: 4px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: #4a4455; }
+    .card[aria-pressed="true"] {
+      border-color: #7dd3c0;
+      box-shadow: 0 0 0 1px #7dd3c0;
+    }
+    .card-phone {
+      width: 100%;
+      aspect-ratio: 360 / 640;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: var(--field);
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .card-phone .art { inset: 0; }
+    .card-phone .mini-copy {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      padding: 18px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .card-phone .mini-copy p {
+      margin: 0;
+      font-size: 0.62rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 12ch;
+    }
+    .card strong {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 650;
+      margin-bottom: 2px;
+    }
+    .card span {
+      display: block;
+      font-size: 0.66rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #7dd3c0;
+    }
+    .tag.live-tag { color: #e0b8ff; }
+
+    /* —— Shared pill / orb atoms —— */
+    .pill {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    /* Motion kits — CSS driven; --motion-scale slows/speeds loops */
+    .phone[data-freeze="true"] .art *,
+    .card-phone[data-freeze="true"] .art * {
+      animation: none !important;
+    }
+
+    /* A — baseline: grow-in once, settle (also live enter on peel / bookends) */
+    [data-kit="baseline"] .stack-top,
+    [data-kit="peel"] .stack-top,
+    [data-kit="breathe"] .stack-top,
+    [data-kit="whisper"] .stack-top,
+    [data-kit="crumbs"] .stack-top {
+      animation: stack-grow calc(var(--enter-dur) / var(--motion-scale)) cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    [data-kit="baseline"] .stack-bot,
+    [data-kit="peel"] .stack-bot,
+    [data-kit="breathe"] .stack-bot,
+    [data-kit="whisper"] .stack-bot,
+    [data-kit="crumbs"] .stack-bot {
+      animation: stack-grow calc(var(--enter-dur) / var(--motion-scale)) cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+    }
+    @keyframes stack-grow {
+      from { opacity: 0; transform: scale(0.72); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes stack-enter {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* B — breathe: grow-in, then gentle scale */
+    [data-kit="breathe"] .stack-top {
+      animation:
+        stack-grow calc(var(--enter-dur) / var(--motion-scale)) cubic-bezier(0.16, 1, 0.3, 1) both,
+        breathe calc(4.8s / var(--motion-scale)) ease-in-out calc(1s / var(--motion-scale)) infinite;
+    }
+    [data-kit="breathe"] .stack-bot {
+      animation:
+        stack-grow calc(var(--enter-dur) / var(--motion-scale)) cubic-bezier(0.16, 1, 0.3, 1) 0.08s both,
+        breathe calc(5.4s / var(--motion-scale)) ease-in-out calc(1.15s / var(--motion-scale)) infinite reverse;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(3px) scale(1.035); }
+    }
+
+    /* C — close the gap: stacks drift toward mid, then ease back a hair */
+    [data-kit="close-gap"] .stack-top {
+      animation: close-top calc(7.5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    [data-kit="close-gap"] .stack-bot {
+      animation: close-bot calc(7.5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    @keyframes close-top {
+      0%, 100% { transform: translateY(0); }
+      45% { transform: translateY(28px); }
+      55% { transform: translateY(24px); }
+    }
+    @keyframes close-bot {
+      0%, 100% { transform: translateY(0); }
+      45% { transform: translateY(-28px); }
+      55% { transform: translateY(-24px); }
+    }
+
+    /* D — exit drift: bookend slowly walks off */
+    [data-kit="exit-drift"] .stack-top {
+      animation: exit-top calc(16s / var(--motion-scale)) linear infinite;
+    }
+    [data-kit="exit-drift"] .stack-bot {
+      animation: exit-bot calc(18s / var(--motion-scale)) linear infinite;
+    }
+    @keyframes exit-top {
+      0% { transform: translate(0, 0); opacity: 0.95; }
+      100% { transform: translate(120px, -28px); opacity: 0.4; }
+    }
+    @keyframes exit-bot {
+      0% { transform: translate(0, 0); opacity: 0.95; }
+      100% { transform: translate(-110px, 24px); opacity: 0.4; }
+    }
+
+    /* E — peel (locked as grow-in only — no idle peel) — uses stack-grow above */
+
+    /* F — whisper rings: concentric ovals spin behind (quiet echo of intro) */
+    [data-kit="whisper"] .ring {
+      transform-origin: 180px 320px;
+      transform-box: fill-box;
+      animation: spin linear infinite;
+    }
+    [data-kit="whisper"] .ring.r1 { animation-duration: calc(28s / var(--motion-scale)); }
+    [data-kit="whisper"] .ring.r2 { animation-duration: calc(38s / var(--motion-scale)); animation-direction: reverse; }
+    [data-kit="whisper"] .ring.r3 { animation-duration: calc(52s / var(--motion-scale)); }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* G — converge: corner orbs drift inward then settle out */
+    [data-kit="converge"] .orb {
+      animation: converge calc(8s / var(--motion-scale)) ease-in-out infinite;
+    }
+    [data-kit="converge"] .orb.o1 { --dx: 70px; --dy: 90px; animation-delay: 0s; }
+    [data-kit="converge"] .orb.o2 { --dx: -70px; --dy: 80px; animation-delay: 0.15s; }
+    [data-kit="converge"] .orb.o3 { --dx: 65px; --dy: -85px; animation-delay: 0.25s; }
+    [data-kit="converge"] .orb.o4 { --dx: -60px; --dy: -90px; animation-delay: 0.35s; }
+    @keyframes converge {
+      0%, 100% { transform: translate(0, 0); opacity: 0.95; }
+      40% { transform: translate(var(--dx), var(--dy)); opacity: 0.7; }
+      55% { transform: translate(calc(var(--dx) * 0.85), calc(var(--dy) * 0.85)); opacity: 0.75; }
+    }
+
+    /* H — tide: vertical rise/fall bookend */
+    [data-kit="tide"] .stack-top {
+      animation: tide-top calc(6.5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    [data-kit="tide"] .stack-bot {
+      animation: tide-bot calc(6.5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    @keyframes tide-top {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(18px); }
+    }
+    @keyframes tide-bot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+
+    /* I — handshake: counterphase opacity crossfade */
+    [data-kit="handshake"] .stack-top {
+      animation: fade-a calc(5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    [data-kit="handshake"] .stack-bot {
+      animation: fade-b calc(5s / var(--motion-scale)) ease-in-out infinite;
+    }
+    @keyframes fade-a {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    @keyframes fade-b {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 1; }
+    }
+
+    /* J — skew morph: continuous subtle skew on whole stacks */
+    [data-kit="skew-morph"] .stack-top {
+      animation: skew-a calc(11s / var(--motion-scale)) ease-in-out infinite;
+      transform-origin: center top;
+    }
+    [data-kit="skew-morph"] .stack-bot {
+      animation: skew-b calc(12.5s / var(--motion-scale)) ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    @keyframes skew-a {
+      0%, 100% { transform: skewX(0deg) rotate(0deg); }
+      50% { transform: skewX(4deg) rotate(-2deg); }
+    }
+    @keyframes skew-b {
+      0%, 100% { transform: skewX(0deg) rotate(0deg); }
+      50% { transform: skewX(-4deg) rotate(2deg); }
+    }
+
+    /* K — orbit crumbs: tiny perimeter orbs slow cascade */
+    [data-kit="crumbs"] .crumb {
+      animation: crumb-drift ease-in-out infinite;
+    }
+    [data-kit="crumbs"] .crumb.c1 { animation-duration: calc(9s / var(--motion-scale)); }
+    [data-kit="crumbs"] .crumb.c2 { animation-duration: calc(11s / var(--motion-scale)); animation-delay: -2s; }
+    [data-kit="crumbs"] .crumb.c3 { animation-duration: calc(10s / var(--motion-scale)); animation-delay: -4s; }
+    [data-kit="crumbs"] .crumb.c4 { animation-duration: calc(12s / var(--motion-scale)); animation-delay: -1s; }
+    [data-kit="crumbs"] .crumb.c5 { animation-duration: calc(8.5s / var(--motion-scale)); animation-delay: -3s; }
+    [data-kit="crumbs"] .crumb.c6 { animation-duration: calc(13s / var(--motion-scale)); animation-delay: -5s; }
+    @keyframes crumb-drift {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(6px, -8px); }
+      50% { transform: translate(-4px, -4px); }
+      75% { transform: translate(5px, 6px); }
+    }
+
+    /* L — single exit pill (lonely) */
+    [data-kit="lonely"] .exit-pill {
+      animation: lonely-exit calc(14s / var(--motion-scale)) linear infinite;
+    }
+    @keyframes lonely-exit {
+      0% { transform: translate(160px, 50px); opacity: 0.75; }
+      100% { transform: translate(380px, 30px); opacity: 0.3; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root { --motion-scale: 0.001; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="panel">
+    <div>
+      <h1>Soft close — motion</h1>
+      <p class="lede">
+        Slide 8 before share. Live kit is <code>double-stack</code> on orchid.
+        Live baseline pins both bookends (top + bottom). Explore more motion without leaving Orbit Cascade.
+      </p>
+    </div>
+
+    <fieldset>
+      <legend>Kit</legend>
+      <div class="row" id="kit-chips"></div>
+      <p class="note" id="kit-blurb"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Field</legend>
+      <div class="row" id="field-swatches"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Accents</legend>
+      <div class="row" id="accent-chips"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Motion</legend>
+      <label class="slider">
+        Speed
+        <span class="val" id="speed-val">1.0×</span>
+        <input type="range" id="speed" min="0.4" max="2.2" step="0.1" value="1" />
+      </label>
+      <div class="row" style="margin-top: 12px">
+        <button type="button" class="chip" id="btn-replay" aria-pressed="false">Replay enter</button>
+        <button type="button" class="chip" id="btn-beat" aria-pressed="false">Flip beat</button>
+        <button type="button" class="chip" id="btn-freeze" aria-pressed="false">Freeze</button>
+      </div>
+      <p class="note">Beats: “Thanks for sitting…” → “See you when they don’t stick.”</p>
+    </fieldset>
+  </aside>
+
+  <div class="stage-wrap">
+    <div class="stage-label">Live stage · slide 08</div>
+    <div class="phone" id="phone" data-kit="baseline" data-beat="0" data-freeze="false">
+      <div class="chrome">
+        <span>Scrapped</span>
+        <div class="chrome-btns"><span>‖</span><span>×</span></div>
+      </div>
+      <div class="progress" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i>
+      </div>
+      <div class="art" id="live-art"></div>
+      <div class="content">
+        <p class="headline b0">Thanks for sitting with the almosts.</p>
+        <p class="headline b1">See you when they don’t stick.</p>
+      </div>
+    </div>
+    <p class="stage-meta" id="stage-meta"></p>
+  </div>
+
+  <section>
+    <div class="gallery-head">
+      <h1 style="font-size:1rem">All kits</h1>
+      <p class="lede" style="margin-bottom:14px">Click a card to promote it to the live stage. Side-by-side for contrast.</p>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <script>
+    const FIELDS = [
+      { id: "orchid", bg: "#9B4DE8", ink: "dark", label: "orchid" },
+      { id: "ink", bg: "#12101A", ink: "dark", label: "ink" },
+      { id: "ember", bg: "#FF7A3A", ink: "light", label: "ember" },
+      { id: "mango", bg: "#FF9F1C", ink: "light", label: "mango" },
+      { id: "gold", bg: "#E8B84B", ink: "light", label: "gold" },
+      { id: "teal", bg: "#1A7A6E", ink: "dark", label: "teal · green · live" },
+      { id: "rose", bg: "#C9185B", ink: "dark", label: "rose" },
+    ];
+
+    const ACCENTS = [
+      { id: "funky", a: "#ff4d8d", b: "#ffe66d", label: "funky · live" },
+      { id: "orchid-gold", a: "#C9A0F5", b: "#FFE66D", label: "orchid→gold" },
+      { id: "ink-lean", a: "#6B21A8", b: "#C9185B", label: "ink-lean" },
+      { id: "ember-ice", a: "#FF7A3A", b: "#7DD3C0", label: "ember→ice" },
+      { id: "mango-ink", a: "#1B2A6B", b: "#FFE66D", label: "navy→gold" },
+    ];
+
+    const KITS = [
+      {
+        id: "baseline",
+        title: "A · Baseline bookend",
+        tag: "prior",
+        blurb: "Pinned top + bottom bookends with grow-in. Same geometry as live; field may differ.",
+        why: "Control geometry — compare motion kits against this.",
+      },
+      {
+        id: "breathe",
+        title: "B · Breathing bookend",
+        tag: "more motion",
+        blurb: "Same stacks, soft counterphase scale after enter — present without leaving the frame.",
+        why: "Adds life; still screenshot-safe mid-beat.",
+      },
+      {
+        id: "close-gap",
+        title: "C · Close the gap",
+        tag: "metaphor",
+        blurb: "Top and bottom drift toward the mid band, almost meet, ease back. Soft close as a verb.",
+        why: "Motion tells the goodbye; watch mid-band clearance.",
+      },
+      {
+        id: "exit-drift",
+        title: "D · Exit drift",
+        tag: "more motion",
+        blurb: "Bookends slowly walk off opposite corners — leaving with you.",
+        why: "Strong farewell read; loops need a reset or one-shot in product.",
+      },
+      {
+        id: "peel",
+        title: "E · Grow-in",
+        tag: "live today",
+        blurb: "Locked: teal field · funky accents · bookends grow in (0.9s, bottom +80ms). No idle peel — enter only.",
+        why: "Live soft close — shapes scale up on scene enter.",
+      },
+      {
+        id: "whisper",
+        title: "F · Whisper rings",
+        tag: "new idea",
+        blurb: "Quiet concentric ovals spin behind a lighter bookend — echo of intro / #1 artist, toned down for goodbye.",
+        why: "Deck rhyme; risk fighting centered copy if rings get loud.",
+      },
+      {
+        id: "converge",
+        title: "G · Corner converge",
+        tag: "new idea",
+        blurb: "Four skewed orbs at corners drift inward then settle out. Reunion rain’s cousin, softer.",
+        why: "Drops the bookend; tests whether orbs alone carry the close.",
+      },
+      {
+        id: "tide",
+        title: "H · Tide bookend",
+        tag: "more motion",
+        blurb: "Stacks rise and fall together like a slow tide — volume ocean’s quiet cousin on orchid.",
+        why: "Simple loop; easy to ship.",
+      },
+      {
+        id: "handshake",
+        title: "I · Handshake fade",
+        tag: "new idea",
+        blurb: "Top and bottom crossfade opacity in counterphase — a soft nod across the mid band.",
+        why: "Very quiet; may feel like a bug if opacity dips too far.",
+      },
+      {
+        id: "skew-morph",
+        title: "J · Skew morph",
+        tag: "more motion",
+        blurb: "Whole stacks gently skew / rotate — the funky atom breathing as a unit.",
+        why: "Keeps composition; motion is structural not decorative.",
+      },
+      {
+        id: "crumbs",
+        title: "K · Orbit crumbs",
+        tag: "new idea",
+        blurb: "Baseline bookend plus six tiny perimeter orbs that drift. Peripheral only.",
+        why: "Adds sparkle without a second hero.",
+      },
+      {
+        id: "lonely",
+        title: "L · Lonely exit pill",
+        tag: "new idea",
+        blurb: "One big skewed pill exiting TR — the old FunkyExitPill energy, alone on the field.",
+        why: "Max mid-band clarity; may feel empty vs bookend.",
+      },
+    ];
+
+    const state = {
+      kit: "peel",
+      field: "teal",
+      accents: "funky",
+      freeze: false,
+      beat: 0,
+      speed: 1,
+    };
+
+    function inkFor(fieldId) {
+      const f = FIELDS.find((x) => x.id === fieldId);
+      return f?.ink === "light" ? "#1c1c1c" : "#f5f5f5";
+    }
+
+    function applyTheme() {
+      const f = FIELDS.find((x) => x.id === state.field);
+      const ac = ACCENTS.find((x) => x.id === state.accents);
+      document.documentElement.style.setProperty("--field", f.bg);
+      document.documentElement.style.setProperty("--ink", inkFor(state.field));
+      document.documentElement.style.setProperty(
+        "--muted-copy",
+        `color-mix(in oklab, ${inkFor(state.field)} 90%, transparent)`,
+      );
+      document.documentElement.style.setProperty("--a", ac.a);
+      document.documentElement.style.setProperty("--b", ac.b);
+      document.documentElement.style.setProperty("--motion-scale", String(state.speed));
+    }
+
+    function gradDefs(prefix) {
+      return `
+        <defs>
+          <linearGradient id="${prefix}-pill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="var(--a)" />
+            <stop offset="100%" stop-color="var(--b)" />
+          </linearGradient>
+          <radialGradient id="${prefix}-orb" cx="32%" cy="30%" r="72%">
+            <stop offset="0%" stop-color="var(--b)" />
+            <stop offset="100%" stop-color="var(--a)" />
+          </radialGradient>
+          <linearGradient id="${prefix}-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--a)" stop-opacity="0.55" />
+            <stop offset="100%" stop-color="var(--b)" stop-opacity="0.25" />
+          </linearGradient>
+        </defs>`;
+    }
+
+    /** Single FunkyPillStack — viewBox matches production MotifPin (0 0 360 220). */
+    function pillStackBody(prefix) {
+      return `
+        <g class="pill pill-a">
+          <g transform="translate(150 90) rotate(-22) skewX(-32) scale(1.15 0.72)">
+            <ellipse cx="0" cy="0" rx="110" ry="48" fill="url(#${prefix}-pill)" />
+          </g>
+        </g>
+        <g class="pill pill-b">
+          <g transform="translate(175 145) rotate(-14) skewX(-24) scale(1.2 0.68)" opacity="0.92">
+            <ellipse cx="0" cy="0" rx="100" ry="44" fill="url(#${prefix}-pill)" />
+          </g>
+        </g>`;
+    }
+
+    function bookendPins(prefix, opacity = 1) {
+      const style = opacity < 1 ? ` style="opacity:${opacity}"` : "";
+      return `
+        <div class="pin-top stack-top"${style}>
+          <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            ${gradDefs(prefix + "-t")}
+            ${pillStackBody(prefix + "-t")}
+          </svg>
+        </div>
+        <div class="pin-bot stack-bot"${style}>
+          <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+            ${gradDefs(prefix + "-b")}
+            <g transform="translate(0 220) scale(1 -1)">
+              ${pillStackBody(prefix + "-b")}
+            </g>
+          </svg>
+        </div>`;
+    }
+
+    function midSvg(prefix, body, meet = false) {
+      const par = meet ? "xMidYMid meet" : "xMidYMid slice";
+      return `
+        <div class="pin-mid">
+          <svg viewBox="0 0 360 640" preserveAspectRatio="${par}" aria-hidden="true">
+            ${gradDefs(prefix)}
+            ${body}
+          </svg>
+        </div>`;
+    }
+
+    /** Pinned bookends like production — both stacks always visible. */
+    function artHtml(kitId, prefix) {
+      switch (kitId) {
+        case "baseline":
+        case "breathe":
+        case "close-gap":
+        case "exit-drift":
+        case "peel":
+        case "tide":
+        case "handshake":
+        case "skew-morph":
+          return bookendPins(prefix);
+
+        case "whisper":
+          return (
+            midSvg(
+              prefix + "-m",
+              `<g opacity="0.55">
+                <ellipse class="ring r1" cx="180" cy="320" rx="78" ry="78" fill="none" stroke="url(#${prefix}-m-ring)" stroke-width="18" />
+                <ellipse class="ring r2" cx="180" cy="320" rx="128" ry="108" fill="none" stroke="url(#${prefix}-m-ring)" stroke-width="22" />
+                <ellipse class="ring r3" cx="180" cy="320" rx="178" ry="138" fill="none" stroke="url(#${prefix}-m-ring)" stroke-width="26" />
+              </g>`,
+              true,
+            ) + bookendPins(prefix, 0.85)
+          );
+
+        case "converge":
+          return midSvg(
+            prefix,
+            `
+            <ellipse class="orb o1" cx="48" cy="100" rx="34" ry="28" fill="url(#${prefix}-orb)" transform="translate(48 100) skewX(-20) scale(1.2 0.75) translate(-48 -100)" />
+            <ellipse class="orb o2" cx="312" cy="88" rx="40" ry="32" fill="url(#${prefix}-orb)" transform="translate(312 88) skewX(18) scale(0.9 1.15) translate(-312 -88)" />
+            <ellipse class="orb o3" cx="44" cy="520" rx="52" ry="42" fill="url(#${prefix}-orb)" transform="translate(44 520) skewX(-12) scale(1.1 0.85) translate(-44 -520)" />
+            <ellipse class="orb o4" cx="308" cy="540" rx="36" ry="30" fill="url(#${prefix}-orb)" transform="translate(308 540) rotate(15) scale(1.15 0.8) translate(-308 -540)" />`,
+            true,
+          );
+
+        case "crumbs":
+          return (
+            bookendPins(prefix) +
+            midSvg(
+              prefix + "-c",
+              `
+              <ellipse class="crumb c1" cx="28" cy="200" rx="14" ry="11" fill="url(#${prefix}-c-orb)" opacity="0.85" />
+              <ellipse class="crumb c2" cx="330" cy="240" rx="11" ry="9" fill="url(#${prefix}-c-orb)" opacity="0.75" />
+              <ellipse class="crumb c3" cx="40" cy="400" rx="12" ry="10" fill="url(#${prefix}-c-orb)" opacity="0.8" />
+              <ellipse class="crumb c4" cx="320" cy="420" rx="15" ry="12" fill="url(#${prefix}-c-orb)" opacity="0.7" />
+              <ellipse class="crumb c5" cx="60" cy="160" rx="9" ry="7" fill="url(#${prefix}-c-orb)" opacity="0.65" />
+              <ellipse class="crumb c6" cx="300" cy="180" rx="10" ry="8" fill="url(#${prefix}-c-orb)" opacity="0.7" />`,
+              true,
+            )
+          );
+
+        case "lonely":
+          return midSvg(
+            prefix,
+            `<g class="exit-pill">
+              <g transform="rotate(-16) skewX(-30) scale(1.15 0.72)">
+                <ellipse cx="0" cy="0" rx="100" ry="44" fill="url(#${prefix}-pill)" />
+              </g>
+            </g>`,
+            true,
+          );
+
+        default:
+          return bookendPins(prefix);
+      }
+    }
+
+    function renderLive() {
+      const phone = document.getElementById("phone");
+      phone.dataset.kit = state.kit;
+      phone.dataset.beat = String(state.beat);
+      phone.dataset.freeze = state.freeze ? "true" : "false";
+      document.getElementById("live-art").innerHTML = artHtml(state.kit, "live");
+
+      const kit = KITS.find((k) => k.id === state.kit);
+      document.getElementById("kit-blurb").textContent = kit.blurb;
+      document.getElementById("stage-meta").innerHTML =
+        `<strong>${kit.title}</strong> — ${kit.why}`;
+
+      document.querySelectorAll("#kit-chips .chip").forEach((btn) => {
+        btn.setAttribute("aria-pressed", btn.dataset.kit === state.kit ? "true" : "false");
+      });
+      document.querySelectorAll("#gallery .card").forEach((card) => {
+        card.setAttribute("aria-pressed", card.dataset.kit === state.kit ? "true" : "false");
+      });
+    }
+
+    function replayEnter() {
+      const art = document.getElementById("live-art");
+      const phone = document.getElementById("phone");
+      /* Retrigger CSS enter by remounting art + briefly clearing kit */
+      const kit = state.kit;
+      phone.dataset.kit = "";
+      art.innerHTML = "";
+      requestAnimationFrame(() => {
+        phone.dataset.kit = kit;
+        art.innerHTML = artHtml(kit, "live-" + Date.now());
+        /* Remount copy too */
+        const beat = state.beat;
+        phone.dataset.beat = "";
+        requestAnimationFrame(() => { phone.dataset.beat = String(beat); });
+      });
+    }
+
+    function buildControls() {
+      const chips = document.getElementById("kit-chips");
+      KITS.forEach((k) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip";
+        btn.dataset.kit = k.id;
+        btn.textContent = k.id === "baseline" ? "A baseline" : k.title.split("·")[0].trim();
+        btn.addEventListener("click", () => {
+          state.kit = k.id;
+          renderLive();
+        });
+        chips.appendChild(btn);
+      });
+
+      const fields = document.getElementById("field-swatches");
+      FIELDS.forEach((f) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "swatch";
+        btn.style.background = f.bg;
+        btn.title = f.label;
+        btn.setAttribute("aria-pressed", f.id === state.field ? "true" : "false");
+        btn.addEventListener("click", () => {
+          state.field = f.id;
+          fields.querySelectorAll(".swatch").forEach((s) => s.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+          applyTheme();
+          renderGallery();
+        });
+        fields.appendChild(btn);
+      });
+
+      const accents = document.getElementById("accent-chips");
+      ACCENTS.forEach((a) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip";
+        btn.textContent = a.label;
+        btn.setAttribute("aria-pressed", a.id === state.accents ? "true" : "false");
+        btn.addEventListener("click", () => {
+          state.accents = a.id;
+          accents.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+          applyTheme();
+          renderLive();
+          renderGallery();
+        });
+        accents.appendChild(btn);
+      });
+
+      document.getElementById("speed").addEventListener("input", (e) => {
+        state.speed = Number(e.target.value);
+        document.getElementById("speed-val").textContent = state.speed.toFixed(1) + "×";
+        applyTheme();
+      });
+
+      document.getElementById("btn-replay").addEventListener("click", replayEnter);
+      document.getElementById("btn-beat").addEventListener("click", () => {
+        state.beat = state.beat === 0 ? 1 : 0;
+        const phone = document.getElementById("phone");
+        phone.dataset.beat = "";
+        requestAnimationFrame(() => { phone.dataset.beat = String(state.beat); });
+      });
+      document.getElementById("btn-freeze").addEventListener("click", (e) => {
+        state.freeze = !state.freeze;
+        e.currentTarget.setAttribute("aria-pressed", state.freeze ? "true" : "false");
+        document.getElementById("phone").dataset.freeze = state.freeze ? "true" : "false";
+        document.querySelectorAll(".card-phone").forEach((el) => {
+          el.dataset.freeze = state.freeze ? "true" : "false";
+        });
+      });
+    }
+
+    function renderGallery() {
+      const gallery = document.getElementById("gallery");
+      gallery.innerHTML = "";
+      KITS.forEach((k) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "card";
+        card.dataset.kit = k.id;
+        card.setAttribute("aria-pressed", k.id === state.kit ? "true" : "false");
+        card.innerHTML = `
+          <div class="card-phone" data-kit="${k.id}" data-freeze="${state.freeze}">
+            <div class="art">${artHtml(k.id, "g-" + k.id)}</div>
+            <div class="mini-copy"><p>Thanks for sitting with the almosts.</p></div>
+          </div>
+          <strong>${k.title}</strong>
+          <span>${k.why}</span>
+          <span class="tag ${k.id === "peel" ? "live-tag" : ""}">${k.tag}</span>`;
+        card.addEventListener("click", () => {
+          state.kit = k.id;
+          renderLive();
+        });
+        gallery.appendChild(card);
+      });
+    }
+
+    buildControls();
+    applyTheme();
+    renderLive();
+    renderGallery();
+  </script>
+</body>
+</html>

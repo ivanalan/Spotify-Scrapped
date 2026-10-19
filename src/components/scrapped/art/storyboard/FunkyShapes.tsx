@@ -98,12 +98,32 @@ export function SkewPill({
   );
 }
 
-type FunkyProps = { a: string; b: string; freeze?: boolean };
+type FunkyProps = {
+  a: string;
+  b: string;
+  freeze?: boolean;
+  /** Stagger enter when stacking top + bottom bookends. */
+  enterDelay?: number;
+  /**
+   * Soft-close enter: slow grow + rotate while drifting toward mid copy.
+   * Motion is in screen space — pass `mirrored` for the bottom bookend.
+   */
+  closeEnter?: "top" | "bottom";
+  /** Flip stack for bottom bookend (applied under the enter motion). */
+  mirrored?: boolean;
+};
 
-/** Stacked skewed pills — matches the hand ref top. */
-export function FunkyPillStack({ a, b, freeze }: FunkyProps) {
+/** Stacked skewed pills — matches the hand ref top. Soft close: slow grow + rotate. */
+export function FunkyPillStack({
+  a,
+  b,
+  freeze,
+  enterDelay = 0,
+  closeEnter,
+  mirrored = false,
+}: FunkyProps) {
   const reduce = useReducedMotion() || freeze;
-  const body = (
+  const pills = (
     <g>
       <SkewPill cx={150} cy={90} rx={110} ry={48} from={a} to={b} skewX={-32} rotate={-22} />
       <SkewPill
@@ -121,12 +141,44 @@ export function FunkyPillStack({ a, b, freeze }: FunkyProps) {
       />
     </g>
   );
+  const body = mirrored ? (
+    <g transform="translate(0 220) scale(1 -1)">{pills}</g>
+  ) : (
+    pills
+  );
+
   if (reduce) return body;
+
+  // Soft close — slow grow + rotate while drifting toward the mid-band copy.
+  if (closeEnter) {
+    const fromY = closeEnter === "top" ? -40 : 40;
+    const fromRot = closeEnter === "top" ? -16 : 16;
+    return (
+      <motion.g
+        initial={{ opacity: 0, scale: 0.5, y: fromY, rotate: fromRot }}
+        animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+        transition={{
+          duration: 2.6,
+          delay: enterDelay,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        style={{ transformOrigin: "180px 110px" }}
+      >
+        {body}
+      </motion.g>
+    );
+  }
+
   return (
     <motion.g
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.72 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.9,
+        delay: enterDelay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      style={{ transformOrigin: "180px 110px" }}
     >
       {body}
     </motion.g>

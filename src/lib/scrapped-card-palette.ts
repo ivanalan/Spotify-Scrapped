@@ -38,9 +38,60 @@ export const SLIDE_SWATCH: CardSwatch[] = [
   "ink", // 5 #1 artist (orchid ladder on ink)
   "ink", // 6 list
   "mango", // 7 reunion
-  "orchid", // 8 soft close
-  "gold", // 9 share
+  "teal", // 8 soft close — bookend grow-in
+  "ink", // 9 share — ink stage + teal card (D-012 / D-014 kit J8)
 ];
+
+/**
+ * Share finale inset density — locked from exploration (D-012).
+ * Visual kit: D-014 (J8 · Ink / teal card).
+ */
+export const SHARE_FINALE_DENSITY = {
+  gutterPx: 36,
+  radiusPx: 12,
+  cardActionsGapPx: 32,
+  bodyTopPx: 28,
+  bodyBottomPx: 16,
+  heroBandPct: 52,
+  heroSizePct: 65,
+  listColGapPx: 18,
+  listRowGapRem: 1.1,
+  listPadXPx: 19,
+  listPadYPx: 16,
+  typeRem: 0.86,
+  sharePadYPx: 12,
+  actionsGapPx: 12,
+} as const;
+
+/**
+ * Share finale visual kit — promoted from explore `j-ink-teal-card` (D-014).
+ * Stage: ink + intro disks/star. Card: teal gradient + 2 ghosts framing hero.
+ * Disks/star reuse INTRO_SHARED_GRADIENT / INTRO_STAR (same stops as the lock).
+ */
+export const SHARE_FINALE_KIT = {
+  id: "j-ink-teal-card",
+  /** Stage field swatch — drives slide chrome (dark theme). */
+  stageSwatch: "ink" as const,
+  cardBg: "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)",
+  /** Light type on teal card. */
+  cardInk: "#f5f5f5",
+  cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+  cardPanel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+  ghostFill: "#f5f0ff",
+  ghostEye: "#0F4C5C",
+  brandLine: "MyScrapped.com",
+  ghosts: {
+    tl: { xPct: 6, yPct: 6, sizePx: 54 },
+    br: { xPct: 76, yPct: 36, sizePx: 66 },
+    bobPx: 10,
+    /** Multiplier on rotate amp (1 = explore default). */
+    wiggle: 1,
+    durationSec: 4.3,
+    opacity: 0.85,
+    /** Delay between TL and BR float cycles. */
+    phaseSec: 1.2,
+  },
+} as const;
 
 /** Deep field → light text; bright field → dark text. */
 export const INK_HEX = {
