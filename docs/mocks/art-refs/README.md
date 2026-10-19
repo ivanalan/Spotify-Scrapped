@@ -19,7 +19,7 @@ Reference stills for the `/scrapped/art` research lab. Not production art.
 
 Six fields only — never white / cream / mist paper:
 
-`ink · orchid · ember · mango · gold · teal · rose`. Intro lock: ink field + orchid concentric ladder. Opening trio: ink → ember → orchid. Volume: bright ember (black ink) + aqua→blue ocean.
+`ink · orchid · ember · mango · gold · teal · rose`. Intro lock: ink field + orchid concentric ladder. Opening trio: ink → ember → orchid. Volume: flame ember (black ink) + ice→deep teal ocean.
 
 ### Oval lock
 

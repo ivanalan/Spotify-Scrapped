@@ -69,8 +69,8 @@ export function StoryboardLab() {
     inkMode === "dark" ? ORBIT_CASCADE.inkDark : ORBIT_CASCADE.inkLight;
   const muted =
     inkMode === "dark"
-      ? "rgba(245,245,245,0.62)"
-      : "rgba(28,28,28,0.55)";
+      ? "rgba(245,245,245,0.9)"
+      : "rgba(28,28,28,0.88)";
 
   function pickShare(id: FunkyShareKind) {
     setShareKind(id);

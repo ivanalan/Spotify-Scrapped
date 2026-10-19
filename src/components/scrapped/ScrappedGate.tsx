@@ -1,5 +1,6 @@
 "use client";
 
+import { preloadIonIcon } from "@/components/Icon";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
 import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
@@ -7,6 +8,10 @@ import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
 import { cn } from "@/lib/utils";
+
+// Warm ion-icon while the user is on Sign in (and on return) so Load’s
+// refresh glyph isn’t blank until a late useEffect + dynamic import.
+preloadIonIcon();
 
 type Props = {
   message?: string;

@@ -16,7 +16,8 @@ Reference mocks: [docs/mocks/](../../../docs/mocks/). Prefer implementing those
 over inventing a parallel system.
 
 **Official Wrapped motion capture (form only):** [docs/mocks/wrapped-ref/](../../../docs/mocks/wrapped-ref/)
-— keyframes + named beat index from a 2023 Wrapped screen capture. Motion grammar
+(2023) and [docs/mocks/wrapped-ref-2024/](../../../docs/mocks/wrapped-ref-2024/)
+(2024 Music Evolution / AI podcast) — keyframes + named beat indexes. Motion grammar
 vs Scrapped today lives in [docs/WRAPPED.md §10](../../../docs/WRAPPED.md). Use it
 to match *pacing / beat spine*, never to import neon ribbons or Sound Town.
 
@@ -30,13 +31,14 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Substrate | Card palette: `ink · orchid · ember · mango · gold · teal · rose` ([`scrapped-card-palette.ts`](../../../src/lib/scrapped-card-palette.ts)) |
 | Intro | Ink field + orchid concentric oval ladder |
 | Opening | ink → ember → orchid (ghosted spiral: gold→aqua orbs, slow perimeter cascade) |
-| Volume | Bright ember field (light theme / black ink) + aqua→blue ocean; high tide on “joined” beat |
+| Volume | Flame ember field (light theme / black ink) + ice→deep teal ocean; high tide on “joined” beat |
 | Theme | **Per-story dark or light** — swatch ink mode; deck chrome (wordmark / progress / controls) must match the active slide |
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
 | Accent | Motif gradients within the 6 swatches — not hazard neon floods / ribbons |
 | Type | **Poppins** everywhere — heavy display headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”). Roles: `text-display` / `text-title` / `text-body` / `text-caption` ([D-002](../../../docs/decisions/D-002-poppins-mobile-first.md)) |
 | Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters) |
 | Geometry | Locked ovals (`OVAL`) by default; volume uses a bottom ocean wave; art in corners / edges; **clear mid band** for copy + lists |
+| #1 artist | **Kit A rose cascade** — centered eccentric ovals · opaque gradients · independent spin — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) (`ARTIST_ORBIT_A`) |
 | Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). Art is peripheral chrome, not a second copy-motion path |
 
 **Emotional register:** conversational, dry, slightly merciful — same as WRAPPED.md tone.
@@ -46,7 +48,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the canvas fill the viewport.
 2. **One job per slide** — setup line → reveal → optional aside. No competing heroes.
 3. **Type owns the mid band** — art stays TL / BL / top drift / corner rain. Prefer clear field over putting body type on vibrant disks.
-4. **Contrast** — every tone sets canvas + ink + muted + panel + progress together. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
+4. **Contrast** — every tone sets canvas + ink + muted + panel + progress together. Muted stays near ink (`INK_MUTED` ≈ 90%/88%), not washed grey. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
 5. **Quiet chrome** — “Scrapped” wordmark, story progress segments, info/close — same theme as the active story. Soundtrack stays secondary.
 6. **Share finale** — gold field; screenshot-legible card using the same ink vars.
 
@@ -87,7 +89,7 @@ Before shipping UI changes:
 ## When stuck
 
 1. Read [docs/WRAPPED.md](../../../docs/WRAPPED.md) for beat/tone (and §10 for motion vs Wrapped).
-2. Read [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) for palette / contrast.
+2. Read [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) for palette / contrast; [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) for the #1 artist orbit mechanic.
 3. Open [docs/mocks/](../../../docs/mocks/) and match structure before inventing.
 4. For “make motion more Wrapped,” compare [docs/mocks/wrapped-ref/named/](../../../docs/mocks/wrapped-ref/named/) to live deck timing — tighten clocks / handoffs, don’t port ribbons.
 5. For copy vs list motion bugs, read [SCARS.md](../../../SCARS.md) and [D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md) before inventing a third path.

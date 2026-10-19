@@ -381,23 +381,23 @@ export function OceanWave({
     front: oceanWavePath(crests.front, OCEAN_LAYERS[2].amp),
   };
 
-  // Soft aqua lip → teal → blue → navy (black ink reads on the bright crest)
+  // Ice crest → cyan → sky → deep teal (black ink reads on the bright crest)
   const defs = (
     <defs>
       <linearGradient id={gradBack} x1="50%" y1="0%" x2="50%" y2="100%">
         <stop offset="0%" stopColor={from} stopOpacity={0.5} />
         <stop offset="12%" stopColor={from} stopOpacity={0.9} />
-        <stop offset="28%" stopColor="#2DD4BF" />
-        <stop offset="48%" stopColor="#38BDF8" />
-        <stop offset="72%" stopColor="#1D4ED8" />
+        <stop offset="28%" stopColor="#67E8F9" />
+        <stop offset="48%" stopColor="#22D3EE" />
+        <stop offset="72%" stopColor="#0284C7" />
         <stop offset="100%" stopColor={to} />
       </linearGradient>
       <linearGradient id={gradFront} x1="50%" y1="0%" x2="50%" y2="100%">
         <stop offset="0%" stopColor={from} stopOpacity={0.35} />
         <stop offset="14%" stopColor={from} stopOpacity={0.92} />
-        <stop offset="32%" stopColor="#22D3EE" />
-        <stop offset="52%" stopColor="#3B82F6" />
-        <stop offset="78%" stopColor="#1E3A8A" />
+        <stop offset="32%" stopColor="#67E8F9" />
+        <stop offset="52%" stopColor="#0EA5E9" />
+        <stop offset="78%" stopColor="#0369A1" />
         <stop offset="100%" stopColor={to} />
       </linearGradient>
     </defs>
@@ -834,6 +834,15 @@ export function makeDotGrid(
   return out;
 }
 
+type SharedGradientStop = { offset: string; color: string };
+
+type SharedGradient = {
+  /** Multi-stop sweep; falls back to from/to when omitted. */
+  stops?: readonly SharedGradientStop[];
+  from?: string;
+  to?: string;
+};
+
 type ConcentricDisksProps = {
   cx: number;
   cy: number;
@@ -842,6 +851,19 @@ type ConcentricDisksProps = {
   step?: number;
   /** Outer → inner colors (or single color with opacity falloff). */
   colors: string[];
+  /**
+   * One gradient every disk paints. Solid fills remap it per ellipse
+   * (objectBoundingBox). Stroke rings (`asRings`) use userSpaceOnUse
+   * so the sweep reads continuous across the ladder.
+   */
+  sharedGradient?: SharedGradient;
+  /**
+   * Stroke rings sharing `sharedGradient` (ink gaps between). Stroke
+   * width defaults to ~86% of `step` for a tight packed ladder.
+   */
+  asRings?: boolean;
+  /** Override stroke width when `asRings` (default `step * 0.86`). */
+  ringWidth?: number;
   animate?: "cascade" | "cascade-soft" | "cascade-breathe" | "breathe" | "none";
   delayBase?: number;
   /** Degrees — rotate major axis around (cx, cy). 45 ≈ peak toward BR diagonal. */
@@ -851,7 +873,8 @@ type ConcentricDisksProps = {
 };
 
 /**
- * Filled concentric ovals (not stroke rings, never perfect circles).
+ * Filled concentric ovals (not stroke rings, never perfect circles) —
+ * or stroke rings when `asRings` + `sharedGradient`.
  * Outer disks drawn first; cascade scales from center with soft overshoot.
  */
 export function ConcentricDisks({
@@ -861,22 +884,50 @@ export function ConcentricDisks({
   startR = 48,
   step = 40,
   colors,
+  sharedGradient,
+  asRings = false,
+  ringWidth,
   animate = "cascade",
   delayBase = 0,
   rotate = 0,
   oval,
 }: ConcentricDisksProps) {
   const reduce = useReducedMotion();
+  const uid = useId();
   const sx = oval?.sx ?? OVAL.sx;
   const sy = oval?.sy ?? OVAL.sy;
+  const strokeW = ringWidth ?? step * 0.86;
+  const sharedId = `${uid}-shared`;
+  const paint = sharedGradient ? `url(#${sharedId})` : null;
+
+  // Bounds for userSpaceOnUse (stroke rings) — cover the outermost oval.
+  const maxR = startR + (count - 1) * step;
+  const maxRx = maxR * sx;
+  const maxRy = maxR * sy;
+
+  const stops: SharedGradientStop[] = sharedGradient
+    ? sharedGradient.stops?.length
+      ? [...sharedGradient.stops]
+      : [
+          { offset: "0%", color: sharedGradient.from ?? colors[0] },
+          {
+            offset: "100%",
+            color: sharedGradient.to ?? colors[colors.length - 1] ?? colors[0],
+          },
+        ]
+    : [];
+
   const disks = Array.from({ length: count }, (_, i) => {
     // draw outer first
     const fromOuter = count - 1 - i;
     const r = startR + fromOuter * step;
+    const solid = colors[fromOuter % colors.length] ?? colors[0];
     return {
       rx: r * sx,
       ry: r * sy,
-      fill: colors[fromOuter % colors.length] ?? colors[0],
+      fill: asRings ? "none" : (paint ?? solid),
+      stroke: asRings && paint ? paint : undefined,
+      strokeWidth: asRings ? strokeW : undefined,
       delay: delayBase + fromOuter * 0.14,
       key: fromOuter,
       enterDelay: delayBase + (count - 1 - fromOuter) * 0.1,
@@ -888,9 +939,49 @@ export function ConcentricDisks({
   const breatheBase =
     delayBase + (count - 1) * 0.1 + enterDuration + 0.08;
 
+  const paintProps = (d: (typeof disks)[number]) =>
+    asRings
+      ? {
+          fill: "none" as const,
+          stroke: d.stroke,
+          strokeWidth: d.strokeWidth,
+        }
+      : { fill: d.fill };
+
   return (
     <g transform={rotate ? `rotate(${rotate} ${cx} ${cy})` : undefined}>
+      {sharedGradient ? (
+        <defs>
+          {asRings ? (
+            <linearGradient
+              id={sharedId}
+              gradientUnits="userSpaceOnUse"
+              x1={cx - maxRx * 0.15}
+              y1={cy - maxRy * 0.2}
+              x2={cx + maxRx * 0.95}
+              y2={cy + maxRy * 0.85}
+            >
+              {stops.map((s) => (
+                <stop key={s.offset} offset={s.offset} stopColor={s.color} />
+              ))}
+            </linearGradient>
+          ) : (
+            <linearGradient
+              id={sharedId}
+              x1="8%"
+              y1="4%"
+              x2="92%"
+              y2="96%"
+            >
+              {stops.map((s) => (
+                <stop key={s.offset} offset={s.offset} stopColor={s.color} />
+              ))}
+            </linearGradient>
+          )}
+        </defs>
+      ) : null}
       {disks.map((d) => {
+        const pp = paintProps(d);
         if (reduce || animate === "none") {
           return (
             <ellipse
@@ -899,7 +990,7 @@ export function ConcentricDisks({
               cy={cy}
               rx={d.rx}
               ry={d.ry}
-              fill={d.fill}
+              {...pp}
             />
           );
         }
@@ -911,7 +1002,7 @@ export function ConcentricDisks({
               cy={cy}
               rx={d.rx}
               ry={d.ry}
-              fill={d.fill}
+              {...pp}
               animate={{ scale: [1, 1.035, 1] }}
               transition={{
                 duration: 5.2 + d.key * 0.25,
@@ -944,7 +1035,7 @@ export function ConcentricDisks({
                 cy={cy}
                 rx={d.rx}
                 ry={d.ry}
-                fill={d.fill}
+                {...pp}
                 animate={{ scale: [1, 0.945, 1] }}
                 transition={{
                   duration: 4.8,
@@ -966,7 +1057,7 @@ export function ConcentricDisks({
               cy={cy}
               rx={d.rx}
               ry={d.ry}
-              fill={d.fill}
+              {...pp}
               initial={{ scale: 0.55, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
@@ -985,7 +1076,7 @@ export function ConcentricDisks({
             cy={cy}
             rx={d.rx}
             ry={d.ry}
-            fill={d.fill}
+            {...pp}
             initial={{ scale: 0.08, opacity: 0 }}
             animate={{
               scale: [0.08, 1.06, 1],
@@ -1002,6 +1093,103 @@ export function ConcentricDisks({
         );
       })}
     </g>
+  );
+}
+
+/** n-pointed star polygon (default 7) — outer tip radius `r`, inner notch `r * innerRatio`. */
+export function pointedStarPoints(
+  cx: number,
+  cy: number,
+  r: number,
+  points = 7,
+  innerRatio = 0.4,
+): string {
+  const pts: string[] = [];
+  const spikes = points * 2;
+  for (let i = 0; i < spikes; i += 1) {
+    const angle = (Math.PI * i) / points - Math.PI / 2;
+    const radius = i % 2 === 0 ? r : r * innerRatio;
+    pts.push(
+      `${cx + Math.cos(angle) * radius},${cy + Math.sin(angle) * radius}`,
+    );
+  }
+  return pts.join(" ");
+}
+
+type PointedStarProps = {
+  cx: number;
+  cy: number;
+  r: number;
+  /** Tip count — intro uses 7. */
+  points?: number;
+  innerRatio?: number;
+  from: string;
+  to: string;
+  /** Grow-in then continuous slow spin; `none` = settled static. */
+  animate?: "grow-spin" | "none";
+  delay?: number;
+};
+
+/**
+ * Authored peripheral star (hand-sun-star motif). Corner subject only —
+ * grow-in once, then rotate slowly. Settles static under reduced-motion.
+ */
+export function PointedStar({
+  cx,
+  cy,
+  r,
+  points = 7,
+  innerRatio = 0.4,
+  from,
+  to,
+  animate = "grow-spin",
+  delay = 0.35,
+}: PointedStarProps) {
+  const reduce = useReducedMotion();
+  const uid = useId();
+  const poly = pointedStarPoints(cx, cy, r, points, innerRatio);
+  const origin = `${cx}px ${cy}px`;
+
+  const star = (
+    <g>
+      <defs>
+        <linearGradient id={uid} x1="20%" y1="10%" x2="80%" y2="90%">
+          <stop offset="0%" stopColor={from} />
+          <stop offset="100%" stopColor={to} />
+        </linearGradient>
+      </defs>
+      <polygon points={poly} fill={`url(#${uid})`} />
+    </g>
+  );
+
+  if (reduce || animate === "none") {
+    return star;
+  }
+
+  return (
+    <motion.g
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{
+        duration: 1.05,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      style={{ transformOrigin: origin }}
+    >
+      <motion.g
+        animate={{ rotate: 360 }}
+        transition={{
+          duration: 42,
+          repeat: Infinity,
+          ease: "linear",
+          delay: delay + 0.9,
+        }}
+        style={{ transformOrigin: origin }}
+      >
+        {star}
+      </motion.g>
+    </motion.g>
   );
 }
 

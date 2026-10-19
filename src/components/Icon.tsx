@@ -12,7 +12,11 @@ type IconProps = {
 
 let defined = false;
 
-function ensureIonIcon() {
+/**
+ * Start fetching `ion-icon` as soon as something imports this module
+ * (e.g. the auth gate), so the first painted Icon isn’t blank.
+ */
+export function preloadIonIcon() {
   if (defined || typeof window === "undefined") return;
   defined = true;
   void import("ionicons/components/ion-icon.js").then((mod) => {
@@ -20,10 +24,13 @@ function ensureIonIcon() {
   });
 }
 
+// Any import of this module (gate, deck, etc.) starts the fetch before paint.
+preloadIonIcon();
+
 /** Official Ionicons web component — no custom SVG re-stroke. */
 export function Icon({ icon, className, style, title }: IconProps) {
   useEffect(() => {
-    ensureIonIcon();
+    preloadIonIcon();
   }, []);
 
   return (

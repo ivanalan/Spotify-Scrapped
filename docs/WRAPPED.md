@@ -242,6 +242,7 @@ Synthesized from Spotify Newsroom (Wrapped UX 2023–2025, Me in 2023, Music Evo
 | [DATA.md](DATA.md) | Export schema, skip heuristics |
 | [SPOTIFY_API.md](SPOTIFY_API.md) | OAuth + Scrapped / Lab limits |
 | [mocks/wrapped-ref/](mocks/wrapped-ref/) | **Official Wrapped 2023 motion capture** (keyframes + index) |
+| [mocks/wrapped-ref-2024/](mocks/wrapped-ref-2024/) | **Official Wrapped 2024 motion capture** (Music Evolution + AI podcast) |
 | `.cursor/rules/spotify-data.mdc` | Always-on data invariants |
 | `.cursor/skills/scrapped-art-direction/` | Visual system for story decks (anti AI-slop) |
 
@@ -251,9 +252,11 @@ When changing Scrapped Plus (export deck), also skim `src/components/scrapped/Sc
 
 ## 10. Motion capture — Wrapped vs Scrapped today
 
-**Agents:** before changing story motion, list stagger, progress timing, or “feel more like Wrapped,” read this section and open [mocks/wrapped-ref/named/](mocks/wrapped-ref/named/). Full frame index + re-extract notes: [mocks/wrapped-ref/README.md](mocks/wrapped-ref/README.md).
+**Agents:** before changing story motion, list stagger, progress timing, or “feel more like Wrapped,” read this section and open [mocks/wrapped-ref/named/](mocks/wrapped-ref/named/) (2023) and/or [mocks/wrapped-ref-2024/named/](mocks/wrapped-ref-2024/named/) (2024 eras / AI podcast). Full frame indexes: [wrapped-ref/README.md](mocks/wrapped-ref/README.md), [wrapped-ref-2024/README.md](mocks/wrapped-ref-2024/README.md).
 
-**Source (local, not committed):** `~/Downloads/My-Spotify-Wrapped-SnapYT.App.mp4` — ~4.5 min screen capture of **Wrapped 2023** (SnapYT player chrome visible). Stills live under `docs/mocks/wrapped-ref/`.
+**Sources (local, not committed):**
+- `~/Downloads/My-Spotify-Wrapped-SnapYT.App.mp4` — ~4.5 min **Wrapped 2023** (SnapYT chrome). Stills: `docs/mocks/wrapped-ref/`.
+- `~/Downloads/Spotify Wrapped 2024.mp4` — ~4.2 min **Wrapped 2024**. Stills: `docs/mocks/wrapped-ref-2024/`.
 
 ### 10.1 What Wrapped motion does in this capture
 

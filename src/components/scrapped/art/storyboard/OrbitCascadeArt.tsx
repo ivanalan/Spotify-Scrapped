@@ -1,14 +1,11 @@
 "use client";
 
-import { useId } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   ConcentricDisks,
-  ConcentricGradientDisks,
   MotifStage,
   OceanWave,
-  ovalRx,
-  ovalRy,
+  PointedStar,
 } from "./ShapeKit";
 import {
   FunkyOrbRain,
@@ -17,9 +14,12 @@ import {
   type FunkyShareKind,
 } from "./FunkyShapes";
 import { ListFrame } from "./PeripheralMotifs";
+import { ArtistOrbitOvals } from "@/components/scrapped/orbit/ArtistOrbitOvals";
 import {
   EMBER_FIELD_GRADIENT,
   INTRO_DISK_COLORS,
+  INTRO_SHARED_GRADIENT,
+  INTRO_STAR,
 } from "@/lib/scrapped-card-palette";
 import { SLIDE_SPECS } from "./orbitCascade";
 import type { SlideArtProps } from "./types";
@@ -85,7 +85,6 @@ export function OrbitCascadeArt({
     accent2: paletteOverride?.accent2 ?? base.accent2,
   };
   const reduce = useReducedMotion() || freeze;
-  const motionOff = freeze ? ("none" as const) : undefined;
   const funkyA = funkyPalette?.a ?? spec.accent;
   const funkyB = funkyPalette?.b ?? spec.accent2;
   const canvas =
@@ -102,19 +101,35 @@ export function OrbitCascadeArt({
     >
       <MotifStage>
         {pattern === "intro" && (
-          <ConcentricDisks
-            cx={-10}
-            cy={-20}
-            count={6}
-            startR={55}
-            step={44}
-            rotate={45}
-            oval={{ sx: 1.08, sy: 0.94 }}
-            colors={
-              paletteOverride?.diskColors ?? [...INTRO_DISK_COLORS]
-            }
-            animate={freeze || reduce ? "none" : "cascade-breathe"}
-          />
+          <>
+            <ConcentricDisks
+              cx={-10}
+              cy={-20}
+              count={6}
+              startR={72}
+              step={26}
+              rotate={45}
+              oval={{ sx: 1.08, sy: 0.94 }}
+              colors={
+                paletteOverride?.diskColors ?? [...INTRO_DISK_COLORS]
+              }
+              sharedGradient={
+                paletteOverride?.diskColors
+                  ? undefined
+                  : INTRO_SHARED_GRADIENT
+              }
+              animate={freeze || reduce ? "none" : "cascade-breathe"}
+            />
+            <PointedStar
+              cx={318}
+              cy={575}
+              r={92}
+              points={7}
+              from={INTRO_STAR.from}
+              to={INTRO_STAR.to}
+              animate={freeze || reduce ? "none" : "grow-spin"}
+            />
+          </>
         )}
 
         {pattern === "volume" && (
@@ -137,33 +152,7 @@ export function OrbitCascadeArt({
         )}
 
         {pattern === "entity" && slideIndex === 5 && (
-          <motion.g
-            animate={reduce ? undefined : { rotate: [0, 1.8, 0, -1.5, 0] }}
-            transition={
-              reduce
-                ? undefined
-                : { duration: 14, repeat: Infinity, ease: "easeInOut" }
-            }
-            style={{ transformOrigin: "180px 300px" }}
-          >
-            <RadialGlow
-              cx={180}
-              cy={300}
-              r={240}
-              from={spec.accent}
-              to={spec.bg}
-            />
-            <ConcentricGradientDisks
-              cx={180}
-              cy={300}
-              count={5}
-              startR={70}
-              step={34}
-              from={spec.accent}
-              to={spec.accent2}
-              animate={motionOff ?? "cascade-soft"}
-            />
-          </motion.g>
+          <ArtistOrbitOvals freeze={!!reduce} />
         )}
 
         {pattern === "list" && (
@@ -190,39 +179,6 @@ export function OrbitCascadeArt({
         {/* 09 share — blank canvas; card only */}
       </MotifStage>
     </div>
-  );
-}
-
-function RadialGlow({
-  cx,
-  cy,
-  r,
-  from,
-  to,
-}: {
-  cx: number;
-  cy: number;
-  r: number;
-  from: string;
-  to: string;
-}) {
-  const id = useId();
-  return (
-    <g opacity={0.5}>
-      <defs>
-        <radialGradient id={id} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={from} stopOpacity={0.65} />
-          <stop offset="75%" stopColor={to} stopOpacity={0} />
-        </radialGradient>
-      </defs>
-      <ellipse
-        cx={cx}
-        cy={cy}
-        rx={ovalRx(r)}
-        ry={ovalRy(r)}
-        fill={`url(#${id})`}
-      />
-    </g>
   );
 }
 

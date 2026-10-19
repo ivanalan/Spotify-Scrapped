@@ -1,20 +1,18 @@
 "use client";
 
-import { useId } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   accentsForSlide,
-  cardForSlide,
   INTRO_DISK_COLORS,
+  INTRO_SHARED_GRADIENT,
+  INTRO_STAR,
   type SlideArtPattern,
 } from "@/lib/scrapped-card-palette";
 import {
   ConcentricDisks,
-  ConcentricGradientDisks,
   MotifStage,
   OceanWave,
-  ovalRx,
-  ovalRy,
+  PointedStar,
 } from "@/components/scrapped/art/storyboard/ShapeKit";
 import {
   FunkyOrbRain,
@@ -22,6 +20,7 @@ import {
   GradOrb,
 } from "@/components/scrapped/art/storyboard/FunkyShapes";
 import { ListFrame } from "@/components/scrapped/art/storyboard/PeripheralMotifs";
+import { ArtistOrbitOvals } from "@/components/scrapped/orbit/ArtistOrbitOvals";
 
 type Props = {
   slideIndex: number;
@@ -84,7 +83,6 @@ export function ScrappedOrbitArt({
   replayKey = 0,
   tide = "low",
 }: Props) {
-  const card = cardForSlide(slideIndex);
   const { accent, accent2 } = accentsForSlide(slideIndex);
   const reduceMotion = useReducedMotion();
   const play = Boolean(active && !reduceMotion);
@@ -94,17 +92,29 @@ export function ScrappedOrbitArt({
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       <MotifStage>
         {pattern === "intro" && (
-          <ConcentricDisks
-            cx={-10}
-            cy={-20}
-            count={6}
-            startR={55}
-            step={44}
-            rotate={45}
-            oval={{ sx: 1.08, sy: 0.94 }}
-            colors={[...INTRO_DISK_COLORS]}
-            animate={freeze ? "none" : "cascade-breathe"}
-          />
+          <>
+            <ConcentricDisks
+              cx={-10}
+              cy={-20}
+              count={6}
+              startR={72}
+              step={26}
+              rotate={45}
+              oval={{ sx: 1.08, sy: 0.94 }}
+              colors={[...INTRO_DISK_COLORS]}
+              sharedGradient={INTRO_SHARED_GRADIENT}
+              animate={freeze ? "none" : "cascade-breathe"}
+            />
+            <PointedStar
+              cx={318}
+              cy={575}
+              r={92}
+              points={7}
+              from={INTRO_STAR.from}
+              to={INTRO_STAR.to}
+              animate={freeze ? "none" : "grow-spin"}
+            />
+          </>
         )}
 
         {pattern === "volume" && (
@@ -129,33 +139,7 @@ export function ScrappedOrbitArt({
         )}
 
         {pattern === "entity-artist" && (
-          <motion.g
-            animate={freeze ? undefined : { rotate: [0, 1.8, 0, -1.5, 0] }}
-            transition={
-              freeze
-                ? undefined
-                : { duration: 14, repeat: Infinity, ease: "easeInOut" }
-            }
-            style={{ transformOrigin: "180px 300px" }}
-          >
-            <RadialGlow
-              cx={180}
-              cy={300}
-              r={240}
-              from={accent}
-              to={card.bg}
-            />
-            <ConcentricGradientDisks
-              cx={180}
-              cy={300}
-              count={5}
-              startR={70}
-              step={34}
-              from={accent}
-              to={accent2}
-              animate={freeze ? "none" : "cascade-soft"}
-            />
-          </motion.g>
+          <ArtistOrbitOvals freeze={freeze} />
         )}
 
         {pattern === "list" && (
@@ -182,39 +166,6 @@ export function ScrappedOrbitArt({
         {/* share — blank; field only */}
       </MotifStage>
     </div>
-  );
-}
-
-function RadialGlow({
-  cx,
-  cy,
-  r,
-  from,
-  to,
-}: {
-  cx: number;
-  cy: number;
-  r: number;
-  from: string;
-  to: string;
-}) {
-  const id = useId();
-  return (
-    <g opacity={0.5}>
-      <defs>
-        <radialGradient id={id} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={from} stopOpacity={0.65} />
-          <stop offset="75%" stopColor={to} stopOpacity={0} />
-        </radialGradient>
-      </defs>
-      <ellipse
-        cx={cx}
-        cy={cy}
-        rx={ovalRx(r)}
-        ry={ovalRy(r)}
-        fill={`url(#${id})`}
-      />
-    </g>
   );
 }
 
