@@ -65,7 +65,7 @@ type Props = {
   onSoundtrackUriChange?: (uri: string | null) => void;
   /** Speculative hot-prime on pointerdown (no cut until navigate). */
   onSoundtrackPrimeTo?: (uri: string | null) => void;
-  /** Abort speculative prime when a press becomes a hold or is cancelled. */
+  /** Abort speculative prime when a press is cancelled before navigate. */
   onSoundtrackCancelPrime?: () => void;
   /**
    * Cut audio to the next act in parallel with the slide change. No-ops when
@@ -95,8 +95,6 @@ const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
 const INTRO_COPY_DELAY_SEC = 0.35;
-/** Stories-style: pause progress + soundtrack after this press duration (taps stay snappy). */
-const HOLD_PAUSE_MS = 180;
 
 function cardById(
   report: ScrappedApiReport,
@@ -135,22 +133,14 @@ export function ApiScrappedDeck({
   const [pausedSticky, setPausedSticky] = useState(false);
   const [shareExportBusy, setShareExportBusy] = useState(false);
   const [sharePrecaptureReady, setSharePrecaptureReady] = useState(false);
-  /** Instagram-style press-and-hold on the main tap zones (not the sticky pause button). */
-  const [pressHeld, setPressHeld] = useState(false);
-  const pressRef = useRef<{
-    dir: -1 | 1;
-    pointerId: number;
-    long: boolean;
-    timer: ReturnType<typeof setTimeout> | null;
-  } | null>(null);
   const reduceMotion = useReducedMotion();
   // Open-slide gate: derive from session key vs async unlock (no sync setState in effects).
   const introSessionKey = held || active !== 0 ? null : String(visitKey);
   const [introUnlockedFor, setIntroUnlockedFor] = useState<string | null>(null);
   const introGate =
     introSessionKey != null && introUnlockedFor !== introSessionKey;
-  /** Sticky button / space + press-hold — drives chrome icon and soundtrack. */
-  const userPaused = pausedSticky || pressHeld;
+  /** Sticky pause button / space — drives chrome icon and soundtrack. */
+  const userPaused = pausedSticky;
   const paused = userPaused || held || introGate;
   const activeRef = useRef(active);
 
@@ -548,66 +538,33 @@ export function ApiScrappedDeck({
     };
   }, [pauseApiRef]);
 
-  const clearPressHold = useCallback(() => {
-    const press = pressRef.current;
-    if (press?.timer) clearTimeout(press.timer);
-    pressRef.current = null;
-    setPressHeld(false);
-  }, []);
-
-  /** Left/right story zones: short press = navigate; hold = pause until release. */
+  /** Left/right story zones: tap = prev/next. Pause is sticky button / space only. */
   const onZonePointerDown = useCallback(
     (dir: -1 | 1, e: ReactPointerEvent<HTMLButtonElement>) => {
       if (e.button !== 0) return;
       // Don't steal presses meant for chrome / the visible Spotify player.
       if (e.target !== e.currentTarget) return;
-      clearPressHold();
-      e.currentTarget.setPointerCapture(e.pointerId);
       const next = activeRef.current + dir;
       // Prime early so cutTo can resume hot when the tap commits.
       if (next >= 0 && next <= FINALE_INDEX) {
         primeSoundtrackFor(next);
       }
-      pressRef.current = {
-        dir,
-        pointerId: e.pointerId,
-        long: false,
-        timer: setTimeout(() => {
-          const press = pressRef.current;
-          if (!press || press.pointerId !== e.pointerId) return;
-          press.long = true;
-          // Hold = pause, not navigate — kill the speculative next-act chirp.
-          cancelSoundtrackPrime();
-          setPressHeld(true);
-        }, HOLD_PAUSE_MS),
-      };
     },
-    [clearPressHold, primeSoundtrackFor, cancelSoundtrackPrime],
+    [primeSoundtrackFor],
   );
 
-  const onZonePointerUp = useCallback(
-    (e: ReactPointerEvent<HTMLButtonElement>) => {
-      const press = pressRef.current;
-      if (!press || press.pointerId !== e.pointerId) return;
-      const { dir, long } = press;
-      clearPressHold();
-      if (long) return;
+  const onZoneClick = useCallback(
+    (dir: -1 | 1) => {
       const next = activeRef.current + dir;
       if (next < 0 || next > FINALE_INDEX) return;
       goTo(next);
     },
-    [clearPressHold, goTo],
+    [goTo],
   );
 
-  const onZonePointerCancel = useCallback(
-    (e: ReactPointerEvent<HTMLButtonElement>) => {
-      const press = pressRef.current;
-      if (!press || press.pointerId !== e.pointerId) return;
-      cancelSoundtrackPrime();
-      clearPressHold();
-    },
-    [clearPressHold, cancelSoundtrackPrime],
-  );
+  const onZonePointerCancel = useCallback(() => {
+    cancelSoundtrackPrime();
+  }, [cancelSoundtrackPrime]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -634,16 +591,15 @@ export function ApiScrappedDeck({
     return () => window.removeEventListener("keydown", onKey);
   }, [goTo, togglePaused]);
 
-  // Release hold if the tab hides mid-press.
+  // Drop speculative prime if the tab hides mid-press.
   useEffect(() => {
     function onVis() {
       if (!document.hidden) return;
       cancelSoundtrackPrime();
-      clearPressHold();
     }
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
-  }, [clearPressHold, cancelSoundtrackPrime]);
+  }, [cancelSoundtrackPrime]);
 
   const soundtrackUri = getApiSlideSoundtrackUri(
     report,
@@ -656,7 +612,7 @@ export function ApiScrappedDeck({
   }, [soundtrackUri, onSoundtrackUriChange]);
 
   useEffect(() => {
-    // User pause (sticky or hold) mutes audio. Gate `held` must not — reveal stays warm.
+    // Sticky user pause mutes audio. Gate `held` must not — reveal stays warm.
     onPausedChange?.(userPaused);
   }, [userPaused, onPausedChange]);
 
@@ -1205,33 +1161,46 @@ export function ApiScrappedDeck({
             className="relative z-10 mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"
             style={{ gap: `${D.cardActionsGapPx}px` }}
           >
-            <div
-              ref={shareCardRef}
-              className="relative min-h-0 flex-1 overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-              style={{ borderRadius: "var(--share-card-radius, 12px)" }}
-            >
-              <ShareRecapCard
-                year={report.year}
-                variant="minimal"
-                active={active === FINALE_INDEX}
-                leftLabel="Ghosted artists"
-                rightLabel="Ghosted songs"
-                heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
-                heroAlt={topArtist?.label ?? topSong?.label ?? ""}
-                skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
-                  (item) => ({
-                    id: item.id,
-                    title: item.label,
-                    artist: item.detail ?? "—",
-                  }),
-                )}
-                stayed={(leftLongSongs?.items ?? []).slice(0, 5).map((item) => ({
-                  id: item.id,
-                  title: item.label,
-                  artist: item.sublabel ?? "—",
-                }))}
-                className="min-h-0 h-full flex-1"
-              />
+            {/*
+              9:16 island (D-012) — width = min(slot width, slot height × 9/16)
+              so the capture node stays true portrait (Stories / Wrapped form).
+            */}
+            <div className="flex min-h-0 w-full flex-1 items-center justify-center [container-type:size]">
+              <div
+                ref={shareCardRef}
+                className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+                style={{
+                  aspectRatio: D.aspectRatio,
+                  width: "min(100cqi, calc(100cqb * 9 / 16))",
+                  height: "auto",
+                  borderRadius: "var(--share-card-radius, 12px)",
+                }}
+              >
+                <ShareRecapCard
+                  year={report.year}
+                  variant="minimal"
+                  active={active === FINALE_INDEX}
+                  leftLabel="Ghosted artists"
+                  rightLabel="Ghosted songs"
+                  heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
+                  heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+                  skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
+                    (item) => ({
+                      id: item.id,
+                      title: item.label,
+                      artist: item.detail ?? "—",
+                    }),
+                  )}
+                  stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
+                    (item) => ({
+                      id: item.id,
+                      title: item.label,
+                      artist: item.sublabel ?? "—",
+                    }),
+                  )}
+                  className="h-full w-full"
+                />
+              </div>
             </div>
 
             <div
@@ -1271,8 +1240,8 @@ export function ApiScrappedDeck({
       </div>
 
       {/*
-        Stories-style tap / hold zones above slide copy (z-10) / motion layers.
-        Short press → prev/next. Hold → pause progress + soundtrack until release.
+        Stories-style tap zones above slide copy (z-10) and list beats (z-35).
+        Tap → prev/next (including over list rows). Pause is sticky button / space.
         Chrome stays higher (z-40) so pause / mute / sign-out still win.
         Finale: leave bottom clear so Share / Replay receive taps.
       */}
@@ -1281,12 +1250,12 @@ export function ApiScrappedDeck({
         tabIndex={-1}
         aria-label="Previous slide"
         onPointerDown={(e) => onZonePointerDown(-1, e)}
-        onPointerUp={onZonePointerUp}
+        onClick={() => onZoneClick(-1)}
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-36 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
-            : "absolute inset-y-0 left-0 z-30 w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "absolute top-0 bottom-36 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            : "absolute inset-y-0 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />
       <button
@@ -1294,12 +1263,12 @@ export function ApiScrappedDeck({
         tabIndex={-1}
         aria-label="Next slide"
         onPointerDown={(e) => onZonePointerDown(1, e)}
-        onPointerUp={onZonePointerUp}
+        onClick={() => onZoneClick(1)}
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-36 left-[30%] z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
-            : "absolute inset-y-0 left-[30%] z-30 w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "absolute top-0 bottom-36 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            : "absolute inset-y-0 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />
     </div>

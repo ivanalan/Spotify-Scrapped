@@ -118,7 +118,7 @@ Scene 8 (2 beats): “Thanks for sitting with the almosts.” → “See you whe
 Scene 9: Share finale (holds; no auto-advance)
 ```
 
-API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses; hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
+API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Pause button / space pauses (sticky); hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
 
 Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx` — handwritten lock: [D-005](decisions/D-005-handwritten-api-story-copy.md); headline style: [D-006](decisions/D-006-api-story-headline-style.md).
 
@@ -296,7 +296,7 @@ Implementation: `ApiScrappedDeck.tsx` + `WrappedStorySlide.tsx` + `src/lib/scrap
 | Progress | Stories segments; deck auto-walks | Segment fills over **scene** duration then **stops** — user advances (`useStoryAutoplay`) |
 | Lists | Numbered + covers + share chrome | Cascade default: 150ms stagger, 0.52s+ per row (`CASCADE_DEFAULTS`); +2s hold on list scenes |
 | Share | Per-card “Share this story” | Finale-first (`ShareRecapCard`); mid-deck share not primary |
-| Interaction | Tap-to-reveal personality; hold pause | Hold/space pause; no flip-card identity beat |
+| Interaction | Tap-to-reveal personality; hold pause | Pause button / space (sticky); no flip-card identity beat |
 | Audio | Ambient under whole story | Optional soundtrack; open slide delays copy for audio catch-up |
 
 Constants that matter when tuning “Wrapped feel” without cloning art:
@@ -313,7 +313,7 @@ Constants that matter when tuning “Wrapped feel” without cloning art:
 - Same emotional spine (open → volume → #1 → list → artists → late identity/redemption → share).  
 - Setup card → reveal card *or* our progressive lines — pick one rhythm per beat; don’t mix both on the same reveal.  
 - List cascade + numbered rows.  
-- Progress segments + hold-to-pause.  
+- Progress segments + sticky pause (button / space).  
 - Share ritual at the end (and only add mid-deck share if it stays optional).
 
 **Don’t borrow**

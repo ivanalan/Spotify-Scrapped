@@ -248,9 +248,9 @@ function BeatBody({
     <motion.div
       className={cn(
         "relative z-10 mx-auto flex w-full max-w-xl flex-col",
-        // List beat: sit above deck tap zones (z-30). pointer-events-none so
-        // title/empty areas still pass taps through; only the list scrollport
-        // re-enables pointer-events (see children wrapper).
+        // List beat: paint above non-list copy (z-10). Deck tap zones sit
+        // higher (z-[36]) so taps on rows still advance. pointer-events-none so
+        // empty areas pass through; list scrollport re-enables for labs / wheel.
         pinTop ? "z-[35] pointer-events-none" : "z-10",
         // List beat only: top-pin without changing section justify (setup stays centered).
         // top-24 matches slide py-24; bottom-0 so the scrollport can use the
@@ -363,9 +363,9 @@ function BeatBody({
             transition={layoutOnlyTransition}
             className={cn(
               "min-h-0 w-full",
-              // List region: height budget + scroll escape. pointer-events-auto
-              // so pans hit this scrollport above deck tap zones (parent is
-              // pointer-events-none when pinTop).
+              // List region: height budget + scroll escape (labs / overflow).
+              // Live deck tap zones are above this (z-[36]); parent is
+              // pointer-events-none when pinTop so title gaps still pass taps.
               isListBeat &&
                 "relative mt-6 flex-1 overflow-y-auto overscroll-y-contain [container-type:size] touch-pan-y pointer-events-auto",
             )}

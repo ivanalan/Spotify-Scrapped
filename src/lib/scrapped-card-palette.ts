@@ -45,6 +45,7 @@ export const SLIDE_SWATCH: CardSwatch[] = [
 /**
  * Share finale inset density — locked from exploration (D-012).
  * Visual kit: D-014 (J8 · Ink / teal card).
+ * Card is always 9:16 (Wrapped share ritual) — on screen and in the export PNG.
  */
 export const SHARE_FINALE_DENSITY = {
   gutterPx: 36,
@@ -52,6 +53,11 @@ export const SHARE_FINALE_DENSITY = {
   cardActionsGapPx: 32,
   bodyTopPx: 28,
   bodyBottomPx: 16,
+  /** Portrait share island — Stories / Reels friendly (Wrapped 25-share-finale). */
+  aspectRatio: "9 / 16",
+  /** Target PNG width; height follows on-screen 9:16 via capture scale. */
+  exportWidthPx: 1080,
+  exportHeightPx: 1920,
   /** Hero band + art sized so the square never overflows into MyScrapped.com. */
   heroBandPct: 46,
   heroSizePct: 48,

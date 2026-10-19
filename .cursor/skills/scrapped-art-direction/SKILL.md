@@ -41,7 +41,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | #1 artist | **Kit F orchid ladder spin** — ink field · ink-lean opaque orchid ovals · independent spin — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) (`ARTIST_ORBIT`) |
 | Ghosted list | **Slide 3 only** — ink field · seamless marquee clouds · spiky wind grass · perimeter blob ghosts — [D-010](../../../docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md) |
 | Soft close | **Teal** field · funky pink→gold bookends · larger pins inset toward mid copy · slow grow+rotate enter (~2.6s) — [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) / [D-009](../../../docs/decisions/D-009-responsive-motif-pins.md) |
-| Share finale | Inset card + Share / Replay — [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Art: **ink** stage + intro disks/star · **teal** gradient card · 2 ghosts frame hero · `MyScrapped.com` — [D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md). Explore method — [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) |
+| Share finale | **9:16** inset card + Share / Replay — [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Art: **ink** stage + intro disks/star · **teal** gradient card · 2 ghosts frame hero · `MyScrapped.com` — [D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md). Explore method — [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) |
 | Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). Art is peripheral chrome, not a second copy-motion path |
 
 **Emotional register:** conversational, dry, slightly merciful — same as WRAPPED.md tone.
@@ -53,7 +53,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 3. **Type owns the mid band** — art stays TL / BL / top drift / corner rain. Prefer clear field over putting body type on vibrant disks.
 4. **Contrast** — every tone sets canvas + ink + muted + panel + progress together. Muted stays near ink (`INK_MUTED` ≈ 90%/88%), not washed grey. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
 5. **Quiet chrome** — italic “Scrapped” wordmark ([D-011](../../../docs/decisions/D-011-scrapped-logo-italic.md)), story progress segments, info/close — same theme as the active story. Soundtrack stays secondary.
-6. **Share finale** — inset card + Share / Replay ([D-012](../../../docs/decisions/D-012-share-finale-inset.md)); production art kit J8 ([D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md)). Lab: deck-rhyme kits; stage behind / card in front; no edge bleed ([D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
+6. **Share finale** — **9:16** inset card + Share / Replay ([D-012](../../../docs/decisions/D-012-share-finale-inset.md)); production art kit J8 ([D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md)). Lab: deck-rhyme kits; stage behind / card in front; no edge bleed ([D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
 
 ## Hard bans (AI-design tells)
 

@@ -1,9 +1,13 @@
 import { domToBlob } from "modern-screenshot";
+import { SHARE_FINALE_DENSITY as D } from "@/lib/scrapped-card-palette";
 
 export type ShareCardImageOptions = {
   /** File name shown in the OS sheet / download. Default `myscrapped.png`. */
   fileName?: string;
-  /** Device-pixel scale for crisp export. Default 2. */
+  /**
+   * Device-pixel scale. Default: scale so the PNG’s width ≈ `exportWidthPx`
+   * (1080) while keeping the on-screen 9:16 layout (rem density intact).
+   */
   scale?: number;
   title?: string;
   text?: string;
@@ -33,15 +37,28 @@ async function waitForImages(node: HTMLElement): Promise<void> {
   );
 }
 
-/** Capture the inset share card as a PNG blob (no share sheet). */
+/**
+ * Scale so the shared PNG is ~`exportWidthPx` wide (still 9:16). Avoids
+ * forcing absolute width/height on the node (that would crush rem density).
+ */
+function scaleForExportWidth(node: HTMLElement): number {
+  const w = node.offsetWidth;
+  if (!w) return 2;
+  return Math.max(1, D.exportWidthPx / w);
+}
+
+/**
+ * Capture the inset share card as a PNG blob (no share sheet).
+ * Node must already be 9:16; output stays 9:16 at ~1080×1920.
+ */
 export async function captureShareCardBlob(
   node: HTMLElement,
-  scale = 2,
+  scale?: number,
 ): Promise<Blob> {
   await waitForImages(node);
 
   const blob = await domToBlob(node, {
-    scale,
+    scale: scale ?? scaleForExportWidth(node),
     type: "image/png",
     backgroundColor: null,
     fetch: {
@@ -119,11 +136,7 @@ export async function shareCardImage(
   node: HTMLElement,
   options: ShareCardImageOptions = {},
 ): Promise<void> {
-  const {
-    fileName = "myscrapped.png",
-    scale = 2,
-    blob: precaptured,
-  } = options;
+  const { fileName = "myscrapped.png", scale, blob: precaptured } = options;
 
   const blob = precaptured ?? (await captureShareCardBlob(node, scale));
   const file = new File([blob], fileName, { type: "image/png" });

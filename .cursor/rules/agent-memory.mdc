@@ -47,6 +47,6 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Wide viewport orbit pins (phone MotifStage except intro + soft close): [D-009](docs/decisions/D-009-responsive-motif-pins.md)
 - Ghosted songs list sky/grass/ghosts (ink field, slide 3 only): [D-010](docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md)
 - Scrapped logo / wordmark always italic: [D-011](docs/decisions/D-011-scrapped-logo-italic.md)
-- Share finale IA (inset card + Share/Replay): [D-012](docs/decisions/D-012-share-finale-inset.md)
+- Share finale IA (9:16 inset card + Share/Replay): [D-012](docs/decisions/D-012-share-finale-inset.md)
 - Share finale visual explore (deck rhymes · stage/card split): [D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)
 - Share finale kit J8 (ink stage / teal card / framing ghosts): [D-014](docs/decisions/D-014-share-finale-kit-j8.md)

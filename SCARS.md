@@ -37,8 +37,16 @@ Format:
 - **Not:** Missing `overflow-y-auto` on the list wrapper, or covers/gaps alone causing the clip.
 - **Cause:** List region used `z-[35]` inside BeatBody’s `z-10` stacking context, while Stories tap zones sit at `z-30` on the deck root — so every vertical pan hit prev/next instead of the scrollport. Horizontal scroller also uses `overflow-y-hidden`, so clipped rows had nowhere to go.
 - **Proof:** Ghosted songs list cut off the 5th row; swipe on the list did not scroll. Labs scrolled because they have no overlay tap zones.
-- **Avoid:** On list beats, elevate BeatBody above tap zones (`z-[35]`) with `pointer-events-none`, and only re-enable `pointer-events-auto` on the list scrollport so title/empty areas still pass taps through.
+- **Avoid:** Superseded for live-deck tap priority — see [Cannot tap to advance on list content](#cannot-tap-to-advance-on-list-content). Labs still use list `pointer-events-auto` + overflow scroll without overlay zones.
 - **Related:** `WrappedStorySlide.tsx`, `ApiScrappedDeck.tsx` tap zones
+
+## Cannot tap to advance on list content
+
+- **Not:** Missing `onClick` on list rows, or pause/hold eating the gesture.
+- **Cause:** List BeatBody was raised to `z-[35]` with scrollport `pointer-events-auto` so pans could scroll above Stories tap zones at `z-30` — so taps on rows never reached prev/next.
+- **Proof:** On ghosted songs / artist list beats, tapping a row did nothing; tapping empty chrome still advanced.
+- **Avoid:** Keep live-deck tap zones above the list (`z-[36]`), under chrome (`z-40`). Do not put the list scrollport above tap zones on `/scrapped`. Accept that row-area touch-scroll loses to Stories tap-to-advance on the live deck; labs without overlay zones still scroll.
+- **Related:** `ApiScrappedDeck.tsx` tap zones, `WrappedStorySlide.tsx` pinTop list beat
 
 ## Title jumps (or stays put) when the subtitle appears on list setup slides
 
@@ -101,3 +109,10 @@ Format:
 - **Cause:** (1) Capture (`domToBlob`) ran inside the click before `navigator.share`, so WebKit dropped the user-gesture token. (2) `ShareData` included `title`/`text` with `files` — WebKit `canShare`/`share` rejects that combo.
 - **Proof:** Share no-op on iPhone Safari; desktop download fallback still worked.
 - **Avoid:** Pre-capture the PNG while the finale is idle; on tap share **files-only** with the warmed blob. Gate the button on precapture ready.
+
+## Hold to pause temporarily is broken / fights taps
+
+- **Not:** Sticky pause button or spacebar failing on their own.
+- **Cause:** Stories-style press-hold on left/right tap zones (`HOLD_PAUSE_MS` + `pressHeld`) shared the same gesture path as prev/next, so short presses and holds competed (timer, pointer capture, soundtrack prime cancel).
+- **Proof:** Hold pause felt unreliable; users wanted pause only via the chrome button.
+- **Avoid:** Do not reintroduce zone press-hold pause. Pause is sticky button / space (and media-key API) only; zones tap to navigate.
