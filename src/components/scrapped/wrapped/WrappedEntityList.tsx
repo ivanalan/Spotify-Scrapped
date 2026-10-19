@@ -96,7 +96,7 @@ export function WrappedEntityList({
                 {i + 1}
               </motion.span>
               <motion.span
-                className="relative size-[clamp(3.25rem,14cqh,4.75rem)] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
+                className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
                 style={
                   !item.imageUrl && item.coverColor
                     ? { backgroundColor: item.coverColor }
