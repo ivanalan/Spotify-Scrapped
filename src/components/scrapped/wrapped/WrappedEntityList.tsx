@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
+import type { ReactNode } from "react";
 import {
   DEFAULT_LIST_MOTION,
   planListRowMotion,
@@ -12,7 +13,7 @@ import {
 export type WrappedEntityRow = {
   id: string;
   label: string;
-  sublabel?: string;
+  sublabel?: ReactNode;
   imageUrl?: string | null;
   /** Solid cover fill when there is no image (labs / empty art). */
   coverColor?: string;

@@ -235,6 +235,27 @@ export function leftLongGhostedCount(report: ScrappedApiReport): number | null {
   return 0;
 }
 
+/**
+ * Older sealed one-save rows used label=artist, detail=`${song} · …d on the shelf`
+ * with no sublabel. Current shape is label=song, sublabel=artist.
+ */
+function migrateOneSaveArtistItems(report: ScrappedApiReport): void {
+  const card = report.cards?.find((c) => c.id === "one-save-artists");
+  if (!card) return;
+  for (const item of card.items) {
+    if (item.sublabel) continue;
+    const song = item.detail?.split(" · ")[0]?.trim();
+    if (!song) continue;
+    const artist = item.label;
+    item.label = song;
+    item.sublabel = artist;
+    item.detail =
+      item.value === 0
+        ? `${artist} · liked today`
+        : `${artist} · ${item.value.toLocaleString()}d ago`;
+  }
+}
+
 /** Fill like-shelf summary fields missing from older sealed Lab snapshots. */
 export function ensureApiReportSummary(
   report: ScrappedApiReport,
@@ -256,6 +277,7 @@ export function ensureApiReportSummary(
     mediumArtistCount: s.mediumArtistCount ?? 0,
     longArtistCount: s.longArtistCount ?? 0,
   };
+  migrateOneSaveArtistItems(report);
   return report;
 }
 
@@ -820,11 +842,12 @@ export function buildScrappedApiReport(
         return {
           id: artist.id,
           trackId: sample.id,
-          label: artist.name,
+          label: sample.name,
+          sublabel: artist.name,
           detail:
             artist.ageDays === 0
-              ? `${sample.name} · liked today`
-              : `${sample.name} · ${artist.ageDays.toLocaleString()}d on the shelf`,
+              ? `${artist.name} · liked today`
+              : `${artist.name} · ${artist.ageDays.toLocaleString()}d ago`,
           value: artist.ageDays,
           imageUrl: sample.imageUrl ?? null,
         };

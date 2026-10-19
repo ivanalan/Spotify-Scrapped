@@ -9,9 +9,11 @@ import {
   useMemo,
   useRef,
   useState,
+  type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
+  heart,
   pauseOutline,
   playOutline,
   volumeHighOutline,
@@ -61,6 +63,18 @@ type Props = {
    * reveal a warm deck without remounting on the same gesture as play().
    */
   held?: boolean;
+  /**
+   * Hardware media keys pause Spotify’s embed, not our keydown handler.
+   * Parent wires DeckSoundtrack external pause/resume into these controls.
+   */
+  pauseApiRef?: MutableRefObject<ApiScrappedPauseApi | null>;
+};
+
+export type ApiScrappedPauseApi = {
+  /** Sticky-pause story + soundtrack (same as spacebar pause). */
+  pauseStory: () => void;
+  /** Clear sticky pause (same as spacebar resume). */
+  resumeStory: () => void;
 };
 
 const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
@@ -89,6 +103,7 @@ export function ApiScrappedDeck({
   onSoundtrackPrimeTo,
   onSoundtrackCutTo,
   held = false,
+  pauseApiRef,
 }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const activeFillRef = useRef<HTMLDivElement | null>(null);
@@ -351,7 +366,7 @@ export function ApiScrappedDeck({
               : "None of them joined this year",
           subline:
             likedYear > 0
-              ? "And you kept adding more..."
+              ? "...and you just kept adding more"
               : "Quiet year for the heart button.",
         },
       ],
@@ -496,6 +511,17 @@ export function ApiScrappedDeck({
   const togglePaused = useCallback(() => {
     setPausedSticky((p) => !p);
   }, []);
+
+  useEffect(() => {
+    if (!pauseApiRef) return;
+    pauseApiRef.current = {
+      pauseStory: () => setPausedSticky(true),
+      resumeStory: () => setPausedSticky(false),
+    };
+    return () => {
+      pauseApiRef.current = null;
+    };
+  }, [pauseApiRef]);
 
   const clearPressHold = useCallback(() => {
     const press = pressRef.current;
@@ -729,7 +755,7 @@ export function ApiScrappedDeck({
                   : "None of them joined this year",
               subline:
                 likedThisYearCount > 0
-                  ? "And you kept adding more..."
+                  ? "...and you just kept adding"
                   : "Quiet year for the heart button.",
               display: "hero",
             },
@@ -828,7 +854,7 @@ export function ApiScrappedDeck({
           tone="cream"
           beats={[
             {
-              headline: "You’ve heard of one hit wonders.",
+              headline: "You’ve heard of 1 hit wonders.",
               display: "hero",
             },
             {
@@ -838,16 +864,36 @@ export function ApiScrappedDeck({
             },
             {
               headline: "1 like artists",
-              subline: "Artists with only one song saved.",
+              subline: "Artists with only 1 song saved.",
               display: "sentence",
               children: (
                 <WrappedEntityList
-                  items={(oneSaveArtists?.items ?? []).map((item) => ({
-                    id: item.id,
-                    label: item.label,
-                    sublabel: item.detail,
-                    imageUrl: item.imageUrl,
-                  }))}
+                  items={(oneSaveArtists?.items ?? []).map((item) => {
+                    // Prefer song/artist shape; fall back for pre-migrate sealed rows.
+                    const song = item.sublabel
+                      ? item.label
+                      : (item.detail?.split(" · ")[0] ?? item.label);
+                    const artist = item.sublabel ?? item.label;
+                    return {
+                      id: item.id,
+                      label: song,
+                      sublabel: (
+                        <span className="inline-flex max-w-full items-center gap-2">
+                          <span className="truncate">{artist}</span>
+                          <span className="inline-flex shrink-0 items-center gap-1">
+                            <Icon
+                              icon={heart}
+                              className="size-3"
+                            />
+                            {item.value === 0
+                              ? "today"
+                              : `${item.value.toLocaleString()}d ago`}
+                          </span>
+                        </span>
+                      ),
+                      imageUrl: item.imageUrl,
+                    };
+                  })}
                   active={!held && active === 4}
                   empty="No 1 like artists in this sample. Loyal, or just indecisive?"
                 />

@@ -133,7 +133,7 @@ function MinimalColumn({
 }) {
   return (
     <div className="min-w-0">
-      <p className={cn(MINIMAL_TYPE, "mb-5 truncate font-normal")}>
+      <p className={cn(MINIMAL_TYPE, "mb-5 truncate font-bold")}>
         {label}
       </p>
       {tracks.length === 0 ? (

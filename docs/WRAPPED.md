@@ -118,7 +118,7 @@ Scene 8 (2 beats): “Thanks for sitting with the almosts.” → “See you whe
 Scene 9: Share finale (holds; no auto-advance)
 ```
 
-API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses. Prev/next resets and replays the target scene.
+API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Hold/space pauses; hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
 
 Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx` — handwritten lock: [D-005](decisions/D-005-handwritten-api-story-copy.md); headline style: [D-006](decisions/D-006-api-story-headline-style.md).
 

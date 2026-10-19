@@ -79,7 +79,7 @@ export type ScrappedApiLabResult =
   | { kind: "needs_auth"; message: string }
   | {
       kind: "needs_fetch";
-      message: string;
+      message?: string;
       retryAfterSeconds?: number;
       quotaExceeded?: boolean;
     }
@@ -173,8 +173,6 @@ export async function loadScrappedApiLab(
 
   return {
     kind: "needs_fetch",
-    message:
-      "Load tops and Liked Songs from Spotify once. Reloads use a saved snapshot and do not spend quota.",
     ...cooldownFields(),
   };
 }
@@ -198,8 +196,6 @@ export async function fetchAndStoreScrappedApiLab(
     return (
       (await reportFromSnapshot(year, connection.userId)) ?? {
         kind: "needs_fetch",
-        message:
-          "Load tops and Liked Songs from Spotify once. Reloads use a saved snapshot and do not spend quota.",
         ...cooldownFields(),
       }
     );

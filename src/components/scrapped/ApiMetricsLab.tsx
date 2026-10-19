@@ -19,7 +19,7 @@ type Props =
   | { kind: "needs_auth"; message: string }
   | {
       kind: "needs_fetch";
-      message: string;
+      message?: string;
       retryAfterSeconds?: number;
       quotaExceeded?: boolean;
     }
@@ -163,10 +163,12 @@ export function ApiMetricsLab(props: Props) {
 
       {props.kind === "needs_fetch" ? (
         <div className="animate-rise-delay-1 space-y-4 border-y border-border py-8">
-          <p className="max-w-xl text-sm text-muted-foreground">{props.message}</p>
+          {props.message ? (
+            <p className="max-w-xl text-sm text-muted-foreground">{props.message}</p>
+          ) : null}
           {props.retryAfterSeconds ? (
             <SpotifyRateLimitWait
-              message={props.message}
+              message={props.message ?? ""}
               retryAfterSeconds={props.retryAfterSeconds}
               quotaExceeded={props.quotaExceeded}
               className="text-sm text-warn"
