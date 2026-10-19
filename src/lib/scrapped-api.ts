@@ -198,6 +198,43 @@ function trackByArtist(
   return undefined;
 }
 
+/** Parse leading count from headline detail (`"12 of 50"`). */
+function countFromDetail(detail: string | undefined): number | null {
+  if (!detail) return null;
+  const match = /^(\d+)/.exec(detail);
+  if (!match) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Multi-year tops that left both recent windows (`left-long` / left-long-run).
+ *
+ * Cookie-safe: older seals wiped headline `detail` but kept `percent` and
+ * card items. Prefer exact detail, then percent×long, then visible rows —
+ * never claim zero when the top-ghosted list still has songs.
+ */
+export function leftLongGhostedCount(report: ScrappedApiReport): number | null {
+  const headline = report.headlines.find((h) => h.id === "left-long");
+  const fromDetail = countFromDetail(headline?.detail);
+  if (fromDetail != null) return fromDetail;
+
+  const long = report.summary?.longTrackCount ?? 0;
+  const itemCount =
+    report.cards.find((c) => c.id === "left-long-run")?.items.length ?? 0;
+
+  let fromPercent: number | null = null;
+  if (headline?.percent != null && long > 0) {
+    fromPercent = Math.round((headline.percent / 100) * long);
+  }
+
+  if (fromPercent != null) return Math.max(fromPercent, itemCount);
+  if (itemCount > 0) return itemCount;
+  if (headline?.percent === 0) return 0;
+  if (long <= 0) return null;
+  return 0;
+}
+
 /** Fill like-shelf summary fields missing from older sealed Lab snapshots. */
 export function ensureApiReportSummary(
   report: ScrappedApiReport,

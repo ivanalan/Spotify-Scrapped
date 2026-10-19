@@ -28,7 +28,11 @@ import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
-import type { ApiMetricCard, ScrappedApiReport } from "@/lib/scrapped-api";
+import {
+  leftLongGhostedCount,
+  type ApiMetricCard,
+  type ScrappedApiReport,
+} from "@/lib/scrapped-api";
 import {
   storyLineBeatDurationsMs,
   sumMs,
@@ -71,15 +75,6 @@ function cardById(
   id: string,
 ): ApiMetricCard | undefined {
   return report.cards.find((c) => c.id === id);
-}
-
-/** Ghosted multi-year count from headline detail `"N of M"`. */
-function ghostedCountFromDetail(detail: string | undefined): number | null {
-  if (!detail) return null;
-  const match = /^(\d+)/.exec(detail);
-  if (!match) return null;
-  const n = Number(match[1]);
-  return Number.isFinite(n) ? n : null;
 }
 
 export function ApiScrappedDeck({
@@ -139,7 +134,6 @@ export function ApiScrappedDeck({
     activeRef.current = active;
   }, [active]);
 
-  const leftLongHeadline = report.headlines.find((h) => h.id === "left-long");
   const leftLongSongs = cardById(report, "left-long-run");
   const leftLongArtists = cardById(report, "left-long-artists");
   const oneSaveArtists = cardById(report, "one-save-artists");
@@ -151,7 +145,7 @@ export function ApiScrappedDeck({
   const likedCount = report.summary.likedCount;
   const likedThisYearCount = report.summary.likedThisYearCount;
   const longCount = report.summary.longTrackCount;
-  const ghostedCount = ghostedCountFromDetail(leftLongHeadline?.detail);
+  const ghostedCount = leftLongGhostedCount(report);
   const reunionList = (secondChance?.items.length ?? 0) > 1;
 
   const soundtrackOpts = useMemo(
@@ -288,9 +282,7 @@ export function ApiScrappedDeck({
     const liked = report.summary.likedCount;
     const likedYear = report.summary.likedThisYearCount;
     const long = report.summary.longTrackCount;
-    const ghosted = ghostedCountFromDetail(
-      report.headlines.find((h) => h.id === "left-long")?.detail,
-    );
+    const ghosted = leftLongGhostedCount(report);
     const hasTopSong =
       (cardById(report, "left-long-run")?.items.length ?? 0) > 0;
     const hasTopArtist =
@@ -1016,10 +1008,10 @@ export function ApiScrappedDeck({
         <section
           data-scrapped-slide
           data-wrapped-tone="slate"
-          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-5 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)] md:px-14"
+          className="relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col overflow-hidden bg-[var(--wrapped-canvas)] px-8 pt-14 pb-[4.75rem] text-[var(--wrapped-ink)]"
           aria-hidden={active !== FINALE_INDEX}
         >
-          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-md flex-1 items-center justify-center py-1">
+          <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col">
             <ShareRecapCard
               year={report.year}
               variant="minimal"
@@ -1038,6 +1030,7 @@ export function ApiScrappedDeck({
                 title: item.label,
                 artist: item.sublabel ?? "—",
               }))}
+              className="min-h-0 flex-1"
             />
           </div>
         </section>

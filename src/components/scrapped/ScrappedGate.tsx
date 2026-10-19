@@ -145,11 +145,16 @@ export function ScrappedGate({
               ) : null}
               <SpotifyLabFetchForm
                 next="/"
-                label={mode === "fetch" ? "Continue" : "Load from Spotify"}
+                label={mode === "fetch" ? "Load data" : "Load from Spotify"}
                 tone="gate"
                 autoStart={mode === "fetch"}
                 className="w-full"
               />
+              {name ? (
+                <p className="text-caption w-full text-center text-[var(--wrapped-muted)]">
+                  Signed in to Spotify as {name}
+                </p>
+              ) : null}
             </div>
           )}
         </div>

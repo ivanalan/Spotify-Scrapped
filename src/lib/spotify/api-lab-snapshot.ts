@@ -88,6 +88,10 @@ const COOKIE_ITEM_CAP = 5;
  * On Vercel the FS write is a no-op, so cookies are the only persistence.
  * Nulling `imageUrl` (the old approach) fit more easily but left every cover
  * blank in production. Drop Lab-only prose and extra rows instead.
+ *
+ * Keep headline `detail` (`"N of M"`) — the API deck reads it for ghosted
+ * counts. Wiping it made production say “No all time favs got ghosted”
+ * while `left-long-run` items (and art) still sealed.
  */
 function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
   const report: ScrappedApiReport = {
@@ -98,7 +102,7 @@ function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
       id: h.id,
       percent: h.percent,
       label: h.label,
-      detail: "",
+      detail: h.detail,
     })),
     summary: stored.report.summary,
     cards: stored.report.cards.map((card) => ({

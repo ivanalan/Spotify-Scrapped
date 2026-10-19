@@ -59,20 +59,6 @@ function SubmitButton({
   );
 }
 
-function GateHint() {
-  const { pending } = useFormStatus();
-  return (
-    <p
-      className="text-caption mt-3 w-full text-left text-[var(--wrapped-muted)]"
-      aria-live="polite"
-    >
-      {pending
-        ? "Fetching tops and Liked Songs. Keep this tab open…"
-        : "Pulls tops and Liked Songs — large libraries can take a minute."}
-    </p>
-  );
-}
-
 const AUTO_START_KEY = "scrapped-lab-autostart";
 
 export function SpotifyLabFetchForm({
@@ -106,7 +92,6 @@ export function SpotifyLabFetchForm({
     >
       <input type="hidden" name="next" value={next} />
       <SubmitButton label={label} tone={tone} className={className} />
-      {tone === "gate" ? <GateHint /> : null}
     </form>
   );
 }

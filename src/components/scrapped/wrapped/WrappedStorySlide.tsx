@@ -247,8 +247,9 @@ function BeatBody({
       className={cn(
         "z-10 mx-auto flex w-full max-w-xl flex-col",
         // List beat only: top-pin without changing section justify (setup stays centered).
+        // bottom-24 matches slide py-24 so the list has a real height budget.
         pinTop
-          ? "absolute inset-x-0 top-24 px-7 md:px-14"
+          ? "absolute inset-x-0 top-24 bottom-24 min-h-0 px-7 md:px-14"
           : "relative",
         align === "center" ? "items-center" : "items-stretch",
         // List: 12px title→subtitle; rows add mt-3 for 24px subtitle→list.
@@ -275,6 +276,7 @@ function BeatBody({
         transition={layoutOnlyTransition}
         className={cn(
           "font-sans font-extrabold tracking-[-0.04em] text-[var(--wrapped-ink)]",
+          pinTop && "shrink-0",
           display === "year" &&
             "text-[clamp(4.5rem,18vw,8rem)] leading-none",
           display === "hero" &&
@@ -298,6 +300,7 @@ function BeatBody({
             transition={layoutOnlyTransition}
             className={cn(
               "max-w-md text-[1.05rem] leading-relaxed text-[var(--wrapped-muted)] md:text-[1.15rem]",
+              pinTop && "shrink-0",
               align === "center" && "mx-auto w-full",
             )}
             initial={followMotion.initial}
@@ -330,7 +333,13 @@ function BeatBody({
             key="children"
             layout={useLayout ? "position" : false}
             transition={layoutOnlyTransition}
-            className={cn("min-h-0 w-full", isListBeat && "mt-6")}
+            className={cn(
+              "min-h-0 w-full",
+              // List region: height budget + scroll escape; z above story tap zones
+              // so vertical pan scrolls the list instead of firing prev/next.
+              isListBeat &&
+                "relative z-[35] mt-6 flex-1 overflow-y-auto overscroll-y-contain [container-type:size] touch-pan-y",
+            )}
             // Rows own cascade; wrapper only participates in layout reflow.
             initial={isListBeat ? false : supportMotion.initial}
             animate={isListBeat ? { opacity: 1 } : supportMotion.animate}

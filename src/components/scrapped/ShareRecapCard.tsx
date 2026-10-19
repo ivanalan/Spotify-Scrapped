@@ -120,6 +120,10 @@ function TrackList({
   );
 }
 
+/** Locked from finale tune: 0.93rem / lh 1.3 / single-line truncate. */
+const MINIMAL_TYPE =
+  "font-sans text-[0.93rem] leading-[1.3] tracking-[-0.01em] text-[var(--wrapped-ink)]";
+
 function MinimalColumn({
   label,
   tracks,
@@ -129,30 +133,32 @@ function MinimalColumn({
 }) {
   return (
     <div className="min-w-0">
-      <p className="mb-3 text-[0.72rem] font-bold tracking-[0.02em] text-[var(--wrapped-ink)]">
+      <p className={cn(MINIMAL_TYPE, "mb-5 truncate font-normal")}>
         {label}
       </p>
       {tracks.length === 0 ? (
-        <p className="text-sm text-[var(--wrapped-muted)]">Nothing here.</p>
+        <p
+          className={cn(
+            MINIMAL_TYPE,
+            "truncate font-semibold text-[var(--wrapped-muted)]",
+          )}
+        >
+          Nothing here.
+        </p>
       ) : (
-        <ol className="flex flex-col gap-[0.55rem]">
+        <ol className="flex flex-col gap-4">
           {tracks.map((track, i) => (
             <li
               key={track.id}
-              className="grid min-w-0 grid-cols-[1.1rem_minmax(0,1fr)] items-baseline gap-[0.35rem] text-[var(--wrapped-ink)]"
+              className="grid min-w-0 grid-cols-[0.8rem_minmax(0,1fr)] items-center gap-1"
             >
-              <span className="tabular-nums text-[0.92rem] font-semibold text-[var(--wrapped-muted)]">
+              <span className={cn(MINIMAL_TYPE, "font-semibold tabular-nums")}>
                 {i + 1}
               </span>
-              <span className="min-w-0">
-                <span className="block truncate text-[0.92rem] font-bold leading-[1.15] tracking-[-0.02em]">
-                  {track.title}
-                </span>
-                {track.artist ? (
-                  <span className="block truncate text-[0.7rem] font-medium leading-snug text-[var(--wrapped-muted)]">
-                    {track.artist}
-                  </span>
-                ) : null}
+              <span
+                className={cn(MINIMAL_TYPE, "min-w-0 truncate font-semibold")}
+              >
+                {track.title}
               </span>
             </li>
           ))}
@@ -192,31 +198,31 @@ export function ShareRecapCard({
     return (
       <div
         className={cn(
-          "relative mx-auto flex h-full max-h-full w-full max-w-[20rem] flex-col items-center justify-center gap-4 overflow-hidden bg-[var(--wrapped-canvas)] px-4 text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)] sm:gap-5 sm:px-5",
+          "relative mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)] transition-opacity duration-[var(--duration-move)] ease-[var(--ease-out)]",
           active ? "opacity-100" : "opacity-55",
           className,
         )}
       >
         {/*
-          Lists are shrink-0 (always fully visible). Art takes leftover height and
-          sizes as min(slot width, slot height) so it stays square as the screen shortens.
+          Wrapped-like share finale: 44% header, art at 63% of that band,
+          single-line dual columns (locked from finale tune).
         */}
-        <div className="relative min-h-0 w-full max-h-[20rem] flex-1 [container-type:size]">
-          <div className="absolute top-1/2 left-1/2 aspect-square w-[min(100cqw,100cqh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]">
+        <header className="relative flex h-[44%] w-full shrink-0 items-center justify-center [container-type:size]">
+          <div className="absolute top-1/2 left-1/2 aspect-square w-[min(63cqw,63cqh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]">
             {heroImageUrl ? (
               <Image
                 src={heroImageUrl}
                 alt={heroAlt}
                 fill
-                sizes="320px"
+                sizes="40vh"
                 className="object-cover"
                 priority
               />
             ) : null}
           </div>
-        </div>
+        </header>
 
-        <div className="grid w-full shrink-0 grid-cols-2 gap-4 sm:gap-5">
+        <div className="grid min-h-0 w-full flex-1 grid-cols-2 content-start gap-x-1.5 px-0 pt-0">
           <MinimalColumn label={leftLabel} tracks={skipped} />
           <MinimalColumn label={rightLabel} tracks={stayed} />
         </div>
