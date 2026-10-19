@@ -1579,10 +1579,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         <div
           ref={poolShellRef}
           className={cn(
+            // Real box + non-zero opacity so iOS will still buffer embeds.
             "h-20 w-full overflow-hidden rounded-md",
             shellOnStage
-              ? "pointer-events-auto opacity-100"
-              : "pointer-events-none opacity-[0.01]",
+              ? "pointer-events-auto relative opacity-100"
+              : // Off the story stage (not in flex flow) so a warm shell
+                // cannot cover list rows / bottom padding on mobile.
+                "pointer-events-none absolute left-0 top-0 -translate-x-[200vw] opacity-[0.01]",
           )}
           aria-hidden={!shellOnStage}
         />

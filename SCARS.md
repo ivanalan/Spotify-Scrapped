@@ -16,6 +16,14 @@ Format:
 
 ---
 
+## Invisible API player still blocks the list on mobile
+
+- **Not:** List `bottom-24` padding alone, or `showPlayer={false}` failing to hide chrome.
+- **Cause:** `DeckSoundtrack` kept the warm embed shell in the fixed bottom stage at `h-20` with `opacity-[0.01]` so iOS would buffer. Nearly invisible, but still painted over the list / bottom of the slide.
+- **Proof:** Ghosted-songs list on `/scrapped` showed empty/smudged space above the browser chrome where the Spotify embed sat; API deck passes `showPlayer={false}`.
+- **Avoid:** When the player is not on stage, park the pool shell out of flex flow and off-viewport (`absolute` + large negative translate). Keep a real painted size/opacity for buffering — do not leave a near-invisible `h-20` on the content stage.
+- **Related:** `DeckSoundtrack.tsx`, `ScrappedExperience.tsx`
+
 ## Numbered entity list is not scrollable on the live deck
 
 - **Not:** Missing `overflow-y-auto` on the list wrapper, or covers/gaps alone causing the clip.
