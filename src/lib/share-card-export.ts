@@ -7,6 +7,11 @@ export type ShareCardImageOptions = {
   scale?: number;
   title?: string;
   text?: string;
+  /**
+   * Pre-captured PNG from `captureShareCardBlob`. When set, Share runs without
+   * awaiting capture — required for iOS WebKit user-gesture → `navigator.share`.
+   */
+  blob?: Blob;
 };
 
 /** Wait for same-origin `/_next/image` (and any other) imgs inside the card. */
@@ -28,9 +33,10 @@ async function waitForImages(node: HTMLElement): Promise<void> {
   );
 }
 
-async function captureCardBlob(
+/** Capture the inset share card as a PNG blob (no share sheet). */
+export async function captureShareCardBlob(
   node: HTMLElement,
-  scale: number,
+  scale = 2,
 ): Promise<Blob> {
   await waitForImages(node);
 
@@ -61,16 +67,53 @@ function downloadBlob(blob: Blob, fileName: string): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && err.name === "AbortError";
+}
+
+/**
+ * WebKit rejects (or `canShare` → false) when `files` is combined with
+ * `title` / `text` / `url`. Files-only is the reliable iOS path.
+ */
+function filesOnlyShareData(file: File): ShareData {
+  return { files: [file] };
+}
+
+async function tryNativeFileShare(file: File): Promise<boolean> {
+  if (typeof navigator.share !== "function") return false;
+
+  const data = filesOnlyShareData(file);
+  // Prefer canShare when present; if it throws/false, still try share once —
+  // some iOS builds lie about canShare for image files.
+  if (typeof navigator.canShare === "function") {
+    try {
+      if (!navigator.canShare(data)) return false;
+    } catch {
+      // fall through and attempt share
+    }
+  }
+
+  try {
+    await navigator.share(data);
+    return true;
+  } catch (err) {
+    if (isAbortError(err)) return true; // user dismissed — not a failure
+    // NotAllowedError / TypeError → caller may download
+    return false;
+  }
+}
+
 /**
  * Capture the inset share card as a PNG, then open the native OS share sheet
  * with that file (Save Image / Messages / IG / etc.). Does not auto-download
  * when the sheet is available.
  *
- * Fallback: browsers that cannot `canShare({ files })` (common on desktop)
- * download the PNG so the card image is still obtainable.
+ * Fallback: browsers that cannot share files (common on desktop) download the
+ * PNG so the card image is still obtainable.
  *
- * Hero art via `/_next/image` is same-origin. If a capture blanks the hero,
- * prefer load-wait / fetch options before an allowlisted `i.scdn.co` proxy.
+ * iOS: pass a pre-captured `blob` (from `captureShareCardBlob` while the finale
+ * is idle) so `navigator.share` stays inside the tap gesture. Files-only
+ * ShareData — WebKit breaks when title/text ride along with files.
  */
 export async function shareCardImage(
   node: HTMLElement,
@@ -79,30 +122,13 @@ export async function shareCardImage(
   const {
     fileName = "myscrapped.png",
     scale = 2,
-    title = "Scrapped",
-    text = "Taste under revision — ghosted artists & songs.",
+    blob: precaptured,
   } = options;
 
-  const blob = await captureCardBlob(node, scale);
+  const blob = precaptured ?? (await captureShareCardBlob(node, scale));
   const file = new File([blob], fileName, { type: "image/png" });
-  const shareData: ShareData = { files: [file], title, text };
 
-  if (
-    typeof navigator.canShare === "function" &&
-    navigator.canShare(shareData) &&
-    typeof navigator.share === "function"
-  ) {
-    try {
-      await navigator.share(shareData);
-      return;
-    } catch (err) {
-      // User dismissed the sheet — do not fall through to auto-download.
-      if (err instanceof DOMException && err.name === "AbortError") {
-        return;
-      }
-      throw err;
-    }
-  }
+  if (await tryNativeFileShare(file)) return;
 
   // No file share sheet (e.g. many desktop browsers) — last-resort download.
   downloadBlob(blob, fileName);

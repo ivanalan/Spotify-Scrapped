@@ -293,14 +293,13 @@ export function ShareRecapCard({
         */}
         <ShareFinaleGhosts active={active} />
         <header
-          className="relative z-[1] flex w-full shrink-0 items-center justify-center [container-type:size]"
+          className="relative z-[1] flex w-full shrink-0 items-center justify-center overflow-hidden [container-type:size]"
           style={{ height: "var(--share-hero-band, 44%)" }}
         >
           <div
-            className="absolute top-1/2 left-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]"
+            className="absolute top-1/2 left-1/2 aspect-square max-h-[92%] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]"
             style={{
-              width:
-                "min(var(--share-hero-size, 63%), var(--share-hero-size, 63%))",
+              width: "min(var(--share-hero-size, 48%), 92%)",
             }}
           >
             {heroImageUrl ? (

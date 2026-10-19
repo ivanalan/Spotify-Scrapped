@@ -38,7 +38,10 @@ import {
   SLIDE_ART_PATTERN,
   slideTone,
 } from "@/lib/scrapped-card-palette";
-import { shareCardImage } from "@/lib/share-card-export";
+import {
+  captureShareCardBlob,
+  shareCardImage,
+} from "@/lib/share-card-export";
 import {
   leftLongGhostedCount,
   type ApiMetricCard,
@@ -122,6 +125,8 @@ export function ApiScrappedDeck({
   const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const shareExportInFlightRef = useRef(false);
+  /** Pre-captured finale PNG — keeps iOS `navigator.share` inside the tap gesture. */
+  const sharePrecaptureRef = useRef<Blob | null>(null);
   /** Locks active index during programmatic prev/next so IO can't land mid-scroll. */
   const navigatingToRef = useRef<number | null>(null);
   const navClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,6 +134,7 @@ export function ApiScrappedDeck({
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
   const [shareExportBusy, setShareExportBusy] = useState(false);
+  const [sharePrecaptureReady, setSharePrecaptureReady] = useState(false);
   /** Instagram-style press-and-hold on the main tap zones (not the sticky pause button). */
   const [pressHeld, setPressHeld] = useState(false);
   const pressRef = useRef<{
@@ -685,6 +691,35 @@ export function ApiScrappedDeck({
   // Chrome (wordmark / progress / controls) follows the active slide’s theme.
   const chromeTone = slideTone(active);
 
+  // Warm the share PNG while the finale is idle so Share can call
+  // navigator.share synchronously enough for iOS WebKit's user-gesture gate.
+  useEffect(() => {
+    if (active !== FINALE_INDEX || held) {
+      sharePrecaptureRef.current = null;
+      setSharePrecaptureReady(false);
+      return;
+    }
+    let cancelled = false;
+    setSharePrecaptureReady(false);
+    const timer = window.setTimeout(() => {
+      const node = shareCardRef.current;
+      if (!node) return;
+      void captureShareCardBlob(node)
+        .then((blob) => {
+          if (cancelled) return;
+          sharePrecaptureRef.current = blob;
+          setSharePrecaptureReady(true);
+        })
+        .catch(() => {
+          // Leave unready — tap still tries on-demand capture (desktop OK).
+        });
+    }, 450);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [active, held, visitKey, report.year]);
+
   const onShareFinale = useCallback(async () => {
     const node = shareCardRef.current;
     if (!node || shareExportInFlightRef.current) return;
@@ -693,6 +728,7 @@ export function ApiScrappedDeck({
     try {
       await shareCardImage(node, {
         fileName: `myscrapped-${report.year}.png`,
+        blob: sharePrecaptureRef.current ?? undefined,
       });
     } catch {
       // Capture / share failed — no toast surface yet. AbortError is handled inside.
@@ -1207,11 +1243,15 @@ export function ApiScrappedDeck({
                 variant="secondary"
                 className="h-auto w-full rounded-full border-0 bg-[#f5f5f5] font-bold text-[#1c1c1c] hover:bg-[#f5f5f5]/90 disabled:opacity-70"
                 style={{ paddingBlock: `${D.sharePadYPx}px` }}
-                disabled={shareExportBusy}
-                aria-busy={shareExportBusy}
+                disabled={shareExportBusy || !sharePrecaptureReady}
+                aria-busy={shareExportBusy || !sharePrecaptureReady}
                 onClick={() => void onShareFinale()}
               >
-                {shareExportBusy ? "Sharing…" : "Share"}
+                {shareExportBusy
+                  ? "Sharing…"
+                  : sharePrecaptureReady
+                    ? "Share"
+                    : "Preparing…"}
               </Button>
               <button
                 type="button"

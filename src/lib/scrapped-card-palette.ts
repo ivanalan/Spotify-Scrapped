@@ -52,13 +52,14 @@ export const SHARE_FINALE_DENSITY = {
   cardActionsGapPx: 32,
   bodyTopPx: 28,
   bodyBottomPx: 16,
-  heroBandPct: 52,
-  heroSizePct: 65,
+  /** Hero band + art sized so the square never overflows into MyScrapped.com. */
+  heroBandPct: 46,
+  heroSizePct: 48,
   listColGapPx: 18,
   listRowGapRem: 1.1,
   listPadXPx: 19,
   listPadYPx: 16,
-  typeRem: 0.86,
+  typeRem: 0.74,
   sharePadYPx: 12,
   actionsGapPx: 12,
 } as const;

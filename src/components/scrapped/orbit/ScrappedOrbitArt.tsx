@@ -131,7 +131,8 @@ function IntroCornerChrome({ freeze }: { freeze: boolean }) {
 
 /**
  * Soft-close bookend — pinned on every viewport.
- * MotifStage `slice` crops the mirrored bottom stack on tall phones.
+ * Bottom uses CSS scaleY(-1) (not SVG mirror inside motion.g) — WebKit often
+ * drops the nested SVG flip + Framer transform combo (SCARS soft-close).
  */
 function CloseBookendChrome({
   a,
@@ -160,15 +161,14 @@ function CloseBookendChrome({
         width={1.05}
         height={0.48}
         viewBox="0 0 360 220"
-        preserveAspectRatio="xMidYMin meet"
-        className="!bottom-[16%]"
+        preserveAspectRatio="xMidYMax meet"
+        className="!bottom-[16%] -scale-y-100"
       >
         <FunkyPillStack
           a={a}
           b={b}
           freeze={freeze}
-          closeEnter="bottom"
-          mirrored
+          closeEnter="top"
           enterDelay={0.2}
         />
       </MotifPin>
