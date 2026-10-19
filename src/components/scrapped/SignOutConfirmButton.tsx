@@ -45,7 +45,7 @@ export function SignOutConfirmButton({
         className={
           isText
             ? cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
+                buttonVariants({ variant: "outline", size: "lg" }),
                 paperOutlineTone,
                 className,
               )

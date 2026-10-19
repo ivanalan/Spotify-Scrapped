@@ -326,7 +326,7 @@ function Slide8Preview({
           </motion.p>
         ) : null}
 
-        <div className="mt-2 min-h-0 flex-1">
+        <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-y-contain [container-type:size]">
           {beat >= 3 ? (
             <WrappedEntityList
               key={`list-${cycleKey}`}
