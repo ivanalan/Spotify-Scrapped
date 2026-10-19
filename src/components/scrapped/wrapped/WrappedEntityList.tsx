@@ -50,7 +50,7 @@ export function WrappedEntityList({
   return (
     // Natural height inside a sized @container parent so rows can overflow and
     // scroll instead of flex-shrinking away. Preferred gap (cqh) is what phones use.
-    <ol className="flex w-full flex-col gap-[clamp(0.5rem,6cqh,2.5rem)]">
+    <ol className="flex w-full flex-col gap-10">
         {items.map((item, i) => {
           const plan = planListRowMotion(motionId, i, {
             active: true,
@@ -96,7 +96,7 @@ export function WrappedEntityList({
                 {i + 1}
               </motion.span>
               <motion.span
-                className="relative size-[clamp(2.75rem,12cqh,4.5rem)] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
+                className="relative size-[clamp(3.25rem,14cqh,4.75rem)] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
                 style={
                   !item.imageUrl && item.coverColor
                     ? { backgroundColor: item.coverColor }
