@@ -150,13 +150,15 @@ export function FunkyPillStack({
   if (reduce) return body;
 
   // Soft close — slow grow + rotate while drifting toward the mid-band copy.
+  // Keep opacity at 1: WebKit has dropped opacity-enter on the bottom bookend
+  // when nested under SVG mirror / CSS flip (shapes stayed invisible).
   if (closeEnter) {
     const fromY = closeEnter === "top" ? -40 : 40;
     const fromRot = closeEnter === "top" ? -16 : 16;
     return (
       <motion.g
-        initial={{ opacity: 0, scale: 0.5, y: fromY, rotate: fromRot }}
-        animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+        initial={{ scale: 0.5, y: fromY, rotate: fromRot }}
+        animate={{ scale: 1, y: 0, rotate: 0 }}
         transition={{
           duration: 2.6,
           delay: enterDelay,

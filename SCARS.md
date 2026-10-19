@@ -89,7 +89,15 @@ Format:
 ## Soft-close bottom pill stack missing on mobile, visible on web
 
 - **Not:** Missing bottom art in the double-stack markup, or a mobile-only CSS `display:none`.
-- **Cause:** Phone soft close used full-frame `MotifStage` (`xMidYMid slice`) with `FunkyDoubleStack`. Tall portrait viewports cover-scale the 360×640 design space and crop top/bottom equally — the mirrored bottom bookend sits near the viewBox floor and disappears. Wide path already pinned stacks to `top-center` / `bottom-center`.
+- **Cause (1):** Phone soft close used full-frame `MotifStage` (`xMidYMid slice`) with `FunkyDoubleStack`. Tall portrait viewports cover-scale the 360×640 design space and crop top/bottom equally — the mirrored bottom bookend sits near the viewBox floor and disappears. Wide path already pinned stacks to `top-center` / `bottom-center`.
+- **Cause (2, after pins):** Bottom bookend still flaky on deployed iOS — SVG `translate+scale(1,-1)` nested inside Framer `motion.g` (opacity enter) often failed to paint under WebKit. Top (unmirrored) was fine.
 - **Proof:** Phone Safari showed only the top bookend on slide 8; desktop wide (and fixed-frame mocks) showed both.
-- **Avoid:** Edge-anchored bookends (intro, soft close) must use Motif pins on every viewport — never rely on MotifStage slice to keep top+bottom chrome.
+- **Avoid:** Edge-anchored bookends must use Motif pins on every viewport. Mirror the bottom pin with CSS `scaleY(-1)` on the pin box, same unmirrored `FunkyPillStack` as top; don’t animate opacity on close enter.
 - **Related:** [D-009](docs/decisions/D-009-responsive-motif-pins.md), `CloseBookendChrome` in `ScrappedOrbitArt.tsx`
+
+## Share button does nothing on iOS Safari
+
+- **Not:** Tap zones eating the Share hit target, or missing `navigator.share` support entirely.
+- **Cause:** (1) Capture (`domToBlob`) ran inside the click before `navigator.share`, so WebKit dropped the user-gesture token. (2) `ShareData` included `title`/`text` with `files` — WebKit `canShare`/`share` rejects that combo.
+- **Proof:** Share no-op on iPhone Safari; desktop download fallback still worked.
+- **Avoid:** Pre-capture the PNG while the finale is idle; on tap share **files-only** with the warmed blob. Gate the button on precapture ready.

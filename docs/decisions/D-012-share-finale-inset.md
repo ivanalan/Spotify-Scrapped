@@ -26,9 +26,9 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 |------|--------|
 | IA | Inset card + Share + Replay below |
 | Card thesis | Hero + Ghosted artists / Ghosted songs |
-| Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })`). User chooses Save/Download or another app. No auto-download when the sheet opens. |
+| Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
 | Replay | `goTo(0)` — same as keyboard `R` |
-| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 12, card↔actions 32, hero 52%/65%, type 0.86rem, …) |
+| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 12, card↔actions 32, hero 46%/48%, type 0.74rem, …) |
 | Tap zones | Bottom cleared on finale so CTAs receive presses |
 | Visual kit | [D-014](D-014-share-finale-kit-j8.md) |
 
@@ -38,7 +38,7 @@ Gold full-bleed share slide with edge-to-edge `ShareRecapCard` and no Share / Re
 
 ## Cost
 
-Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Agents must not restore URL-only share or silent auto-download-as-primary without revisiting this decision.
+Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). iOS requires files-only ShareData + precapture before tap (see SCARS). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Agents must not restore URL-only share, title/text+files ShareData, or silent auto-download-as-primary without revisiting this decision.
 
 ## Source of truth
 
