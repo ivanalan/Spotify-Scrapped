@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -26,12 +26,15 @@ type Props = {
  * Paper tones use hex — AlertDialog portals outside `.wrapped-story`, so
  * `--wrapped-*` vars do not resolve (transparent panel + wrong text).
  * Global shadcn tokens are dark-theme; force ink contrast (D-003).
+ *
+ * `!` overrides matter: outline’s `aria-expanded:text-foreground` (near-white)
+ * + `dark:bg-input/30` (near-transparent) made the gate label vanish on open.
  */
 const paperOutlineTone =
-  "cursor-pointer border-[#1c1c1c]/20 bg-transparent text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c]";
+  "cursor-pointer border-[#1c1c1c]/20 !bg-transparent !text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c] aria-expanded:!border-[#1c1c1c]/20 aria-expanded:!bg-transparent aria-expanded:!text-[#1c1c1c] dark:!border-[#1c1c1c]/20 dark:!bg-transparent dark:!text-[#1c1c1c] dark:hover:!bg-[#1c1c1c]/15 dark:aria-expanded:!bg-transparent dark:aria-expanded:!text-[#1c1c1c]";
 
 const paperSolidTone =
-  "cursor-pointer bg-[#1c1c1c] text-[#f4f4f2] hover:!bg-[#1c1c1c] hover:!opacity-90";
+  "cursor-pointer !bg-[#1c1c1c] !text-[#f4f4f2] hover:!bg-[#1c1c1c] hover:!opacity-90 aria-expanded:!bg-[#1c1c1c] aria-expanded:!text-[#f4f4f2]";
 
 export function SignOutConfirmButton({
   className,
@@ -42,21 +45,23 @@ export function SignOutConfirmButton({
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={
-          isText
-            ? cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                paperOutlineTone,
-                className,
-              )
-            : cn(
-                buttonVariants({ variant: "default", size: "icon" }),
-                "rounded-full",
-                paperSolidTone,
-                className,
-              )
-        }
         aria-label="Sign out of Spotify"
+        className={className}
+        render={
+          isText ? (
+            <Button
+              variant="outline"
+              size="lg"
+              className={paperOutlineTone}
+            />
+          ) : (
+            <Button
+              variant="default"
+              size="icon"
+              className={cn("rounded-full", paperSolidTone)}
+            />
+          )
+        }
       >
         {isText ? "Sign out" : <Icon icon={closeOutline} className="size-4" />}
       </AlertDialogTrigger>

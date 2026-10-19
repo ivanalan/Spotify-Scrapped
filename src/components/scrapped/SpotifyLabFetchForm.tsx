@@ -59,8 +59,6 @@ function SubmitButton({
   );
 }
 
-const AUTO_START_KEY = "scrapped-lab-autostart";
-
 export function SpotifyLabFetchForm({
   next,
   label,
@@ -70,15 +68,21 @@ export function SpotifyLabFetchForm({
 }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Defer + cancel on cleanup so React Strict Mode remounts (and short-lived
+  // mobile mounts) don't latch a "already started" flag and skip the real submit.
+  // sessionStorage was wrong here: it was set *before* navigation, so a killed
+  // first attempt blocked every later auto-start in the same tab.
   useEffect(() => {
     if (!autoStart) return;
-    try {
-      if (sessionStorage.getItem(AUTO_START_KEY) === "1") return;
-      sessionStorage.setItem(AUTO_START_KEY, "1");
-    } catch {
-      /* private mode — still attempt once via ref guard below */
-    }
-    formRef.current?.requestSubmit();
+    let cancelled = false;
+    const id = window.setTimeout(() => {
+      if (cancelled) return;
+      formRef.current?.requestSubmit();
+    }, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
   }, [autoStart]);
 
   return (

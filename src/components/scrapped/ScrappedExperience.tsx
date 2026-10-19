@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ApiScrappedDeck } from "@/components/scrapped/ApiScrappedDeck";
+import {
+  ApiScrappedDeck,
+  type ApiScrappedPauseApi,
+} from "@/components/scrapped/ApiScrappedDeck";
 import {
   collectSoundtrackUris,
   DeckSoundtrack,
@@ -45,17 +48,10 @@ async function fetchArtistTrackUri(need: {
 
 export function ScrappedExperience({ report }: Props) {
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
+  const pauseApiRef = useRef<ApiScrappedPauseApi | null>(null);
   const [phase, setPhase] = useState<Phase>("gate");
   const [soundOn, setSoundOn] = useState(false);
 
-  // Allow a future needs_fetch visit to auto-Load again (same tab).
-  useEffect(() => {
-    try {
-      sessionStorage.removeItem("scrapped-lab-autostart");
-    } catch {
-      /* ignore */
-    }
-  }, []);
   const [deckPaused, setDeckPaused] = useState(false);
   const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
     null,
@@ -197,6 +193,7 @@ export function ScrappedExperience({ report }: Props) {
             onSoundtrackPrimeTo={primeSoundtrackTo}
             onSoundtrackCutTo={cutSoundtrackTo}
             held={!started}
+            pauseApiRef={pauseApiRef}
           />
         </div>
       ) : null}
@@ -209,8 +206,10 @@ export function ScrappedExperience({ report }: Props) {
         enabled={soundOn && (!started || !deckPaused)}
         onEnabledChange={setSoundOn}
         showToggle={false}
-        showPlayer={started}
+        showPlayer={false}
         onWarmChange={setWarm}
+        onExternalPause={() => pauseApiRef.current?.pauseStory()}
+        onExternalResume={() => pauseApiRef.current?.resumeStory()}
       />
     </div>
   );

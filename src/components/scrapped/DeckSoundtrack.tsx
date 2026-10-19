@@ -241,6 +241,16 @@ type Props = {
   showPlayer?: boolean;
   /** Fires when preload controllers become ready (for the post-Continue cue). */
   onWarmChange?: (state: SoundtrackWarmState) => void;
+  /**
+   * Owning embed paused mid-sample while we still wanted audio (e.g. Mac F8 /
+   * headset play-pause). Parent should sticky-pause the story like spacebar.
+   */
+  onExternalPause?: () => void;
+  /**
+   * Owning embed resumed while we had disabled playback (media-key play after
+   * a sticky pause). Parent should clear sticky pause so soundtrack can re-enable.
+   */
+  onExternalResume?: () => void;
 };
 
 export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
@@ -254,6 +264,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       showToggle = true,
       showPlayer = true,
       onWarmChange,
+      onExternalPause,
+      onExternalResume,
     },
     ref,
   ) {
@@ -774,6 +786,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       );
     }
 
+    const notifyExternalPause = useEffectEvent(() => {
+      onExternalPause?.();
+    });
+    const notifyExternalResume = useEffectEvent(() => {
+      onExternalResume?.();
+    });
+
     const attachEntryListeners = useEffectEvent((entry: PoolEntry) => {
       const { controller, slot } = entry;
       const trackUriFor = () => entry.uri;
@@ -872,6 +891,16 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
           if (!allowed) {
             clearEndTimersFor(`${slot}:${trackUri}`);
+            // Media-key / OS resume while story sticky-pause left us disabled —
+            // ask the parent to clear pause instead of fighting the play.
+            if (
+              !enabledRef.current &&
+              playingUriRef.current === trackUri &&
+              playingSlotRef.current === slot
+            ) {
+              notifyExternalResume();
+              return;
+            }
             controller.pause();
             return;
           }
@@ -922,8 +951,14 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         const resetAfterEnd =
           state.lastPlayingPosition >= duration - END_RESTART_MS &&
           position <= END_RESTART_MS;
-        if (!pausedAtEnd && !resetAfterEnd) return;
-        beginLoopCutover(trackUri);
+        if (pausedAtEnd || resetAfterEnd) {
+          beginLoopCutover(trackUri);
+          return;
+        }
+        // Mid-sample pause while we still wanted audio — hardware media keys.
+        if (state.seenHealthyProgress) {
+          notifyExternalPause();
+        }
       });
     });
 

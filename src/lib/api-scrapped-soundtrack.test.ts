@@ -141,8 +141,9 @@ function reportFixture(overrides?: {
           {
             id: "oneSaveArtist",
             trackId: oneSaveTrackId,
-            label: "One Save Act",
-            detail: "Song Name · 100d on the shelf",
+            label: "Song Name",
+            sublabel: "One Save Act",
+            detail: "One Save Act · 100d ago",
             value: 100,
           },
         ],

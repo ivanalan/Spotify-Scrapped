@@ -40,9 +40,24 @@ Format:
 - **Avoid:** On portaled UI (AlertDialog, etc.), do not rely on `--wrapped-*`. Use literal paper hex or tokens that exist on `:root`.
 - **Related:** [D-003](docs/decisions/D-003-shadcn-standard-controls.md)
 
+## Gate Sign out button disappears when the confirm modal opens
+
+- **Not:** Unmount on click, logout firing early, or the trigger being removed from the DOM.
+- **Cause:** Outline `Button` styles include `aria-expanded:text-foreground` (near-white on the app’s dark theme) while `dark:bg-input/30` keeps a near-transparent fill. Opening the AlertDialog sets `aria-expanded` on the trigger → white ink on paper → label vanishes; modal still shows.
+- **Proof:** Computed style after open was light foreground + transparent bg; forcing `aria-expanded` / `dark:` paper hex with `!` kept `rgb(28,28,28)`.
+- **Avoid:** On paper surfaces, override outline/default `aria-expanded` and `dark:` color utilities with `!` hex (same class of leak as the transparent modal scar).
+- **Related:** [D-003](docs/decisions/D-003-shadcn-standard-controls.md), `SignOutConfirmButton.tsx`
+
 ## “No all time favs got ghosted” then Most ghosted song with art
 
 - **Not:** Mobile-only layout, soundtrack fallback, or missing Spotify tops.
 - **Cause:** `slimForCookie` wiped headline `detail` (`"N of M"`) to save header bytes while keeping `left-long-run` items + art. Deck copy parsed only `detail` → null → empty headline; next beat still read `items[0]`.
 - **Proof:** Production (cookie-only on Vercel) showed empty copy then Dapper cover; local FS snapshots kept detail and looked fine.
 - **Avoid:** Keep headline `detail` in cookie slim. Resolve ghosted count via `leftLongGhostedCount` (detail → percent×long → items), never claim zero when the list still has songs.
+
+## Load data gate does not auto-start on mobile
+
+- **Not:** Missing `autoStart` prop, iOS blocking `requestSubmit`, or the user needing to tap once for a gesture.
+- **Cause:** Auto-start wrote `sessionStorage["scrapped-lab-autostart"]=1` *before* the POST navigated. A cancelled first attempt (Strict Mode remount, refresh mid-load, Safari restore) left the latch set; later mounts returned early and never submitted. The key was only cleared after a successful ready deck.
+- **Proof:** Mobile showed the idle “Load data” button after sign-in / revisit in the same tab; desktop often “worked” because people tapped. Cleared only in `ScrappedExperience`.
+- **Avoid:** Do not latch auto-start in `sessionStorage` before navigation succeeds. Defer submit with a timeout and cancel it on effect cleanup so Strict Mode remounts get one real submit.
