@@ -33,7 +33,7 @@ export type DeckSoundtrackHandle = {
   primeTo: (uri: string | null) => void;
   /**
    * Abort an in-flight speculative prime (and any hot-primed next act).
-   * Call when a press becomes a hold or is cancelled so the chirp does not linger.
+   * Call when a press is cancelled before navigate so the chirp does not linger.
    */
   cancelPrime: () => void;
   /**

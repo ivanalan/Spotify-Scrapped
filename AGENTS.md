@@ -71,7 +71,7 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - Wide viewport orbit art: corner-pinned motifs; phone keeps legacy `MotifStage` slice except intro + soft-close bookends ([D-009](docs/decisions/D-009-responsive-motif-pins.md)). Soft close: teal + funky grow-in bookends ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)).
 - Ghosted songs list (slide 3): ink field + seamless clouds + spiky grass + perimeter ghosts ([D-010](docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md)).
 - **Scrapped** logo / wordmark is always italic ([D-011](docs/decisions/D-011-scrapped-logo-italic.md)); body copy stays roman.
-- Share finale: inset card + Share / Replay ([D-012](docs/decisions/D-012-share-finale-inset.md)); visual kit J8 ink stage / teal card / framing ghosts ([D-014](docs/decisions/D-014-share-finale-kit-j8.md)). Explore method: deck rhymes · stage behind / card in front ([D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
+- Share finale: inset **9:16** card + Share / Replay ([D-012](docs/decisions/D-012-share-finale-inset.md)); visual kit J8 ink stage / teal card / framing ghosts ([D-014](docs/decisions/D-014-share-finale-kit-j8.md)). Explore method: deck rhymes · stage behind / card in front ([D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
 
 ## Layout
 

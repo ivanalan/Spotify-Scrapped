@@ -306,11 +306,22 @@
       gap: var(--card-actions-gap);
     }
 
+    /* Card slot — leftover height; island itself is locked 9:16 (D-012). */
+    .share-card-slot {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      container-type: size;
+    }
+
     .share-card {
       position: relative;
       z-index: 2;
-      flex: 1;
-      min-height: 0;
+      aspect-ratio: 9 / 16;
+      width: min(100cqi, calc(100cqb * 9 / 16));
+      height: auto;
       display: flex;
       flex-direction: column;
       background: var(--card-bg);
@@ -662,37 +673,39 @@
       </div>
 
       <div class="finale-body">
-        <article class="share-card" id="share-card">
-          <div class="card-art" id="card-art" aria-hidden="true"></div>
-          <header class="card-hero">
-            <div class="hero-sq">
-              <span class="ph">#1 ghosted artist art</span>
+        <div class="share-card-slot">
+          <article class="share-card" id="share-card">
+            <div class="card-art" id="card-art" aria-hidden="true"></div>
+            <header class="card-hero">
+              <div class="hero-sq">
+                <span class="ph">#1 ghosted artist art</span>
+              </div>
+            </header>
+            <div class="card-lists">
+              <div>
+                <h2>Ghosted artists</h2>
+                <ol>
+                  <li><span class="n">1</span><span class="t">Kendrick Lamar</span></li>
+                  <li><span class="n">2</span><span class="t">Mamalarky</span></li>
+                  <li><span class="n">3</span><span class="t">LE SSERAFIM</span></li>
+                  <li><span class="n">4</span><span class="t">keshi</span></li>
+                  <li><span class="n">5</span><span class="t">Kevin Abstract</span></li>
+                </ol>
+              </div>
+              <div>
+                <h2>Ghosted songs</h2>
+                <ol>
+                  <li><span class="n">1</span><span class="t">Dapper</span></li>
+                  <li><span class="n">2</span><span class="t">Calling After Me</span></li>
+                  <li><span class="n">3</span><span class="t">My Baby</span></li>
+                  <li><span class="n">4</span><span class="t">Cariño</span></li>
+                  <li><span class="n">5</span><span class="t">I'd Like To Walk</span></li>
+                </ol>
+              </div>
             </div>
-          </header>
-          <div class="card-lists">
-            <div>
-              <h2>Ghosted artists</h2>
-              <ol>
-                <li><span class="n">1</span><span class="t">Kendrick Lamar</span></li>
-                <li><span class="n">2</span><span class="t">Mamalarky</span></li>
-                <li><span class="n">3</span><span class="t">LE SSERAFIM</span></li>
-                <li><span class="n">4</span><span class="t">keshi</span></li>
-                <li><span class="n">5</span><span class="t">Kevin Abstract</span></li>
-              </ol>
-            </div>
-            <div>
-              <h2>Ghosted songs</h2>
-              <ol>
-                <li><span class="n">1</span><span class="t">Dapper</span></li>
-                <li><span class="n">2</span><span class="t">Calling After Me</span></li>
-                <li><span class="n">3</span><span class="t">My Baby</span></li>
-                <li><span class="n">4</span><span class="t">Cariño</span></li>
-                <li><span class="n">5</span><span class="t">I'd Like To Walk</span></li>
-              </ol>
-            </div>
-          </div>
-          <footer class="card-foot">MyScrapped.com</footer>
-        </article>
+            <footer class="card-foot">MyScrapped.com</footer>
+          </article>
+        </div>
 
         <div class="actions">
           <button type="button" class="btn-share" id="btn-share">Share</button>

@@ -289,7 +289,7 @@ export function ShareRecapCard({
       >
         {/*
           Inset share finale (D-012 IA + D-014 kit J8): teal card, framing
-          ghosts, MyScrapped.com. Density from --share-* on the deck host.
+          ghosts, MyScrapped.com. Host locks 9:16; density from --share-*.
         */}
         <ShareFinaleGhosts active={active} />
         <header
