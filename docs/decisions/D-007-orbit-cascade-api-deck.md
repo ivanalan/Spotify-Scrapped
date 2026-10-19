@@ -18,7 +18,7 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 |------|--------|
 | Palette | `ink · orchid · ember · mango · gold · teal · rose` — see `src/lib/scrapped-card-palette.ts` |
 | Intro | Ink field + orchid concentric oval ladder |
-| Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches |
+| Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches. Ghosted songs list (slide 3) is ink again with sky/grass/ghosts — [D-010](D-010-ghosted-list-sky-grass-ghosts.md) |
 | Ghosted spiral | Orchid field; gold→aqua GradOrbs on a perimeter-biased spiral; slow in-place cascade then drift |
 | Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year” |
 | Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |
@@ -50,4 +50,5 @@ Denser art; risk of type/art collision if mid-band is ignored. Plus / Lab stay o
 - Tokens: `src/lib/scrapped-card-palette.ts`
 - CSS: `.wrapped-story[data-wrapped-tone=…]` in `src/app/globals.css`
 - Art: `src/components/scrapped/orbit/ScrappedOrbitArt.tsx`
+- Wide viewport pins (mobile-locked): [D-009](D-009-responsive-motif-pins.md)
 - Skill: `.cursor/skills/scrapped-art-direction/SKILL.md`

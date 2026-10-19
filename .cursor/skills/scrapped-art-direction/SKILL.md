@@ -36,16 +36,17 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
 | Accent | Motif gradients within the 6 swatches — not hazard neon floods / ribbons |
 | Type | **Poppins** everywhere — heavy display headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”). Roles: `text-display` / `text-title` / `text-body` / `text-caption` ([D-002](../../../docs/decisions/D-002-poppins-mobile-first.md)) |
-| Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters) |
+| Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters). Wide: corner pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone keeps legacy `MotifStage` slice |
 | Geometry | Locked ovals (`OVAL`) by default; volume uses a bottom ocean wave; art in corners / edges; **clear mid band** for copy + lists |
-| #1 artist | **Kit A rose cascade** — centered eccentric ovals · opaque gradients · independent spin — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) (`ARTIST_ORBIT_A`) |
+| #1 artist | **Kit F orchid ladder spin** — ink field · ink-lean opaque orchid ovals · independent spin — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) (`ARTIST_ORBIT`) |
+| Ghosted list | **Slide 3 only** — ink field · seamless marquee clouds · spiky wind grass · perimeter blob ghosts — [D-010](../../../docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md) |
 | Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). Art is peripheral chrome, not a second copy-motion path |
 
 **Emotional register:** conversational, dry, slightly merciful — same as WRAPPED.md tone.
 
 ## Composition rules
 
-1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the canvas fill the viewport.
+1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the canvas fill the viewport. Wide orbit chrome uses motif pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); never regress the phone `MotifStage` path.
 2. **One job per slide** — setup line → reveal → optional aside. No competing heroes.
 3. **Type owns the mid band** — art stays TL / BL / top drift / corner rain. Prefer clear field over putting body type on vibrant disks.
 4. **Contrast** — every tone sets canvas + ink + muted + panel + progress together. Muted stays near ink (`INK_MUTED` ≈ 90%/88%), not washed grey. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
@@ -82,6 +83,7 @@ Before shipping UI changes:
 - [ ] Deck chrome inherits the active slide tone (`data-wrapped-tone` on chrome host)
 - [ ] Headline → subline → aside are reading-timed line beats; respect `prefers-reduced-motion`
 - [ ] Art is static (or settled) under reduced-motion; mid band stays clear
+- [ ] Wide viewport uses motif pins; phone `MotifStage` path unchanged ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md))
 - [ ] Empty states keep a short honest line
 - [ ] No new AI-slop patterns from the ban list
 - [ ] Copy matches the API conversational spine in WRAPPED.md
@@ -89,7 +91,7 @@ Before shipping UI changes:
 ## When stuck
 
 1. Read [docs/WRAPPED.md](../../../docs/WRAPPED.md) for beat/tone (and §10 for motion vs Wrapped).
-2. Read [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) for palette / contrast; [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) for the #1 artist orbit mechanic.
+2. Read [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) for palette / contrast; [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) for the #1 artist orbit; [D-010](../../../docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md) for ghosted-songs list chrome.
 3. Open [docs/mocks/](../../../docs/mocks/) and match structure before inventing.
 4. For “make motion more Wrapped,” compare [docs/mocks/wrapped-ref/named/](../../../docs/mocks/wrapped-ref/named/) to live deck timing — tighten clocks / handoffs, don’t port ribbons.
 5. For copy vs list motion bugs, read [SCARS.md](../../../SCARS.md) and [D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md) before inventing a third path.

@@ -67,7 +67,9 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - API story deck copy is **handwritten** and locked — don’t regenerate lines casually ([D-005](docs/decisions/D-005-handwritten-api-story-copy.md)).
 - API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)).
 - API deck look: Orbit Cascade palette + peripheral ovals / volume ocean ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)); each story is dark or light — deck chrome follows the active slide.
-- #1 artist beat: kit A rose cascade — centered eccentric ovals, opaque gradients, independent slow spin ([D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)).
+- #1 artist beat: kit F orchid ladder spin — ink field, ink-lean opaque orchid ovals, independent slow spin ([D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)).
+- Wide viewport orbit art: corner-pinned motifs; phone keeps legacy `MotifStage` slice ([D-009](docs/decisions/D-009-responsive-motif-pins.md)).
+- Ghosted songs list (slide 3): ink field + seamless clouds + spiky grass + perimeter ghosts ([D-010](docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md)).
 
 ## Layout
 
