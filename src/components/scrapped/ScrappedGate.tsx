@@ -1,5 +1,6 @@
 "use client";
 
+import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
 import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
 import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
@@ -49,10 +50,14 @@ export function ScrappedGate({
 
   return (
     <div
-      className="wrapped-story relative flex min-h-dvh w-full flex-col items-center px-10"
-      data-wrapped-tone="paper"
+      className="wrapped-story relative flex min-h-dvh w-full flex-col items-center overflow-hidden px-10"
+      data-wrapped-tone="ink"
     >
-      <div className="flex min-h-dvh w-full max-w-sm flex-col items-stretch py-10 text-left">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <ScrappedOrbitArt slideIndex={0} pattern="intro" active />
+      </div>
+
+      <div className="relative z-10 flex min-h-dvh w-full max-w-sm flex-col items-stretch py-10 text-left">
         {connected ? (
           <div className="mb-8 flex w-full shrink-0 justify-end">
             <SignOutConfirmButton appearance="text" />

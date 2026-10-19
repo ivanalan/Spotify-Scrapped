@@ -42,3 +42,4 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Auth copy (sign in / sign out): [D-004](docs/decisions/D-004-sign-in-sign-out-copy.md)
 - Handwritten API story copy: [D-005](docs/decisions/D-005-handwritten-api-story-copy.md)
 - API story headline style (≤6 words / favs / open compounds): [D-006](docs/decisions/D-006-api-story-headline-style.md)
+- API deck Orbit Cascade look / per-story dark|light theme + chrome: [D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)

@@ -165,6 +165,12 @@ export function ArtMotionLab() {
             ← Scrapped
           </Link>
           <Link
+            href="/scrapped/art/storyboard"
+            className="text-foreground underline-offset-2 hover:underline"
+          >
+            Full-deck storyboard →
+          </Link>
+          <Link
             href="/scrapped/art/list"
             className="text-foreground underline-offset-2 hover:underline"
           >

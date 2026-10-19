@@ -14,7 +14,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type Props = {
   className?: string;
@@ -23,17 +22,17 @@ type Props = {
 };
 
 /**
- * Paper tones use hex — AlertDialog portals outside `.wrapped-story`, so
- * `--wrapped-*` vars do not resolve (transparent panel + wrong text).
- * Global shadcn tokens are dark-theme; force ink contrast (D-003).
- *
- * `!` overrides matter: outline’s `aria-expanded:text-foreground` (near-white)
- * + `dark:bg-input/30` (near-transparent) made the gate label vanish on open.
+ * Gate “Sign out” trigger uses `--wrapped-*` (Orbit ink field).
+ * AlertDialog portals outside `.wrapped-story`, so dialog actions keep paper hex
+ * (D-003 / D-007 contrast).
  */
-const paperOutlineTone =
-  "cursor-pointer border-[#1c1c1c]/20 !bg-transparent !text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c] aria-expanded:!border-[#1c1c1c]/20 aria-expanded:!bg-transparent aria-expanded:!text-[#1c1c1c] dark:!border-[#1c1c1c]/20 dark:!bg-transparent dark:!text-[#1c1c1c] dark:hover:!bg-[#1c1c1c]/15 dark:aria-expanded:!bg-transparent dark:aria-expanded:!text-[#1c1c1c]";
+const gateOutlineTone =
+  "cursor-pointer border-[var(--wrapped-ink)]/25 !bg-transparent !text-[var(--wrapped-ink)] hover:!border-[var(--wrapped-ink)]/50 hover:!bg-[var(--wrapped-ink)]/10 hover:!text-[var(--wrapped-ink)] aria-expanded:!border-[var(--wrapped-ink)]/25 aria-expanded:!bg-transparent aria-expanded:!text-[var(--wrapped-ink)]";
 
-const paperSolidTone =
+const dialogOutlineTone =
+  "cursor-pointer border-[#1c1c1c]/20 !bg-transparent !text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c] aria-expanded:!border-[#1c1c1c]/20 aria-expanded:!bg-transparent aria-expanded:!text-[#1c1c1c]";
+
+const dialogSolidTone =
   "cursor-pointer !bg-[#1c1c1c] !text-[#f4f4f2] hover:!bg-[#1c1c1c] hover:!opacity-90 aria-expanded:!bg-[#1c1c1c] aria-expanded:!text-[#f4f4f2]";
 
 export function SignOutConfirmButton({
@@ -52,13 +51,13 @@ export function SignOutConfirmButton({
             <Button
               variant="outline"
               size="lg"
-              className={paperOutlineTone}
+              className={gateOutlineTone}
             />
           ) : (
             <Button
               variant="default"
               size="icon"
-              className={cn("rounded-full", paperSolidTone)}
+              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
             />
           )
         }
@@ -80,7 +79,7 @@ export function SignOutConfirmButton({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="mx-0 mb-0 flex-row items-center justify-end gap-2 rounded-none border-0 bg-transparent p-0">
-          <AlertDialogCancel variant="outline" size="default" className={paperOutlineTone}>
+          <AlertDialogCancel variant="outline" size="default" className={dialogOutlineTone}>
             Cancel
           </AlertDialogCancel>
           <form
@@ -91,7 +90,7 @@ export function SignOutConfirmButton({
             <AlertDialogAction
               type="submit"
               size="default"
-              className={paperSolidTone}
+              className={dialogSolidTone}
             >
               Sign out
             </AlertDialogAction>

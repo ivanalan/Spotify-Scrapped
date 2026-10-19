@@ -267,65 +267,210 @@
   line-height: 1.4;
 }
 
-/* Scrapped (API story) — conversational light story (docs/mocks) */
+/* Scrapped story canvas — Orbit Cascade on API deck (D-007); legacy paper for gate/labs */
 .wrapped-story {
+  --wrapped-canvas: #12101a;
+  --wrapped-ink: #f5f5f5;
+  --wrapped-muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+  --wrapped-panel: #2a2438;
+  --wrapped-accent: #c9a0f5;
+  --wrapped-progress-track: #f5f5f5;
+  --wrapped-progress-fill: #f5f5f5;
+  color-scheme: dark;
+  background: var(--wrapped-canvas);
+}
+
+/* Orbit Cascade tones — each sets canvas + ink + muted + panel + progress */
+.wrapped-story[data-wrapped-tone="ink"],
+.wrapped-story [data-wrapped-tone="ink"] {
+  --wrapped-canvas: #12101a;
+  --wrapped-ink: #f5f5f5;
+  --wrapped-muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+  --wrapped-panel: #2a2438;
+  --wrapped-accent: #c9a0f5;
+  --wrapped-progress-track: #f5f5f5;
+  --wrapped-progress-fill: #f5f5f5;
+  color-scheme: dark;
+}
+
+.wrapped-story[data-wrapped-tone="orchid"],
+.wrapped-story [data-wrapped-tone="orchid"] {
+  --wrapped-canvas: #9b4de8;
+  --wrapped-ink: #f5f5f5;
+  --wrapped-muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+  --wrapped-panel: #7a2ec4;
+  --wrapped-accent: #ffe66d;
+  --wrapped-progress-track: #f5f5f5;
+  --wrapped-progress-fill: #f5f5f5;
+  color-scheme: dark;
+}
+
+.wrapped-story[data-wrapped-tone="ember"],
+.wrapped-story [data-wrapped-tone="ember"] {
+  --wrapped-canvas: #ffb04a;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 55%, transparent);
+  --wrapped-panel: #f59e2e;
+  --wrapped-accent: #5eead4;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
+}
+
+/* Field fill only on the slide — not chrome/host (avoids a second header gradient). */
+.wrapped-story [data-scrapped-slide][data-wrapped-tone="ember"] {
+  background-color: var(--wrapped-canvas);
+  background-image: linear-gradient(
+    165deg,
+    #ffd08a 0%,
+    #ffb04a 45%,
+    #ff8f2a 100%
+  );
+}
+
+.wrapped-story[data-wrapped-tone="mango"],
+.wrapped-story [data-wrapped-tone="mango"] {
+  --wrapped-canvas: #ff9f1c;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 55%, transparent);
+  --wrapped-panel: #e08a0e;
+  --wrapped-accent: #1b2a6b;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
+}
+
+.wrapped-story[data-wrapped-tone="gold"],
+.wrapped-story [data-wrapped-tone="gold"] {
+  --wrapped-canvas: #e8b84b;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 55%, transparent);
+  --wrapped-panel: #d4a017;
+  --wrapped-accent: #5c1a7a;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
+}
+
+.wrapped-story[data-wrapped-tone="teal"],
+.wrapped-story [data-wrapped-tone="teal"] {
+  --wrapped-canvas: #1a7a6e;
+  --wrapped-ink: #f5f5f5;
+  --wrapped-muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+  --wrapped-panel: #146358;
+  --wrapped-accent: #ffe66d;
+  --wrapped-progress-track: #f5f5f5;
+  --wrapped-progress-fill: #f5f5f5;
+  color-scheme: dark;
+}
+
+.wrapped-story[data-wrapped-tone="rose"],
+.wrapped-story [data-wrapped-tone="rose"] {
+  --wrapped-canvas: #c9185b;
+  --wrapped-ink: #f5f5f5;
+  --wrapped-muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+  --wrapped-panel: #a01248;
+  --wrapped-accent: #ffe66d;
+  --wrapped-progress-track: #f5f5f5;
+  --wrapped-progress-fill: #f5f5f5;
+  color-scheme: dark;
+}
+
+/* Legacy paper tones — Gate / loading / list labs only (not API deck) */
+.wrapped-story[data-wrapped-tone="paper"],
+.wrapped-story [data-wrapped-tone="paper"] {
   --wrapped-canvas: #f4f4f2;
   --wrapped-ink: #1c1c1c;
   --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
-  --wrapped-panel: #d9d9d4;
+  --wrapped-panel: #dcdcd6;
   --wrapped-accent: #1c1c1c;
   --wrapped-progress-track: #1c1c1c;
   --wrapped-progress-fill: #1c1c1c;
   color-scheme: light;
-  background: var(--wrapped-canvas);
-}
-
-.wrapped-story[data-wrapped-tone="paper"],
-.wrapped-story [data-wrapped-tone="paper"] {
-  --wrapped-canvas: #f4f4f2;
-  --wrapped-panel: #dcdcd6;
 }
 
 .wrapped-story[data-wrapped-tone="cream"],
 .wrapped-story [data-wrapped-tone="cream"] {
   --wrapped-canvas: #f3eee6;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #ddd4c6;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="sand"],
 .wrapped-story [data-wrapped-tone="sand"] {
   --wrapped-canvas: #efe9df;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #d8d0c3;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="mist"],
 .wrapped-story [data-wrapped-tone="mist"] {
   --wrapped-canvas: #e9eef2;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #cfd8e0;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="blush"],
 .wrapped-story [data-wrapped-tone="blush"] {
   --wrapped-canvas: #f2e9e7;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #ddd0cd;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="sage"],
 .wrapped-story [data-wrapped-tone="sage"] {
   --wrapped-canvas: #e8eee9;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #cdd8cf;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="sky"],
 .wrapped-story [data-wrapped-tone="sky"] {
   --wrapped-canvas: #e7eef5;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #ccd8e4;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story[data-wrapped-tone="slate"],
 .wrapped-story [data-wrapped-tone="slate"] {
   --wrapped-canvas: #ececec;
+  --wrapped-ink: #1c1c1c;
+  --wrapped-muted: color-mix(in oklab, #1c1c1c 58%, transparent);
   --wrapped-panel: #d4d4d4;
+  --wrapped-accent: #1c1c1c;
+  --wrapped-progress-track: #1c1c1c;
+  --wrapped-progress-fill: #1c1c1c;
+  color-scheme: light;
 }
 
 .wrapped-story .wrapped-progress {

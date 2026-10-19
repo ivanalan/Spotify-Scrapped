@@ -101,7 +101,7 @@ Current export order that already follows this:
 
 ### Scrapped conversational spine (`/scrapped`)
 
-Mocks in `docs/mocks/` set the voice: light solid backgrounds, no art yet, **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines — not industrial receipt chrome.
+Mocks in `docs/mocks/` set the voice: **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines. API deck **look** is Orbit Cascade (card fields + peripheral ovals / volume ocean) — [D-007](decisions/D-007-orbit-cascade-api-deck.md); still not Wrapped neon ribbons.
 
 Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle→aside lines on one narrative block stay on **one scene** — each line is its own beat (reading-time paced); later lines accumulate without wiping the title.
 
@@ -286,7 +286,7 @@ Implementation: `ApiScrappedDeck.tsx` + `WrappedStorySlide.tsx` + `src/lib/scrap
 
 | Axis | Wrapped (this capture) | Scrapped today |
 |------|------------------------|----------------|
-| Hero | Looping / morphing illustration | **Text**; solid tint canvas (`paper`/`cream`/…) |
+| Hero | Looping / morphing illustration | **Text** on Orbit Cascade card fields + corner art ([D-007](decisions/D-007-orbit-cascade-api-deck.md)) |
 | In-scene pacing | One card, short dwell, auto next | **Line beats** on one scene: headline → subline → aside (reading-time @ ~260 wpm + enter travel) |
 | Enter motion | Art sting + copy already composed | Soft rise + fade (`titleY` 14px, ~0.32s fade / ~0.52s travel); optional blur on open |
 | Exit | Hard cut to new art | Soft fade / slight `-8px` rise; setup→list can **fade-only** so title slot doesn’t jump |
@@ -319,4 +319,4 @@ Constants that matter when tuning “Wrapped feel” without cloning art:
 - Auto-walking the whole deck without a user advance (our progress-fill-then-wait is intentional).  
 - Claiming true skips from API affinity proxies.
 
-**Closest gap vs Wrapped today:** Wrapped feels *art-led and card-cut*; Scrapped feels *text-led and line-stack*. Closing the gap means tighter reading clocks and clearer setup→punchline handoffs — not porting Wrapped art.
+**Closest gap vs Wrapped today:** Wrapped feels *art-led and card-cut*; Scrapped is *text-led* on Orbit Cascade card cuts ([D-007](decisions/D-007-orbit-cascade-api-deck.md)). Closing the motion gap means tighter reading clocks — not porting Wrapped ribbons or Sound Town.
