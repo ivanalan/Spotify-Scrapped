@@ -837,13 +837,13 @@ export function ApiScrappedDeck({
                 ? "A multi year fav that fell out of the recent rotation."
                 : "Wow — you actually still talk to your old favs.",
               lead: topSong ? (
-                <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
+                <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topSong.imageUrl ? (
                     <Image
                       src={topSong.imageUrl}
                       alt=""
                       fill
-                      sizes="192px"
+                      sizes="160px"
                       className="object-cover"
                       // Eager: horizontal snap + opacity enter motion break Safari lazy-load.
                       priority
@@ -851,6 +851,7 @@ export function ApiScrappedDeck({
                   ) : null}
                 </div>
               ) : undefined,
+              align: "center",
               display: "hero",
               footer: topSong ? (
                 <span>
@@ -966,19 +967,20 @@ export function ApiScrappedDeck({
                 ? "Highest multi year fav missing from latest activity."
                 : "Your loyalty program is weirdly intact.",
               lead: topArtist ? (
-                <div className="relative aspect-square w-40 max-w-[45%] overflow-hidden rounded-sm bg-[var(--wrapped-panel)] sm:w-48">
+                <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topArtist.imageUrl ? (
                     <Image
                       src={topArtist.imageUrl}
                       alt=""
                       fill
-                      sizes="192px"
+                      sizes="160px"
                       className="object-cover"
                       priority
                     />
                   ) : null}
                 </div>
               ) : undefined,
+              align: "center",
               display: "hero",
               footer: topArtist ? (
                 <span>

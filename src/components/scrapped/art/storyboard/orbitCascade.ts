@@ -105,7 +105,7 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(1).bg,
     ink: card(1).ink,
     ...accents(1),
-    hero: "Bottom ocean wave — aqua→blue on bright ember; light theme (black ink)",
+    hero: "Bottom ocean wave — ice→deep teal on flame ember; light theme (black ink)",
     motion:
       "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s",
     composition:
@@ -113,7 +113,7 @@ export const SLIDE_SPECS: SlideSpec[] = [
     why: "Likes as rising water on a hot orange field — dark-theme chrome + copy travel with the slide.",
     iterations: [
       "B1 — Bottom semi + linear gradient + enter-breathe",
-      "B2 — Aqua→blue ocean on bright ember; tide rises on joined beat (current)",
+      "B2 — Ice→deep teal ocean on flame ember; tide rises on joined beat (current)",
       "B3 — Stronger multi-crest foam line",
       "B4 — Tide keyed to subline instead of narrative beat",
     ],

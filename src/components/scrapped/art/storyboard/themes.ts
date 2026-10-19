@@ -4,7 +4,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#1a2a6c",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff4d8d",
     accent2: "#c43bff",
     motionNote: "cascade-in TL rings · outer hue pulse",
@@ -13,7 +13,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#3b1458",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff6b9d",
     accent2: "#ffe66d",
     motionNote: "semi breathe · rim gradient crawl",
@@ -22,7 +22,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#5c1038",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff4d8d",
     accent2: "#3de0ff",
     motionNote: "rings settle · slow 2–3° rotate",
@@ -31,7 +31,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#1e3a6e",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#3de0ff",
     accent2: "#ff4d8d",
     motionNote: "arc draw · rank dots pulse",
@@ -40,7 +40,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#0d2f2f",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#7cff6b",
     accent2: "#ffc93c",
     motionNote: "arc draw · rank dots pulse",
@@ -49,7 +49,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#2a1458",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#b44dff",
     accent2: "#ff6b3d",
     motionNote: "rings settle · slow rotate",
@@ -58,7 +58,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#14301f",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#7cff6b",
     accent2: "#3de0ff",
     motionNote: "arc draw · rank dots pulse",
@@ -67,7 +67,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#2a2a2e",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.65)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff4d8d",
     accent2: "#3de0ff",
     motionNote: "two arcs close the gap over dwell",
@@ -76,7 +76,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#1c2438",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.55)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff4d8d",
     motionNote: "single ring opacity settle",
     reuseNote: "CascadeRings ×1",
@@ -84,7 +84,7 @@ const CASCADE: SlideTheme[] = [
   {
     bg: "#0e0e12",
     ink: "#f5f5f5",
-    muted: "rgba(245,245,245,0.6)",
+    muted: "rgba(245,245,245,0.9)",
     accent: "#ff4d8d",
     accent2: "#ffc93c",
     motionNote: "quarter fan · micro hue travel",
@@ -96,7 +96,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#efe9df",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#c45c7a",
     accent2: "#e8b4c4",
     motionNote: "dots drift in · wash fades up",
@@ -105,7 +105,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#f2e9e7",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#d4786a",
     accent2: "#f0c4bc",
     motionNote: "density eases in (decorative pile)",
@@ -114,7 +114,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#e7eef5",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#5a8fbf",
     accent2: "#b8d4ec",
     motionNote: "orbit rotate ~8s loop",
@@ -123,7 +123,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#f3eee6",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#c4a06a",
     accent2: "#e8d4b0",
     motionNote: "rank dots stagger with list",
@@ -132,7 +132,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#e8eee9",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#5a8f72",
     accent2: "#b8d4c4",
     motionNote: "rank dots stagger with list",
@@ -141,7 +141,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#ebe4f0",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#8a6aab",
     accent2: "#d4c4e8",
     motionNote: "orbit rotate ~8s loop",
@@ -150,7 +150,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#e4f0ee",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#4a9a8e",
     accent2: "#b0dcd4",
     motionNote: "rank dots stagger with list",
@@ -159,7 +159,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#f0ebe3",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#c4785a",
     accent2: "#6a9ab8",
     motionNote: "two clusters slowly attract",
@@ -168,7 +168,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#e8e8ea",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.5)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#8a8a92",
     motionNote: "few remaining dots fade",
     reuseNote: "DotField sparse",
@@ -176,7 +176,7 @@ const DOT: SlideTheme[] = [
   {
     bg: "#e4e6ea",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#6a7a8a",
     accent2: "#c4ccd4",
     motionNote: "static dot border frame",
@@ -188,7 +188,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#f4f4f2",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#12c4b0",
     accent2: "#f05a3d",
     motionNote: "quarters wipe in from corners",
@@ -197,7 +197,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#efe9df",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#f5c518",
     accent2: "#2f6bff",
     motionNote: "oversized quarter behind numeral",
@@ -206,7 +206,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#f2e9e7",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#f05a3d",
     accent2: "#12c4b0",
     motionNote: "quarter bracket snap-in · hold",
@@ -215,7 +215,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#e7eef5",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#2f6bff",
     accent2: "#e84a8a",
     motionNote: "tiny quarter ticks with cascade",
@@ -224,7 +224,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#f3eee6",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#f5c518",
     accent2: "#12c4b0",
     motionNote: "tiny quarter ticks with cascade",
@@ -233,7 +233,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#e9eef2",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#12c4b0",
     accent2: "#f05a3d",
     motionNote: "quarter bracket snap-in · hold",
@@ -242,7 +242,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#e8eee9",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#2a6f6a",
     accent2: "#f5c518",
     motionNote: "tiny quarter ticks with cascade",
@@ -251,7 +251,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#f3eee6",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#e84a8a",
     accent2: "#12c4b0",
     motionNote: "complementary quarters micro-rotate toward close",
@@ -260,7 +260,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#f4f4f2",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.5)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#cdd0c8",
     motionNote: "single muted quarter · no motion",
     reuseNote: "QuarterDisk muted",
@@ -268,7 +268,7 @@ const QUARTER: SlideTheme[] = [
   {
     bg: "#ececec",
     ink: "#1c1c1c",
-    muted: "rgba(28,28,28,0.55)",
+    muted: "rgba(28,28,28,0.88)",
     accent: "#f05a3d",
     accent2: "#2f6bff",
     motionNote: "static quarter stamp on card",

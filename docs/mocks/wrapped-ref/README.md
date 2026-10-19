@@ -5,6 +5,8 @@
 
 **Purpose:** Beat spine + motion grammar reference for Scrapped. Invert meaning; do **not** clone neon art, ribbons, or purple/coral carnival looks. Narrative rules: [docs/WRAPPED.md](../../WRAPPED.md) §10.
 
+Sibling pack (**2024** Music Evolution / AI podcast): [../wrapped-ref-2024/](../wrapped-ref-2024/).
+
 ## Folders
 
 | Path | What’s in it |

@@ -16,6 +16,14 @@ Format:
 
 ---
 
+## Left-aligned setup copy jumps to center before fading into a centered cover beat
+
+- **Not:** Framer layout spring, wrong `align` on the setup beat, or the cover beat’s own centering.
+- **Cause:** `WrappedStorySlide` applied `text-center` on the **section** from `current.align`. When the scene advanced left→center (e.g. “One of them stings most” → “Most ghosted song”), the section flipped immediately while `AnimatePresence` was still exiting the old `BeatBody`, so outgoing copy inherited center mid-fade. Same class of leak as section-level justify yanking setup copy ([Title jumps…](#title-jumps-or-stays-put-when-the-subtitle-appears-on-list-setup-slides)).
+- **Proof:** “One of them stings most” slid to center, then faded; only the cover beat should be centered. Same risk on left→center artist reveal and any mixed-align scene.
+- **Avoid:** Never put beat `align` / `text-center` on the slide section. Own `text-left` / `text-center` on `BeatBody` from that beat’s `align` so exits keep their alignment.
+- **Related:** `WrappedStorySlide.tsx`, single-cover beats in `ApiScrappedDeck.tsx`
+
 ## Invisible API player still blocks the list on mobile
 
 - **Not:** List `bottom-24` padding alone, or `showPlayer={false}` failing to hide chrome.

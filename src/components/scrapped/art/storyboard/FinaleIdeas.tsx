@@ -138,8 +138,8 @@ export function FinaleIdeasGrid({ selected, onSelect }: Props) {
                     }
                     muted={
                       idea.ink === "dark"
-                        ? "rgba(245,245,245,0.6)"
-                        : "rgba(28,28,28,0.55)"
+                        ? "rgba(245,245,245,0.9)"
+                        : "rgba(28,28,28,0.88)"
                     }
                   />
                 </StoryChromeStage>

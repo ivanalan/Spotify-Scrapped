@@ -258,9 +258,13 @@ function BeatBody({
         pinTop
           ? "absolute inset-x-0 top-24 bottom-0 min-h-0 px-7 md:px-14"
           : "relative",
-        align === "center" ? "items-center" : "items-stretch",
-        // List: 12px title→subtitle; rows add mt-3 for 24px subtitle→list.
-        isListBeat ? "gap-3" : beat.lead ? "gap-8" : "gap-4",
+        // Own text-align + inset on the beat (not the section) so exits keep
+        // their alignment/padding when the next beat flips align.
+        align === "center"
+          ? "items-center px-4 text-center sm:px-6"
+          : "items-stretch text-left",
+        // List: gap-3. Cover lead: gap-0 + per-slot margins (tuned). Else gap-4.
+        isListBeat ? "gap-3" : beat.lead ? "gap-0" : "gap-4",
       )}
       layout={useLayout ? "position" : false}
       transition={layoutOnlyTransition}
@@ -270,7 +274,13 @@ function BeatBody({
     >
       {beat.lead ? (
         <motion.div
-          className="w-full"
+          className={cn(
+            // Don’t stretch full width when centered — parent items-center
+            // places the cover on the true horizontal mid.
+            align === "center" ? "shrink-0" : "w-full",
+            // Cover art → title (tuned).
+            "mb-8",
+          )}
           initial={leadMotion.initial}
           animate={leadMotion.animate}
         >
@@ -286,12 +296,19 @@ function BeatBody({
           pinTop && "shrink-0",
           display === "year" &&
             "text-[clamp(4.5rem,18vw,8rem)] leading-none",
+          // Cover lead: tighter display (tuned). Other heroes keep clamp.
           display === "hero" &&
-            "max-w-[16ch] text-[clamp(2.5rem,9vw,4.25rem)] leading-[0.95]",
+            (beat.lead
+              ? "mb-3 max-w-[22ch] text-[1.625rem] leading-[0.95]"
+              : "max-w-[16ch] text-[clamp(2.5rem,9vw,4.25rem)] leading-[0.95]"),
           display === "sentence" &&
             "max-w-[20ch] text-[clamp(1.85rem,6.5vw,3rem)] leading-[1.05]",
           align === "center" && display === "year" && "max-w-none",
-          align === "center" && display === "hero" && "max-w-[22ch]",
+          align === "center" &&
+            display === "hero" &&
+            !beat.lead &&
+            "max-w-[22ch]",
+          align === "center" && "text-center",
         )}
         initial={titleMotion.initial}
         animate={titleMotion.animate}
@@ -306,9 +323,12 @@ function BeatBody({
             layout={useLayout ? "position" : false}
             transition={layoutOnlyTransition}
             className={cn(
-              "max-w-md text-[1.05rem] leading-relaxed text-[var(--wrapped-muted)] md:text-[1.15rem]",
+              "text-[var(--wrapped-muted)]",
+              beat.lead
+                ? "w-full text-sm font-normal leading-[1.625]"
+                : "max-w-md text-[1.05rem] leading-relaxed md:text-[1.15rem]",
               pinTop && "shrink-0",
-              align === "center" && "mx-auto w-full",
+              align === "center" && "mx-auto text-center",
             )}
             initial={followMotion.initial}
             animate={followMotion.animate}
@@ -323,8 +343,8 @@ function BeatBody({
             layout={useLayout ? "position" : false}
             transition={layoutOnlyTransition}
             className={cn(
-              "max-w-md text-[0.95rem] leading-relaxed text-[var(--wrapped-ink)]/75",
-              align === "center" && "mx-auto w-full",
+              "max-w-md text-[0.95rem] leading-relaxed text-[var(--wrapped-muted)]",
+              align === "center" && "mx-auto w-full text-center",
             )}
             initial={followMotion.initial}
             animate={followMotion.animate}
@@ -361,7 +381,11 @@ function BeatBody({
             key="footer"
             layout={useLayout ? "position" : false}
             transition={layoutOnlyTransition}
-            className="pt-2 text-sm text-[var(--wrapped-muted)]"
+            className={cn(
+              "text-sm text-[var(--wrapped-muted)]",
+              beat.lead ? "pt-1.5" : "pt-2",
+              align === "center" && "text-center",
+            )}
             initial={supportMotion.initial}
             animate={supportMotion.animate}
           >
@@ -439,7 +463,9 @@ export function WrappedStorySlide({
     phases[Math.min(Math.max(beatIndex, 0), phases.length - 1)] ??
     phases[0]!;
   const current = resolvedBeats[phase.narrativeIndex]!;
-  const sceneAlign = current.align ?? align;
+  // Resolve on the beat so BeatBody owns align for enter + exit (never the
+  // section — section text-align would jump the outgoing beat mid-fade).
+  const beatAlign = current.align ?? align;
   const isListBeat = Boolean(current.children);
   const enterDelay = copyEnterDelaySec ?? timing.copyEnterDelaySec;
   // Stable for a narrative block’s lifetime (key’d on narrativeIndex) so
@@ -454,8 +480,8 @@ export function WrappedStorySlide({
       className={cn(
         "relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 py-24 md:px-14",
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",
-        // Same centering as every other slide — list beat self-pins via pinTop.
-        sceneAlign === "center" ? "justify-center text-center" : "justify-center",
+        // Vertical center only — text-align lives on BeatBody per beat.
+        "justify-center",
         className,
       )}
       aria-hidden={!active}
@@ -470,7 +496,7 @@ export function WrappedStorySlide({
         {active ? (
           <BeatBody
             key={`${replayKey}-${phase.narrativeIndex}`}
-            beat={current}
+            beat={{ ...current, align: beatAlign }}
             reduceMotion={reduceMotion}
             delayChildren={delayChildren}
             blurIn={Boolean(copyBlurIn && beatIndex <= 0)}

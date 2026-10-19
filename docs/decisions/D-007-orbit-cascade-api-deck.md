@@ -20,8 +20,8 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 | Intro | Ink field + orchid concentric oval ladder |
 | Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches |
 | Ghosted spiral | Orchid field; gold→aqua GradOrbs on a perimeter-biased spiral; slow in-place cascade then drift |
-| Volume | Bright ember field (**light theme** / black ink) + aqua→blue ocean; tide rises on “joined this year” |
-| Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk) |
+| Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year” |
+| Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |
 | Art role | Peripheral chrome behind copy; clear mid band for type and lists |
 | Motion | D-001 unchanged — shared copy motion; only the 5-row list is special. Volume tide is art chrome keyed to narrative beat, not a copy-motion fork. |
 | Theme | **Each story is dark or light** — from the swatch’s ink mode (`dark` = light foreground, `light` = dark foreground). See `slideChromeTheme()`. |
@@ -31,6 +31,7 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 ## Contrast rules
 
 - Every tone sets `--wrapped-canvas`, `--wrapped-ink`, `--wrapped-muted`, `--wrapped-panel`, and progress vars together.
+- `--wrapped-muted` stays near ink (dark ≈ 90% `#f5f5f5`, light ≈ 88% `#1c1c1c`) — soft hierarchy for sublines, not washed grey. Source: `INK_MUTED` in `scrapped-card-palette.ts`.
 - Target WCAG AA: large display ≥ 3:1, body ≥ 4.5:1 vs the solid field (not vs decorative disks).
 - Prefer clear mid-band over darkening vibrant art under type.
 - No white / cream / mist paper fills on the API deck.
