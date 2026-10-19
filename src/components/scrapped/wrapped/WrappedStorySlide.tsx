@@ -245,7 +245,11 @@ function BeatBody({
   return (
     <motion.div
       className={cn(
-        "z-10 mx-auto flex w-full max-w-xl flex-col",
+        "mx-auto flex w-full max-w-xl flex-col",
+        // List beat: sit above deck tap zones (z-30). pointer-events-none so
+        // title/empty areas still pass taps through; only the list scrollport
+        // re-enables pointer-events (see children wrapper).
+        pinTop ? "z-[35] pointer-events-none" : "z-10",
         // List beat only: top-pin without changing section justify (setup stays centered).
         // bottom-24 matches slide py-24 so the list has a real height budget.
         pinTop
@@ -335,10 +339,11 @@ function BeatBody({
             transition={layoutOnlyTransition}
             className={cn(
               "min-h-0 w-full",
-              // List region: height budget + scroll escape; z above story tap zones
-              // so vertical pan scrolls the list instead of firing prev/next.
+              // List region: height budget + scroll escape. pointer-events-auto
+              // so pans hit this scrollport above deck tap zones (parent is
+              // pointer-events-none when pinTop).
               isListBeat &&
-                "relative z-[35] mt-6 flex-1 overflow-y-auto overscroll-y-contain [container-type:size] touch-pan-y",
+                "relative mt-6 flex-1 overflow-y-auto overscroll-y-contain [container-type:size] touch-pan-y pointer-events-auto",
             )}
             // Rows own cascade; wrapper only participates in layout reflow.
             initial={isListBeat ? false : supportMotion.initial}
