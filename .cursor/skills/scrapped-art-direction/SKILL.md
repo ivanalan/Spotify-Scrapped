@@ -35,23 +35,25 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Theme | **Per-story dark or light** — swatch ink mode; deck chrome (wordmark / progress / controls) must match the active slide |
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
 | Accent | Motif gradients within the 6 swatches — not hazard neon floods / ribbons |
-| Type | **Poppins** everywhere — heavy display headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”). Roles: `text-display` / `text-title` / `text-body` / `text-caption` ([D-002](../../../docs/decisions/D-002-poppins-mobile-first.md)) |
-| Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters). Wide: corner pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone keeps legacy `MotifStage` slice |
+| Type | **Poppins** everywhere — heavy display headlines (sentence case); italic for emphasis (“scrapped”, “anti-wrapped”). **Logo wordmark “Scrapped” is always italic** ([D-011](../../../docs/decisions/D-011-scrapped-logo-italic.md)). Roles: `text-display` / `text-title` / `text-body` / `text-caption` ([D-002](../../../docs/decisions/D-002-poppins-mobile-first.md)) |
+| Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters). Wide: corner pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone keeps legacy `MotifStage` slice except intro + soft-close bookends (pinned) |
 | Geometry | Locked ovals (`OVAL`) by default; volume uses a bottom ocean wave; art in corners / edges; **clear mid band** for copy + lists |
 | #1 artist | **Kit F orchid ladder spin** — ink field · ink-lean opaque orchid ovals · independent spin — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md) (`ARTIST_ORBIT`) |
 | Ghosted list | **Slide 3 only** — ink field · seamless marquee clouds · spiky wind grass · perimeter blob ghosts — [D-010](../../../docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md) |
+| Soft close | **Teal** field · funky pink→gold bookends · larger pins inset toward mid copy · slow grow+rotate enter (~2.6s) — [D-007](../../../docs/decisions/D-007-orbit-cascade-api-deck.md) / [D-009](../../../docs/decisions/D-009-responsive-motif-pins.md) |
+| Share finale | Inset card + Share / Replay — [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Art: **ink** stage + intro disks/star · **teal** gradient card · 2 ghosts frame hero · `MyScrapped.com` — [D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md). Explore method — [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) |
 | Motion | **Text first** — same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). Art is peripheral chrome, not a second copy-motion path |
 
 **Emotional register:** conversational, dry, slightly merciful — same as WRAPPED.md tone.
 
 ## Composition rules
 
-1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the canvas fill the viewport. Wide orbit chrome uses motif pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); never regress the phone `MotifStage` path.
+1. **Mobile-first, full-bleed** — design phone density first; on larger screens keep left-aligned content and let the canvas fill the viewport. Wide orbit chrome uses motif pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone `MotifStage` stays for mid patterns — intro + soft close stay pinned (slice crops bookends).
 2. **One job per slide** — setup line → reveal → optional aside. No competing heroes.
 3. **Type owns the mid band** — art stays TL / BL / top drift / corner rain. Prefer clear field over putting body type on vibrant disks.
 4. **Contrast** — every tone sets canvas + ink + muted + panel + progress together. Muted stays near ink (`INK_MUTED` ≈ 90%/88%), not washed grey. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
-5. **Quiet chrome** — “Scrapped” wordmark, story progress segments, info/close — same theme as the active story. Soundtrack stays secondary.
-6. **Share finale** — gold field; screenshot-legible card using the same ink vars.
+5. **Quiet chrome** — italic “Scrapped” wordmark ([D-011](../../../docs/decisions/D-011-scrapped-logo-italic.md)), story progress segments, info/close — same theme as the active story. Soundtrack stays secondary.
+6. **Share finale** — inset card + Share / Replay ([D-012](../../../docs/decisions/D-012-share-finale-inset.md)); production art kit J8 ([D-014](../../../docs/decisions/D-014-share-finale-kit-j8.md)). Lab: deck-rhyme kits; stage behind / card in front; no edge bleed ([D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
 
 ## Hard bans (AI-design tells)
 
@@ -83,7 +85,7 @@ Before shipping UI changes:
 - [ ] Deck chrome inherits the active slide tone (`data-wrapped-tone` on chrome host)
 - [ ] Headline → subline → aside are reading-timed line beats; respect `prefers-reduced-motion`
 - [ ] Art is static (or settled) under reduced-motion; mid band stays clear
-- [ ] Wide viewport uses motif pins; phone `MotifStage` path unchanged ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md))
+- [ ] Wide viewport uses motif pins; phone `MotifStage` for non-exception patterns; intro + soft close pinned ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md))
 - [ ] Empty states keep a short honest line
 - [ ] No new AI-slop patterns from the ban list
 - [ ] Copy matches the API conversational spine in WRAPPED.md

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Share finale — Kit J palette + ghosts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #0e0c12;
+      --border: #2a2433;
+      --ink-ui: #f0ebe6;
+      --muted: #9a94a4;
+      --accent-ui: #c9a0f5;
+
+      /* Locked SHARE_FINALE_DENSITY */
+      --gutter: 36px;
+      --body-top: 28px;
+      --body-bottom: 16px;
+      --card-actions-gap: 32px;
+      --hero-band: 52%;
+      --hero-size: 65%;
+      --list-pad-x: 19px;
+      --list-pad-y: 16px;
+      --list-col-gap: 18px;
+      --list-row-gap: 1.1rem;
+      --list-label-gap: 12px;
+      --type-size: 0.86rem;
+      --share-pad-y: 12px;
+      --actions-gap: 12px;
+      --card-radius: 12px;
+
+      --stage: #C9185B;
+      --card-bg: linear-gradient(180deg, #1C1828 0%, #12101A 100%);
+      --card-ink: #f5f5f5;
+      --card-muted: color-mix(in oklab, #f5f5f5 90%, transparent);
+      --card-panel: color-mix(in oklab, #f5f5f5 12%, transparent);
+      --share-bg: #f5f5f5;
+      --share-ink: #1c1c1c;
+      --replay-ink: #f5f5f5;
+      --chrome-ink: #f5f5f5;
+      --ghost-opacity: 0.85;
+      --ghost-bob: 9;
+      --ghost-wiggle: 1;
+      --ghost-dur: 4s;
+
+      --phone-w: 360px;
+      --phone-h: 720px;
+      --enter-dur: 0.4s;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Poppins, system-ui, sans-serif;
+      background: var(--page);
+      color: var(--ink-ui);
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(300px, var(--phone-w)) 1fr;
+      gap: 28px;
+      padding: 28px;
+      min-height: 100vh;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      body {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .lede {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 0 0 18px;
+    }
+    .lede code {
+      font-size: 0.78em;
+      background: #1c1824;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #e0b8ff;
+    }
+
+    .panel { display: flex; flex-direction: column; gap: 14px; }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px 14px;
+      margin: 0;
+    }
+    legend {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a8278;
+      padding: 0 6px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    button.chip {
+      appearance: none;
+      border: 1px solid #3a3344;
+      background: #18141f;
+      color: #ebe4dc;
+      font: inherit;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 7px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    button.chip:hover { border-color: #6a5f78; }
+    button.chip[aria-pressed="true"] {
+      background: #2a2235;
+      border-color: var(--accent-ui);
+      color: #f5f0ff;
+    }
+
+    .note {
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+    .note strong { color: #ebe4dc; font-weight: 600; }
+    .note .against { color: #c4a0a0; }
+
+    label.slider {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2px 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 8px;
+      align-items: center;
+    }
+    label.slider:first-of-type { margin-top: 4px; }
+    label.slider span.val {
+      font-variant-numeric: tabular-nums;
+      color: #d4cfc8;
+    }
+    input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      accent-color: var(--accent-ui);
+    }
+    .slider-group {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #2a2433;
+    }
+    .slider-group:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+    .slider-group h3 {
+      margin: 0 0 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #a890d0;
+    }
+
+    .swatch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+    .swatch[aria-pressed="true"] {
+      border-color: #fff;
+      box-shadow: 0 0 0 2px #12101a;
+    }
+
+    .stage-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: sticky;
+      top: 28px;
+    }
+    .stage-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .stage-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+      min-height: 2.6em;
+    }
+    .stage-meta strong { color: #ebe4dc; font-weight: 600; }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      max-width: 100%;
+      border-radius: 28px;
+      position: relative;
+      background: var(--stage);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 24px 64px rgba(0, 0, 0, 0.55);
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage-art {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .stage-art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chrome {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--chrome-ink);
+      opacity: 0.9;
+    }
+    .chrome .wordmark { font-style: italic; }
+    .chrome-btns { display: flex; gap: 6px; }
+    .chrome-btns span {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--chrome-ink) 12%, transparent);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+      color: var(--chrome-ink);
+    }
+    .progress {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 3px;
+      padding: 10px 16px 0;
+    }
+    .progress i {
+      flex: 1;
+      height: 2px;
+      border-radius: 1px;
+      background: color-mix(in oklab, var(--chrome-ink) 22%, transparent);
+    }
+    .progress i.on {
+      background: color-mix(in oklab, var(--chrome-ink) 85%, transparent);
+    }
+
+    .finale-body {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: var(--body-top) var(--gutter) var(--body-bottom);
+      gap: var(--card-actions-gap);
+    }
+
+    .share-card {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      color: var(--card-ink);
+      border-radius: var(--card-radius);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      transform-origin: center center;
+    }
+    .share-card.entering {
+      animation: card-enter var(--enter-dur) cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes card-enter {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .card-art {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .card-art .ghosts {
+      position: absolute;
+      inset: 0;
+      opacity: var(--ghost-opacity);
+    }
+    .card-art .ghost {
+      position: absolute;
+      width: var(--gw, 48px);
+      height: var(--gw, 48px);
+      animation: ghost-float var(--ghost-dur) ease-in-out infinite;
+      animation-delay: var(--ghost-delay, 0s);
+    }
+    .card-art .ghost svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .phone[data-motion="off"] .card-art .ghost { animation: none; }
+
+    @keyframes ghost-float {
+      0%, 100% {
+        transform: translateY(0) rotate(calc(-2deg * var(--ghost-wiggle)));
+      }
+      35% {
+        transform: translateY(calc(-1px * var(--ghost-bob))) rotate(calc(3deg * var(--ghost-wiggle)));
+      }
+      70% {
+        transform: translateY(calc(-0.35px * var(--ghost-bob))) rotate(calc(-1deg * var(--ghost-wiggle)));
+      }
+    }
+
+    .card-hero {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 var(--hero-band);
+      display: grid;
+      place-items: center;
+    }
+    .card-hero .hero-sq {
+      width: var(--hero-size);
+      aspect-ratio: 1;
+      background: var(--card-panel);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .card-hero .hero-sq .ph {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--card-muted);
+      text-align: center;
+      padding: 12px;
+      line-height: 1.35;
+    }
+
+    .card-lists {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--list-col-gap);
+      padding: 4px var(--list-pad-x) 0;
+      align-content: start;
+    }
+    .card-lists h2 {
+      font-size: var(--type-size);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 var(--list-label-gap);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-lists ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--list-row-gap);
+    }
+    .card-lists li {
+      display: grid;
+      grid-template-columns: 0.85rem 1fr;
+      gap: 4px;
+      align-items: center;
+      font-size: var(--type-size);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+    .card-lists li .n { font-variant-numeric: tabular-nums; }
+    .card-lists li .t {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-foot {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+      padding: 10px var(--list-pad-x) var(--list-pad-y);
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--card-muted);
+    }
+
+    .actions {
+      position: relative;
+      z-index: 3;
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--actions-gap);
+    }
+
+    .btn-share {
+      appearance: none;
+      border: none;
+      background: var(--share-bg);
+      color: var(--share-ink);
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      padding: var(--share-pad-y) 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-share:active { transform: scale(0.98); opacity: 0.92; }
+
+    .btn-replay {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--replay-ink);
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      opacity: 0.92;
+    }
+    .btn-replay .ico {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1.5px solid currentColor;
+      display: grid;
+      place-items: center;
+      font-size: 0.55rem;
+    }
+
+    .gallery-head { margin-bottom: 4px; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .thumb {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #141218;
+      border-radius: 14px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+    }
+    .thumb:hover { border-color: #5a4f68; }
+    .thumb[aria-pressed="true"] {
+      border-color: var(--accent-ui);
+      background: #1c1824;
+    }
+    .thumb-preview {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .thumb-preview .mini-stage { position: absolute; inset: 0; }
+    .thumb-preview .mini-card {
+      position: absolute;
+      inset: 18% 10% 28%;
+      border-radius: 6px;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .thumb-preview .mini-share {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      bottom: 14%;
+      height: 8px;
+      border-radius: 999px;
+      background: #f5f5f5;
+      z-index: 3;
+    }
+    .thumb h3 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin: 0 0 2px;
+    }
+    .thumb p {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.35;
+    }
+    .thumb .tag {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #a890d0;
+      margin-bottom: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root { --enter-dur: 0.01s; }
+      .share-card.entering { animation: none; }
+      .card-art .ghost { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="panel">
+    <div>
+      <h1>Share finale — Kit J tune</h1>
+      <p class="lede">
+        Locked composition (<code>D-013</code> lead): rose-family <strong>stage</strong> + intro disks/star ·
+        dark <strong>card</strong> · <strong>2 ghosts</strong> framing album art (TL + BR) ·
+        <code>MyScrapped.com</code>. Flip palettes; tune ghosts with sliders.
+      </p>
+    </div>
+
+    <fieldset>
+      <legend>Palette</legend>
+      <div class="row" id="kit-chips"></div>
+      <p class="note" id="kit-blurb"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ghosts</legend>
+      <div class="slider-group">
+        <h3>Top-left (of album art)</h3>
+        <label class="slider">X <span class="val" id="val-tl-x">12%</span>
+          <input type="range" id="sl-tl-x" min="0" max="40" step="1" value="6" />
+        </label>
+        <label class="slider">Y <span class="val" id="val-tl-y">6%</span>
+          <input type="range" id="sl-tl-y" min="0" max="40" step="1" value="6" />
+        </label>
+        <label class="slider">Size <span class="val" id="val-tl-size">54px</span>
+          <input type="range" id="sl-tl-size" min="24" max="80" step="1" value="54" />
+        </label>
+      </div>
+      <div class="slider-group">
+        <h3>Bottom-right (of album art)</h3>
+        <label class="slider">X <span class="val" id="val-br-x">76%</span>
+          <input type="range" id="sl-br-x" min="40" max="90" step="1" value="76" />
+        </label>
+        <label class="slider">Y <span class="val" id="val-br-y">36%</span>
+          <input type="range" id="sl-br-y" min="20" max="55" step="1" value="36" />
+        </label>
+        <label class="slider">Size <span class="val" id="val-br-size">66px</span>
+          <input type="range" id="sl-br-size" min="24" max="80" step="1" value="66" />
+        </label>
+      </div>
+      <div class="slider-group">
+        <h3>Motion</h3>
+        <label class="slider">Bob (px) <span class="val" id="val-bob">10</span>
+          <input type="range" id="sl-bob" min="0" max="24" step="1" value="10" />
+        </label>
+        <label class="slider">Wiggle <span class="val" id="val-wiggle">1.0</span>
+          <input type="range" id="sl-wiggle" min="0" max="20" step="1" value="10" />
+        </label>
+        <label class="slider">Duration <span class="val" id="val-dur">4.3s</span>
+          <input type="range" id="sl-dur" min="15" max="80" step="1" value="43" />
+        </label>
+        <label class="slider">Opacity <span class="val" id="val-opacity">85%</span>
+          <input type="range" id="sl-opacity" min="30" max="100" step="1" value="85" />
+        </label>
+        <label class="slider">Phase gap <span class="val" id="val-phase">1.2s</span>
+          <input type="range" id="sl-phase" min="0" max="30" step="1" value="12" />
+        </label>
+        <div class="row" style="margin-top:10px">
+          <button type="button" class="chip" id="btn-motion" aria-pressed="true">Motion on</button>
+          <button type="button" class="chip" id="btn-reset-ghosts">Reset ghosts</button>
+        </div>
+      </div>
+      <p class="note" id="copy-status">Copy settings → paste in chat when you lock a tune.</p>
+      <div class="row">
+        <button type="button" class="chip" id="btn-copy">Copy settings</button>
+      </div>
+    </fieldset>
+  </aside>
+
+  <div class="stage-wrap">
+    <div class="stage-label">Live stage · Kit J · palette tune</div>
+    <div class="phone" id="phone" data-kit="j-ink-teal-card" data-motion="on">
+      <div class="stage-art" id="stage-art" aria-hidden="true"></div>
+
+      <div class="chrome">
+        <span class="wordmark">Scrapped</span>
+        <div class="chrome-btns"><span>‖</span><span>♫</span></div>
+      </div>
+      <div class="progress" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i>
+      </div>
+
+      <div class="finale-body">
+        <article class="share-card" id="share-card">
+          <div class="card-art" id="card-art" aria-hidden="true"></div>
+          <header class="card-hero">
+            <div class="hero-sq">
+              <span class="ph">#1 ghosted artist art</span>
+            </div>
+          </header>
+          <div class="card-lists">
+            <div>
+              <h2>Ghosted artists</h2>
+              <ol>
+                <li><span class="n">1</span><span class="t">Kendrick Lamar</span></li>
+                <li><span class="n">2</span><span class="t">Mamalarky</span></li>
+                <li><span class="n">3</span><span class="t">LE SSERAFIM</span></li>
+                <li><span class="n">4</span><span class="t">keshi</span></li>
+                <li><span class="n">5</span><span class="t">Kevin Abstract</span></li>
+              </ol>
+            </div>
+            <div>
+              <h2>Ghosted songs</h2>
+              <ol>
+                <li><span class="n">1</span><span class="t">Dapper</span></li>
+                <li><span class="n">2</span><span class="t">Calling After Me</span></li>
+                <li><span class="n">3</span><span class="t">My Baby</span></li>
+                <li><span class="n">4</span><span class="t">Cariño</span></li>
+                <li><span class="n">5</span><span class="t">I'd Like To Walk</span></li>
+              </ol>
+            </div>
+          </div>
+          <footer class="card-foot">MyScrapped.com</footer>
+        </article>
+
+        <div class="actions">
+          <button type="button" class="btn-share" id="btn-share">Share</button>
+          <button type="button" class="btn-replay" id="btn-replay">
+            <span class="ico" aria-hidden="true">↺</span>
+            Replay from beginning
+          </button>
+        </div>
+      </div>
+    </div>
+    <p class="stage-meta" id="stage-meta"></p>
+  </div>
+
+  <section>
+    <div class="gallery-head">
+      <h1 style="font-size:1rem">Kit J palettes</h1>
+      <p class="lede" style="margin-bottom:14px">
+        Same layout. Stage / card / disks / star / ghost fill only.
+      </p>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <script>
+    /**
+     * Kit J fine-tune lab — composition locked; palettes + ghost sliders.
+     * Palette tokens from CARD_PALETTE / intro / D-007–D-010.
+     */
+    const BLOB_PATH =
+      "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+
+    /* Locked production defaults — D-014 / SHARE_FINALE_KIT */
+    const GHOST_DEFAULTS = {
+      tlX: 6,
+      tlY: 6,
+      tlSize: 54,
+      brX: 76,
+      brY: 36,
+      brSize: 66,
+      bob: 10,
+      wiggle: 10, // /10 → CSS --ghost-wiggle
+      dur: 43, // /10 → seconds
+      opacity: 85,
+      phase: 12, // /10 → seconds delay between ghosts
+      motion: true,
+    };
+
+    function lightType(panelMix = 12) {
+      return {
+        cardInk: "#f5f5f5",
+        cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+        cardPanel: `color-mix(in oklab, #f5f5f5 ${panelMix}%, transparent)`,
+        chromeInk: "#f5f5f5",
+        replayInk: "#f5f5f5",
+        shareBg: "#f5f5f5",
+        shareInk: "#1c1c1c",
+      };
+    }
+    function darkType(panelMix = 10) {
+      return {
+        cardInk: "#1c1c1c",
+        cardMuted: "color-mix(in oklab, #1c1c1c 88%, transparent)",
+        cardPanel: `color-mix(in oklab, #1c1c1c ${panelMix}%, transparent)`,
+        chromeInk: "#1c1c1c",
+        replayInk: "#1c1c1c",
+        shareBg: "#1c1c1c",
+        shareInk: "#f5f5f5",
+      };
+    }
+
+    /** Kit J spine: vibrant stage + intro disks/star + dark(ish) card + 2 framing ghosts */
+    const KITS = [
+      {
+        id: "j-rose",
+        title: "J1 · Rose / ink",
+        tag: "alt",
+        blurb: "Rose stage · orchid intro disks · mango→ember star · ink card · lilac ghosts.",
+        why: "Locked lead from the 10-kit pass.",
+        against: "Rose can overpower chrome if chrome stays light — keep wordmark bright.",
+        stage: "#C9185B",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...lightType(),
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "28%", c: "#E070FF" },
+          { o: "58%", c: "#C9185B" },
+          { o: "100%", c: "#3B0764" },
+        ],
+        starFrom: "#FFB04A",
+        starTo: "#E85D2C",
+      },
+      {
+        id: "j-orchid",
+        title: "J2 · Orchid / ink",
+        tag: "slide 2",
+        blurb: "Orchid stage · same disk ladder · gold star · ink card · wash ghosts.",
+        why: "Feast purple as the gutter field; card stays the quiet island.",
+        against: "Orchid stage + orchid disks can merge — star warmth helps separate.",
+        stage: "#9B4DE8",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...lightType(),
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "30%", c: "#C9A0F5" },
+          { o: "65%", c: "#9B4DE8" },
+          { o: "100%", c: "#3B0764" },
+        ],
+        starFrom: "#FFE66D",
+        starTo: "#E8B84B",
+      },
+      {
+        id: "j-teal",
+        title: "J3 · Teal / ink",
+        tag: "soft-close",
+        blurb: "Teal stage · pink→gold disks · ember star · ink card · wash ghosts.",
+        why: "Soft-close field behind; ghosts still frame the art on ink.",
+        against: "Teal + pink disks is loud in gutters — keep card dark for rest.",
+        stage: "#1A7A6E",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...lightType(),
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#FFE4F0" },
+          { o: "35%", c: "#ff4d8d" },
+          { o: "70%", c: "#ffe66d" },
+          { o: "100%", c: "#1A7A6E" },
+        ],
+        starFrom: "#FFC878",
+        starTo: "#E85018",
+      },
+      {
+        id: "j-ember",
+        title: "J4 · Ember / ink",
+        tag: "volume",
+        blurb: "Ember stage · ice→deep disks · gold star · ink card · wash ghosts.",
+        why: "Volume warmth as stage; ice disks echo the ocean crest without a wave.",
+        against: "Light chrome on ember — wordmark must stay dark ink.",
+        stage: "#FF7A3A",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...darkType(12),
+        chromeInk: "#1c1c1c",
+        replayInk: "#1c1c1c",
+        shareBg: "#f5f5f5",
+        shareInk: "#1c1c1c",
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#E0FDFF" },
+          { o: "40%", c: "#2DD4BF" },
+          { o: "75%", c: "#0E7490" },
+          { o: "100%", c: "#0F4C5C" },
+        ],
+        starFrom: "#FFE66D",
+        starTo: "#E8B84B",
+      },
+      {
+        id: "j-mango",
+        title: "J5 · Mango / ink",
+        tag: "reunion",
+        blurb: "Mango stage · orchid disks · rose star · ink card · wash ghosts.",
+        why: "Reunion warmth in the gutters; card stays nocturnal.",
+        against: "Mango + orchid can feel carnival — keep disks cropped to TL only.",
+        stage: "#FF9F1C",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...darkType(),
+        chromeInk: "#1c1c1c",
+        replayInk: "#1c1c1c",
+        shareBg: "#1c1c1c",
+        shareInk: "#f5f5f5",
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "35%", c: "#E070FF" },
+          { o: "70%", c: "#9B4DE8" },
+          { o: "100%", c: "#4C1D95" },
+        ],
+        starFrom: "#F472B6",
+        starTo: "#C9185B",
+      },
+      {
+        id: "j-gold",
+        title: "J6 · Gold / ink",
+        tag: "share swatch",
+        blurb: "Gold stage · deep orchid disks · rose star · ink card · wash ghosts.",
+        why: "Closest to classic share gold — inverted so gold is the stage not the card.",
+        against: "Gold gutters + dark card is high contrast; watch list type AA.",
+        stage: "#E8B84B",
+        cardBg: "linear-gradient(180deg, #1C1828 0%, #12101A 100%)",
+        ...darkType(),
+        chromeInk: "#1c1c1c",
+        replayInk: "#1c1c1c",
+        shareBg: "#1c1c1c",
+        shareInk: "#f5f5f5",
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#E070FF" },
+          { o: "40%", c: "#9B4DE8" },
+          { o: "75%", c: "#6B21A8" },
+          { o: "100%", c: "#1A0A2E" },
+        ],
+        starFrom: "#C9185B",
+        starTo: "#7A1038",
+      },
+      {
+        id: "j-ink-rose-card",
+        title: "J7 · Ink / rose card",
+        tag: "invert",
+        blurb: "Ink stage · intro disks · ember star · rose gradient card · ink ghosts.",
+        why: "Flip J1 — dark gutters, vibrant shareable surface; ghosts go ink on rose.",
+        against: "Rose card + light type needs opaque hero panel.",
+        stage: "#12101A",
+        cardBg: "linear-gradient(170deg, #F472B6 0%, #C9185B 50%, #7A1038 100%)",
+        ...lightType(14),
+        ghostFill: "#1c1c1c",
+        ghostEye: "#f5f0ff",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "28%", c: "#E070FF" },
+          { o: "58%", c: "#C9185B" },
+          { o: "100%", c: "#3B0764" },
+        ],
+        starFrom: "#FFB04A",
+        starTo: "#E85D2C",
+      },
+      {
+        id: "j-ink-teal-card",
+        title: "J8 · Ink / teal card",
+        tag: "shipped · D-014",
+        blurb: "Ink stage · intro disks · ember star · teal ice→deep card · wash ghosts.",
+        why: "Promoted to production (D-014) — framing ghosts + intro stage on ink.",
+        against: "Two cool fields (disks + teal card) — star warmth is load-bearing.",
+        stage: "#12101A",
+        cardBg: "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)",
+        ...lightType(),
+        ghostFill: "#f5f0ff",
+        ghostEye: "#0F4C5C",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "28%", c: "#E070FF" },
+          { o: "58%", c: "#C9185B" },
+          { o: "100%", c: "#3B0764" },
+        ],
+        starFrom: "#FFB04A",
+        starTo: "#E85D2C",
+      },
+      {
+        id: "j-rose-gold-card",
+        title: "J9 · Rose / gold card",
+        tag: "warm pair",
+        blurb: "Rose stage · orchid disks · ice star · gold card · ink ghosts.",
+        why: "Both surfaces warm — ghosts go dark to stay readable on gold.",
+        against: "Rose + gold can feel continuous; ice star breaks the seam.",
+        stage: "#C9185B",
+        cardBg: "linear-gradient(160deg, #F5E6B8 0%, #E8B84B 55%, #C9A03A 100%)",
+        ...darkType(8),
+        chromeInk: "#f5f5f5",
+        replayInk: "#f5f5f5",
+        shareBg: "#1c1c1c",
+        shareInk: "#f5f5f5",
+        ghostFill: "#1c1c1c",
+        ghostEye: "#f5f0ff",
+        diskStops: [
+          { o: "0%", c: "#FBEAFF" },
+          { o: "35%", c: "#C9A0F5" },
+          { o: "70%", c: "#9B4DE8" },
+          { o: "100%", c: "#4C1D95" },
+        ],
+        starFrom: "#A5F3FC",
+        starTo: "#0E7490",
+      },
+      {
+        id: "j-ember-orchid-card",
+        title: "J10 · Ember / orchid card",
+        tag: "hot",
+        blurb: "Ember stage · teal disks · gold star · orchid card · wash ghosts.",
+        why: "Max deck energy — volume stage + feast card; ghosts stay lilac wash.",
+        against: "Very loud; only keep if Share/Replay still read as the CTA.",
+        stage: "#FF7A3A",
+        cardBg: "linear-gradient(155deg, #E070FF 0%, #9B4DE8 50%, #4C1D95 100%)",
+        ...darkType(12),
+        chromeInk: "#1c1c1c",
+        replayInk: "#1c1c1c",
+        shareBg: "#f5f5f5",
+        shareInk: "#1c1c1c",
+        ghostFill: "#f5f0ff",
+        ghostEye: "#2a2433",
+        diskStops: [
+          { o: "0%", c: "#E0FDFF" },
+          { o: "45%", c: "#2DD4BF" },
+          { o: "100%", c: "#0F4C5C" },
+        ],
+        starFrom: "#FFE66D",
+        starTo: "#E8B84B",
+      },
+    ];
+
+    const phone = document.getElementById("phone");
+    const shareCard = document.getElementById("share-card");
+    const stageArt = document.getElementById("stage-art");
+    const cardArt = document.getElementById("card-art");
+    const kitBlurb = document.getElementById("kit-blurb");
+    const stageMeta = document.getElementById("stage-meta");
+    const kitChips = document.getElementById("kit-chips");
+    const gallery = document.getElementById("gallery");
+
+    let activeKit = "j-ink-teal-card";
+    let ghostState = { ...GHOST_DEFAULTS };
+
+    const SLIDERS = [
+      { id: "sl-tl-x", val: "val-tl-x", key: "tlX", unit: "%", fmt: (n) => n + "%" },
+      { id: "sl-tl-y", val: "val-tl-y", key: "tlY", unit: "%", fmt: (n) => n + "%" },
+      { id: "sl-tl-size", val: "val-tl-size", key: "tlSize", unit: "px", fmt: (n) => n + "px" },
+      { id: "sl-br-x", val: "val-br-x", key: "brX", unit: "%", fmt: (n) => n + "%" },
+      { id: "sl-br-y", val: "val-br-y", key: "brY", unit: "%", fmt: (n) => n + "%" },
+      { id: "sl-br-size", val: "val-br-size", key: "brSize", unit: "px", fmt: (n) => n + "px" },
+      { id: "sl-bob", val: "val-bob", key: "bob", unit: "", fmt: (n) => String(n) },
+      {
+        id: "sl-wiggle",
+        val: "val-wiggle",
+        key: "wiggle",
+        unit: "",
+        fmt: (n) => (n / 10).toFixed(1),
+      },
+      {
+        id: "sl-dur",
+        val: "val-dur",
+        key: "dur",
+        unit: "s",
+        fmt: (n) => (n / 10).toFixed(1) + "s",
+      },
+      {
+        id: "sl-opacity",
+        val: "val-opacity",
+        key: "opacity",
+        unit: "%",
+        fmt: (n) => n + "%",
+      },
+      {
+        id: "sl-phase",
+        val: "val-phase",
+        key: "phase",
+        unit: "s",
+        fmt: (n) => (n / 10).toFixed(1) + "s",
+      },
+    ];
+
+    function applyPalette(kit) {
+      const root = document.documentElement.style;
+      root.setProperty("--stage", kit.stage);
+      root.setProperty("--card-bg", kit.cardBg);
+      root.setProperty("--card-ink", kit.cardInk);
+      root.setProperty("--card-muted", kit.cardMuted);
+      root.setProperty("--card-panel", kit.cardPanel);
+      root.setProperty("--chrome-ink", kit.chromeInk);
+      root.setProperty("--replay-ink", kit.replayInk);
+      root.setProperty("--share-bg", kit.shareBg);
+      root.setProperty("--share-ink", kit.shareInk);
+      phone.style.background = kit.stage;
+    }
+
+    function applyGhostMotionCss() {
+      const root = document.documentElement.style;
+      root.setProperty("--ghost-bob", String(ghostState.bob));
+      root.setProperty("--ghost-wiggle", String(ghostState.wiggle / 10));
+      root.setProperty("--ghost-dur", ghostState.dur / 10 + "s");
+      root.setProperty("--ghost-opacity", String(ghostState.opacity / 100));
+      phone.dataset.motion = ghostState.motion ? "on" : "off";
+      document.getElementById("btn-motion").setAttribute(
+        "aria-pressed",
+        String(ghostState.motion),
+      );
+      document.getElementById("btn-motion").textContent = ghostState.motion
+        ? "Motion on"
+        : "Motion off";
+    }
+
+    function pointedStarPoints(cx, cy, r, points = 7, innerRatio = 0.42) {
+      const pts = [];
+      for (let i = 0; i < points * 2; i++) {
+        const ang = -Math.PI / 2 + (i * Math.PI) / points;
+        const rad = i % 2 === 0 ? r : r * innerRatio;
+        pts.push(`${cx + Math.cos(ang) * rad},${cy + Math.sin(ang) * rad}`);
+      }
+      return pts.join(" ");
+    }
+
+    function stageIntroSvg(kit) {
+      const gradStops = kit.diskStops
+        .map((s) => `<stop offset="${s.o}" stop-color="${s.c}"/>`)
+        .join("");
+      const disks = [];
+      for (let i = 5; i >= 0; i--) {
+        const r = 72 + i * 26;
+        disks.push(
+          `<ellipse cx="0" cy="0" rx="${r * 1.08}" ry="${r * 0.94}" fill="url(#introGrad)" opacity="${0.55 + (5 - i) * 0.08}" transform="rotate(45)"/>`,
+        );
+      }
+      const star = pointedStarPoints(0, 0, 92);
+      return `
+        <svg viewBox="0 0 360 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="introGrad" x1="0%" y1="0%" x2="100%" y2="100%">${gradStops}</linearGradient>
+            <linearGradient id="starGrad" x1="20%" y1="15%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="${kit.starFrom}"/>
+              <stop offset="100%" stop-color="${kit.starTo}"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(0 0)">${disks.join("")}</g>
+          <g transform="translate(360 720)">
+            <polygon points="${star}" fill="url(#starGrad)"/>
+          </g>
+        </svg>`;
+    }
+
+    function renderStage(kit) {
+      stageArt.innerHTML = stageIntroSvg(kit);
+    }
+
+    function ghostEl(x, y, size, delay, fill, eye) {
+      const el = document.createElement("div");
+      el.className = "ghost";
+      el.style.left = `${x}%`;
+      el.style.top = `${y}%`;
+      el.style.setProperty("--gw", `${size}px`);
+      el.style.setProperty("--ghost-delay", `${-delay}s`);
+      el.innerHTML = `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="${BLOB_PATH}" fill="${fill}"/>
+          <circle cx="24" cy="26" r="3.2" fill="${eye}"/>
+          <circle cx="40" cy="26" r="3.2" fill="${eye}"/>
+        </svg>`;
+      return el;
+    }
+
+    function renderGhosts(kit) {
+      cardArt.innerHTML = "";
+      const root = document.createElement("div");
+      root.className = "ghosts";
+      const phase = ghostState.phase / 10;
+      root.appendChild(
+        ghostEl(
+          ghostState.tlX,
+          ghostState.tlY,
+          ghostState.tlSize,
+          0,
+          kit.ghostFill,
+          kit.ghostEye,
+        ),
+      );
+      root.appendChild(
+        ghostEl(
+          ghostState.brX,
+          ghostState.brY,
+          ghostState.brSize,
+          phase,
+          kit.ghostFill,
+          kit.ghostEye,
+        ),
+      );
+      cardArt.appendChild(root);
+      applyGhostMotionCss();
+    }
+
+    function syncSliderLabels() {
+      SLIDERS.forEach((spec) => {
+        const n = ghostState[spec.key];
+        document.getElementById(spec.id).value = String(n);
+        document.getElementById(spec.val).textContent = spec.fmt(n);
+      });
+    }
+
+    function playEnter() {
+      shareCard.classList.remove("entering");
+      void shareCard.offsetWidth;
+      shareCard.classList.add("entering");
+    }
+
+    function selectKit(id, { animate = true } = {}) {
+      const kit = KITS.find((k) => k.id === id);
+      if (!kit) return;
+      activeKit = id;
+      phone.dataset.kit = id;
+      applyPalette(kit);
+      renderStage(kit);
+      renderGhosts(kit);
+
+      kitBlurb.innerHTML = `
+        <strong>${kit.title}</strong> — ${kit.blurb}<br/>
+        <strong>Why:</strong> ${kit.why}<br/>
+        <span class="against"><strong>Against:</strong> ${kit.against}</span>`;
+
+      stageMeta.innerHTML = `<strong>${kit.title}</strong> · ${kit.tag} · 2 ghosts frame art · MyScrapped.com`;
+
+      document.querySelectorAll("#kit-chips .chip").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.kit === id));
+      });
+      document.querySelectorAll(".thumb").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.kit === id));
+      });
+
+      if (animate) playEnter();
+    }
+
+    function thumbPreview(kit) {
+      return `
+        <div class="thumb-preview" style="background:${kit.stage}">
+          <div class="mini-stage">${stageIntroSvg(kit)}</div>
+          <div class="mini-card" style="background:${kit.cardBg}"></div>
+          <div class="mini-share" style="background:${kit.shareBg}"></div>
+        </div>`;
+    }
+
+    function readSettings() {
+      const kit = KITS.find((k) => k.id === activeKit);
+      return {
+        surface: "share-finale-kit-j",
+        kit: activeKit,
+        kitTitle: kit ? kit.title : activeKit,
+        palette: kit
+          ? {
+              stage: kit.stage,
+              cardBg: kit.cardBg,
+              ghostFill: kit.ghostFill,
+              ghostEye: kit.ghostEye,
+              starFrom: kit.starFrom,
+              starTo: kit.starTo,
+              diskStops: kit.diskStops,
+            }
+          : null,
+        ghosts: { ...ghostState },
+      };
+    }
+
+    async function copySettings() {
+      const text = [
+        "```share-finale-kit-j",
+        JSON.stringify(readSettings(), null, 2),
+        "```",
+      ].join("\n");
+      const status = document.getElementById("copy-status");
+      const btn = document.getElementById("btn-copy");
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = "Copied — paste in chat.";
+        btn.textContent = "Copied ✓";
+        setTimeout(() => {
+          btn.textContent = "Copy settings";
+        }, 1600);
+      } catch {
+        status.textContent = "Clipboard blocked — see console.";
+        console.log(text);
+      }
+    }
+
+    function resetGhosts() {
+      ghostState = { ...GHOST_DEFAULTS };
+      syncSliderLabels();
+      const kit = KITS.find((k) => k.id === activeKit);
+      if (kit) renderGhosts(kit);
+      document.getElementById("copy-status").textContent = "Ghosts reset to frame defaults.";
+    }
+
+    KITS.forEach((kit) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.dataset.kit = kit.id;
+      chip.textContent = kit.title.replace(/^J(\d+) · /, "J$1 · ");
+      chip.addEventListener("click", () => selectKit(kit.id));
+      kitChips.appendChild(chip);
+
+      const thumb = document.createElement("button");
+      thumb.type = "button";
+      thumb.className = "thumb";
+      thumb.dataset.kit = kit.id;
+      thumb.innerHTML = `
+        <span class="tag">${kit.tag}</span>
+        ${thumbPreview(kit)}
+        <h3>${kit.title}</h3>
+        <p>${kit.blurb}</p>`;
+      thumb.addEventListener("click", () => selectKit(kit.id));
+      gallery.appendChild(thumb);
+    });
+
+    SLIDERS.forEach((spec) => {
+      document.getElementById(spec.id).addEventListener("input", (e) => {
+        ghostState[spec.key] = Number(e.target.value);
+        document.getElementById(spec.val).textContent = spec.fmt(ghostState[spec.key]);
+        const kit = KITS.find((k) => k.id === activeKit);
+        if (!kit) return;
+        if (
+          spec.key === "bob" ||
+          spec.key === "wiggle" ||
+          spec.key === "dur" ||
+          spec.key === "opacity"
+        ) {
+          applyGhostMotionCss();
+        } else {
+          renderGhosts(kit);
+        }
+      });
+    });
+
+    document.getElementById("btn-motion").addEventListener("click", () => {
+      ghostState.motion = !ghostState.motion;
+      applyGhostMotionCss();
+    });
+    document.getElementById("btn-reset-ghosts").addEventListener("click", resetGhosts);
+    document.getElementById("btn-copy").addEventListener("click", copySettings);
+
+    document.getElementById("btn-share").addEventListener("click", () => {
+      stageMeta.innerHTML = `<strong>Share</strong> · visual only`;
+    });
+    document.getElementById("btn-replay").addEventListener("click", () => {
+      playEnter();
+      stageMeta.innerHTML = `<strong>Replay</strong> · visual only`;
+    });
+
+    syncSliderLabels();
+    selectKit("j-ink-teal-card", { animate: true });
+  </script>
+</body>
+</html>

@@ -17,7 +17,6 @@ import {
 import {
   FunkyOrbRain,
   FunkyPillStack,
-  FunkyShareArt,
   GradOrb,
 } from "@/components/scrapped/art/storyboard/FunkyShapes";
 import {
@@ -130,6 +129,53 @@ function IntroCornerChrome({ freeze }: { freeze: boolean }) {
   );
 }
 
+/**
+ * Soft-close bookend — pinned on every viewport.
+ * MotifStage `slice` crops the mirrored bottom stack on tall phones.
+ */
+function CloseBookendChrome({
+  a,
+  b,
+  freeze,
+}: {
+  a: string;
+  b: string;
+  freeze: boolean;
+}) {
+  // Larger pins, inset from edges so stacks sit nearer the mid-band copy.
+  return (
+    <>
+      <MotifPin
+        anchor="top-center"
+        width={1.05}
+        height={0.48}
+        viewBox="0 0 360 220"
+        preserveAspectRatio="xMidYMax meet"
+        className="!top-[16%]"
+      >
+        <FunkyPillStack a={a} b={b} freeze={freeze} closeEnter="top" />
+      </MotifPin>
+      <MotifPin
+        anchor="bottom-center"
+        width={1.05}
+        height={0.48}
+        viewBox="0 0 360 220"
+        preserveAspectRatio="xMidYMin meet"
+        className="!bottom-[16%]"
+      >
+        <FunkyPillStack
+          a={a}
+          b={b}
+          freeze={freeze}
+          closeEnter="bottom"
+          mirrored
+          enterDelay={0.2}
+        />
+      </MotifPin>
+    </>
+  );
+}
+
 function PhoneOrbitChrome({
   pattern,
   slideIndex,
@@ -140,9 +186,13 @@ function PhoneOrbitChrome({
   replayKey,
   tide,
 }: ChromeProps) {
-  // Intro uses viewport corner pins — MotifStage slice does not pin centers.
-  if (pattern === "intro") {
+  // Edge-anchored patterns skip MotifStage — slice crops top/bottom.
+  // Share finale (D-014): same intro disks + star as open, behind the inset card.
+  if (pattern === "intro" || pattern === "share") {
     return <IntroCornerChrome freeze={freeze} />;
+  }
+  if (pattern === "close") {
+    return <CloseBookendChrome a={accent} b={accent2} freeze={freeze} />;
   }
 
   return (
@@ -183,17 +233,6 @@ function PhoneOrbitChrome({
       {pattern === "reunion" && (
         <FunkyOrbRain a={accent} b={accent2} freeze={freeze} />
       )}
-
-      {pattern === "close" && (
-        <FunkyShareArt
-          kind="double-stack"
-          a={accent}
-          b={accent2}
-          freeze={freeze}
-        />
-      )}
-
-      {/* share — blank; field only */}
     </MotifStage>
   );
 }
@@ -209,9 +248,7 @@ function WideOrbitChrome({
   replayKey,
   tide,
 }: ChromeProps) {
-  if (pattern === "share") return null;
-
-  if (pattern === "intro") {
+  if (pattern === "share" || pattern === "intro") {
     return <IntroCornerChrome freeze={freeze} />;
   }
 
@@ -317,30 +354,7 @@ function WideOrbitChrome({
   }
 
   if (pattern === "close") {
-    return (
-      <>
-        <MotifPin
-          anchor="top-center"
-          width={0.7}
-          height={0.32}
-          viewBox="0 0 360 220"
-          preserveAspectRatio="xMidYMin meet"
-        >
-          <FunkyPillStack a={accent} b={accent2} freeze={freeze} />
-        </MotifPin>
-        <MotifPin
-          anchor="bottom-center"
-          width={0.7}
-          height={0.32}
-          viewBox="0 0 360 220"
-          preserveAspectRatio="xMidYMax meet"
-        >
-          <g transform="translate(0 220) scale(1 -1)">
-            <FunkyPillStack a={accent} b={accent2} freeze={freeze} />
-          </g>
-        </MotifPin>
-      </>
-    );
+    return <CloseBookendChrome a={accent} b={accent2} freeze={freeze} />;
   }
 
   return null;

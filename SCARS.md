@@ -85,3 +85,11 @@ Format:
 - **Cause:** Auto-start wrote `sessionStorage["scrapped-lab-autostart"]=1` *before* the POST navigated. A cancelled first attempt (Strict Mode remount, refresh mid-load, Safari restore) left the latch set; later mounts returned early and never submitted. The key was only cleared after a successful ready deck.
 - **Proof:** Mobile showed the idle “Load data” button after sign-in / revisit in the same tab; desktop often “worked” because people tapped. Cleared only in `ScrappedExperience`.
 - **Avoid:** Do not latch auto-start in `sessionStorage` before navigation succeeds. Defer submit with a timeout and cancel it on effect cleanup so Strict Mode remounts get one real submit.
+
+## Soft-close bottom pill stack missing on mobile, visible on web
+
+- **Not:** Missing bottom art in the double-stack markup, or a mobile-only CSS `display:none`.
+- **Cause:** Phone soft close used full-frame `MotifStage` (`xMidYMid slice`) with `FunkyDoubleStack`. Tall portrait viewports cover-scale the 360×640 design space and crop top/bottom equally — the mirrored bottom bookend sits near the viewBox floor and disappears. Wide path already pinned stacks to `top-center` / `bottom-center`.
+- **Proof:** Phone Safari showed only the top bookend on slide 8; desktop wide (and fixed-frame mocks) showed both.
+- **Avoid:** Edge-anchored bookends (intro, soft close) must use Motif pins on every viewport — never rely on MotifStage slice to keep top+bottom chrome.
+- **Related:** [D-009](docs/decisions/D-009-responsive-motif-pins.md), `CloseBookendChrome` in `ScrappedOrbitArt.tsx`

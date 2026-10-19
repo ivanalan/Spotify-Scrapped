@@ -118,7 +118,7 @@ function ReunionListMock({
         {beat >= 1 ? (
           <motion.h2
             key={`title-${cycleKey}`}
-            className="max-w-[20ch] font-sans text-[clamp(1.85rem,6.5vw,2.35rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-[var(--wrapped-ink)]"
+            className="max-w-[20ch] font-sans text-[clamp(1.85rem,6.5vw,2.35rem)] font-extrabold leading-[1.15] tracking-[-0.04em] text-[var(--wrapped-ink)]"
             initial={titleEnter}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{

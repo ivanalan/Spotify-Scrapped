@@ -247,13 +247,15 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(9).bg,
     ink: card(9).ink,
     ...accents(9),
-    hero: "Blank — share card only on gold field",
-    motion: "None",
-    composition: "Gold card cut; ShareRecapCard is the whole graphic",
-    why: "Screenshot-first finale — colored field, no white, no peripheral art.",
+    hero: "Intro disks + star on ink stage; teal gradient card; 2 ghosts frame hero (D-014)",
+    motion: "Intro cascade-breathe + star grow-spin; ghost float on card",
+    composition:
+      "Ink stage gutters; opaque teal card in front; Share/Replay below; MyScrapped.com",
+    why: "Wrapped-form inset IA (D-012) + kit J8 visual promote (D-014).",
     iterations: [
-      "J1 — Blank on gold (current)",
-      "J2 — Reintroduce a quiet corner mark later if needed",
+      "J1 — Blank on gold (displaced by D-012)",
+      "J2 — Ember stage + ink card (D-012, displaced by D-014)",
+      "J3 — Ink stage + teal card + framing ghosts (current / D-014)",
     ],
   },
 ];

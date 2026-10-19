@@ -296,13 +296,14 @@ function BeatBody({
           pinTop && "shrink-0",
           display === "year" &&
             "text-[clamp(4.5rem,18vw,8rem)] leading-none",
-          // Cover lead: tighter display (tuned). Other heroes keep clamp.
+          // Cover lead: slightly tighter display. Other heroes keep clamp.
+          // 1.12 clears Poppins extrabold descenders (e.g. y / d) on wrap.
           display === "hero" &&
             (beat.lead
-              ? "mb-3 max-w-[22ch] text-[1.625rem] leading-[0.95]"
-              : "max-w-[16ch] text-[clamp(2.5rem,9vw,4.25rem)] leading-[0.95]"),
+              ? "mb-3 max-w-[22ch] text-[1.625rem] leading-[1.12]"
+              : "max-w-[16ch] text-[clamp(2.5rem,9vw,4.25rem)] leading-[1.12]"),
           display === "sentence" &&
-            "max-w-[20ch] text-[clamp(1.85rem,6.5vw,3rem)] leading-[1.05]",
+            "max-w-[20ch] text-[clamp(1.85rem,6.5vw,3rem)] leading-[1.15]",
           align === "center" && display === "year" && "max-w-none",
           align === "center" &&
             display === "hero" &&
