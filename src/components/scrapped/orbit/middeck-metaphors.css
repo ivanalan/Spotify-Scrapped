@@ -17,93 +17,161 @@
   --mm-ink: #0a0810;
 }
 
-/* ── 4A · One-like heart ── */
-/* Scene keeps hero + frame mounted so list handoff can crossfade (D-016). */
+/* ── 4A · One-like heart (Spotify-pop + polar sparks) ── */
+/*
+ * Grammar: slow stroke-draw → then like (fill + short smooth pop + sparks).
+ * Pop is a separate ~1.25s settle (no long-timeline undershoot stutter).
+ * No underglow / ring. Hero + frame stay mounted (D-016).
+ */
 .mm-heart-scene {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  --mm-heart-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  /* Linear draw — constant stroke speed (no mid-path rush) */
+  --mm-heart-draw-ease: linear;
+  /* Smooth settle — no aggressive overshoot ease (that stuttered at the peak) */
+  --mm-heart-pop-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* 1) Linear draw  2) 1s hold  3) like (fill+pop) */
+  --mm-heart-draw-dur: 1.9s;
+  --mm-heart-like-at: 2.9s;
+  --mm-heart-like-dur: 1.25s;
+  --mm-heart-spark-at: 3.1s;
+  --mm-heart-pop-scale: 1.28;
 }
 
 .mm-heart-hero {
   position: absolute;
-  top: 18%;
+  top: 16%;
   left: 50%;
-  width: 220px;
-  height: 220px;
-  margin-left: -110px;
+  width: 260px;
+  height: 260px;
+  margin-left: -130px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* Pop scale wrapper — never transform the <svg> itself (hi-DPI crispness). */
+.mm-heart-pop {
+  position: relative;
+  z-index: 2;
+  width: 128px;
+  height: 128px;
   display: grid;
   place-items: center;
   transform-origin: 50% 55%;
-  pointer-events: none;
-  z-index: 1;
+  color: var(--mm-pink);
 }
 
-.mm-heart-hero::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 14%;
-  width: 58%;
-  height: 22%;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in oklab, var(--mm-pink) 55%, transparent) 0%,
-    color-mix(in oklab, var(--mm-rose) 28%, transparent) 42%,
-    transparent 72%
-  );
-  filter: blur(10px);
-  z-index: 0;
-  transform: translateX(-50%) scale(0.92);
-}
-
-.mm-heart-icon {
-  position: relative;
-  z-index: 1;
+.mm-heart-glyph {
   width: 128px;
   height: 128px;
-  color: var(--mm-pink);
-  filter: drop-shadow(
-    0 10px 14px color-mix(in oklab, var(--mm-pink) 38%, transparent)
-  );
+  overflow: visible;
+  display: block;
 }
 
-/* Setup — grow-in then lub-dub */
-.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-hero {
-  animation: mm-heart-grow-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+.mm-heart-outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 22;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  /* pathLength=1 on the element — dash 1 = full perimeter */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 1;
 }
 
-.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-hero::after {
-  animation:
-    mm-underglow-grow-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) both,
-    mm-underglow-pulse 1.6s 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-}
-
-.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-icon {
-  animation: mm-heart-beat 1.6s 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95)
-    infinite;
-}
-
-.mm-heart-scene[data-mode="hero"][data-animate="0"] .mm-heart-hero::after {
-  opacity: 0.45;
+.mm-heart-fill {
+  fill: currentColor;
+  opacity: 0;
 }
 
 /*
- * List handoff — one continuous scale on the icon (replaces lub-dub) +
- * opacity on the wrapper. No mid keyframes; no parent+child double scale.
+ * Sparks: layout/color only. Motion drives x/y/opacity in OneLikeHeartChrome
+ * (CSS keyframe + delay + fill-mode:both was hitching at burst start/end).
  */
+.mm-heart-sparks {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mm-heart-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  border-radius: 50%;
+  background: var(--mm-pink);
+  /* transform/opacity owned by Motion */
+}
+
+.mm-heart-spark--gold {
+  background: var(--mm-gold);
+}
+
+.mm-heart-spark--rose {
+  background: var(--mm-rose);
+}
+
+/* Idle / freeze — full outline drawn, no fill */
+.mm-heart-scene[data-mode="hero"][data-animate="0"] .mm-heart-outline {
+  stroke-dashoffset: 0;
+  opacity: 0.9;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="0"] .mm-heart-fill {
+  opacity: 0;
+}
+
+/* Setup enter — slow draw, then like (fill + short smooth pop + sparks) */
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-outline {
+  animation:
+    mm-heart-draw var(--mm-heart-draw-dur) var(--mm-heart-draw-ease) both,
+    mm-heart-outline-fade var(--mm-heart-like-dur) var(--mm-heart-like-at)
+      var(--mm-heart-ease) both;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-fill {
+  animation: mm-heart-fill var(--mm-heart-like-dur) var(--mm-heart-like-at)
+    var(--mm-heart-ease) both;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-pop {
+  animation: mm-heart-pop var(--mm-heart-like-dur) var(--mm-heart-like-at)
+    var(--mm-heart-pop-ease) both;
+}
+
+/*
+ * List handoff — match story copy exit opacity (STORY_MOTION.exitFadeSec /
+ * exitEase). Keep fill painted during exit (base .mm-heart-fill is opacity 0;
+ * dropping the enter animation used to snap the heart off before the fade).
+ */
+.mm-heart-scene[data-mode="frame"] .mm-heart-fill {
+  opacity: 1;
+}
+
+.mm-heart-scene[data-mode="frame"] .mm-heart-outline {
+  opacity: 0;
+  stroke-dashoffset: 0;
+}
+
 .mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-hero {
-  animation: mm-heart-fade-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: mm-heart-fade-out 0.32s cubic-bezier(0.4, 0, 0.6, 1) both;
 }
 
-.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-hero::after {
-  animation: mm-underglow-fade-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-icon {
-  animation: mm-heart-scale-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-pop {
+  /* Soft rise with copy exitY — no shrink-to-vanish */
+  animation: mm-heart-exit-drift 0.42s cubic-bezier(0.4, 0, 0.6, 1) both;
 }
 
 .mm-heart-scene[data-mode="frame"][data-animate="0"] .mm-heart-hero {
@@ -111,21 +179,47 @@
   visibility: hidden;
 }
 
-@keyframes mm-heart-grow-in {
-  0% {
-    transform: scale(0.12);
+@keyframes mm-heart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mm-heart-outline-fade {
+  from {
+    opacity: 1;
+  }
+  to {
     opacity: 0;
   }
-  55% {
+}
+
+/* Full-size opacity fill — never scale(tiny) (that was the mid disc). */
+@keyframes mm-heart-fill {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
-  72% {
-    transform: scale(1.08);
-    opacity: 1;
+}
+
+/*
+ * Short like-pop after draw. Two-stop scale (peak → settle) + soft ease —
+ * the old 1→peak→0.94→1 on a long timeline stuttered at the crest.
+ */
+@keyframes mm-heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(var(--mm-heart-pop-scale));
   }
   100% {
     transform: scale(1);
-    opacity: 1;
   }
 }
 
@@ -138,72 +232,12 @@
   }
 }
 
-@keyframes mm-heart-scale-out {
+@keyframes mm-heart-exit-drift {
   from {
-    transform: scale(1);
+    transform: translateY(0);
   }
   to {
-    transform: scale(0.28);
-  }
-}
-
-@keyframes mm-underglow-grow-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.2);
-  }
-  100% {
-    opacity: 0.45;
-    transform: translateX(-50%) scale(0.92);
-  }
-}
-
-@keyframes mm-underglow-fade-out {
-  0% {
-    opacity: 0.45;
-    transform: translateX(-50%) scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.35);
-  }
-}
-
-@keyframes mm-underglow-pulse {
-  0%,
-  28%,
-  100% {
-    opacity: 0.45;
-    transform: translateX(-50%) scale(0.92);
-  }
-  7% {
-    opacity: 0.75;
-    transform: translateX(-50%) scale(1.06);
-  }
-  21% {
-    opacity: 0.6;
-    transform: translateX(-50%) scale(1);
-  }
-}
-
-@keyframes mm-heart-beat {
-  0% {
-    transform: scale(1);
-  }
-  7% {
-    transform: scale(1.055);
-  }
-  14% {
-    transform: scale(1);
-  }
-  21% {
-    transform: scale(1.035);
-  }
-  28% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1);
+    transform: translateY(-8px);
   }
 }
 
@@ -276,80 +310,81 @@
 }
 
 /*
- * List enter: positive stagger (no negative delays) so hearts rise from the
- * bottom after the hero starts easing out — not mid-flight pops.
+ * List enter: alternate far-left / far-right cascade (1s between each).
+ * Order: L · R · L · R · center. Negative delays shift the wave ~2s earlier
+ * so the first hearts are already rising as the hero exits.
  */
 .mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-floater {
-  animation: mm-heart-rise 13s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+  animation: mm-heart-rise 13s linear infinite;
 }
+/* 1 · far left */
 .mm-heart-scene[data-mode="frame"][data-animate="1"]
   .mm-heart-floater:nth-child(1) {
   animation-duration: 14s;
-  animation-delay: 0.85s;
+  animation-delay: -2s;
 }
+/* 5 · far right */
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(5) {
+  animation-duration: 15.5s;
+  animation-delay: -1s;
+}
+/* 2 · left-mid */
 .mm-heart-scene[data-mode="frame"][data-animate="1"]
   .mm-heart-floater:nth-child(2) {
   animation-duration: 15s;
-  animation-delay: 1.45s;
+  animation-delay: 0s;
 }
+/* 4 · right-mid */
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(4) {
+  animation-duration: 14.5s;
+  animation-delay: 1s;
+}
+/* 3 · center (soft) */
 .mm-heart-scene[data-mode="frame"][data-animate="1"]
   .mm-heart-floater:nth-child(3) {
   animation-name: mm-heart-rise-soft;
   animation-duration: 13.5s;
-  animation-delay: 2.05s;
-}
-.mm-heart-scene[data-mode="frame"][data-animate="1"]
-  .mm-heart-floater:nth-child(4) {
-  animation-duration: 14.5s;
-  animation-delay: 1.15s;
-}
-.mm-heart-scene[data-mode="frame"][data-animate="1"]
-  .mm-heart-floater:nth-child(5) {
-  animation-duration: 15.5s;
-  animation-delay: 1.75s;
+  animation-delay: 2s;
 }
 
+/* Continuous float — transform moves from frame 0; opacity only fades in/out */
 @keyframes mm-heart-rise {
   0% {
     opacity: 0;
-    transform: translate(0, 0) scale(0.75);
+    transform: translate(0, 0) scale(0.78);
   }
-  14% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.75);
-  }
-  28% {
+  10% {
     opacity: 0.85;
+    transform: translate(calc(var(--dx, 0) * 0.12), -9vh) scale(0.88);
   }
-  58% {
-    opacity: 0.7;
-    transform: translate(var(--dx, 0), -48vh) scale(0.95);
+  55% {
+    opacity: 0.72;
+    transform: translate(calc(var(--dx, 0) * 0.7), -50vh) scale(0.95);
   }
   100% {
     opacity: 0;
-    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.7);
+    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.72);
   }
 }
 
 @keyframes mm-heart-rise-soft {
   0% {
     opacity: 0;
-    transform: translate(0, 0) scale(0.75);
+    transform: translate(0, 0) scale(0.78);
   }
-  14% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.75);
+  10% {
+    opacity: 0.3;
+    transform: translate(calc(var(--dx, 0) * 0.12), -9vh) scale(0.88);
   }
-  28% {
-    opacity: 0.28;
-  }
-  58% {
+  55% {
     opacity: 0.22;
-    transform: translate(var(--dx, 0), -48vh) scale(0.95);
+    transform: translate(calc(var(--dx, 0) * 0.7), -50vh) scale(0.95);
   }
   100% {
     opacity: 0;
-    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.7);
+    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.72);
   }
 }
 
@@ -741,8 +776,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mm-heart-hero,
-  .mm-heart-hero::after,
-  .mm-heart-hero .mm-heart-icon,
+  .mm-heart-hero .mm-heart-outline,
+  .mm-heart-hero .mm-heart-fill,
+  .mm-heart-hero .mm-heart-pop,
+  .mm-heart-hero .mm-heart-spark,
   .mm-heart-frame .mm-heart-floater,
   .mm-chat .mm-chat-bubble,
   .mm-chat-typing,
@@ -754,15 +791,20 @@
   }
   .mm-heart-scene[data-mode="hero"] .mm-heart-hero {
     opacity: 1;
-    transform: scale(1);
+  }
+  .mm-heart-scene[data-mode="hero"] .mm-heart-outline {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  .mm-heart-scene[data-mode="hero"] .mm-heart-fill {
+    opacity: 1;
+  }
+  .mm-heart-scene[data-mode="hero"] .mm-heart-pop {
+    transform: none;
   }
   .mm-heart-scene[data-mode="frame"] .mm-heart-hero {
     opacity: 0;
     visibility: hidden;
-  }
-  .mm-heart-hero::after {
-    opacity: 0.45;
-    transform: translateX(-50%) scale(0.92);
   }
   .mm-iris {
     --mm-hole: 10%;

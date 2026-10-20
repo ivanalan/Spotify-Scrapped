@@ -17,7 +17,8 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 | Axis | Choice |
 |------|--------|
 | Palette | `ink · orchid · ember · mango · gold · teal · rose` — see `src/lib/scrapped-card-palette.ts` |
-| Intro | Ink field + orchid concentric oval ladder |
+| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only |
+| Scene 4 (1 like) | Teal nest field (`TEAL_NEST_GRADIENT` = share C0) + 4A heart — soft-close stays flat teal |
 | Opening | ink → ember → **ink** (slides 00–02). Ghosted song entity (slide 2) + list (slide 3) share ink + purple→ember — night rhyme [D-017](D-017-entity-list-pair-rhymes.md) / list [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + iris — [D-016](D-016-middeck-metaphor-promote.md). Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
 | Soft close | Teal field · **8B mono teal iris** shrink-to-stop — [D-016](D-016-middeck-metaphor-promote.md) (displaces funky MotifPin bookends) |
 | Middeck 4–7 | 4A heart · TL typing pin + edge chat · 7L film letterbox — [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md); left-on-read field/frame — [D-019](D-019-left-on-read-orchid-corners.md) |

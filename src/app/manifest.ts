@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Scrapped",
     short_name: "Scrapped",
     description:
-      "Scrapped is your anti-wrapped. Songs you hated and artists you skipped.",
+      "Scrapped is your anti-wrapped. Songs you ghosted and artists you left on read.",
     start_url: "/",
     display: "standalone",
     background_color: "#1a1a1a",

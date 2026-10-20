@@ -25,7 +25,7 @@ function OverviewMock() {
         <h1 className="text-display mt-1 italic">Scrapped</h1>
         <p className="text-body mt-5 max-w-[14rem]">
           Scrapped is your <span className="italic">anti-wrapped</span>. Songs
-          you hated and artists you skipped.
+          you ghosted and artists you left on read.
         </p>
         <div className="mt-8 inline-flex h-11 max-w-[12rem] items-center justify-center rounded-2xl bg-[#1c1c1c] px-6 text-sm font-semibold text-white">
           Continue

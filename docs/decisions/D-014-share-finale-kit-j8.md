@@ -9,7 +9,7 @@
 Promote kit **`j-ink-teal-card`** (Kit J8) to production share finale:
 
 1. **Stage** — ink field (`SLIDE_SWATCH[9] = ink`); intro concentric disks + BR pointed star (same chrome as open / `INTRO_*` tokens).
-2. **Card** — teal ice→deep gradient; light type; hero + Ghosted artists / Ghosted songs; footer **`MyScrapped.com`** (sentence case).
+2. **Card** — teal ice→deep gradient; light type; hero + Left on read / Ghosted songs; footer **`MyScrapped.com`** (sentence case).
 3. **Moon** — large BL sphere (not the ghost-night purple→ember): gold → mango → rose radial; **center on the card’s bottom-left corner**; sphere only — no outer glow ring.
 4. **Ghosts** — two wash blobs framing the album art (TL + BR of the hero square); bob/wiggle as locked.
 5. **Z-axis** — stage chrome behind; opaque card in front; no edge-bleed motifs ([D-013](D-013-share-finale-deck-rhyme-explore.md)).

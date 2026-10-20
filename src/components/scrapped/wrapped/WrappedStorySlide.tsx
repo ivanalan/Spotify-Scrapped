@@ -63,6 +63,11 @@ type Props = {
   copyBlurIn?: boolean;
   /** Peripheral Orbit Cascade art — behind copy, pointer-events none. */
   chrome?: ReactNode;
+  /**
+   * Optional field kit on the slide canvas (e.g. intro orchid corners).
+   * Maps to `data-scrapped-field` for globals.css gradients.
+   */
+  field?: "intro-dusk" | "one-like-nest";
   className?: string;
   /** Multi-beat scene (same canvas; text enters then exits). */
   beats?: WrappedStoryBeat[];
@@ -406,6 +411,7 @@ export function WrappedStorySlide({
   copyEnterDelaySec,
   copyBlurIn = false,
   chrome,
+  field,
   className,
   beats,
   headline,
@@ -478,6 +484,7 @@ export function WrappedStorySlide({
     <section
       data-scrapped-slide
       data-wrapped-tone={tone}
+      data-scrapped-field={field}
       className={cn(
         "relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 py-24 md:px-14",
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",

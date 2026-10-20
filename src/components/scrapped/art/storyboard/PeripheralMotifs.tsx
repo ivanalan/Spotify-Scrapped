@@ -33,12 +33,15 @@ export function ListFrame({ accent, accent2, animate = "soft" }: MotifProps) {
 /**
  * Ghosted songs list (slide 3) — TR moon · S9 stars · enter-then-float ghosts.
  * No grass/clouds (those live on the entity). Locked: D-018 (C8 + S9).
+ * Ghost fade starts on the list beat (“Your ghosted songs”), not scene enter.
  */
 export function GhostedListFrame({
   accent,
   accent2,
   animate = "soft",
-}: MotifProps) {
+  /** When false, edge ghosts stay hidden (setup beat). */
+  ghostsEnter = true,
+}: MotifProps & { ghostsEnter?: boolean }) {
   const reduce = useReducedMotion();
   const freeze = reduce || animate === "none";
 
@@ -49,8 +52,8 @@ export function GhostedListFrame({
         accent2={accent2}
         freeze={freeze}
       />
-      <PointGlowStars count={7} freeze={freeze} />
-      <RisingColumnGhosts freeze={freeze} />
+      <PointGlowStars layout="list" freeze={freeze} />
+      <RisingColumnGhosts freeze={freeze} enter={ghostsEnter} />
     </g>
   );
 }
@@ -108,13 +111,19 @@ export function ListSpikyGrass({
 }
 
 /** Edge ghosts — phone MotifStage / wide meet stage (D-018). */
-export function ListPerimeterGhosts({ freeze }: { freeze: boolean }) {
-  return <RisingColumnGhosts freeze={freeze} />;
+export function ListPerimeterGhosts({
+  freeze,
+  enter = true,
+}: {
+  freeze: boolean;
+  enter?: boolean;
+}) {
+  return <RisingColumnGhosts freeze={freeze} enter={enter} />;
 }
 
 /**
  * Most-ghosted-song entity (slide 2) — ground first (D-018).
- * Ink field: ridge grass · S9 4-point glow stars · one haunt on cover TR.
+ * Ink field: ridge grass · S9 4-point glow stars · one haunt on cover TL.
  * No moon (list owns the sky).
  */
 export function GhostedNightEntity({
@@ -128,11 +137,16 @@ export function GhostedNightEntity({
 }) {
   return (
     <g>
-      <PointGlowStars count={5} freeze={freeze} />
-      {/* Haunt peeks at cover art TR — cover is centered ~160px mid-band */}
-      <g opacity={0.82}>
-        <BlobGhost x={248} y={198} size={64} freeze={freeze} delay={0} />
-      </g>
+      <PointGlowStars layout="entity" freeze={freeze} />
+      {/* Haunt — same former TR inset, mirrored to cover TL */}
+      <BlobGhost
+        x={51}
+        y={149}
+        size={77}
+        opacity={0.74}
+        freeze={freeze}
+        delay={HAUNT_ENTER_DELAY}
+      />
       <g transform="translate(0 500)">
         <SpikyGrass from={accent} to={accent2} freeze={freeze} />
       </g>
@@ -140,7 +154,7 @@ export function GhostedNightEntity({
   );
 }
 
-/** List moon — silver→ember, TR inset toward content (D-018). */
+/** List moon — silver→ember, TR corner + lilac underglow (D-018). */
 export function GhostedHardMoon({
   accent: _accent,
   accent2,
@@ -152,11 +166,13 @@ export function GhostedHardMoon({
   freeze: boolean;
 }) {
   const moonGrad = useId();
-  // Inset from hard TR — lower + left toward list copy; no outer halo.
-  // Deck still uses ink scrim + solid pills (C8) for chrome.
-  const cx = 292;
-  const cy = 96;
-  const r = 46;
+  const glowGrad = useId();
+  const glowBlur = useId();
+  // Harder TR corner (lab) — deck still uses ink scrim + solid pills (C8).
+  const cx = 336;
+  const cy = 104;
+  const r = 62;
+  const op = 0.8;
   void _accent;
 
   return (
@@ -168,35 +184,81 @@ export function GhostedHardMoon({
           <stop offset="70%" stopColor="#C9A0F5" />
           <stop offset="100%" stopColor={accent2} />
         </radialGradient>
+        <radialGradient id={glowGrad} cx="50%" cy="42%" r="50%">
+          <stop offset="0%" stopColor="#C9A0F5" stopOpacity={0.55} />
+          <stop offset="40%" stopColor={accent2} stopOpacity={0.32} />
+          <stop offset="100%" stopColor={accent2} stopOpacity={0} />
+        </radialGradient>
+        <filter
+          id={glowBlur}
+          x="-60%"
+          y="-60%"
+          width="220%"
+          height="220%"
+        >
+          <feGaussianBlur stdDeviation="10" />
+        </filter>
       </defs>
-      <motion.circle
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill={`url(#${moonGrad})`}
-        opacity={0.98}
-        initial={freeze ? false : { scale: 0.72, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.98 }}
+      <motion.g
+        initial={freeze ? false : { scale: 0.28, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         transition={
           freeze
             ? undefined
-            : { duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.06 }
+            : {
+                duration: 1.25,
+                ease: [0.22, 1, 0.36, 1],
+                delay: 0.06,
+              }
         }
         style={{ transformOrigin: `${cx}px ${cy}px` }}
-      />
+      >
+        {/* Soft underglow — heart-scene grammar (scene 4) */}
+        <ellipse
+          cx={cx}
+          cy={cy + r * 0.22}
+          rx={r * 1.55}
+          ry={r * 0.72}
+          fill={`url(#${glowGrad})`}
+          filter={`url(#${glowBlur})`}
+          opacity={0.7}
+        />
+        <motion.circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill={`url(#${moonGrad})`}
+          opacity={op}
+          animate={
+            freeze
+              ? undefined
+              : { opacity: [op * 0.92, op, op * 0.92] }
+          }
+          transition={
+            freeze
+              ? undefined
+              : {
+                  duration: 4.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.1,
+                }
+          }
+        />
+      </motion.g>
     </g>
   );
 }
 
-/** S9 — 4-point stars with orchid glow pulse (entity 5 / list 7). */
+/** S9 — 4-point stars; entity + list use distinct slot maps (D-018). */
 export function PointGlowStars({
-  count,
+  layout = "entity",
   freeze,
 }: {
-  count: number;
+  layout?: "entity" | "list";
   freeze: boolean;
 }) {
-  const pts = STAR_SLOTS.slice(0, count);
+  const pts = layout === "list" ? STAR_SLOTS_LIST : STAR_SLOTS_ENTITY;
   return (
     <g>
       {pts.map((s, i) => (
@@ -204,9 +266,9 @@ export function PointGlowStars({
           key={i}
           cx={s.cx}
           cy={s.cy}
-          r={s.r * 1.2}
+          r={s.r * STAR_SIZE_SCALE}
           freeze={freeze}
-          delay={i * 0.4}
+          delay={0.12 + i * 0.18}
           duration={3.8 + i * 0.2}
         />
       ))}
@@ -214,17 +276,38 @@ export function PointGlowStars({
   );
 }
 
-const STAR_SLOTS = [
-  { cx: 48, cy: 168, r: 3.8 },
-  { cx: 92, cy: 128, r: 5 },
-  { cx: 248, cy: 196, r: 3.6 },
+/**
+ * Star slots must clear ghost AABBs (haunt + list floats) — never spawn under a
+ * ghost body (stars paint behind ghosts; a tip peeking through reads as a bug).
+ * Pad ≈ ghost size/2 + 18 for bob amp. Haunt rest: 51,149 · size 77 (TL).
+ */
+/** Story 2 entity night — 5 stars. */
+const STAR_SLOTS_ENTITY = [
+  { cx: 200, cy: 120, r: 3.8 },
+  { cx: 300, cy: 156, r: 5 },
+  { cx: 248, cy: 220, r: 3.6 },
   { cx: 36, cy: 456, r: 4.1 },
   { cx: 312, cy: 428, r: 4.8 },
-  { cx: 180, cy: 140, r: 3.4 },
-  { cx: 300, cy: 240, r: 4.3 },
-  { cx: 140, cy: 380, r: 3.6 },
-  { cx: 270, cy: 160, r: 4.5 },
 ] as const;
+
+/** Story 3 list sky — 7 stars, distinct from entity so the chorus doesn’t echo. */
+const STAR_SLOTS_LIST = [
+  { cx: 28, cy: 220, r: 4.2 },
+  { cx: 118, cy: 96, r: 3.5 },
+  { cx: 198, cy: 178, r: 5.1 },
+  { cx: 68, cy: 380, r: 3.8 },
+  { cx: 330, cy: 300, r: 4.6 },
+  { cx: 250, cy: 448, r: 3.3 },
+  { cx: 160, cy: 300, r: 4.0 },
+] as const;
+
+const STAR_OP_MIN = 0.11;
+const STAR_OP_MAX = 0.58;
+const STAR_GLOW = 0.28;
+const STAR_SIZE_SCALE = 1.05;
+const STAR_GROW_DUR = 0.75;
+/** Pulse starts mid grow-in so enter + idle blend (intro disk grammar). */
+const STAR_PULSE_BLEND = 0.55;
 
 /** 4-point star path centered at origin, tip radius r. */
 function pointStarPath(r: number) {
@@ -257,52 +340,63 @@ function PointGlowStar({
   duration: number;
 }) {
   const d = pointStarPath(r);
+  const settledOp = (STAR_OP_MIN + STAR_OP_MAX) / 2;
+  // Keep SVG translate on a static parent — motion scale must not fight it.
   return (
-    <motion.g
-      transform={`translate(${cx} ${cy})`}
-      initial={false}
-      animate={
-        freeze
-          ? { opacity: 0.28 }
-          : { opacity: [0.16, 0.42, 0.16] }
-      }
-      transition={
-        freeze
-          ? undefined
-          : {
-              duration,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay,
-            }
-      }
-      style={{
-        filter: freeze
-          ? undefined
-          : "drop-shadow(0 0 2px rgba(201, 160, 245, 0.32))",
-      }}
-    >
-      <motion.path
-        d={d}
-        fill="#f5f0ff"
-        initial={false}
+    <g transform={`translate(${cx} ${cy})`}>
+      <motion.g
+        initial={freeze ? false : { scale: 0, opacity: 0 }}
         animate={
           freeze
-            ? { scale: 1 }
-            : { scale: [0.88, 1.12, 0.88] }
+            ? { scale: 1, opacity: settledOp }
+            : { scale: 1, opacity: STAR_OP_MAX }
         }
         transition={
           freeze
             ? undefined
             : {
-                duration,
-                repeat: Infinity,
-                ease: "easeInOut",
+                duration: STAR_GROW_DUR,
+                ease: [0.22, 1, 0.36, 1],
                 delay,
               }
         }
-      />
-    </motion.g>
+        style={{
+          transformOrigin: "0px 0px",
+          filter: freeze
+            ? undefined
+            : `drop-shadow(0 0 3px rgba(201, 160, 245, ${STAR_GLOW}))`,
+        }}
+      >
+        <motion.path
+          d={d}
+          fill="#f5f0ff"
+          initial={false}
+          animate={
+            freeze
+              ? { scale: 1, opacity: 1 }
+              : {
+                  scale: [0.88, 1.12, 0.88],
+                  opacity: [
+                    STAR_OP_MIN / STAR_OP_MAX,
+                    1,
+                    STAR_OP_MIN / STAR_OP_MAX,
+                  ],
+                }
+          }
+          transition={
+            freeze
+              ? undefined
+              : {
+                  duration,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: delay + STAR_GROW_DUR * STAR_PULSE_BLEND,
+                }
+          }
+          style={{ transformOrigin: "0px 0px" }}
+        />
+      </motion.g>
+    </g>
   );
 }
 
@@ -583,7 +677,7 @@ function SpikyGrass({
 
 /**
  * Five edge ghosts — inset so slice/meet crops don’t clip them.
- * Staggered enter (heart-list grammar), then independent bob float (D-018).
+ * Outer fade + inner float overlap (intro cascade-breathe grammar · D-018).
  */
 const FLOAT_GHOST_SLOTS = [
   { x: 32, y: 148, size: 24, amp: 11, dur: 4.6, rot: 3.2, dx: 3 },
@@ -593,13 +687,41 @@ const FLOAT_GHOST_SLOTS = [
   { x: 278, y: 360, size: 20, amp: 10, dur: 4.3, rot: 3.5, dx: 2 },
 ] as const;
 
-/** Stagger like one-like perimeter hearts (~0.4s steps). */
-const GHOST_ENTER_STAGGER = [0.85, 1.25, 1.65, 2.05, 2.45] as const;
-const GHOST_ENTER_DUR = 0.85;
+/**
+ * Stagger after list-beat gate (“Your ghosted songs”).
+ * Extra pad so copy lands before the chorus fades in.
+ */
+const LIST_GHOST_ENTER_PAD = 1.45;
+const GHOST_ENTER_STAGGER = [0.85, 1.3, 1.75, 2.2, 2.65].map(
+  (t) => t + LIST_GHOST_ENTER_PAD,
+) as readonly number[];
+/** Fade at rest — haunt + list floats. */
+const GHOST_ENTER_DUR = 1.7;
+/**
+ * Float / bob starts this far into the fade (0–1) so enter + idle blend
+ * instead of a hard handoff (same idea as intro cascade-breathe).
+ */
+const GHOST_FLOAT_BLEND = 0.45;
+const HAUNT_ENTER_DELAY = 0.4;
+
+function ghostFloatDelay(enterDelay: number) {
+  return enterDelay + GHOST_ENTER_DUR * GHOST_FLOAT_BLEND;
+}
 
 /** Blob ghost body — wash fill, no hem wave (D-018). */
 function blobPath() {
   return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+}
+
+function GhostBody({ size }: { size: number }) {
+  const scale = size / 64;
+  return (
+    <g transform={`scale(${scale})`}>
+      <path d={blobPath()} fill="#f5f0ff" />
+      <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
+      <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
+    </g>
+  );
 }
 
 function BlobGhost({
@@ -608,43 +730,55 @@ function BlobGhost({
   size,
   freeze,
   delay = 0,
+  opacity = 0.74,
 }: {
   x: number;
   y: number;
   size: number;
   freeze: boolean;
   delay?: number;
+  opacity?: number;
 }) {
-  const scale = size / 64;
+  const floatDelay = ghostFloatDelay(delay);
   return (
     <motion.g
-      initial={false}
-      animate={
-        freeze
-          ? { x, y }
-          : {
-              x,
-              y: [y, y - 10, y - 4, y],
-              rotate: [-2, 3, -1, -2],
-            }
-      }
+      initial={freeze ? false : { opacity: 0 }}
+      animate={{ opacity }}
       transition={
         freeze
           ? undefined
           : {
-              duration: 4.2,
-              repeat: Infinity,
+              duration: GHOST_ENTER_DUR,
               ease: "easeInOut",
               delay,
             }
       }
-      style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
     >
-      <g transform={`scale(${scale})`}>
-        <path d={blobPath()} fill="#f5f0ff" />
-        <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
-        <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
-      </g>
+      <motion.g
+        initial={{ x, y, rotate: -2 }}
+        animate={
+          freeze
+            ? { x, y, rotate: -2 }
+            : {
+                x,
+                y: [y, y - 10, y - 4, y],
+                rotate: [-2, 3, -1, -2],
+              }
+        }
+        transition={
+          freeze
+            ? undefined
+            : {
+                duration: 4.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: floatDelay,
+              }
+        }
+        style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
+      >
+        <GhostBody size={size} />
+      </motion.g>
     </motion.g>
   );
 }
@@ -654,6 +788,7 @@ function FloatingBlobGhost({
   y,
   size,
   freeze,
+  enter,
   delay = 0,
   amp = 10,
   dur = 4.5,
@@ -664,80 +799,70 @@ function FloatingBlobGhost({
   y: number;
   size: number;
   freeze: boolean;
+  /** List-beat gate — stay at 0 until “Your ghosted songs”. */
+  enter: boolean;
   delay?: number;
   amp?: number;
   dur?: number;
   rot?: number;
   dx?: number;
 }) {
-  const scale = size / 64;
   const op = 0.42;
+  const show = enter;
+  const play = show && !freeze;
+  const floatDelay = ghostFloatDelay(delay);
   return (
     <motion.g
-      initial={
-        freeze
-          ? false
-          : { x, y: y + 32, opacity: 0, scale: 0.82 }
-      }
-      animate={
-        freeze
-          ? { x, y, opacity: op }
-          : {
-              x: [x, x + dx, x - dx * 0.6, x],
-              y: [y, y - amp, y - amp * 0.35, y],
-              opacity: op,
-              scale: 1,
-              rotate: [-rot * 0.6, rot, -rot * 0.3, -rot * 0.6],
-            }
-      }
+      initial={play ? { opacity: 0 } : false}
+      animate={{ opacity: show ? op : 0 }}
       transition={
-        freeze
-          ? undefined
-          : {
-              opacity: {
-                duration: GHOST_ENTER_DUR,
-                ease: [0.22, 1, 0.36, 1],
-                delay,
-              },
-              scale: {
-                duration: GHOST_ENTER_DUR,
-                ease: [0.22, 1, 0.36, 1],
-                delay,
-              },
-              x: {
-                duration: dur,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: delay + GHOST_ENTER_DUR,
-              },
-              y: {
-                duration: dur,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: delay + GHOST_ENTER_DUR,
-              },
-              rotate: {
-                duration: dur * 1.15,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: delay + GHOST_ENTER_DUR,
-              },
+        play
+          ? {
+              duration: GHOST_ENTER_DUR,
+              ease: "easeInOut",
+              delay,
             }
+          : { duration: 0 }
       }
-      style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
     >
-      <g transform={`scale(${scale})`}>
-        <path d={blobPath()} fill="#f5f0ff" />
-        <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
-        <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
-      </g>
+      <motion.g
+        initial={{ x, y, rotate: 0 }}
+        animate={
+          play
+            ? {
+                x: [x, x + dx, x - dx * 0.6, x],
+                y: [y, y - amp, y - amp * 0.35, y],
+                rotate: [-rot * 0.6, rot, -rot * 0.3, -rot * 0.6],
+              }
+            : { x, y, rotate: 0 }
+        }
+        transition={
+          play
+            ? {
+                duration: dur,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: floatDelay,
+              }
+            : undefined
+        }
+        style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
+      >
+        <GhostBody size={size} />
+      </motion.g>
     </motion.g>
   );
 }
 
-export function RisingColumnGhosts({ freeze }: { freeze: boolean }) {
+export function RisingColumnGhosts({
+  freeze,
+  enter = true,
+}: {
+  freeze: boolean;
+  enter?: boolean;
+}) {
   return (
-    <g>
+    <g key={enter ? "ghosts-enter" : "ghosts-wait"}>
       {FLOAT_GHOST_SLOTS.map((s, i) => (
         <FloatingBlobGhost
           key={i}
@@ -745,6 +870,7 @@ export function RisingColumnGhosts({ freeze }: { freeze: boolean }) {
           y={s.y}
           size={s.size}
           freeze={freeze}
+          enter={enter}
           delay={GHOST_ENTER_STAGGER[i] ?? i * 0.4}
           amp={s.amp}
           dur={s.dur}

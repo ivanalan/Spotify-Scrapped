@@ -5,6 +5,7 @@ export default function HomeLoading() {
     <div
       className="wrapped-story relative left-1/2 flex min-h-[100dvh] w-screen -translate-x-1/2 flex-col items-center justify-center overflow-hidden"
       data-wrapped-tone="ink"
+      data-scrapped-field="intro-dusk"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <ScrappedOrbitArt slideIndex={0} pattern="intro" active={false} />

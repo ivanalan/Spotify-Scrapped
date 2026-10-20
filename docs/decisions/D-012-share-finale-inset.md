@@ -9,7 +9,7 @@
 The share finale uses **Wrapped-form information architecture** on Scrapped Orbit Cascade tokens:
 
 1. **Full-bleed stage** — slide field fills the viewport (gutters are stage, not letterboxing).
-2. **Inset shareable card** — always **9:16** portrait island (Wrapped `25-share-finale` form) with hero + Ghosted artists / Ghosted songs.
+2. **Inset shareable card** — always **9:16** portrait island (Wrapped `25-share-finale` form) with hero + Left on read / Ghosted songs.
 3. **Actions below the card** (not inside it) — primary **Share** pill, secondary **Replay from beginning**.
 
 Density is locked via `SHARE_FINALE_DENSITY` in `scrapped-card-palette.ts`.
@@ -27,7 +27,7 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 | IA | Inset card + Share + Replay below |
 | Card aspect | **9:16** always — stage leftover height caps the island; width follows aspect (no flex-stretch to non-portrait) |
 | Export PNG | Scale capture so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16; rem density stays phone-tuned |
-| Card thesis | Hero + Ghosted artists / Ghosted songs |
+| Card thesis | Hero + Left on read / Ghosted songs |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
 | Replay | `goTo(0)` — same as keyboard `R` |
 | Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 4, card↔actions 32, hero 46%/48%, type 0.62rem, …) |
