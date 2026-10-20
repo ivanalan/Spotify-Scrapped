@@ -178,29 +178,32 @@ export function MotifCornerOrigin({
 }
 
 /**
- * Full-bleed meet stage — shows the whole portrait design without cover-crop.
- * Used for centered systems (spiral / artist) on wide viewports.
+ * Full-slide SVG stage for centered systems (spiral / artist) on wide viewports.
+ * Default `meet` shows the whole portrait design (may letterbox).
+ * Pass `slice` when the field must cover the slide (no phone-frame gutters).
  */
 export function MotifMeetStage({
   children,
   className,
   viewBox = "0 0 360 640",
+  preserveAspectRatio = "xMidYMid meet",
 }: {
   children: ReactNode;
   className?: string;
   viewBox?: string;
+  preserveAspectRatio?: string;
 }) {
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 overflow-visible",
+        "pointer-events-none absolute inset-0 overflow-hidden",
         className,
       )}
     >
       <svg
-        className="h-full w-full overflow-visible"
+        className="h-full w-full"
         viewBox={viewBox}
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio={preserveAspectRatio}
         aria-hidden
       >
         {children}

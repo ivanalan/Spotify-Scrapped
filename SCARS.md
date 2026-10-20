@@ -16,6 +16,30 @@ Format:
 
 ---
 
+## Chat bubbles jump when the left-on-read list enters
+
+- **Not:** List layout reflow, MotifStage crop, or another remount of `LeftOnReadChatChrome`.
+- **Cause:** `quiet` and `frame` used different column scale / `top` / `left` (and mirror size). Setup looked larger and more inboard; list beat snapped to the edge frame.
+- **Proof:** “Get the gang back together?” bubbles sat mid-left; “Top artists you left on read” had the same pills smaller and hard against the edges.
+- **Avoid:** Quiet and frame share edge geometry **and** opacity — no second layout, no fade-up on list enter. (Supersedes earlier “quiet only lowers opacity.”)
+- **Related:** [D-015](docs/decisions/D-015-list-art-frames-not-heroes.md), `middeck-metaphors.css`
+
+## Left-on-read chats start dimmer than on the list
+
+- **Not:** Stagger enter mid-flight, or a remount of `LeftOnReadChatChrome`.
+- **Cause:** After geometry was unified, `quiet` still used column `opacity: 0.55` / mirror `0.28` vs frame `0.8` / `0.38`, so setup→list brightened the pills.
+- **Proof:** Bubbles on “Get the gang back together?” read softer than the same edge stack under “Top artists left on read.”
+- **Avoid:** Quiet and frame use the same column/mirror opacity (frame values). Mode flip is semantic only.
+- **Related:** scar above, `middeck-metaphors.css`
+
+## “Get the gang back together” slide starts twice
+
+- **Not:** Copy `visitKey` / `BeatBody` remounting, or the list cascade playing early.
+- **Cause:** Scene 6 chat chrome used `beatPhase >= 1` for quiet→frame, so the edge bubbles remounted when the setup *subline* landed. `LeftOnReadChatChrome` keyed on `visualMode`, which re-ran `mm-skew-slide` enter.
+- **Proof:** Bubbles slid in on “Get the gang back together?”, then slid in again as “They’ll take you back.” appeared — before the list beat.
+- **Avoid:** Frame mode only when the list narrative starts (`beatPhase >= 2` for this scene’s 2-line setup). Key chat chrome on `replayKey` only; flip `data-mode` for quiet→frame. Quiet/frame must share edge geometry (see scar above).
+- **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), [D-017](docs/decisions/D-017-entity-list-pair-rhymes.md), `LeftOnReadChatChrome.tsx`, `ScrappedOrbitArt.tsx`
+
 ## Left-aligned setup copy jumps to center before fading into a centered cover beat
 
 - **Not:** Framer layout spring, wrong `align` on the setup beat, or the cover beat’s own centering.
@@ -116,3 +140,27 @@ Format:
 - **Cause:** Stories-style press-hold on left/right tap zones (`HOLD_PAUSE_MS` + `pressHeld`) shared the same gesture path as prev/next, so short presses and holds competed (timer, pointer capture, soundtrack prime cancel).
 - **Proof:** Hold pause felt unreliable; users wanted pause only via the chrome button.
 - **Avoid:** Do not reintroduce zone press-hold pause. Pause is sticky button / space (and media-key API) only; zones tap to navigate.
+
+## Desktop #1 artist slide looks like a mobile-cropped background
+
+- **Not:** `ProductMain` max-width, missing `w-screen`, or the slide canvas failing to paint edge-to-edge.
+- **Cause:** Wide `entity-artist` used `MotifMeetStage` with `preserveAspectRatio="xMidYMid meet"`. That letterboxes the 9:16 design into the landscape slide — solid ink still filled the viewport, but the orbit read as a phone-sized frame with empty side flanks.
+- **Proof:** “Artists you left on read” on desktop showed a centered portrait oval stack with flat ink gutters L/R.
+- **Avoid:** On wide, cover-scale the artist orbit (`slice`), not `meet`. Keep `meet` only where showing the whole motif matters more than filling (e.g. song spiral arms).
+- **Related:** [D-009](docs/decisions/D-009-responsive-motif-pins.md), `ScrappedOrbitArt` WideOrbitChrome
+
+## 1-like heart vanishes too early / list hearts pop in too fast
+
+- **Not:** Story autoplay advancing before the setup beat finishes, or copy motion stealing the handoff.
+- **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Even with a crossfade, art followed `beatIndex` instantly — hero fade started while setup copy was still exiting.
+- **Proof:** Advancing “Meet your 1 like artists” → “1 like artists” list: big heart cut out / started leaving before the list title landed; edge hearts already halfway up.
+- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Delay visual `frame` until copy exit + list title enter settle (`LIST_HANDOFF_HOLD_MS`). List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise.
+- **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), `OneLikeHeartChrome.tsx`, `middeck-metaphors.css`
+
+## MyScrapped.com clipped by the share moon
+
+- **Not:** Missing footer copy, wrong brand string, or stage disks bleeding onto the card.
+- **Cause:** Share finale moon/ghosts used `z-[2]` while hero / lists / footer sat at `z-[1]`, so the BL sphere painted over type.
+- **Proof:** Warm gold→rose oval covered part of `MyScrapped.com` and list rows on the teal card.
+- **Avoid:** Keep moon/ghosts under type (`z-0` art, `z-[2]` content). Ghosts still read through the transparent hero band.
+- **Related:** [D-014](docs/decisions/D-014-share-finale-kit-j8.md), `ShareRecapCard`

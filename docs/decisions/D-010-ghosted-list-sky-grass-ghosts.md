@@ -35,7 +35,7 @@ Gold field + bottom-left orb on the ghosted songs list.
 
 ## Cost
 
-Two ink list-adjacent beats (slide 3 motif vs slide 6 classic list on ink) — differentiated by chrome, not field alone. Ghost characters must stay peripheral or they fight the list.
+Two ink list-adjacent beats (slide 3 motif vs slide 6 classic list on ink) — differentiated by chrome, not field alone. Ghost characters must stay peripheral or they fight the list. Slide 2 entity now shares the ink + ghost language ([D-017](D-017-entity-list-pair-rhymes.md)) without copying clouds/grass.
 
 ## Source of truth
 

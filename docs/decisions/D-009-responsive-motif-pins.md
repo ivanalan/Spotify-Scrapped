@@ -28,7 +28,7 @@ Mobile is protected by a **separate render path**, not by hoping pin math matche
 | Axis | Choice |
 |------|--------|
 | Phone path | Legacy `MotifStage` for non-exception patterns; intro + soft close use pins (see above) |
-| Wide path | Same intro / close pins; `MotifMeetStage` (song/artist); `MotifPin` (volume/list/reunion) |
+| Wide path | Same intro / close pins; `MotifMeetStage` (song meet / artist slice); `MotifPin` (volume/list/reunion) |
 | Breakpoint | Phone if `max-width: 480px` **or** `max-aspect-ratio: 3/4` |
 | Sizing | Motif boxes from short side (`min(100vw, 100dvh)`); mid band stays clear |
 | Motifs | Reuse ShapeKit / Funky / List / ArtistOrbit components — do not redraw |
@@ -37,11 +37,11 @@ Mobile is protected by a **separate render path**, not by hoping pin math matche
 
 ## Displaced
 
-Using `xMidYMid slice` alone as the wide-viewport scaling model for production orbit chrome.
+Using `xMidYMid slice` alone as the wide-viewport scaling model for **edge-anchored** production orbit chrome. Center `#1 artist` on wide uses slice so the field covers the slide (meet read as a phone-frame crop).
 
 ## Cost
 
-Two composition paths to maintain; wide pins need visual QA when motifs change. Center patterns (`entity-song`, `entity-artist`) use a short-side-scaled portrait stage, not edge pins.
+Two composition paths to maintain; wide pins need visual QA when motifs change. `entity-song` uses meet for night moon/ghost (D-017). `entity-artist` uses slice (full-bleed field; may crop oval tops/bottoms on ultrawide).
 
 ## Source of truth
 

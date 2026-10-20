@@ -117,6 +117,114 @@ export function ListPerimeterGhosts({ freeze }: { freeze: boolean }) {
   return <PerimeterGhosts freeze={freeze} />;
 }
 
+/**
+ * Most-ghosted-song entity (slide 2) — night rhyme with D-010 list.
+ * Ink field (palette): TR moon + sparse edge stars + one BL ghost.
+ * No clouds / grass — those arrive on the list beat.
+ */
+export function GhostedNightEntity({
+  accent,
+  accent2,
+  freeze,
+}: {
+  accent: string;
+  accent2: string;
+  freeze: boolean;
+}) {
+  const moonGrad = useId();
+  const stars = [
+    { cx: 48, cy: 168, r: 1.6 },
+    { cx: 92, cy: 128, r: 2.1 },
+    { cx: 248, cy: 196, r: 1.5 },
+    { cx: 36, cy: 456, r: 1.7 },
+    { cx: 312, cy: 428, r: 2 },
+  ] as const;
+
+  return (
+    <g>
+      <defs>
+        <radialGradient id={moonGrad} cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#f5f0ff" />
+          <stop offset="55%" stopColor={accent} />
+          <stop offset="100%" stopColor={accent2} />
+        </radialGradient>
+      </defs>
+
+      {/* Top-right moon — pinned clear of mid-band copy */}
+      <motion.circle
+        cx={308}
+        cy={78}
+        r={42}
+        fill={`url(#${moonGrad})`}
+        opacity={0.9}
+        initial={freeze ? false : { scale: 0.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 0.9 }}
+        transition={
+          freeze
+            ? undefined
+            : { duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.08 }
+        }
+        style={{ transformOrigin: "308px 78px" }}
+      />
+      <motion.circle
+        cx={308}
+        cy={78}
+        r={58}
+        fill={accent}
+        opacity={0.12}
+        initial={false}
+        animate={
+          freeze
+            ? { opacity: 0.12 }
+            : { opacity: [0.1, 0.18, 0.1] }
+        }
+        transition={
+          freeze
+            ? undefined
+            : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+        }
+      />
+
+      {stars.map((s, i) => (
+        <motion.circle
+          key={i}
+          cx={s.cx}
+          cy={s.cy}
+          r={s.r}
+          fill="#f5f0ff"
+          initial={freeze ? false : { opacity: 0 }}
+          animate={
+            freeze
+              ? { opacity: 0.5 }
+              : { opacity: [0.35, 0.7, 0.35] }
+          }
+          transition={
+            freeze
+              ? undefined
+              : {
+                  duration: 3.2 + i * 0.35,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.4,
+                }
+          }
+        />
+      ))}
+
+      {/* One haunt — same blob as list perimeter ghosts */}
+      <g opacity={0.8}>
+        <BlobGhost
+          x={26}
+          y={468}
+          size={72}
+          freeze={freeze}
+          delay={0}
+        />
+      </g>
+    </g>
+  );
+}
+
 /** Minimal cloud — three bumps, flat bottom. */
 function cloudPath() {
   return "M 20 56 C 8 56 4 40 18 34 C 14 18 36 8 52 20 C 62 8 88 12 92 30 C 110 28 118 48 102 56 Z";
@@ -364,49 +472,66 @@ function blobPath() {
   return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
 }
 
+function BlobGhost({
+  x,
+  y,
+  size,
+  freeze,
+  delay = 0,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  freeze: boolean;
+  delay?: number;
+}) {
+  const scale = size / 64;
+  return (
+    <motion.g
+      initial={false}
+      animate={
+        freeze
+          ? { x, y }
+          : {
+              x,
+              y: [y, y - 10, y - 4, y],
+              rotate: [-2, 3, -1, -2],
+            }
+      }
+      transition={
+        freeze
+          ? undefined
+          : {
+              duration: 4.2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay,
+            }
+      }
+      style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
+    >
+      <g transform={`scale(${scale})`}>
+        <path d={blobPath()} fill="#f5f0ff" />
+        <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
+        <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
+      </g>
+    </motion.g>
+  );
+}
+
 function PerimeterGhosts({ freeze }: { freeze: boolean }) {
   return (
     <g opacity={0.74}>
-      {GHOST_SLOTS.map((s, i) => {
-        const scale = s.size / 64;
-        return (
-          <motion.g
-            key={i}
-            initial={false}
-            animate={
-              freeze
-                ? { x: s.x, y: s.y }
-                : {
-                    x: s.x,
-                    y: [
-                      s.y,
-                      s.y - 10 * (0.75 + (i % 3) * 0.2),
-                      s.y - 4 * (0.75 + (i % 3) * 0.2),
-                      s.y,
-                    ],
-                    rotate: [-2, 3, -1, -2],
-                  }
-            }
-            transition={
-              freeze
-                ? undefined
-                : {
-                    duration: 3.2 + (i % 4) * 0.7,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: -i * 0.85,
-                  }
-            }
-            style={{ transformOrigin: `${s.size / 2}px ${s.size / 2}px` }}
-          >
-            <g transform={`scale(${scale})`}>
-              <path d={blobPath()} fill="#f5f0ff" />
-              <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
-              <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
-            </g>
-          </motion.g>
-        );
-      })}
+      {GHOST_SLOTS.map((s, i) => (
+        <BlobGhost
+          key={i}
+          x={s.x}
+          y={s.y}
+          size={s.size}
+          freeze={freeze}
+          delay={-i * 0.85}
+        />
+      ))}
     </g>
   );
 }

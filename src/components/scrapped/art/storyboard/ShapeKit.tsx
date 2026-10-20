@@ -354,12 +354,194 @@ type OceanWaveProps = {
 };
 
 /**
+ * Kit C — oval + triangle tail + single eye (volume-ocean-fish-styles).
+ * Local coords face right; caller flips via scaleX for rtl.
+ */
+function CuteFishGlyph({ body, size }: { body: string; size: number }) {
+  const s = size;
+  return (
+    <g>
+      <path
+        d={`M ${-5 * s} 0 L ${-8.8 * s} ${-2.4 * s} L ${-8.8 * s} ${2.4 * s} Z`}
+        fill={body}
+        opacity={0.9}
+      />
+      <ellipse cx={0} cy={0} rx={6.2 * s} ry={3.4 * s} fill={body} />
+      <circle cx={3.2 * s} cy={-0.45 * s} r={0.7 * s} fill="#1c1c1c" />
+    </g>
+  );
+}
+
+type OceanFishSpec = {
+  id: string;
+  /** 0 near crest → 1 deep. */
+  depth: number;
+  size: number;
+  body: string;
+  /** Full-width crossing duration — keep slow / calm. */
+  swimSec: number;
+  delay: number;
+  dir: "ltr" | "rtl";
+  bob: number;
+  bobSec: number;
+  /** Horizontal start offset 0–1 along the swim lane. */
+  phase: number;
+};
+
+/** Minimal school — warm pops on teal; slow glide under copy. */
+const OCEAN_FISH: OceanFishSpec[] = [
+  {
+    id: "peach",
+    depth: 0.22,
+    size: 0.95,
+    body: "#FFB07A",
+    swimSec: 42,
+    delay: 0.4,
+    dir: "ltr",
+    bob: 2.4,
+    bobSec: 5.6,
+    phase: 0.1,
+  },
+  {
+    id: "gold",
+    depth: 0.48,
+    size: 0.72,
+    body: "#E8B84B",
+    swimSec: 54,
+    delay: 2.2,
+    dir: "rtl",
+    bob: 2,
+    bobSec: 6.8,
+    phase: 0.55,
+  },
+  {
+    id: "rose",
+    depth: 0.68,
+    size: 0.85,
+    body: "#F472B6",
+    swimSec: 48,
+    delay: 1.1,
+    dir: "ltr",
+    bob: 2.8,
+    bobSec: 5.2,
+    phase: 0.35,
+  },
+  {
+    id: "mango",
+    depth: 0.35,
+    size: 0.64,
+    body: "#FF9F1C",
+    swimSec: 38,
+    delay: 3.6,
+    dir: "rtl",
+    bob: 1.8,
+    bobSec: 4.8,
+    phase: 0.8,
+  },
+  {
+    id: "coral",
+    depth: 0.82,
+    size: 0.58,
+    body: "#FB7185",
+    swimSec: 58,
+    delay: 0.8,
+    dir: "ltr",
+    bob: 2.2,
+    bobSec: 7.2,
+    phase: 0.2,
+  },
+];
+
+function oceanFishY(tide: "low" | "high", depth: number): number {
+  const crest = OCEAN_TIDE[tide].front;
+  const deep = Math.min(OCEAN_FLOOR_Y - 36, 640);
+  const top = crest + (tide === "high" ? 52 : 28);
+  return top + depth * Math.max(40, deep - top - 24);
+}
+
+function OceanFishSchool({
+  tide,
+  reduce,
+}: {
+  tide: "low" | "high";
+  reduce: boolean;
+}) {
+  const xLeft = -36;
+  const xRight = 396;
+  const glide = [0.42, 0, 0.58, 1] as const;
+
+  return (
+    <g aria-hidden>
+      {OCEAN_FISH.map((fish) => {
+        const y = oceanFishY(tide, fish.depth);
+        const facing = fish.dir === "ltr" ? 1 : -1;
+        const xFrom = fish.dir === "ltr" ? xLeft : xRight;
+        const xTo = fish.dir === "ltr" ? xRight : xLeft;
+
+        if (reduce) {
+          const xPark = xFrom + (xTo - xFrom) * fish.phase;
+          return (
+            <g
+              key={fish.id}
+              transform={`translate(${xPark}, ${y}) scale(${facing}, 1)`}
+              opacity={0.85}
+            >
+              <CuteFishGlyph body={fish.body} size={fish.size} />
+            </g>
+          );
+        }
+
+        return (
+          <motion.g
+            key={fish.id}
+            // Opacity is owned by the high-tide reveal wrapper.
+            animate={{
+              // One-way lane; negative delay starts mid-crossing.
+              x: [xFrom, xTo],
+              y: [y, y - fish.bob, y, y + fish.bob * 0.55, y],
+            }}
+            transition={{
+              x: {
+                duration: fish.swimSec,
+                repeat: Infinity,
+                ease: "linear",
+                delay: -fish.phase * fish.swimSec,
+              },
+              y: {
+                duration: fish.bobSec,
+                repeat: Infinity,
+                ease: glide,
+                delay: fish.delay * 0.35,
+              },
+            }}
+          >
+            <motion.g
+              style={{ scaleX: facing }}
+              animate={{ rotate: [0, -2.2, 0, 2.2, 0] }}
+              transition={{
+                duration: fish.bobSec * 1.25,
+                repeat: Infinity,
+                ease: glide,
+                delay: fish.delay * 0.25,
+              }}
+            >
+              <CuteFishGlyph body={fish.body} size={fish.size} />
+            </motion.g>
+          </motion.g>
+        );
+      })}
+    </g>
+  );
+}
+
+/**
  * Bottom ocean band — aqua crest → navy deep, soft roll, rises on high tide.
  * Tide morphs crest Y upward (path `d`) so the waterline sits above copy;
  * floor stays pinned. Volume slide exception to the oval-only chrome rule.
  *
  * Motion follows CG water practice (Gerstner / GPU Gems): continuous phase
  * travel (not ping-pong), layered trains with dispersion, low steepness.
+ * Kit-C oval fish school — hidden at low tide; fades in as the crest rises.
  */
 export function OceanWave({
   from,
@@ -373,6 +555,12 @@ export function OceanWave({
   const crests = OCEAN_TIDE[tide];
   const tideEase = [0.4, 0, 0.2, 1] as const;
   const tideTransition = { duration: 4.2, ease: tideEase };
+  /** Fish appear mid-rise so they feel carried in by the water. */
+  const fishReveal = {
+    duration: tide === "high" ? 2.6 : 0.7,
+    ease: tideEase,
+    delay: tide === "high" ? 1.15 : 0,
+  } as const;
   const gradId = { back: gradBack, front: gradFront };
 
   const paths = {
@@ -415,6 +603,7 @@ export function OceanWave({
             opacity={layer.opacity}
           />
         ))}
+        {tide === "high" && <OceanFishSchool tide="high" reduce />}
       </g>
     );
   }
@@ -460,6 +649,14 @@ export function OceanWave({
           />
         </motion.g>
       ))}
+      {/* High-tide only — fade with the rise; parked at high-tide depths. */}
+      <motion.g
+        initial={false}
+        animate={{ opacity: tide === "high" ? 0.9 : 0 }}
+        transition={fishReveal}
+      >
+        <OceanFishSchool tide="high" reduce={false} />
+      </motion.g>
     </motion.g>
   );
 }

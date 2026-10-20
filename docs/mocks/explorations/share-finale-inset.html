@@ -30,7 +30,7 @@
       --type-size: 0.86rem;
       --share-pad-y: 12px;
       --actions-gap: 12px;
-      --card-radius: 12px;
+      --card-radius: 4px;
 
       --stage: #C9185B;
       --card-bg: linear-gradient(180deg, #1C1828 0%, #12101A 100%);
@@ -346,6 +346,33 @@
       pointer-events: none;
       overflow: hidden;
     }
+    .card-art .moon {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 260px;
+      height: 260px;
+      /* Center of the circle = bottom-left corner of the card. */
+      transform: translate(-50%, -50%);
+      overflow: visible;
+    }
+    .card-art .moon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .card-art .moon .moon-body {
+      transform-origin: 50px 50px;
+      animation: moon-settle 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    }
+    .phone[data-motion="off"] .card-art .moon .moon-body {
+      animation: none;
+    }
+    @keyframes moon-settle {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
     .card-art .ghosts {
       position: absolute;
       inset: 0;
@@ -584,6 +611,7 @@
       :root { --enter-dur: 0.01s; }
       .share-card.entering { animation: none; }
       .card-art .ghost { animation: none; }
+      .card-art .moon .moon-body { animation: none; }
     }
   </style>
 </head>
@@ -593,7 +621,8 @@
       <h1>Share finale — Kit J tune</h1>
       <p class="lede">
         Locked composition (<code>D-013</code> lead): rose-family <strong>stage</strong> + intro disks/star ·
-        dark <strong>card</strong> · <strong>2 ghosts</strong> framing album art (TL + BR) ·
+        dark <strong>card</strong> · <strong>BL moon</strong> (center on corner) ·
+        <strong>2 ghosts</strong> framing album art (TL + BR) ·
         <code>MyScrapped.com</code>. Flip palettes; tune ghosts with sliders.
       </p>
     </div>
@@ -941,8 +970,8 @@
         id: "j-ink-teal-card",
         title: "J8 · Ink / teal card",
         tag: "shipped · D-014",
-        blurb: "Ink stage · intro disks · ember star · teal ice→deep card · wash ghosts.",
-        why: "Promoted to production (D-014) — framing ghosts + intro stage on ink.",
+        blurb: "Ink stage · intro disks · ember star · teal ice→deep card · BL corner moon + wash ghosts.",
+        why: "Promoted to production (D-014) — moon center on BL corner; ghosts frame art on teal.",
         against: "Two cool fields (disks + teal card) — star warmth is load-bearing.",
         stage: "#12101A",
         cardBg: "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)",
@@ -1147,8 +1176,27 @@
       return el;
     }
 
+    /** BL corner moon sphere — gold→mango→rose; no glow (D-014). */
+    function moonEl() {
+      const el = document.createElement("div");
+      el.className = "moon";
+      el.innerHTML = `
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <radialGradient id="share-moon-grad" cx="32%" cy="28%" r="72%">
+              <stop offset="0%" stop-color="#FFF4D6"/>
+              <stop offset="42%" stop-color="#FF9F1C"/>
+              <stop offset="100%" stop-color="#C9185B"/>
+            </radialGradient>
+          </defs>
+          <circle class="moon-body" cx="50" cy="50" r="50" fill="url(#share-moon-grad)"/>
+        </svg>`;
+      return el;
+    }
+
     function renderGhosts(kit) {
       cardArt.innerHTML = "";
+      cardArt.appendChild(moonEl());
       const root = document.createElement("div");
       root.className = "ghosts";
       const phase = ghostState.phase / 10;
@@ -1204,7 +1252,7 @@
         <strong>Why:</strong> ${kit.why}<br/>
         <span class="against"><strong>Against:</strong> ${kit.against}</span>`;
 
-      stageMeta.innerHTML = `<strong>${kit.title}</strong> · ${kit.tag} · 2 ghosts frame art · MyScrapped.com`;
+      stageMeta.innerHTML = `<strong>${kit.title}</strong> · ${kit.tag} · BL moon + 2 ghosts · MyScrapped.com`;
 
       document.querySelectorAll("#kit-chips .chip").forEach((b) => {
         b.setAttribute("aria-pressed", String(b.dataset.kit === id));
