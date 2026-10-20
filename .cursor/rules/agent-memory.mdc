@@ -45,7 +45,7 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - API deck Orbit Cascade look / per-story dark|light theme + chrome: [D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)
 - #1 artist opaque gradient orbit ovals (kit F ink-lean orchid ladder spin): [D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)
 - Wide viewport orbit pins (phone MotifStage except intro + soft close / middeck full-bleed): [D-009](docs/decisions/D-009-responsive-motif-pins.md)
-- Ghosted pair ground→sky (TR-inset moon · 5 enter-float ghosts · quiet S9 · C8 scrim): [D-018](docs/decisions/D-018-ghosted-ground-sky-s9.md) (D-010 historical)
+- Ghosted pair ground→sky (TR-corner moon · distinct list S9 grow-in · 5 slow-fade ghosts · C8 scrim): [D-018](docs/decisions/D-018-ghosted-ground-sky-s9.md) (D-010 historical)
 - Scrapped logo / wordmark always italic: [D-011](docs/decisions/D-011-scrapped-logo-italic.md)
 - Share finale IA (9:16 inset card + Share/Replay): [D-012](docs/decisions/D-012-share-finale-inset.md)
 - Share finale visual explore (deck rhymes · stage/card split): [D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)

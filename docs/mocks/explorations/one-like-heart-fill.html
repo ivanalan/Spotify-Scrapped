@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>1 like — Spotify pop heart (simple)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --teal-deep: #0f4c5c;
+        --teal-ice: #5eead4;
+        --nest: linear-gradient(165deg, #5eead4 0%, #1a7a6e 50%, #0f4c5c 100%);
+        --pink: #ff4d8d;
+        --gold: #ffe66d;
+        --fg: #f5f5f5;
+        --page: #0c0b10;
+        --page-ink: #e8e4f0;
+        --page-muted: #9a93a8;
+        --panel: #18161f;
+        --line: #2a2634;
+        --accent: #5eead4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--page);
+        color: var(--page-ink);
+        font-family: Poppins, system-ui, sans-serif;
+      }
+
+      body {
+        padding: 28px 24px 80px;
+      }
+
+      header {
+        max-width: 1100px;
+        margin: 0 auto 24px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        margin: 8px 0 0;
+        max-width: 64ch;
+        color: var(--page-muted);
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .toolbar {
+        max-width: 1100px;
+        margin: 0 auto 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .toolbar button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--page-ink);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .toolbar button:hover {
+        border-color: var(--teal-ice);
+      }
+
+      .toolbar button[aria-pressed="true"] {
+        background: #0f4c5c;
+        border-color: var(--teal-ice);
+        color: #fff;
+      }
+
+      .toolbar .hint {
+        color: var(--page-muted);
+        font-size: 0.78rem;
+      }
+
+      .layout {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(260px, 360px) 1fr;
+        gap: 28px;
+        align-items: start;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stage-wrap {
+        position: sticky;
+        top: 16px;
+      }
+
+      .stage-label {
+        margin: 0 0 10px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--page-muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .phone {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 9 / 16;
+        max-height: min(78vh, 720px);
+        margin: 0 auto;
+        border-radius: 28px;
+        overflow: hidden;
+        background: var(--nest);
+        box-shadow:
+          0 0 0 1px color-mix(in oklab, #fff 12%, transparent),
+          0 24px 60px color-mix(in oklab, #000 45%, transparent);
+        cursor: pointer;
+      }
+
+      .phone .copy {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 18% 12% 22%;
+        pointer-events: none;
+      }
+
+      .phone .copy h2 {
+        margin: 0;
+        font-size: clamp(1.35rem, 6.2vw, 1.85rem);
+        font-weight: 700;
+        line-height: 1.12;
+        letter-spacing: -0.03em;
+        color: var(--fg);
+        text-shadow: 0 1px 12px
+          color-mix(in oklab, var(--teal-deep) 55%, transparent);
+      }
+
+      .phone .copy p {
+        margin: 12px 0 0;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        color: color-mix(in oklab, var(--fg) 90%, transparent);
+        max-width: 28ch;
+      }
+
+      .phone .tap {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 14px;
+        z-index: 3;
+        text-align: center;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: color-mix(in oklab, var(--fg) 55%, transparent);
+        pointer-events: none;
+      }
+
+      .phone .heart-slot {
+        position: absolute;
+        top: 14%;
+        left: 50%;
+        width: 48%;
+        aspect-ratio: 1;
+        margin-left: -24%;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .kits {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+      }
+
+      .kit {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 16px;
+        padding: 0;
+        text-align: left;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      .kit:hover {
+        border-color: color-mix(in oklab, var(--teal-ice) 55%, var(--line));
+      }
+
+      .kit[aria-current="true"] {
+        border-color: var(--teal-ice);
+        box-shadow: 0 0 0 1px var(--teal-ice);
+      }
+
+      .kit .preview {
+        position: relative;
+        aspect-ratio: 1.15;
+        background: var(--nest);
+        overflow: hidden;
+      }
+
+      .kit .preview .heart-slot {
+        position: absolute;
+        inset: 10% 16% 16%;
+      }
+
+      .kit .meta {
+        padding: 12px 14px 14px;
+      }
+
+      .kit .meta strong {
+        display: block;
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      .kit .meta span {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.75rem;
+        line-height: 1.35;
+        color: var(--page-muted);
+      }
+
+      /*
+       * Simple Spotify pop:
+       *   outline → fill crossfade → soft scale pop → a few sparks
+       * No rings, shockwaves, underglow discs, or spinner-y motion.
+       */
+      .heart {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        --pop-scale: 1.32;
+        --dur: 1.7s;
+        --fill-at: 0.45s;
+        --spark-at: 0.62s;
+        --ease: cubic-bezier(0.33, 1, 0.68, 1);
+        --ease-pop: cubic-bezier(0.34, 1.45, 0.64, 1);
+      }
+
+      .heart[data-var="xl"] {
+        --dur: 2s;
+        --fill-at: 0.55s;
+        --spark-at: 0.75s;
+        --pop-scale: 1.42;
+      }
+
+      /* Same lush timing as Slow, with a real outward spark burst */
+      .heart[data-var="sparks"] {
+        --dur: 1.75s;
+        --fill-at: 0.48s;
+        --spark-at: 0.58s;
+        --pop-scale: 1.34;
+        --spark-dur: 1.15s;
+      }
+
+      .heart svg.glyph {
+        position: absolute;
+        width: 74%;
+        height: 74%;
+        overflow: visible;
+        transform-origin: 50% 55%;
+      }
+
+      .heart .outline {
+        fill: none;
+        stroke: var(--pink);
+        stroke-width: 22;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        opacity: 0;
+      }
+
+      .heart .fill {
+        fill: var(--pink);
+        opacity: 0;
+      }
+
+      .heart .sparks {
+        position: absolute;
+        inset: -30%;
+        pointer-events: none;
+        overflow: visible;
+      }
+
+      .heart .spark {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        width: 8px;
+        height: 8px;
+        margin: -4px 0 0 -4px;
+        border-radius: 50%;
+        background: var(--pink);
+        opacity: 0;
+      }
+
+      .heart .spark.gold {
+        background: var(--gold);
+        width: 6px;
+        height: 6px;
+        margin: -3px 0 0 -3px;
+      }
+
+      .heart .spark.sm {
+        width: 4px;
+        height: 4px;
+        margin: -2px 0 0 -2px;
+      }
+
+      .heart:not([data-play="1"]) .outline {
+        opacity: 0.9;
+      }
+
+      .heart:not([data-play="1"]) .fill {
+        opacity: 0;
+      }
+
+      .heart[data-play="1"] .outline {
+        animation: pop-outline var(--dur) var(--ease) both;
+      }
+
+      .heart[data-play="1"] .fill {
+        animation: pop-fill var(--dur) var(--fill-at) var(--ease) both;
+      }
+
+      .heart[data-play="1"] svg.glyph {
+        animation: pop-bounce var(--dur) var(--ease-pop) both;
+      }
+
+      /* Sparks only on the sparks variant — Slow / XL stay clean */
+      .heart[data-var="sparks"][data-play="1"] .spark {
+        animation: pop-spark var(--spark-dur, 1.15s) var(--spark-at) var(--ease)
+          both;
+      }
+
+      @keyframes pop-outline {
+        0% {
+          opacity: 0;
+        }
+        14% {
+          opacity: 1;
+        }
+        40% {
+          opacity: 1;
+        }
+        58% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes pop-fill {
+        0%,
+        10% {
+          opacity: 0;
+        }
+        40% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes pop-bounce {
+        0% {
+          transform: scale(0.78);
+        }
+        20% {
+          transform: scale(1);
+        }
+        42% {
+          transform: scale(1);
+        }
+        60% {
+          transform: scale(var(--pop-scale));
+        }
+        82% {
+          transform: scale(0.96);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pop-spark {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.35);
+        }
+        12% {
+          opacity: 1;
+          transform: translate(
+              calc(var(--sx) * 0.12),
+              calc(var(--sy) * 0.12)
+            )
+            scale(1.2);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--sx), var(--sy)) scale(0.15);
+        }
+      }
+
+      .heart[data-play="1"][data-settled="1"] .fill {
+        opacity: 1 !important;
+        animation: none !important;
+      }
+      .heart[data-play="1"][data-settled="1"] .outline {
+        opacity: 0 !important;
+        animation: none !important;
+      }
+      .heart[data-play="1"][data-settled="1"] svg.glyph {
+        transform: none !important;
+        animation: none !important;
+      }
+      .heart[data-play="1"][data-settled="1"] .spark {
+        opacity: 0 !important;
+        animation: none !important;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .heart[data-play="1"] .outline,
+        .heart[data-play="1"] .fill,
+        .heart[data-play="1"] svg.glyph,
+        .heart[data-play="1"] .spark {
+          animation-duration: 0.01ms !important;
+          animation-delay: 0s !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>1 like heart — Spotify pop (simple)</h1>
+      <p>
+        Outline → fill → bounce. Slow / XL stay clean; Sparks adds a burst of
+        dots flying out of the heart on fill. No rings.
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <button type="button" id="replay">Replay</button>
+      <button type="button" id="loop" aria-pressed="false">Loop</button>
+      <span class="hint" id="active-hint">A · Sparks</span>
+    </div>
+
+    <div class="layout">
+      <div class="stage-wrap">
+        <p class="stage-label">Focus · Meet beat</p>
+        <div class="phone" id="phone" title="Click to replay">
+          <div class="heart-slot" id="focus-slot"></div>
+          <div class="copy">
+            <h2>Meet your 1 like artists</h2>
+            <p>You liked a single track and never looked back.</p>
+          </div>
+          <div class="tap">Tap to replay</div>
+        </div>
+      </div>
+
+      <div>
+        <p class="stage-label">Timing</p>
+        <div class="kits" id="kits" role="listbox"></div>
+      </div>
+    </div>
+
+    <script>
+      const HEART_PATH =
+        "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
+
+      /* Flying sparks — longer throw, mixed sizes (sparks kit only) */
+      const SPARKS = [
+        { sx: 0, sy: -118, cls: "" },
+        { sx: 48, sy: -102, cls: "gold" },
+        { sx: 88, sy: -72, cls: "sm" },
+        { sx: 110, sy: -18, cls: "" },
+        { sx: 96, sy: 42, cls: "gold" },
+        { sx: 58, sy: 96, cls: "sm" },
+        { sx: 0, sy: 118, cls: "" },
+        { sx: -58, sy: 96, cls: "gold" },
+        { sx: -96, sy: 42, cls: "sm" },
+        { sx: -110, sy: -18, cls: "" },
+        { sx: -88, sy: -72, cls: "gold" },
+        { sx: -48, sy: -102, cls: "sm" },
+        { sx: 72, sy: 12, cls: "gold" },
+        { sx: -72, sy: 12, cls: "" },
+      ];
+
+      const KITS = [
+        {
+          id: "slow",
+          varName: "",
+          title: "A · Slow",
+          blurb: "~1.7s · outline → fill → pop · no sparks",
+          settleMs: 1900,
+          sparks: false,
+        },
+        {
+          id: "xl",
+          varName: "xl",
+          title: "A · XL",
+          blurb: "~2s · bigger bounce · no sparks",
+          settleMs: 2300,
+          sparks: false,
+        },
+        {
+          id: "sparks",
+          varName: "sparks",
+          title: "A · Sparks",
+          blurb: "~1.75s · same pop + dots flying out on fill",
+          settleMs: 2100,
+          sparks: true,
+        },
+      ];
+
+      let active = "sparks";
+      let looping = false;
+      let settleTimer = 0;
+      let loopTimer = 0;
+
+      function sparkHtml() {
+        return SPARKS.map(
+          (s, i) =>
+            `<span class="spark ${s.cls}" style="--sx:${s.sx}px;--sy:${s.sy}px;animation-delay:calc(var(--spark-at) + ${i * 0.018}s)"></span>`,
+        ).join("");
+      }
+
+      function heartMarkup(varName, withSparks) {
+        const attr = varName ? ` data-var="${varName}"` : "";
+        const sparks = withSparks
+          ? `<div class="sparks" aria-hidden="true">${sparkHtml()}</div>`
+          : "";
+        return `
+          <div class="heart"${attr}>
+            ${sparks}
+            <svg class="glyph" viewBox="0 0 512 512" aria-hidden="true">
+              <path class="outline" d="${HEART_PATH}" />
+              <path class="fill" d="${HEART_PATH}" />
+            </svg>
+          </div>
+        `;
+      }
+
+      const focusSlot = document.getElementById("focus-slot");
+      const kitsEl = document.getElementById("kits");
+      const hint = document.getElementById("active-hint");
+      const phone = document.getElementById("phone");
+
+      function kitMeta(id) {
+        return KITS.find((k) => k.id === id) ?? KITS[0];
+      }
+
+      function mountFocus() {
+        const k = kitMeta(active);
+        focusSlot.innerHTML = heartMarkup(k.varName, k.sparks);
+      }
+
+      function renderKits() {
+        kitsEl.innerHTML = "";
+        KITS.forEach((k) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "kit";
+          btn.setAttribute("role", "option");
+          btn.setAttribute("aria-current", k.id === active ? "true" : "false");
+          btn.innerHTML = `
+            <div class="preview"><div class="heart-slot">${heartMarkup(k.varName, k.sparks)}</div></div>
+            <div class="meta"><strong>${k.title}</strong><span>${k.blurb}</span></div>
+          `;
+          btn.addEventListener("click", () => {
+            active = k.id;
+            renderKits();
+            mountFocus();
+            hint.textContent = k.title;
+            playAll();
+          });
+          kitsEl.appendChild(btn);
+        });
+      }
+
+      function clearTimers() {
+        window.clearTimeout(settleTimer);
+        window.clearTimeout(loopTimer);
+      }
+
+      function playNode(root) {
+        if (!root) return;
+        root.removeAttribute("data-play");
+        root.removeAttribute("data-settled");
+        void root.offsetWidth;
+        root.setAttribute("data-play", "1");
+      }
+
+      function playAll() {
+        clearTimers();
+        const meta = kitMeta(active);
+        hint.textContent = meta.title;
+        playNode(focusSlot.querySelector(".heart"));
+        kitsEl.querySelectorAll(".kit").forEach((tile) => {
+          const h = tile.querySelector(".heart");
+          if (tile.getAttribute("aria-current") === "true") playNode(h);
+          else if (h) {
+            h.removeAttribute("data-play");
+            h.removeAttribute("data-settled");
+          }
+        });
+        settleTimer = window.setTimeout(() => {
+          document
+            .querySelectorAll('.heart[data-play="1"]')
+            .forEach((h) => h.setAttribute("data-settled", "1"));
+          if (looping) loopTimer = window.setTimeout(playAll, 700);
+        }, meta.settleMs);
+      }
+
+      document.getElementById("replay").addEventListener("click", playAll);
+      phone.addEventListener("click", playAll);
+      document.getElementById("loop").addEventListener("click", (e) => {
+        looping = !looping;
+        e.currentTarget.setAttribute(
+          "aria-pressed",
+          looping ? "true" : "false",
+        );
+        e.currentTarget.textContent = looping ? "Looping…" : "Loop";
+        if (looping) playAll();
+        else clearTimers();
+      });
+
+      mountFocus();
+      renderKits();
+      requestAnimationFrame(() => playAll());
+    </script>
+  </body>
+</html>

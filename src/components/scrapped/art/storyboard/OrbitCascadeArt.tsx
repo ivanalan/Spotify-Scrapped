@@ -18,8 +18,10 @@ import { ArtistOrbitOvals } from "@/components/scrapped/orbit/ArtistOrbitOvals";
 import {
   EMBER_FIELD_GRADIENT,
   INTRO_DISK_COLORS,
+  INTRO_FIELD_GRADIENT,
   INTRO_SHARED_GRADIENT,
   INTRO_STAR,
+  TEAL_NEST_GRADIENT,
 } from "@/lib/scrapped-card-palette";
 import { SLIDE_SPECS } from "./orbitCascade";
 import type { SlideArtProps } from "./types";
@@ -95,7 +97,11 @@ export function OrbitCascadeArt({
       ? funkyPalette.bg
       : pattern === "volume"
         ? EMBER_FIELD_GRADIENT
-        : spec.bg;
+        : pattern === "intro"
+          ? INTRO_FIELD_GRADIENT
+          : slideIndex === 4
+            ? TEAL_NEST_GRADIENT
+            : spec.bg;
 
   return (
     <div

@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Scrapped",
   description:
-    "Scrapped is your anti-wrapped. Songs you hated and artists you skipped.",
+    "Scrapped is your anti-wrapped. Songs you ghosted and artists you left on read.",
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },

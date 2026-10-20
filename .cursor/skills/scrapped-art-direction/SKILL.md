@@ -29,8 +29,8 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 |------|--------|
 | Direction | **Orbit Cascade** — ovals / orbs / skewed pills; hard card-cut fields |
 | Substrate | Card palette: `ink · orchid · ember · mango · gold · teal · rose` ([`scrapped-card-palette.ts`](../../../src/lib/scrapped-card-palette.ts)) |
-| Intro | Ink field + orchid concentric oval ladder |
-| Opening | ink → ember → ink (ghosted: grass · quiet S9 · cover-TR haunt → list TR-inset moon + 5 float ghosts — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md)) |
+| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only |
+| Opening | ink → ember → ink (ghosted: grass · entity S9 grow-in · cover-TL haunt fade → list TR-corner moon + distinct list S9 · 5 slow-fade ghosts — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md)) |
 | Volume | Flame ember field (light theme / black ink) + ice→deep teal ocean; high tide on “joined” beat; fish = liked-this-year (1:1, cap 50) from subtitle → viewport bottom |
 | Theme | **Per-story dark or light** — swatch ink mode; deck chrome (wordmark / progress / controls) must match the active slide |
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
@@ -39,11 +39,11 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters). Wide: corner pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone keeps legacy `MotifStage` slice except intro + soft-close bookends (pinned) |
 | Geometry | Locked ovals (`OVAL`) by default; volume uses a bottom ocean wave; art in corners / edges; **clear mid band** for copy + lists |
 | #1 artist | Oval ladder grammar — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md). Live **left-on-read** entity uses **T1 typing pin** — [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
-| Ghosted list | **Slide 3 only** — TR-inset moon (no halo) · quiet S9 stars · 5 enter-float ghosts · C8 chrome scrim — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
-| Ghosted entity | **Slide 2** — ink · grass (rise-from-soil cascade — [D-021](../../../docs/decisions/D-021-ghosted-grass-rise-from-soil.md)) · S9 stars · cover-TR haunt · no moon — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
+| Ghosted list | **Slide 3 only** — TR-corner moon (no halo) · distinct S9 list stars (grow-in) · 5 slow-fade-then-float ghosts · C8 chrome scrim — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
+| Ghosted entity | **Slide 2** — ink · grass (rise-from-soil cascade — [D-021](../../../docs/decisions/D-021-ghosted-grass-rise-from-soil.md)) · entity S9 grow-in · cover-TL haunt slow-fade · no moon — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
 | List beats | Art **frames** the list (edges only) — never a mid-band hero over rows — [D-015](../../../docs/decisions/D-015-list-art-frames-not-heroes.md). Scene 4 rising hearts · scene 6 chat frame — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) |
-| Soft close | **Teal** field · **8B mono teal iris** shrink-to-stop — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) |
-| Middeck 4–7 | **4A** heart · **T1** typing pin · **7L** film letterbox — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) / [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
+| Soft close | **Teal** field (flat) · **8B mono teal iris** shrink-to-stop — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) |
+| Middeck 4–7 | Scene 4: **teal nest** (`TEAL_NEST_GRADIENT` / share C0) + **4A** heart · **T1** typing pin · **7L** film letterbox — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) / [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
 | Left on read 5→6 field | Ink + **B1 orchid corners** wash · pin/frame geometry — [D-019](../../../docs/decisions/D-019-left-on-read-orchid-corners.md) |
 | Entity→list rhyme | Ghosted D-018 · left-on-read T1 — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) / [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
 | Share finale | **9:16** inset card + Share / Replay — [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Production: **ink** stage + intro disks/star · **teal** nest · **B1 orchid corners** · **lilac-rim** BL moon · framing ghosts — [D-021](../../../docs/decisions/D-021-share-finale-teal-orchid-lilac-moon.md). Stage/card split — [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) · spine [D-020](../../../docs/decisions/D-020-share-finale-orchid-corners-white-moon.md) |
@@ -79,7 +79,7 @@ Do **not** introduce:
 | `/scrapped` (`wrapped-story`) | Orbit Cascade — D-007 |
 | Scrapped Plus `/scrapped/plus` | May stay editorial Anysphere until intentionally unified |
 | Scrapped Lab `/scrapped/lab` | Functional Anysphere; not a story carnival |
-| Gate / loading | Same as intro — ink field + orchid concentric chrome |
+| Gate / loading | Same as intro — orchid corners + orchid concentric chrome |
 | `/scrapped/art` | **Research** — iterate motifs/palettes; production tokens live in `src/lib/scrapped-card-palette.ts`. Promoting further changes still needs an explicit decision. |
 
 ## Implementation checklist

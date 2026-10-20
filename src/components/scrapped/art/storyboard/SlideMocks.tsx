@@ -31,7 +31,7 @@ export function SlideMock({ pattern, slideIndex, ink, muted }: Props) {
             <h1 className="text-display mt-1 italic">Scrapped</h1>
             <p className="text-body mt-5 max-w-[15rem]" style={{ color: muted }}>
               Scrapped is your <span className="italic">anti-wrapped</span>.
-              Artists you ghosted and songs that fell off.
+              Songs you ghosted and artists you left on read.
             </p>
             <div
               className="mt-8 inline-flex h-11 max-w-[11rem] items-center justify-center rounded-2xl px-6 text-sm font-semibold"
@@ -202,7 +202,7 @@ export function SlideMock({ pattern, slideIndex, ink, muted }: Props) {
               Scrapped · 2026
             </p>
             <p className="mt-3 font-sans text-lg font-extrabold leading-snug tracking-tight">
-              Ghosted artists & songs
+              Ghosted songs & left on read
             </p>
             <p className="mt-2 text-sm text-[#6b6b6b]">
               Anti-wrapped, on purpose.

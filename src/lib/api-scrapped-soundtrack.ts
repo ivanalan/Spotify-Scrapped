@@ -4,8 +4,8 @@
  *
  * Scene index (1-based user slides → 0-based):
  * 0 open (short-term #1) · 1 liked this year · 2 top ghosted song ·
- * 3 2nd ghosted song · 4 one-like · 5 top ghosted artist ·
- * 6 2nd ghosted artist · 7 reunion · 8 soft close · 9 share
+ * 3 2nd ghosted song · 4 one-like · 5 top left-on-read artist ·
+ * 6 2nd left-on-read artist · 7 reunion · 8 soft close · 9 share
  */
 
 import type {
@@ -16,7 +16,7 @@ import type {
 
 export const API_SCRAPPED_SLIDE_COUNT = 10;
 
-/** 0-based indices: #1 ghosted artist → top ghosted artists list. */
+/** 0-based indices: #1 left-on-read artist → top left-on-read artists list. */
 export const ARTIST_ACT_SLIDES = [5, 6] as const;
 
 /**
@@ -114,7 +114,7 @@ export function needsArtistSoundtrackResolve(
   };
 }
 
-/** Same for #2 ghosted artist when the report has no distinct sample. */
+/** Same for #2 left-on-read artist when the report has no distinct sample. */
 export function needsSecondArtistSoundtrackResolve(
   report: ScrappedApiReport,
 ): {
@@ -234,9 +234,9 @@ export function getApiSlideSoundtrackUris(
   out[2] = take(ghostedIds[0]);
   // 3 — second ghosted song
   out[3] = take(ghostedIds[1]);
-  // 5 — top ghosted artist sample
+  // 5 — top left-on-read artist sample
   out[5] = take(artist0Id);
-  // 6 — second ghosted artist sample
+  // 6 — second left-on-read artist sample
   out[6] = take(artist1Id);
   // 4 — top one-like sample
   out[4] = take(oneLikeIds[0]);

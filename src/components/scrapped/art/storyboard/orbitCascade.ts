@@ -125,11 +125,12 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(2).bg,
     ink: card(2).ink,
     ...accents(2),
-    hero: "Ridge grass · S9 4-point glow stars · one cover-TR blob ghost (no moon)",
-    motion: "Grass rise-from-soil cascade (near→mid→far) + flow sway; star glow pulse; ghost bob at cover TR",
+    hero: "Ridge grass · S9 entity star map · cover-TR blob haunt (no moon)",
+    motion:
+      "Grass rise-from-soil cascade; stars grow-in then pulse; haunt slow-fade then bob",
     composition:
       "Ink field; purple→ember accents; grass floor; mid clear for cover + copy (D-018)",
-    why: "Ground haunt first — sky (moon + enter-float ghosts) arrives on the list.",
+    why: "Ground haunt first — sky (moon + fade-float ghosts) arrives on the list.",
     iterations: [
       "C1 — Orchid + gold/aqua spiral (displaced)",
       "C2 — Ink night · moon · stars · one BL ghost (D-017 N4 · displaced)",
@@ -143,17 +144,18 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(3).bg,
     ink: card(3).ink,
     ...accents(3),
-    hero: "TR-inset silver→ember moon (no halo) · quiet S9 stars · 5 enter-float ghosts",
+    hero: "TR-corner silver→ember moon (no halo) · distinct S9 list stars · 5 fade-float ghosts",
     motion:
-      "Moon settle; quiet star glow; ghosts stagger-enter then independent bob",
+      "Moon grow-in + underglow; stars grow-in with pulse overlap; ghosts fade with float blend",
     composition:
-      "Ink field; no grass/clouds; moon TR-inset + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
+      "Ink field; no grass/clouds; moon TR-corner + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
     why: "Sky chorus after the ground haunt — bright moon with chrome scrim.",
     iterations: [
       "D1 — Two drifting clouds + BL orb (displaced)",
       "D2 — Sky/grass pack (D-010 · displaced)",
       "D3 — Hard-TR moon · S9 · rising ghosts · C8 scrim (displaced)",
-      "D4 — TR-inset moon · 5 enter-float ghosts · quiet stars (current · D-018)",
+      "D4 — TR-inset moon · 5 enter-float ghosts · quiet stars (displaced)",
+      "D5 — TR-corner moon · distinct list stars · slow fade ghosts (current · D-018)",
     ],
   },
   {
@@ -163,13 +165,13 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(4).bg,
     ink: card(4).ink,
     ...accents(4),
-    hero: "Same orb + drifting clouds — gold→pink on teal",
-    motion: "Identical motif verbs; palette only",
-    composition: "Identical grammar as slide 3",
-    why: "Reuse motifs; retint only within the 6-swatch system.",
+    hero: "4A heart on teal nest (ice→mid→deep · share C0)",
+    motion: "Heart grow-in / lub-dub → perimeter rising hearts on list",
+    composition: "TEAL_NEST_GRADIENT field; mid clear for copy + list (D-015 / D-016)",
+    why: "Nest rhymes share card; soft-close stays flat teal.",
     iterations: [
-      "E1 — Teal field (current)",
-      "E2 — Smaller orb",
+      "E1 — Flat teal (displaced)",
+      "E2 — Teal nest C0 / share cardBg (current)",
     ],
   },
   {

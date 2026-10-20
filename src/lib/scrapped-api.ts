@@ -256,25 +256,94 @@ export function leftLongGhostedCount(report: ScrappedApiReport): number | null {
   return 0;
 }
 
+/** Older Lab detail lines sometimes prefixed the metric before the song. */
+const ONE_LIKE_DETAIL_STUB = /^1 like$/i;
+
+function isOneSaveAgePart(part: string): boolean {
+  return /^(liked today|\d[\d,]*d\b)/i.test(part.trim());
+}
+
+function formatOneSaveDetail(artist: string, ageDays: number): string {
+  return ageDays === 0
+    ? `${artist} · liked today`
+    : `${artist} · ${ageDays.toLocaleString()}d ago`;
+}
+
 /**
- * Older sealed one-save rows used label=artist, detail=`${song} · …d on the shelf`
- * with no sublabel. Current shape is label=song, sublabel=artist.
+ * Recover song title from legacy one-save `detail` shapes:
+ * - `Song · 622d on the shelf`
+ * - `1 like · Song · 622d on the shelf` (metric stub — do not treat as title)
+ */
+function songFromOneSaveDetail(
+  detail: string | undefined,
+  artistLabel?: string,
+): string | null {
+  if (!detail) return null;
+  const parts = detail
+    .split(" · ")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length === 0) return null;
+
+  if (ONE_LIKE_DETAIL_STUB.test(parts[0]!)) {
+    const song = parts[1];
+    if (
+      song &&
+      !isOneSaveAgePart(song) &&
+      !ONE_LIKE_DETAIL_STUB.test(song)
+    ) {
+      return song;
+    }
+    return null;
+  }
+
+  // Oldest: `Song · …d on the shelf`. Reject rewritten `Artist · Nd ago`
+  // where the first segment matches the artist (song already lost).
+  if (
+    parts.length >= 2 &&
+    isOneSaveAgePart(parts[parts.length - 1]!) &&
+    !isOneSaveAgePart(parts[0]!)
+  ) {
+    const candidate = parts[0]!;
+    if (artistLabel && candidate === artistLabel) return null;
+    return candidate;
+  }
+
+  return null;
+}
+
+/**
+ * Older sealed one-save rows used label=artist with detail shapes:
+ * - `${song} · …d on the shelf`
+ * - `1 like · ${song} · …d on the shelf` (metric stub prefix)
+ * Current shape is label=song, sublabel=artist.
  * Also drop duplicate songs from collab credits (same trackId / label).
  */
 function migrateOneSaveArtistItems(report: ScrappedApiReport): void {
   const card = report.cards?.find((c) => c.id === "one-save-artists");
   if (!card) return;
   for (const item of card.items) {
-    if (item.sublabel) continue;
-    const song = item.detail?.split(" · ")[0]?.trim();
+    const labelIsStub = ONE_LIKE_DETAIL_STUB.test(item.label.trim());
+
+    // Current shape: label=song, sublabel=artist.
+    if (item.sublabel && !labelIsStub) continue;
+
+    if (!item.sublabel) {
+      const artist = labelIsStub ? null : item.label;
+      const song = songFromOneSaveDetail(item.detail, artist ?? undefined);
+      if (!song || !artist) continue;
+      item.label = song;
+      item.sublabel = artist;
+      item.detail = formatOneSaveDetail(artist, item.value);
+      continue;
+    }
+
+    // Broken prior migrate: label stuck on "1 like", sublabel=artist.
+    // Recover only when detail still carries the song (stub-prefixed form).
+    const song = songFromOneSaveDetail(item.detail, item.sublabel);
     if (!song) continue;
-    const artist = item.label;
     item.label = song;
-    item.sublabel = artist;
-    item.detail =
-      item.value === 0
-        ? `${artist} · liked today`
-        : `${artist} · ${item.value.toLocaleString()}d ago`;
+    item.detail = formatOneSaveDetail(item.sublabel, item.value);
   }
   const seen = new Set<string>();
   card.items = card.items.filter((item) => {

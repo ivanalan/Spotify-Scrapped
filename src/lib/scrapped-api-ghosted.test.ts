@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  ensureApiReportSummary,
   leftLongGhostedCount,
   type ScrappedApiReport,
 } from "@/lib/scrapped-api";
@@ -124,5 +125,68 @@ describe("leftLongGhostedCount", () => {
       ),
       5,
     );
+  });
+});
+
+describe("ensureApiReportSummary one-save migrate", () => {
+  it("does not treat the '1 like' detail stub as the song title", () => {
+    const report = ensureApiReportSummary(
+      baseReport({
+        cards: [
+          {
+            id: "one-save-artists",
+            title: "One-save shelf",
+            calculated: "",
+            means: "",
+            bar: "",
+            source: "",
+            items: [
+              {
+                id: "artist-1",
+                trackId: "track-1",
+                label: "Indigo",
+                detail: "1 like · Empty Chair · 622d on the shelf",
+                value: 622,
+                imageUrl: null,
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    const item = report.cards.find((c) => c.id === "one-save-artists")?.items[0];
+    assert.equal(item?.label, "Empty Chair");
+    assert.equal(item?.sublabel, "Indigo");
+    assert.equal(item?.detail, "Indigo · 622d ago");
+  });
+
+  it("still migrates oldest song · age detail without the stub", () => {
+    const report = ensureApiReportSummary(
+      baseReport({
+        cards: [
+          {
+            id: "one-save-artists",
+            title: "One-save shelf",
+            calculated: "",
+            means: "",
+            bar: "",
+            source: "",
+            items: [
+              {
+                id: "artist-1",
+                trackId: "track-1",
+                label: "Indigo",
+                detail: "Empty Chair · 622d on the shelf",
+                value: 622,
+                imageUrl: null,
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    const item = report.cards.find((c) => c.id === "one-save-artists")?.items[0];
+    assert.equal(item?.label, "Empty Chair");
+    assert.equal(item?.sublabel, "Indigo");
   });
 });

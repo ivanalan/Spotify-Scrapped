@@ -111,8 +111,8 @@ Scene 1 (2 beats): liked library volume → liked this year + “Not bad for a c
 Scene 2 (3 beats): all time favs + ghosted punchline → “One of them stings the most” (center) → #1 ghosted song
 Scene 3 (2 beats): “one ghost town” setup → Top ghosted songs list
 Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists list
-Scene 5 (2 beats): “Now the artists” → #1 ghosted artist
-Scene 6 (2 beats): “Get the gang back together?” → Top ghosted artists list
+Scene 5 (2 beats): “Now the artists” → #1 left-on-read artist
+Scene 6 (2 beats): “Get the gang back together?” → Top left-on-read artists list
 Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
 Scene 8 (2 beats): “Thanks for sitting with the almosts.” → “See you when they don’t stick.”
 Scene 9: Share finale (holds; no auto-advance)

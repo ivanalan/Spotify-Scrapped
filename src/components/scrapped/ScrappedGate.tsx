@@ -60,6 +60,7 @@ export function ScrappedGate({
     <div
       className="wrapped-story relative flex min-h-dvh w-full flex-col items-center overflow-hidden px-10"
       data-wrapped-tone="ink"
+      data-scrapped-field="intro-dusk"
     >
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
         <ScrappedOrbitArt slideIndex={0} pattern="intro" active />
@@ -81,7 +82,7 @@ export function ScrappedGate({
           </h1>
           <p className="text-body mt-6 w-full text-[var(--wrapped-ink)]">
             Scrapped is your <span className="italic">anti-wrapped</span>. Songs
-            you hated and artists you skipped.
+            you ghosted and artists you left on read.
           </p>
 
           {mode === "auth" ? (

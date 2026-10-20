@@ -478,7 +478,7 @@ export function ApiScrappedDeck({
             ? { copyEnterDelaySec: INTRO_COPY_DELAY_SEC }
             : undefined,
         );
-        // List slides: hold final list beat +2s (ghosted songs, 1-like artists, ghosted artists).
+        // List slides: hold final list beat +2s (ghosted songs, 1-like artists, left-on-read artists).
         if (
           (scene !== 3 && scene !== 4 && scene !== 6) ||
           durations.length === 0
@@ -813,6 +813,7 @@ export function ApiScrappedDeck({
           tone={slideTone(0)}
           chrome={orbitChrome(0)}
           copyEnterDelaySec={INTRO_COPY_DELAY_SEC}
+          field="intro-dusk"
           beats={[
             {
               headline: (
@@ -963,6 +964,7 @@ export function ApiScrappedDeck({
           {...sceneMotion(4)}
           tone={slideTone(4)}
           chrome={orbitChrome(4)}
+          field="one-like-nest"
           beats={[
             {
               headline: "You’ve heard of 1 hit wonders.",
@@ -979,32 +981,25 @@ export function ApiScrappedDeck({
               display: "sentence",
               children: (
                 <WrappedEntityList
-                  items={(oneSaveArtists?.items ?? []).map((item) => {
-                    // Prefer song/artist shape; fall back for pre-migrate sealed rows.
-                    const song = item.sublabel
-                      ? item.label
-                      : (item.detail?.split(" · ")[0] ?? item.label);
-                    const artist = item.sublabel ?? item.label;
-                    return {
-                      id: item.id,
-                      label: song,
-                      sublabel: (
-                        <span className="inline-flex max-w-full items-center gap-2">
-                          <span className="truncate">{artist}</span>
-                          <span className="inline-flex shrink-0 items-center gap-1">
-                            <Icon
-                              icon={heart}
-                              className="size-3"
-                            />
-                            {item.value === 0
-                              ? "today"
-                              : `${item.value.toLocaleString()}d ago`}
-                          </span>
+                  items={(oneSaveArtists?.items ?? []).map((item) => ({
+                    id: item.id,
+                    // Migrated by ensureApiReportSummary → label=song, sublabel=artist.
+                    label: item.label,
+                    sublabel: (
+                      <span className="inline-flex max-w-full items-center gap-2">
+                        <span className="truncate">
+                          {item.sublabel ?? "—"}
                         </span>
-                      ),
-                      imageUrl: item.imageUrl,
-                    };
-                  })}
+                        <span className="inline-flex shrink-0 items-center gap-1">
+                          <Icon icon={heart} className="size-3" />
+                          {item.value === 0
+                            ? "today"
+                            : `${item.value.toLocaleString()}d ago`}
+                        </span>
+                      </span>
+                    ),
+                    imageUrl: item.imageUrl,
+                  }))}
                   active={!held && active === 4}
                   empty="No 1 like artists in this sample. Loyal, or just indecisive?"
                 />
@@ -1013,7 +1008,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 5 — left on read → #1 ghosted artist */}
+        {/* 5 — left on read → #1 left-on-read artist */}
         <WrappedStorySlide
           {...sceneMotion(5)}
           tone={slideTone(5)}
@@ -1200,7 +1195,7 @@ export function ApiScrappedDeck({
                   year={report.year}
                   variant="minimal"
                   active={active === FINALE_INDEX}
-                  leftLabel="Ghosted artists"
+                  leftLabel="Left on read"
                   rightLabel="Ghosted songs"
                   heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
                   heroAlt={topArtist?.label ?? topSong?.label ?? ""}

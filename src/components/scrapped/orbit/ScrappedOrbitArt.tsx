@@ -132,10 +132,11 @@ function PhoneOrbitChrome({
     );
   }
   // Middeck metaphors (D-016) — full-bleed HTML/CSS layers.
+  // Scene 4 phases: 0 1-hit · 1–2 Meet 1-like (+sub) · ≥3 list narrative.
   if (slideIndex === 4) {
     return (
       <OneLikeHeartChrome
-        mode={beatPhase >= 2 ? "frame" : "hero"}
+        mode={beatPhase >= 3 ? "frame" : "hero"}
         freeze={freeze}
         replayKey={replayKey}
       />
@@ -195,9 +196,12 @@ function PhoneOrbitChrome({
 
       {pattern === "list" && slideIndex === 3 && (
         <GhostedListFrame
+          key={play ? `ghost-list-${replayKey}` : "ghost-list-settled"}
           accent={accent}
           accent2={accent2}
           animate={freeze ? "none" : "soft"}
+          // Beat 1 = “Your ghosted songs” list (setup stays ghost-free).
+          ghostsEnter={beatPhase >= 1}
         />
       )}
 
@@ -235,10 +239,11 @@ function WideOrbitChrome({
       <SoftCloseIrisChrome freeze={freeze} replayKey={replayKey} />
     );
   }
+  // Scene 4 phases: 0 1-hit · 1–2 Meet 1-like (+sub) · ≥3 list narrative.
   if (slideIndex === 4) {
     return (
       <OneLikeHeartChrome
-        mode={beatPhase >= 2 ? "frame" : "hero"}
+        mode={beatPhase >= 3 ? "frame" : "hero"}
         freeze={freeze}
         replayKey={replayKey}
       />
@@ -309,13 +314,22 @@ function WideOrbitChrome({
   if (pattern === "list" && slideIndex === 3) {
     return (
       <MotifMeetStage viewBox="0 0 360 640">
-        <GhostedHardMoon
-          accent={accent}
-          accent2={accent2}
-          freeze={freeze}
-        />
-        <PointGlowStars count={7} freeze={freeze} />
-        <ListPerimeterGhosts freeze={freeze} />
+        <g
+          key={
+            play ? `ghost-list-wide-${replayKey}` : "ghost-list-wide-settled"
+          }
+        >
+          <GhostedHardMoon
+            accent={accent}
+            accent2={accent2}
+            freeze={freeze}
+          />
+          <PointGlowStars layout="list" freeze={freeze} />
+          <ListPerimeterGhosts
+            freeze={freeze}
+            enter={beatPhase >= 1}
+          />
+        </g>
       </MotifMeetStage>
     );
   }

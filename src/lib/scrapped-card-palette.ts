@@ -18,6 +18,14 @@ export const CARD_PALETTE = {
 export const EMBER_FIELD_GRADIENT =
   "linear-gradient(165deg, #FFC878 0%, #FF7A3A 45%, #E85018 100%)";
 
+/**
+ * Teal nest — ice → canvas → deep (165deg).
+ * Share finale card + scene 4 one-like field (C0). Soft-close stays flat teal.
+ * Keep in sync with `data-scrapped-field="one-like-nest"` in globals.css.
+ */
+export const TEAL_NEST_GRADIENT =
+  "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)";
+
 export type CardSwatch = keyof typeof CARD_PALETTE;
 /**
  * Ink mode on a swatch = story theme:
@@ -79,7 +87,7 @@ export const SHARE_FINALE_KIT = {
   id: "c-teal-m-lilac-rim",
   /** Stage field swatch — drives slide chrome (dark theme). */
   stageSwatch: "ink" as const,
-  cardBg: "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)",
+  cardBg: TEAL_NEST_GRADIENT,
   /** Light type on teal card. */
   cardInk: "#f5f5f5",
   cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
@@ -170,6 +178,14 @@ export const INTRO_STAR = {
   from: "#FFB04A",
   to: "#E85D2C",
 } as const;
+
+/**
+ * Intro / gate field — A3 orchid corners (B1 recipe baked into the field).
+ * Gate + slide 0 only; other ink slides stay flat or use their own washes.
+ * Keep in sync with `data-scrapped-field="intro-dusk"` in globals.css.
+ */
+export const INTRO_FIELD_GRADIENT =
+  "radial-gradient(125% 85% at 0% 0%, color-mix(in oklab, #6B21A8 22%, transparent) 0%, transparent 68%), radial-gradient(105% 75% at 100% 100%, color-mix(in oklab, #3B0764 16%, transparent) 0%, transparent 65%), #12101A";
 
 /**
  * #1 artist orbit — prototype kit F (D-008), ink-lean contrast retune.

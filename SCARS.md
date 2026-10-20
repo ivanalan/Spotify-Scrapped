@@ -152,9 +152,9 @@ Format:
 ## 1-like heart vanishes too early / list hearts pop in too fast
 
 - **Not:** Story autoplay advancing before the setup beat finishes, or copy motion stealing the handoff.
-- **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Even with a crossfade, art followed `beatIndex` instantly — hero fade started while setup copy was still exiting.
-- **Proof:** Advancing “Meet your 1 like artists” → “1 like artists” list: big heart cut out / started leaving before the list title landed; edge hearts already halfway up.
-- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Delay visual `frame` until copy exit + list title enter settle (`LIST_HANDOFF_HOLD_MS`). List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise.
+- **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Scene 4 used `beatPhase >= 2` (copied from 2-line setups) — with a 3-block spine that is the Meet 1-like *subtitle*, so the hero fade began while “Meet your 1 like artists” was still on screen. (3) An extra `LIST_HANDOFF_HOLD_MS` then postponed the fade past the copy exit it was meant to match.
+- **Proof:** Heart left during “Meet your 1 like artists” reading; advancing Meet → list looked cut / misaligned with shared copy exit.
+- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Flip `frame` only when the list narrative starts (`beatPhase >= 3` on scene 4). Start the CSS hero fade with that flip (same moment Meet copy exits) — no second hold. List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise. Enter uses outline→fill opacity + polar sparks — never a tiny scaled fill or underglow disc (reads as a mid spinner).
 - **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), `OneLikeHeartChrome.tsx`, `middeck-metaphors.css`
 
 ## MyScrapped.com clipped by the share moon
@@ -180,3 +180,11 @@ Format:
 - **Proof:** Ghosted entity ridge grass expanded up **and** down from a mid band instead of emerging from the soil line.
 - **Avoid:** Do not use `scaleY` for grass grow-in. Rise each ridge from below a ground `clipPath` (`y: rise → 0`), cascade near→mid→far.
 - **Related:** [D-021](docs/decisions/D-021-ghosted-grass-rise-from-soil.md), `SpikyGrass` in `PeripheralMotifs.tsx`
+
+## 1-like list rows show “1 like” instead of the song name
+
+- **Not:** Deck copy regressing to the metric label, or `WrappedEntityList` ignoring `label`.
+- **Cause:** Some sealed one-save rows used `detail: "1 like · {song} · …d on the shelf"`. `migrateOneSaveArtistItems` took `detail.split(" · ")[0]` as the song, so every title became `"1 like"` and the real title was dropped when detail was rewritten.
+- **Proof:** Live 1-like list showed identical “1 like” titles over real artist sublines (Indigo, Mind Shrine, …); disk snapshot still had `1 like · Empty Chair · 622d…`.
+- **Avoid:** Skip a leading `1 like` detail stub; song is the next segment. Never persist a migrate that leaves `label === "1 like"`. If a cookie already lost the song into `Artist · Nd ago`, Reload Lab data.
+- **Related:** `ensureApiReportSummary` / `migrateOneSaveArtistItems` in `scrapped-api.ts`
