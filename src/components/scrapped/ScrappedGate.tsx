@@ -15,6 +15,8 @@ preloadIonIcon();
 
 type Props = {
   message?: string;
+  /** OAuth failure shown on the auth gate (from `?spotify_error=`). */
+  authError?: string;
   mode: "auth" | "fetch" | "error" | "ready" | "loading";
   displayName?: string | null;
   retryAfterSeconds?: number;
@@ -40,6 +42,7 @@ const gateCtaClass = cn(
 
 export function ScrappedGate({
   message,
+  authError,
   mode,
   displayName,
   retryAfterSeconds,
@@ -82,9 +85,16 @@ export function ScrappedGate({
           </p>
 
           {mode === "auth" ? (
-            <a href="/api/spotify/login" className={gateCtaClass}>
-              Sign in to Spotify
-            </a>
+            <div className="mt-8 w-full space-y-3">
+              {authError ? (
+                <p className="text-caption w-full text-[var(--wrapped-muted)]">
+                  {authError}
+                </p>
+              ) : null}
+              <a href="/api/spotify/login" className={cn(gateCtaClass, "mt-0")}>
+                Sign in to Spotify
+              </a>
+            </div>
           ) : mode === "ready" || mode === "loading" ? (
             <div className="mt-8 flex w-full flex-col items-stretch">
               <button

@@ -39,12 +39,12 @@ export const SLIDE_SWATCH: CardSwatch[] = [
   "ink", // 6 left-on-read list — chat frame (D-016)
   "mango", // 7 plot twist / reunion — film letterbox (D-016)
   "teal", // 8 soft close — mono teal iris (D-016)
-  "ink", // 9 share — ink stage + teal card (D-012 / D-014 kit J8)
+  "ink", // 9 share — ink stage + teal nest / orchid wash (D-012 / D-021)
 ];
 
 /**
  * Share finale inset density — locked from exploration (D-012).
- * Visual kit: D-014 (J8 · Ink / teal card).
+ * Visual kit: D-021 (teal nest · orchid corners · lilac-rim moon).
  * Card is always 9:16 (Wrapped share ritual) — on screen and in the export PNG.
  */
 export const SHARE_FINALE_DENSITY = {
@@ -71,12 +71,12 @@ export const SHARE_FINALE_DENSITY = {
 } as const;
 
 /**
- * Share finale visual kit — promoted from explore `j-ink-teal-card` (D-014).
- * Stage: ink + intro disks/star. Card: teal gradient + BL corner moon sphere
- * + 2 ghosts framing hero. Disks/star reuse INTRO_SHARED_GRADIENT / INTRO_STAR.
+ * Share finale visual kit — D-021 · C6 teal + B1 orchid corners + M4 lilac-rim moon.
+ * Stage: ink + intro disks/star. Card: teal nest + orchid corner wash +
+ * white→lilac moon + framing ghosts. Disks/star reuse INTRO_* tokens.
  */
 export const SHARE_FINALE_KIT = {
-  id: "j-ink-teal-card",
+  id: "c-teal-m-lilac-rim",
   /** Stage field swatch — drives slide chrome (dark theme). */
   stageSwatch: "ink" as const,
   cardBg: "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)",
@@ -84,31 +84,43 @@ export const SHARE_FINALE_KIT = {
   cardInk: "#f5f5f5",
   cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
   cardPanel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+  /**
+   * B1 orchid corners wash over the teal nest (D-019 recipe · D-021).
+   * Stays inside the card island — no edge bleed (D-013).
+   */
+  orchidWash: {
+    opacity: 0.75,
+    /** spread = 1 → default radial sizes */
+    background: [
+      "radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, #6B21A8 55%, transparent) 0%, transparent 58%)",
+      "radial-gradient(100% 70% at 100% 100%, color-mix(in oklab, #3B0764 45%, transparent) 0%, transparent 55%)",
+    ].join(", "),
+  },
   ghostFill: "#f5f0ff",
-  ghostEye: "#0F4C5C",
+  ghostEye: "#2a2433",
   brandLine: "MyScrapped.com",
   /**
    * BL moon sphere — center on the card’s bottom-left corner (quarter peeks in).
-   * sizePx = diameter. Warm gold→mango→rose (not the ghost-night purple→ember).
-   * No outer glow — sphere only.
+   * sizePx = diameter. White → lilac → orchid rim (M4). Sphere only.
    */
   moon: {
     /** Center pinned to this card corner. */
     anchor: "bl" as const,
     sizePx: 260,
-    /** Radial stops: highlight → mid → rim. */
+    /** Radial stops: highlight → mid → rim (always a gradient). */
     stops: [
-      { offset: "0%", color: "#FFF4D6" },
-      { offset: "42%", color: "#FF9F1C" },
-      { offset: "100%", color: "#C9185B" },
+      { offset: "0%", color: "#FFFFFF" },
+      { offset: "28%", color: "#F4EBFF" },
+      { offset: "62%", color: "#C9A0F5" },
+      { offset: "100%", color: "#6B21A8" },
     ],
-    opacity: 1,
+    opacity: 0.88,
   },
   ghosts: {
     tl: { xPct: 6, yPct: 6, sizePx: 46 },
     br: { xPct: 76, yPct: 36, sizePx: 56 },
     bobPx: 10,
-    /** Multiplier on rotate amp (1 = explore default). */
+    /** Multiplier on rotate amp (1 = default). */
     wiggle: 1,
     durationSec: 4.3,
     opacity: 0.85,

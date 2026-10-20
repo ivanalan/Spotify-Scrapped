@@ -11,11 +11,11 @@ The #1 artist slide art is a **centered orbit system**: multiple ovals share one
 
 **Shipped kit:** prototype **F — Orchid ladder spin** — ink field (`CARD_PALETTE.ink`), **ink-lean** opaque orchid cascade (`#9B4DE8`→`#7A3CC8`→`#6B21A8`→`#4C1D95`→`#3B0764`→`#1A0A2E`), cascade eccentricities, bottom wash `#0A0810` (starts ~viewBox Y 360).
 
-This displaces the prior soft concentric cascade (near-uniform disks + high transparency / glow) on this beat only, and supersedes the interim kit A rose cascade pick. Contrast retune (2026-10-19): dropped near-white lilac / hot magenta stops that fought mid-band type — see [`docs/mocks/explorations/artist-orbit-contrast.html`](../mocks/explorations/artist-orbit-contrast.html) variant F.
+This displaces the prior soft concentric cascade (near-uniform disks + high transparency / glow) on this beat only, and supersedes the interim kit A rose cascade pick. Contrast retune (2026-10-19): dropped near-white lilac / hot magenta stops that fought mid-band type — kit F ink-lean orchid cascade.
 
 ## Why
 
-Research prototype [`docs/prototypes/artist-space-orbit-options.html`](../prototypes/artist-space-orbit-options.html) (options A–X) showed that:
+Prototype boards (options A–X) showed that:
 
 - Stroke-only / frosted-transparent rings on a void read as generic “AI cosmic UI.”
 - Opaque gradient fills + hard card field keep Scrapped’s Orbit Cascade register (poster / card-cut) while still reading as orbits.
@@ -43,7 +43,7 @@ On `entity-artist` only:
 - Soft concentric near-circles with translucent / glow fills as the primary look
 - Stroke-only void orbits as the primary look
 - Offset multi-center “binary system” layouts as the default
-- Kit **A — Rose cascade** (interim lock) and unpicked prototype kits B–E, G–X (board kept for reference)
+- Kit **A — Rose cascade** (interim lock) and unpicked prototype kits B–E, G–X
 
 Intro ladder, volume ocean, ghosted spiral, and other patterns stay on D-007 unless separately decided.
 
@@ -55,6 +55,5 @@ Richer SVG (per-ring gradient defs + independent spin). Wash + ink field must ke
 
 - Tokens: `ARTIST_ORBIT` in `src/lib/scrapped-card-palette.ts`
 - Art: `src/components/scrapped/orbit/ArtistOrbitOvals.tsx` (wired from `ScrappedOrbitArt` + storyboard)
-- Prototype board: [`docs/prototypes/artist-space-orbit-options.html`](../prototypes/artist-space-orbit-options.html) (option F)
 - Deck look parent: [D-007](D-007-orbit-cascade-api-deck.md)
 - Skill: `.cursor/skills/scrapped-art-direction/SKILL.md`

@@ -1,8 +1,8 @@
 # D-017 — Entity→list pair rhymes (ghosted night · typing pin)
 
-**Status:** Locked  
+**Status:** Partially superseded — ghosted pair (scenes 2–3) live art is [D-018](D-018-ghosted-ground-sky-s9.md). Left-on-read **T1** pin still locked here.  
 **Date:** 2026-10-20  
-**Surfaces:** `/scrapped` API deck scenes 2–3 and 5–6. Explore: [`docs/mocks/explorations/entity-list-pair-rhymes.html`](../mocks/explorations/entity-list-pair-rhymes.html) (favs **N4** · **T1**).
+**Surfaces:** `/scrapped` API deck scenes 2–3 and 5–6. Favs **N4** · **T1**.
 
 ## Decision
 
@@ -25,9 +25,9 @@ Entity and list were related by copy only (orchid spiral → ink ghosts; full 5I
 | Scene 2 accents | Same purple→ember as slide 3 (`#5C1A7A` → `#F05A3D`) |
 | Scene 2 motifs | Moon TR · edge stars · one BL D-010 ghost — **no** clouds/grass |
 | Scene 3 | Unchanged (D-010) |
-| Scene 5 motif | Compact typing pin TL (`--chat-type-w: 86px`) |
-| Scene 6 | Unchanged edge chat frame (D-016 / D-015) |
-| Explore favs | N4 · T1 |
+| Scene 5 motif | Compact typing pin (T1 grammar) — placement/size tuned in [D-019](D-019-left-on-read-orchid-corners.md) |
+| Scene 6 | Edge chat frame (D-016 / D-015) — geometry + orchid field wash in [D-019](D-019-left-on-read-orchid-corners.md) |
+| Kit favs | N4 · T1 |
 
 ## Displaced
 
@@ -36,11 +36,10 @@ Entity and list were related by copy only (orchid spiral → ink ghosts; full 5I
 
 ## Cost
 
-Opening trio is no longer ink→ember→orchid (slide 2 joins ink). Two consecutive ink fields (2→3 and 5→6) rely on motif escalation, not field color, for beat change.
+Opening trio is no longer ink→ember→orchid (slide 2 joins ink). Scenes 5→6 keep the ink canvas but add a shared orchid-corner wash ([D-019](D-019-left-on-read-orchid-corners.md)) so the pair is not flat ink alone.
 
 ## Source of truth
 
 - Motifs: `GhostedNightEntity` in `PeripheralMotifs.tsx`; `LeftOnReadChatChrome` `mode="pin"` + `middeck-metaphors.css`
 - Wire: `ScrappedOrbitArt`
 - Palette: `SLIDE_SWATCH[2]`, `SLIDE_ACCENTS[2]` in `scrapped-card-palette.ts`
-- Explore: `entity-list-pair-rhymes.html`

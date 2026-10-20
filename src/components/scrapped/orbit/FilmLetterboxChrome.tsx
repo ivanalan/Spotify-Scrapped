@@ -22,7 +22,7 @@ function PerfRow() {
 /**
  * 7L film letterbox — 14.5% bars present from scene start, inset sprockets,
  * 1.7s / 5-step stutter; long smooth retract when the list / reveal beat enters.
- * Tune explore: docs/mocks/explorations/film-letterbox-loop.html
+ * Locked: D-016.
  */
 export function FilmLetterboxChrome({
   mode,

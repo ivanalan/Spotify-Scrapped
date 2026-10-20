@@ -107,9 +107,9 @@ export const SLIDE_SPECS: SlideSpec[] = [
     ...accents(1),
     hero: "Bottom ocean wave — ice→deep teal on flame ember; light theme (black ink)",
     motion:
-      "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s; kit-C oval fish fade in with the rise (slow glide)",
+      "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s; kit-C oval fish = likedThisYear (1:1, cap 50) fade in below copy",
     composition:
-      "High tide waterline above centered copy; aqua crest under black type; deck chrome matches light theme",
+      "High tide waterline above centered copy; fish school from subtitle → viewport bottom (y≈390–630, even strata); aqua crest under black type; deck chrome matches light theme",
     why: "Likes as rising water on a hot orange field — dark-theme chrome + copy travel with the slide.",
     iterations: [
       "B1 — Bottom semi + linear gradient + enter-breathe",
@@ -125,14 +125,15 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(2).bg,
     ink: card(2).ink,
     ...accents(2),
-    hero: "TR moon · sparse edge stars · one BL blob ghost (D-010 asset)",
-    motion: "Moon settle + soft glow; star twinkle; ghost float",
+    hero: "Ridge grass · S9 4-point glow stars · one cover-TR blob ghost (no moon)",
+    motion: "Grass rise-from-soil cascade (near→mid→far) + flow sway; star glow pulse; ghost bob at cover TR",
     composition:
-      "Ink field; purple→ember accents; no clouds/grass — mid clear for copy (D-017 N4)",
-    why: "Night rhyme with ghosted list — one haunt before the weather/gang arrive.",
+      "Ink field; purple→ember accents; grass floor; mid clear for cover + copy (D-018)",
+    why: "Ground haunt first — sky (moon + enter-float ghosts) arrives on the list.",
     iterations: [
       "C1 — Orchid + gold/aqua spiral (displaced)",
-      "C2 — Ink night · moon · stars · one ghost (current · D-017)",
+      "C2 — Ink night · moon · stars · one BL ghost (D-017 N4 · displaced)",
+      "C3 — Grass · cover-TR haunt · S9 stars · no moon (current · D-018)",
     ],
   },
   {
@@ -142,16 +143,17 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(3).bg,
     ink: card(3).ink,
     ...accents(3),
-    hero: "Seamless marquee clouds · spiky wind grass · perimeter blob ghosts",
+    hero: "TR-inset silver→ember moon (no halo) · quiet S9 stars · 5 enter-float ghosts",
     motion:
-      "Cloud marquee 32s (no jump); grass gust windStrength 0.4 / 5s; ghosts float",
+      "Moon settle; quiet star glow; ghosts stagger-enter then independent bob",
     composition:
-      "Ink field; purple→ember accents; sky top / grass floor / ghosts on edges; mid clear for list (D-010)",
-    why: "Ghosted theme as weather + characters — not a BL orb on gold.",
+      "Ink field; no grass/clouds; moon TR-inset + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
+    why: "Sky chorus after the ground haunt — bright moon with chrome scrim.",
     iterations: [
       "D1 — Two drifting clouds + BL orb (displaced)",
-      "D2 — Sky/grass HTML explore",
-      "D3 — Ink + purple→ember + blob ghosts perimeter (current / D-010)",
+      "D2 — Sky/grass pack (D-010 · displaced)",
+      "D3 — Hard-TR moon · S9 · rising ghosts · C8 scrim (displaced)",
+      "D4 — TR-inset moon · 5 enter-float ghosts · quiet stars (current · D-018)",
     ],
   },
   {
@@ -177,14 +179,15 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(5).bg,
     ink: card(5).ink,
     ...accents(5),
-    hero: "Compact TL typing bubble (5I bloom fill) · mid clear for artwork",
+    hero: "Typing pin (5I bloom) · orchid corner wash (D-019 B1)",
     motion: "Pin settle + typing-dot bob; freeze on reduced motion",
-    composition: "Ink field; one accent top-left (D-017 T1); not a centered hero",
+    composition: "Ink + B1 wash; pin mid-left clear of artwork (D-017 T1 / D-019)",
     why: "One→many with list edge bubbles — same grammar as hearts/ghosts.",
     iterations: [
       "F1 — D-008 orchid ladder (displaced on live deck)",
       "F2 — 5I dual skew bloom hero (displaced)",
-      "F3 — Compact TL typing pin (current · D-017)",
+      "F3 — Compact TL typing pin (D-017)",
+      "F4 — B1 orchid corners + pin place (current · D-019)",
     ],
   },
   {
@@ -194,13 +197,14 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(6).bg,
     ink: card(6).ink,
     ...accents(6),
-    hero: "Edge-scaled chat columns (quiet → frame)",
-    motion: "Same bubble bloom as pin fill; edge scale only (D-015)",
-    composition: "Ink field; chat frame at edges; mid clear for list",
+    hero: "Softer large edge chat (quiet → frame) · B1 wash",
+    motion: "Same bubble bloom as pin fill; edge frame only (D-015)",
+    composition: "Ink + B1 wash; chat frames edges; mid clear for list (D-019)",
     why: "List half of typing-pin pair — mini chorus, not a second pin.",
     iterations: [
       "G1 — Classic orb + cloud (displaced on live deck)",
-      "G2 — Edge chat frame (current · D-016 / D-017)",
+      "G2 — Edge chat frame (D-016 / D-017)",
+      "G3 — B1 wash + softer large frame (current · D-019)",
     ],
   },
   {

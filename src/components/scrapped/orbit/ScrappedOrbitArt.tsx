@@ -15,13 +15,14 @@ import {
   PointedStar,
 } from "@/components/scrapped/art/storyboard/ShapeKit";
 import {
+  GhostedHardMoon,
   GhostedListFrame,
   GhostedNightEntity,
   ListClouds,
   ListCornerOrb,
   ListFrame,
   ListPerimeterGhosts,
-  ListSpikyGrass,
+  PointGlowStars,
 } from "@/components/scrapped/art/storyboard/PeripheralMotifs";
 import { FilmLetterboxChrome } from "@/components/scrapped/orbit/FilmLetterboxChrome";
 import { LeftOnReadChatChrome } from "@/components/scrapped/orbit/LeftOnReadChatChrome";
@@ -51,6 +52,10 @@ type Props = {
    */
   tide?: "low" | "high";
   /**
+   * Liked-this-year count for the volume school (1 like = 1 fish, cap 50).
+   */
+  fishCount?: number;
+  /**
    * Active beat within the scene (D-016 middeck metaphors).
    * Mirrors volume `tide` — art can swap hero ↔ list frame.
    */
@@ -66,6 +71,7 @@ type ChromeProps = {
   play: boolean;
   replayKey: number;
   tide: "low" | "high";
+  fishCount: number;
   beatPhase: number;
 };
 
@@ -111,6 +117,7 @@ function PhoneOrbitChrome({
   play,
   replayKey,
   tide,
+  fishCount,
   beatPhase,
 }: ChromeProps) {
   // Edge-anchored patterns skip MotifStage — slice crops top/bottom.
@@ -168,7 +175,13 @@ function PhoneOrbitChrome({
   return (
     <MotifStage>
       {pattern === "volume" && (
-        <OceanWave from={accent} to={accent2} tide={tide} freeze={freeze} />
+        <OceanWave
+          from={accent}
+          to={accent2}
+          tide={tide}
+          freeze={freeze}
+          fishCount={fishCount}
+        />
       )}
 
       {pattern === "entity-song" && (
@@ -209,6 +222,7 @@ function WideOrbitChrome({
   play,
   replayKey,
   tide,
+  fishCount,
   beatPhase,
 }: ChromeProps) {
   if (pattern === "share" || pattern === "intro") {
@@ -268,7 +282,13 @@ function WideOrbitChrome({
         viewBox="0 0 360 640"
         preserveAspectRatio="xMidYMax slice"
       >
-        <OceanWave from={accent} to={accent2} tide={tide} freeze={freeze} />
+        <OceanWave
+          from={accent}
+          to={accent2}
+          tide={tide}
+          freeze={freeze}
+          fishCount={fishCount}
+        />
       </MotifPin>
     );
   }
@@ -288,35 +308,15 @@ function WideOrbitChrome({
 
   if (pattern === "list" && slideIndex === 3) {
     return (
-      <>
-        <MotifPin
-          anchor="top"
-          width="100%"
-          height={0.14}
-          viewBox="0 -12 360 80"
-          preserveAspectRatio="xMidYMin slice"
-        >
-          <ListClouds
-            from={accent}
-            to={accent2}
-            freeze={freeze}
-            durationSec={32}
-            placement="sky"
-          />
-        </MotifPin>
-        <MotifPin
-          anchor="bottom"
-          width="100%"
-          height={0.2}
-          viewBox="0 0 360 140"
-          preserveAspectRatio="xMidYMax slice"
-        >
-          <ListSpikyGrass from={accent} to={accent2} freeze={freeze} />
-        </MotifPin>
-        <MotifMeetStage viewBox="0 0 360 640">
-          <ListPerimeterGhosts freeze={freeze} />
-        </MotifMeetStage>
-      </>
+      <MotifMeetStage viewBox="0 0 360 640">
+        <GhostedHardMoon
+          accent={accent}
+          accent2={accent2}
+          freeze={freeze}
+        />
+        <PointGlowStars count={7} freeze={freeze} />
+        <ListPerimeterGhosts freeze={freeze} />
+      </MotifMeetStage>
     );
   }
 
@@ -358,6 +358,7 @@ export function ScrappedOrbitArt({
   active = true,
   replayKey = 0,
   tide = "low",
+  fishCount = 0,
   beatPhase = 0,
 }: Props) {
   const { accent, accent2 } = accentsForSlide(slideIndex);
@@ -375,6 +376,7 @@ export function ScrappedOrbitArt({
     play,
     replayKey,
     tide,
+    fishCount,
     beatPhase,
   };
 

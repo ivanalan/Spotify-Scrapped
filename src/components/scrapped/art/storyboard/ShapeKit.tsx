@@ -351,7 +351,15 @@ type OceanWaveProps = {
   /** Low sits under copy; high rises on the second narrative beat. */
   tide?: "low" | "high";
   freeze?: boolean;
+  /**
+   * Liked-this-year count → fish (1:1). Hard-capped at {@link OCEAN_FISH_CAP}.
+   * School only paints on high tide.
+   */
+  fishCount?: number;
 };
+
+/** Max fish glyphs — 1 like = 1 fish up to this ceiling. */
+export const OCEAN_FISH_CAP = 50;
 
 /**
  * Kit C — oval + triangle tail + single eye (volume-ocean-fish-styles).
@@ -374,7 +382,7 @@ function CuteFishGlyph({ body, size }: { body: string; size: number }) {
 
 type OceanFishSpec = {
   id: string;
-  /** 0 near crest → 1 deep. */
+  /** 0 near top of school band → 1 deep (always below copy). */
   depth: number;
   size: number;
   body: string;
@@ -388,92 +396,86 @@ type OceanFishSpec = {
   phase: number;
 };
 
-/** Minimal school — warm pops on teal; slow glide under copy. */
-const OCEAN_FISH: OceanFishSpec[] = [
-  {
-    id: "peach",
-    depth: 0.22,
-    size: 0.95,
-    body: "#FFB07A",
-    swimSec: 42,
-    delay: 0.4,
-    dir: "ltr",
-    bob: 2.4,
-    bobSec: 5.6,
-    phase: 0.1,
-  },
-  {
-    id: "gold",
-    depth: 0.48,
-    size: 0.72,
-    body: "#E8B84B",
-    swimSec: 54,
-    delay: 2.2,
-    dir: "rtl",
-    bob: 2,
-    bobSec: 6.8,
-    phase: 0.55,
-  },
-  {
-    id: "rose",
-    depth: 0.68,
-    size: 0.85,
-    body: "#F472B6",
-    swimSec: 48,
-    delay: 1.1,
-    dir: "ltr",
-    bob: 2.8,
-    bobSec: 5.2,
-    phase: 0.35,
-  },
-  {
-    id: "mango",
-    depth: 0.35,
-    size: 0.64,
-    body: "#FF9F1C",
-    swimSec: 38,
-    delay: 3.6,
-    dir: "rtl",
-    bob: 1.8,
-    bobSec: 4.8,
-    phase: 0.8,
-  },
-  {
-    id: "coral",
-    depth: 0.82,
-    size: 0.58,
-    body: "#FB7185",
-    swimSec: 58,
-    delay: 0.8,
-    dir: "ltr",
-    bob: 2.2,
-    bobSec: 7.2,
-    phase: 0.2,
-  },
-];
+const FISH_BODIES = [
+  "#FFB07A",
+  "#E8B84B",
+  "#F472B6",
+  "#FF9F1C",
+  "#FB7185",
+  "#FCD34D",
+  "#FDA4AF",
+] as const;
 
-function oceanFishY(tide: "low" | "high", depth: number): number {
-  const crest = OCEAN_TIDE[tide].front;
-  const deep = Math.min(OCEAN_FLOOR_Y - 36, 640);
-  const top = crest + (tide === "high" ? 52 : 28);
-  return top + depth * Math.max(40, deep - top - 24);
+/**
+ * High-tide school: from the subtitle band down to the viewport floor
+ * (MotifStage 360×640; centered copy puts subline ~y 380–400).
+ * Depth 0 = at subtitle; 1 = bottom. Even strata — no pile-up.
+ */
+const OCEAN_FISH_BAND = { top: 390, bottom: 630 } as const;
+
+function fishSeed(i: number, salt: number) {
+  const t = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return t - Math.floor(t);
+}
+
+/** Build a deterministic school: `min(likedThisYear, OCEAN_FISH_CAP)` fish. */
+export function buildOceanFishSchool(likedThisYear: number): OceanFishSpec[] {
+  const n = Math.max(
+    0,
+    Math.min(OCEAN_FISH_CAP, Math.floor(likedThisYear)),
+  );
+  if (n === 0) return [];
+
+  let sizeMul = 1.05;
+  if (n > 20) sizeMul = 0.88;
+  if (n > 35) sizeMul = 0.72;
+  if (n >= OCEAN_FISH_CAP) sizeMul = 0.62;
+
+  return Array.from({ length: n }, (_, i) => {
+    const r = fishSeed(i, 3);
+    const r2 = fishSeed(i, 17);
+    const r3 = fishSeed(i, 41);
+    // Even strata + jitter so the school fills crest→deep, not one cluster.
+    const stratum = n === 1 ? 0.5 : i / (n - 1);
+    const depth = Math.min(1, Math.max(0, stratum * 0.92 + (r - 0.5) * 0.14));
+    return {
+      id: `f${i}`,
+      depth,
+      size: sizeMul * (0.7 + r2 * 0.38),
+      body: FISH_BODIES[i % FISH_BODIES.length],
+      swimSec: 36 + r * 28,
+      delay: r3 * 3.2,
+      dir: (r2 > 0.5 ? "ltr" : "rtl") as "ltr" | "rtl",
+      bob: 1.5 + r * 1.4,
+      bobSec: 4.8 + r2 * 2.4,
+      phase: (r3 * 0.7 + (i % 9) * 0.033) % 1,
+    };
+  });
+}
+
+function oceanFishY(depth: number): number {
+  const { top, bottom } = OCEAN_FISH_BAND;
+  return top + depth * (bottom - top);
 }
 
 function OceanFishSchool({
-  tide,
+  fishCount,
   reduce,
 }: {
-  tide: "low" | "high";
+  fishCount: number;
   reduce: boolean;
 }) {
+  const school = buildOceanFishSchool(fishCount);
+  if (school.length === 0) return null;
+
   const xLeft = -36;
   const xRight = 396;
   const glide = [0.42, 0, 0.58, 1] as const;
 
   return (
     <g aria-hidden>
-      {OCEAN_FISH.map((fish) => {
-        const y = oceanFishY(tide, fish.depth);
+      {school.map((fish) => {
+        const y = oceanFishY(fish.depth);
         const facing = fish.dir === "ltr" ? 1 : -1;
         const xFrom = fish.dir === "ltr" ? xLeft : xRight;
         const xTo = fish.dir === "ltr" ? xRight : xLeft;
@@ -541,13 +543,15 @@ function OceanFishSchool({
  *
  * Motion follows CG water practice (Gerstner / GPU Gems): continuous phase
  * travel (not ping-pong), layered trains with dispersion, low steepness.
- * Kit-C oval fish school — hidden at low tide; fades in as the crest rises.
+ * Kit-C oval fish school — 1 like = 1 fish (cap {@link OCEAN_FISH_CAP}),
+ * hidden at low tide; fades in below copy as the crest rises.
  */
 export function OceanWave({
   from,
   to,
   tide = "low",
   freeze = false,
+  fishCount = 0,
 }: OceanWaveProps) {
   const reduce = useReducedMotion() || freeze;
   const gradBack = useId();
@@ -562,6 +566,7 @@ export function OceanWave({
     delay: tide === "high" ? 1.15 : 0,
   } as const;
   const gradId = { back: gradBack, front: gradFront };
+  const schoolCount = Math.max(0, Math.floor(fishCount));
 
   const paths = {
     back: oceanWavePath(crests.back, OCEAN_LAYERS[0].amp),
@@ -603,7 +608,9 @@ export function OceanWave({
             opacity={layer.opacity}
           />
         ))}
-        {tide === "high" && <OceanFishSchool tide="high" reduce />}
+        {tide === "high" && (
+          <OceanFishSchool fishCount={schoolCount} reduce />
+        )}
       </g>
     );
   }
@@ -649,13 +656,13 @@ export function OceanWave({
           />
         </motion.g>
       ))}
-      {/* High-tide only — fade with the rise; parked at high-tide depths. */}
+      {/* High-tide only — fade with the rise; school swims below copy. */}
       <motion.g
         initial={false}
         animate={{ opacity: tide === "high" ? 0.9 : 0 }}
         transition={fishReveal}
       >
-        <OceanFishSchool tide="high" reduce={false} />
+        <OceanFishSchool fishCount={schoolCount} reduce={false} />
       </motion.g>
     </motion.g>
   );

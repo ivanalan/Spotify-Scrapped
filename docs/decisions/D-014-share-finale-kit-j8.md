@@ -1,24 +1,24 @@
 # D-014 — Share finale kit J8 (ink stage / teal card)
 
-**Status:** Locked  
+**Status:** Superseded (production art) by [D-021](D-021-share-finale-teal-orchid-lilac-moon.md)  
 **Date:** 2026-10-19  
-**Surfaces:** `/scrapped` API deck scene 9 — visual art only. IA + density remain [D-012](D-012-share-finale-inset.md). Explore method: [D-013](D-013-share-finale-deck-rhyme-explore.md).
+**Surfaces:** `/scrapped` API deck scene 9 — visual art only. IA + density remain [D-012](D-012-share-finale-inset.md). Stage/card split: [D-013](D-013-share-finale-deck-rhyme-explore.md). Superseded by [D-021](D-021-share-finale-teal-orchid-lilac-moon.md).
 
 ## Decision
 
-Promote explore lock **`j-ink-teal-card`** (Kit J8) to production share finale:
+Promote kit **`j-ink-teal-card`** (Kit J8) to production share finale:
 
 1. **Stage** — ink field (`SLIDE_SWATCH[9] = ink`); intro concentric disks + BR pointed star (same chrome as open / `INTRO_*` tokens).
 2. **Card** — teal ice→deep gradient; light type; hero + Ghosted artists / Ghosted songs; footer **`MyScrapped.com`** (sentence case).
 3. **Moon** — large BL sphere (not the ghost-night purple→ember): gold → mango → rose radial; **center on the card’s bottom-left corner**; sphere only — no outer glow ring.
-4. **Ghosts** — two wash blobs framing the album art (TL + BR of the hero square); bob/wiggle locked from the explore tune.
+4. **Ghosts** — two wash blobs framing the album art (TL + BR of the hero square); bob/wiggle as locked.
 5. **Z-axis** — stage chrome behind; opaque card in front; no edge-bleed motifs ([D-013](D-013-share-finale-deck-rhyme-explore.md)).
 
 Density, Share / Replay CTAs, and tap-zone clearance stay [D-012](D-012-share-finale-inset.md).
 
 ## Why
 
-User-tuned explore settings beat the prior ember-stage / ink-card ship look: intro bookends the story on the stage while the teal card + framing ghosts carry the “ghosted” thesis without cloud/grass noise. The large BL corner moon sphere (warm gold→mango→rose) warms the teal card without cloning the ghost-night purple→ember treatment.
+This kit beat the prior ember-stage / ink-card ship look: intro bookends the story on the stage while the teal card + framing ghosts carry the “ghosted” thesis without cloud/grass noise. The large BL corner moon sphere (warm gold→mango→rose) warms the teal card without cloning the ghost-night purple→ember treatment.
 
 ## Locked choices
 
@@ -47,4 +47,4 @@ Share slide and intro now share disk/star chrome — intentional rhyme; agents m
 - Stage chrome: `ScrappedOrbitArt` (`pattern === "share"` → `IntroCornerChrome`)
 - Card + moon + ghosts + footer: `ShareRecapCard` (`variant="minimal"`)
 - Host: `ApiScrappedDeck` scene 9
-- Explore: `docs/mocks/explorations/share-finale-inset.html`
+- Superseded production look: [D-020](D-020-share-finale-orchid-corners-white-moon.md) → [D-021](D-021-share-finale-teal-orchid-lilac-moon.md)
