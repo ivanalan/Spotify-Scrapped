@@ -14,7 +14,7 @@ The share finale uses **Wrapped-form information architecture** on Scrapped Orbi
 
 Density is locked via `SHARE_FINALE_DENSITY` in `scrapped-card-palette.ts`.
 
-**Visual art** (stage swatch, card field, motifs) is locked separately in [D-014](D-014-share-finale-kit-j8.md) (kit J8 · ink stage / teal card). Explore method: [D-013](D-013-share-finale-deck-rhyme-explore.md).
+**Visual art** (stage swatch, card field, motifs) is locked separately in [D-021](D-021-share-finale-teal-orchid-lilac-moon.md) (prior J8 [D-014](D-014-share-finale-kit-j8.md)). Stage/card split: [D-013](D-013-share-finale-deck-rhyme-explore.md).
 
 ## Why
 
@@ -50,4 +50,3 @@ Desktop browsers that lack `canShare({ files })` fall back to a direct PNG downl
 - Share: `src/lib/share-card-export.ts` (`shareCardImage`)
 - Layout / CTAs: `src/components/scrapped/ApiScrappedDeck.tsx` scene 9
 - Card: `src/components/scrapped/ShareRecapCard.tsx` (`minimal`)
-- Exploration: `docs/mocks/explorations/share-finale-inset.html`

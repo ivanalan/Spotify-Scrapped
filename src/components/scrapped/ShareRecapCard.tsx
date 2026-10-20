@@ -44,9 +44,21 @@ function blobPath() {
   return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
 }
 
+/** B1 orchid corner wash over the teal nest — D-021 / D-019 recipe. */
+function ShareFinaleOrchidWash() {
+  const w = SF.orchidWash;
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      style={{ opacity: w.opacity, background: w.background }}
+      aria-hidden
+    />
+  );
+}
+
 /**
- * BL moon sphere — gold→mango→rose radial, no outer glow.
- * Center pinned to the card’s bottom-left corner (D-014).
+ * BL moon sphere — white→lilac→orchid radial, no outer glow.
+ * Center pinned to the card’s bottom-left corner (D-021).
  * Stays under type (z-0); soft breathe after enter.
  */
 function ShareFinaleMoon({ active }: { active?: boolean }) {
@@ -113,8 +125,8 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
 }
 
 /**
- * Two wash ghosts framing the album art (TL + BR) — D-014 kit J8.
- * Positions/sizes from SHARE_FINALE_KIT (explore lock).
+ * Two wash ghosts framing the album art (TL + BR) — D-021.
+ * Positions/sizes from SHARE_FINALE_KIT.
  */
 function ShareFinaleGhosts({ active }: { active?: boolean }) {
   const reduce = useReducedMotion();
@@ -357,10 +369,11 @@ export function ShareRecapCard({
         }}
       >
         {/*
-          Inset share finale (D-012 IA + D-014 kit J8): teal card, BL moon
-          (center on corner), framing ghosts, MyScrapped.com.
+          Inset share finale (D-012 IA + D-021): teal nest · B1 orchid corners ·
+          lilac-rim BL moon · framing ghosts · MyScrapped.com.
           Host locks 9:16; density from --share-*.
         */}
+        <ShareFinaleOrchidWash />
         <ShareFinaleMoon active={active} />
         <ShareFinaleGhosts active={active} />
         <header

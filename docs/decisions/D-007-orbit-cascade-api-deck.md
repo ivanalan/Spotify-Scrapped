@@ -20,9 +20,9 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 | Intro | Ink field + orchid concentric oval ladder |
 | Opening | ink → ember → **ink** (slides 00–02). Ghosted song entity (slide 2) + list (slide 3) share ink + purple→ember — night rhyme [D-017](D-017-entity-list-pair-rhymes.md) / list [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + iris — [D-016](D-016-middeck-metaphor-promote.md). Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
 | Soft close | Teal field · **8B mono teal iris** shrink-to-stop — [D-016](D-016-middeck-metaphor-promote.md) (displaces funky MotifPin bookends) |
-| Middeck 4–7 | 4A heart · TL typing pin + edge chat · 7L film letterbox — [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md) |
+| Middeck 4–7 | 4A heart · TL typing pin + edge chat · 7L film letterbox — [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md); left-on-read field/frame — [D-019](D-019-left-on-read-orchid-corners.md) |
 | Ghosted entity | Ink field · TR moon · edge stars · one BL blob ghost — [D-017](D-017-entity-list-pair-rhymes.md) (displaces orchid spiral) |
-| Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year” |
+| Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year”; school = `likedThisYearCount` (1 like = 1 fish, cap 50) from subtitle → viewport bottom |
 | Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |
 | Art role | Peripheral chrome behind copy; clear mid band for type and lists |
 | Motion | D-001 unchanged — shared copy motion; only the 5-row list is special. Volume tide is art chrome keyed to narrative beat, not a copy-motion fork. |

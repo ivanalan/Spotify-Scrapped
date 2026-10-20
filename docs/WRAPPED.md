@@ -108,7 +108,7 @@ Mock filenames `{act}.{frame}` are **animation frames within one progress segmen
 ```
 Scene 0 (2 beats, ~8s): year / Scrapped → Hey {name} + welcome
 Scene 1 (2 beats): liked library volume → liked this year + “Not bad for a collector.”
-Scene 2 (3 beats): all time favs + ghosted punchline → “one stings most” → #1 ghosted song
+Scene 2 (3 beats): all time favs + ghosted punchline → “One of them stings the most” (center) → #1 ghosted song
 Scene 3 (2 beats): “one ghost town” setup → Top ghosted songs list
 Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists list
 Scene 5 (2 beats): “Now the artists” → #1 ghosted artist

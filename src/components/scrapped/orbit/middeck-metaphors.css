@@ -10,6 +10,7 @@
   --mm-gold: #ffe66d;
   --mm-orchid: #9b4de8;
   --mm-orchid-deep: #6b21a8;
+  --mm-orchid-ink: #3b0764;
   --mm-teal: #1a7a6e;
   --mm-teal-deep: #0f4c5c;
   --mm-mango: #ff9f1c;
@@ -352,18 +353,22 @@
   }
 }
 
-/* ── Left-on-read chat — pin (entity) + edge bloom (list) ── */
+/* ── Left-on-read chat — pin (entity) + edge bloom (list) · D-019 ── */
 .mm-chat {
   --chat-col-w: 124px;
-  --chat-col-top: 13%;
-  --chat-col-left: 5%;
+  --chat-col-top: 8%;
+  --chat-col-left: 0%;
   --chat-skew-y: 11deg;
-  --chat-skew-z: 0deg;
+  --chat-skew-z: -3deg;
+  --chat-col-scale: 0.85;
+  --chat-col-opacity: 0.35;
   --chat-bubble-h: 30px;
   --chat-gap: 13px;
   --chat-mirror-w: 86px;
-  --chat-mirror-bottom: 6%;
-  --chat-mirror-opacity: 0.72;
+  --chat-mirror-bottom: 11.5%;
+  --chat-mirror-right: 0%;
+  --chat-mirror-scale: 0.9;
+  --chat-mirror-opacity: 0.21;
   --chat-bloom-x: 25%;
   --chat-bloom-y: 30%;
   --chat-bloom-w: 100%;
@@ -376,19 +381,41 @@
     var(--mm-orchid) 72%,
     var(--mm-orchid-deep) 100%
   );
-  /* T1 compact typing pin */
-  --chat-type-w: 86px;
-  --chat-type-h: 42px;
-  --chat-type-x: 16px;
-  --chat-type-y: 72px;
+  /* Typing pin — horizontally centered, below cover-lead headline (D-019).
+     Art-first stack is justify-center; 50% ± offsets track that mid. */
+  --chat-type-w: 84px;
+  --chat-type-h: 43px;
+  --chat-type-x: calc(50% - (var(--chat-type-w) / 2));
+  --chat-type-y: calc(50% + 190px);
   --chat-type-dot: 8px;
+  /* B1 · Orchid corners wash */
+  --chat-field-wash-op: 0.75;
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
 }
 
-/* Entity — one compact typing bubble, top-left (mid clear for artwork) */
+/* Soft orchid TL / orchid-ink BR — ink canvas stays under (D-019) */
+.mm-chat-field {
+  position: absolute;
+  inset: 0;
+  opacity: var(--chat-field-wash-op);
+  background:
+    radial-gradient(
+      120% 80% at 0% 0%,
+      color-mix(in oklab, var(--mm-orchid-deep) 55%, transparent) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      100% 70% at 100% 100%,
+      color-mix(in oklab, var(--mm-orchid-ink) 45%, transparent) 0%,
+      transparent 55%
+    );
+  z-index: 0;
+}
+
+/* Entity — one compact typing bubble (mid clear for artwork) */
 .mm-chat-typing {
   position: absolute;
   left: var(--chat-type-x);
@@ -461,8 +488,9 @@
   top: var(--chat-col-top);
   width: var(--chat-col-w);
   transform: perspective(400px) rotateY(var(--chat-skew-y))
-    rotateZ(var(--chat-skew-z));
+    rotateZ(var(--chat-skew-z)) scale(var(--chat-col-scale));
   transform-origin: left center;
+  opacity: var(--chat-col-opacity);
 }
 
 .mm-chat-bubble {
@@ -504,10 +532,11 @@
 
 .mm-chat-mirror {
   position: absolute;
-  right: 2%;
+  right: var(--chat-mirror-right);
   bottom: var(--chat-mirror-bottom);
   width: var(--chat-mirror-w);
-  transform: perspective(400px) rotateY(-16deg) rotateZ(3deg);
+  transform: perspective(400px) rotateY(-12deg) rotateZ(2deg)
+    scale(var(--chat-mirror-scale));
   opacity: var(--chat-mirror-opacity);
 }
 
@@ -529,22 +558,8 @@
   }
 }
 
-/* D-015 list / quiet frame — same edge geometry + opacity.
-   Quiet used larger/inboard scale (then softer opacity) before — jumped on list enter. */
-.mm-chat[data-mode="frame"] .mm-chat-col,
-.mm-chat[data-mode="quiet"] .mm-chat-col {
-  transform: perspective(400px) rotateY(14deg) rotateZ(-3deg) scale(0.55);
-  top: 10%;
-  left: 0;
-  opacity: 0.8;
-}
-.mm-chat[data-mode="frame"] .mm-chat-mirror,
-.mm-chat[data-mode="quiet"] .mm-chat-mirror {
-  transform: perspective(400px) rotateY(-12deg) rotateZ(2deg) scale(0.62);
-  bottom: 6%;
-  right: 0;
-  opacity: 0.38;
-}
+/* D-015 / D-019 — quiet + frame share .mm-chat-col / .mm-chat-mirror vars
+   (no mode-specific geometry jump on list enter). */
 
 /* ── 7L · Film letterbox stutter ── */
 .mm-film {

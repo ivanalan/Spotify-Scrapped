@@ -31,8 +31,8 @@ export function ListFrame({ accent, accent2, animate = "soft" }: MotifProps) {
 }
 
 /**
- * Ghosted songs list (slide 3) — ink field + sky/grass/ghosts (D-010).
- * Locked from docs/mocks/explorations/ghosted-list-sky-grass.html.
+ * Ghosted songs list (slide 3) — TR moon · S9 stars · enter-then-float ghosts.
+ * No grass/clouds (those live on the entity). Locked: D-018 (C8 + S9).
  */
 export function GhostedListFrame({
   accent,
@@ -44,18 +44,13 @@ export function GhostedListFrame({
 
   return (
     <g>
-      <ListClouds
-        from={accent}
-        to={accent2}
+      <GhostedHardMoon
+        accent={accent}
+        accent2={accent2}
         freeze={freeze}
-        durationSec={32}
-        placement="sky"
       />
-      {/* Short grass band — sits low under the list */}
-      <g transform="translate(0 500)">
-        <SpikyGrass from={accent} to={accent2} freeze={freeze} />
-      </g>
-      <PerimeterGhosts freeze={freeze} />
+      <PointGlowStars count={7} freeze={freeze} />
+      <RisingColumnGhosts freeze={freeze} />
     </g>
   );
 }
@@ -112,15 +107,15 @@ export function ListSpikyGrass({
   return <SpikyGrass from={from} to={to} freeze={freeze} />;
 }
 
-/** Perimeter blob ghosts — phone MotifStage / wide meet stage. */
+/** Edge ghosts — phone MotifStage / wide meet stage (D-018). */
 export function ListPerimeterGhosts({ freeze }: { freeze: boolean }) {
-  return <PerimeterGhosts freeze={freeze} />;
+  return <RisingColumnGhosts freeze={freeze} />;
 }
 
 /**
- * Most-ghosted-song entity (slide 2) — night rhyme with D-010 list.
- * Ink field (palette): TR moon + sparse edge stars + one BL ghost.
- * No clouds / grass — those arrive on the list beat.
+ * Most-ghosted-song entity (slide 2) — ground first (D-018).
+ * Ink field: ridge grass · S9 4-point glow stars · one haunt on cover TR.
+ * No moon (list owns the sky).
  */
 export function GhostedNightEntity({
   accent,
@@ -131,97 +126,183 @@ export function GhostedNightEntity({
   accent2: string;
   freeze: boolean;
 }) {
+  return (
+    <g>
+      <PointGlowStars count={5} freeze={freeze} />
+      {/* Haunt peeks at cover art TR — cover is centered ~160px mid-band */}
+      <g opacity={0.82}>
+        <BlobGhost x={248} y={198} size={64} freeze={freeze} delay={0} />
+      </g>
+      <g transform="translate(0 500)">
+        <SpikyGrass from={accent} to={accent2} freeze={freeze} />
+      </g>
+    </g>
+  );
+}
+
+/** List moon — silver→ember, TR inset toward content (D-018). */
+export function GhostedHardMoon({
+  accent: _accent,
+  accent2,
+  freeze,
+}: {
+  /** Kept for call-site parity with other motifs (halo removed). */
+  accent: string;
+  accent2: string;
+  freeze: boolean;
+}) {
   const moonGrad = useId();
-  const stars = [
-    { cx: 48, cy: 168, r: 1.6 },
-    { cx: 92, cy: 128, r: 2.1 },
-    { cx: 248, cy: 196, r: 1.5 },
-    { cx: 36, cy: 456, r: 1.7 },
-    { cx: 312, cy: 428, r: 2 },
-  ] as const;
+  // Inset from hard TR — lower + left toward list copy; no outer halo.
+  // Deck still uses ink scrim + solid pills (C8) for chrome.
+  const cx = 292;
+  const cy = 96;
+  const r = 46;
+  void _accent;
 
   return (
     <g>
       <defs>
-        <radialGradient id={moonGrad} cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="#f5f0ff" />
-          <stop offset="55%" stopColor={accent} />
+        <radialGradient id={moonGrad} cx="34%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="35%" stopColor="#e8e4f0" />
+          <stop offset="70%" stopColor="#C9A0F5" />
           <stop offset="100%" stopColor={accent2} />
         </radialGradient>
       </defs>
-
-      {/* Top-right moon — pinned clear of mid-band copy */}
       <motion.circle
-        cx={308}
-        cy={78}
-        r={42}
+        cx={cx}
+        cy={cy}
+        r={r}
         fill={`url(#${moonGrad})`}
-        opacity={0.9}
-        initial={freeze ? false : { scale: 0.7, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.9 }}
+        opacity={0.98}
+        initial={freeze ? false : { scale: 0.72, opacity: 0 }}
+        animate={{ scale: 1, opacity: 0.98 }}
         transition={
           freeze
             ? undefined
-            : { duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.08 }
+            : { duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.06 }
         }
-        style={{ transformOrigin: "308px 78px" }}
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
       />
-      <motion.circle
-        cx={308}
-        cy={78}
-        r={58}
-        fill={accent}
-        opacity={0.12}
-        initial={false}
-        animate={
-          freeze
-            ? { opacity: 0.12 }
-            : { opacity: [0.1, 0.18, 0.1] }
-        }
-        transition={
-          freeze
-            ? undefined
-            : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
-        }
-      />
+    </g>
+  );
+}
 
-      {stars.map((s, i) => (
-        <motion.circle
+/** S9 — 4-point stars with orchid glow pulse (entity 5 / list 7). */
+export function PointGlowStars({
+  count,
+  freeze,
+}: {
+  count: number;
+  freeze: boolean;
+}) {
+  const pts = STAR_SLOTS.slice(0, count);
+  return (
+    <g>
+      {pts.map((s, i) => (
+        <PointGlowStar
           key={i}
           cx={s.cx}
           cy={s.cy}
-          r={s.r}
-          fill="#f5f0ff"
-          initial={freeze ? false : { opacity: 0 }}
-          animate={
-            freeze
-              ? { opacity: 0.5 }
-              : { opacity: [0.35, 0.7, 0.35] }
-          }
-          transition={
-            freeze
-              ? undefined
-              : {
-                  duration: 3.2 + i * 0.35,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.4,
-                }
-          }
+          r={s.r * 1.2}
+          freeze={freeze}
+          delay={i * 0.4}
+          duration={3.8 + i * 0.2}
         />
       ))}
-
-      {/* One haunt — same blob as list perimeter ghosts */}
-      <g opacity={0.8}>
-        <BlobGhost
-          x={26}
-          y={468}
-          size={72}
-          freeze={freeze}
-          delay={0}
-        />
-      </g>
     </g>
+  );
+}
+
+const STAR_SLOTS = [
+  { cx: 48, cy: 168, r: 3.8 },
+  { cx: 92, cy: 128, r: 5 },
+  { cx: 248, cy: 196, r: 3.6 },
+  { cx: 36, cy: 456, r: 4.1 },
+  { cx: 312, cy: 428, r: 4.8 },
+  { cx: 180, cy: 140, r: 3.4 },
+  { cx: 300, cy: 240, r: 4.3 },
+  { cx: 140, cy: 380, r: 3.6 },
+  { cx: 270, cy: 160, r: 4.5 },
+] as const;
+
+/** 4-point star path centered at origin, tip radius r. */
+function pointStarPath(r: number) {
+  const tips: [number, number][] = [
+    [0, -r],
+    [r * 0.24, -r * 0.24],
+    [r, 0],
+    [r * 0.24, r * 0.24],
+    [0, r],
+    [-r * 0.24, r * 0.24],
+    [-r, 0],
+    [-r * 0.24, -r * 0.24],
+  ];
+  return `${tips.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]} ${p[1]}`).join(" ")} Z`;
+}
+
+function PointGlowStar({
+  cx,
+  cy,
+  r,
+  freeze,
+  delay,
+  duration,
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  freeze: boolean;
+  delay: number;
+  duration: number;
+}) {
+  const d = pointStarPath(r);
+  return (
+    <motion.g
+      transform={`translate(${cx} ${cy})`}
+      initial={false}
+      animate={
+        freeze
+          ? { opacity: 0.28 }
+          : { opacity: [0.16, 0.42, 0.16] }
+      }
+      transition={
+        freeze
+          ? undefined
+          : {
+              duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay,
+            }
+      }
+      style={{
+        filter: freeze
+          ? undefined
+          : "drop-shadow(0 0 2px rgba(201, 160, 245, 0.32))",
+      }}
+    >
+      <motion.path
+        d={d}
+        fill="#f5f0ff"
+        initial={false}
+        animate={
+          freeze
+            ? { scale: 1 }
+            : { scale: [0.88, 1.12, 0.88] }
+        }
+        transition={
+          freeze
+            ? undefined
+            : {
+                duration,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay,
+              }
+        }
+      />
+    </motion.g>
   );
 }
 
@@ -346,10 +427,18 @@ function MarqueeClouds({
 
 /**
  * Soft sine-like sway — long period, small amp, no jagged gust peaks.
- * Grow-in: scaleY from the ground line.
+ * Grow-in: no scaleY (motion’s SVG scale always pivots mid-box). Instead each
+ * ridge starts buried below the ground line and rises into a ground clip —
+ * tips emerge from soil, cascade near → mid → far.
  */
 const FLOW_DUR = 9;
 const FLOW_AMP = 2.2; // degrees skew peak
+const GRASS_GROW_EASE = [0.22, 1, 0.36, 1] as const;
+const GRASS_GROW_DUR = 0.85;
+/** Near → mid → far (front grows first; deeper ridges fill in behind). */
+const GRASS_GROW_DELAY = { near: 0.08, mid: 0.34, far: 0.6 } as const;
+/** Rise distance = ground (H) − tallest tip y — fully hidden under the clip. */
+const GRASS_RISE = { far: 76, mid: 58, near: 44 } as const;
 
 function SpikyGrass({
   from,
@@ -362,9 +451,9 @@ function SpikyGrass({
 }) {
   const gFar = useId();
   const gNear = useId();
+  const clipId = useId();
   // Local band height — short tufts (was 280-tall meadow).
   const H = 140;
-  const origin = `180px ${H}px`;
 
   const flow = (amp: number, phase: number) =>
     freeze
@@ -399,18 +488,17 @@ function SpikyGrass({
           delay,
         };
 
+  const growTransition = (delay: number) =>
+    freeze
+      ? undefined
+      : {
+          duration: GRASS_GROW_DUR,
+          ease: GRASS_GROW_EASE,
+          delay,
+        };
+
   return (
-    <motion.g
-      opacity={0.95}
-      initial={freeze ? false : { scaleY: 0, opacity: 0.4 }}
-      animate={{ scaleY: 1, opacity: 0.95 }}
-      transition={
-        freeze
-          ? undefined
-          : { duration: 1.35, ease: [0.22, 1, 0.36, 1], delay: 0.15 }
-      }
-      style={{ transformOrigin: origin }}
-    >
+    <g opacity={0.95}>
       <defs>
         <linearGradient id={gFar} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={from} stopOpacity={0.55} />
@@ -420,54 +508,96 @@ function SpikyGrass({
           <stop offset="0%" stopColor={from} />
           <stop offset="100%" stopColor={to} />
         </linearGradient>
+        {/* Soil line — anything below y=H is underground and hidden. */}
+        <clipPath id={clipId}>
+          <rect x={-28} y={0} width={416} height={H} />
+        </clipPath>
       </defs>
 
-      {/* Far ridge — short, soft tips */}
-      <motion.g
-        style={{ transformOrigin: `180px ${H}px` }}
-        animate={flow(0.65, 0)}
-        transition={flowTransition(FLOW_DUR * 1.2, 0)}
-      >
-        <path
-          fill={`url(#${gFar})`}
-          d={`M0 ${H} L0 88 L22 72 L40 90 L58 68 L78 88 L98 70 L118 86 L140 66 L160 84 L182 68 L204 86 L226 64 L248 84 L270 70 L292 88 L314 72 L336 90 L360 78 L360 ${H} Z`}
-        />
-      </motion.g>
-      {/* Mid */}
-      <motion.g
-        style={{ transformOrigin: `120px ${H}px` }}
-        animate={flow(1, 1.1)}
-        transition={flowTransition(FLOW_DUR, 0.4)}
-      >
-        <path
-          fill={`url(#${gNear})`}
-          d={`M0 ${H} L0 102 L16 88 L32 104 L48 84 L66 102 L84 86 L102 104 L120 82 L138 100 L156 88 L174 104 L192 84 L210 102 L228 86 L246 104 L264 88 L282 102 L300 84 L318 100 L338 90 L360 98 L360 ${H} Z`}
-        />
-      </motion.g>
-      {/* Near blades */}
-      <motion.g
-        style={{ transformOrigin: `240px ${H}px` }}
-        animate={flow(1.15, 2.2)}
-        transition={flowTransition(FLOW_DUR * 0.92, 0.9)}
-      >
-        <path
-          fill={from}
-          opacity={0.85}
-          d={`M-8 ${H} L-8 112 L10 100 L24 114 L40 98 L56 112 L72 96 L88 112 L104 100 L120 114 L138 98 L154 112 L170 100 L186 114 L204 96 L220 110 L238 100 L254 114 L272 98 L288 112 L306 102 L322 114 L340 100 L356 110 L372 104 L372 ${H} Z`}
-        />
-      </motion.g>
-    </motion.g>
+      <g clipPath={`url(#${clipId})`}>
+        {/* Far ridge — grows last (behind) */}
+        <motion.g
+          initial={freeze ? false : { y: GRASS_RISE.far }}
+          animate={{ y: 0 }}
+          transition={growTransition(GRASS_GROW_DELAY.far)}
+        >
+          <motion.g
+            style={{ transformOrigin: `180px ${H}px` }}
+            animate={flow(0.65, 0)}
+            transition={flowTransition(
+              FLOW_DUR * 1.2,
+              GRASS_GROW_DELAY.far + GRASS_GROW_DUR,
+            )}
+          >
+            <path
+              fill={`url(#${gFar})`}
+              d={`M0 ${H} L0 88 L22 72 L40 90 L58 68 L78 88 L98 70 L118 86 L140 66 L160 84 L182 68 L204 86 L226 64 L248 84 L270 70 L292 88 L314 72 L336 90 L360 78 L360 ${H} Z`}
+            />
+          </motion.g>
+        </motion.g>
+        {/* Mid — second */}
+        <motion.g
+          initial={freeze ? false : { y: GRASS_RISE.mid }}
+          animate={{ y: 0 }}
+          transition={growTransition(GRASS_GROW_DELAY.mid)}
+        >
+          <motion.g
+            style={{ transformOrigin: `120px ${H}px` }}
+            animate={flow(1, 1.1)}
+            transition={flowTransition(
+              FLOW_DUR,
+              GRASS_GROW_DELAY.mid + GRASS_GROW_DUR,
+            )}
+          >
+            <path
+              fill={`url(#${gNear})`}
+              d={`M0 ${H} L0 102 L16 88 L32 104 L48 84 L66 102 L84 86 L102 104 L120 82 L138 100 L156 88 L174 104 L192 84 L210 102 L228 86 L246 104 L264 88 L282 102 L300 84 L318 100 L338 90 L360 98 L360 ${H} Z`}
+            />
+          </motion.g>
+        </motion.g>
+        {/* Near blades — first (front) */}
+        <motion.g
+          initial={freeze ? false : { y: GRASS_RISE.near }}
+          animate={{ y: 0 }}
+          transition={growTransition(GRASS_GROW_DELAY.near)}
+        >
+          <motion.g
+            style={{ transformOrigin: `240px ${H}px` }}
+            animate={flow(1.15, 2.2)}
+            transition={flowTransition(
+              FLOW_DUR * 0.92,
+              GRASS_GROW_DELAY.near + GRASS_GROW_DUR,
+            )}
+          >
+            <path
+              fill={from}
+              opacity={0.85}
+              d={`M-8 ${H} L-8 112 L10 100 L24 114 L40 98 L56 112 L72 96 L88 112 L104 100 L120 114 L138 98 L154 112 L170 100 L186 114 L204 96 L220 110 L238 100 L254 114 L272 98 L288 112 L306 102 L322 114 L340 100 L356 110 L372 104 L372 ${H} Z`}
+            />
+          </motion.g>
+        </motion.g>
+      </g>
+    </g>
   );
 }
 
-const GHOST_SLOTS = [
-  { x: 22, y: 125, size: 48 },
-  { x: 281, y: 151, size: 40 },
-  { x: 14, y: 381, size: 36 },
-  { x: 295, y: 407, size: 44 },
+/**
+ * Five edge ghosts — inset so slice/meet crops don’t clip them.
+ * Staggered enter (heart-list grammar), then independent bob float (D-018).
+ */
+const FLOAT_GHOST_SLOTS = [
+  { x: 32, y: 148, size: 24, amp: 11, dur: 4.6, rot: 3.2, dx: 3 },
+  { x: 48, y: 292, size: 20, amp: 14, dur: 5.4, rot: 2.4, dx: -2 },
+  { x: 38, y: 430, size: 22, amp: 9, dur: 3.9, rot: 3.8, dx: 4 },
+  { x: 292, y: 168, size: 24, amp: 13, dur: 5.1, rot: 2.8, dx: -3 },
+  { x: 278, y: 360, size: 20, amp: 10, dur: 4.3, rot: 3.5, dx: 2 },
 ] as const;
 
-/** Blob ghost body — wash fill, no hem wave (locked explore). */
+/** Stagger like one-like perimeter hearts (~0.4s steps). */
+const GHOST_ENTER_STAGGER = [0.85, 1.25, 1.65, 2.05, 2.45] as const;
+const GHOST_ENTER_DUR = 0.85;
+
+/** Blob ghost body — wash fill, no hem wave (D-018). */
 function blobPath() {
   return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
 }
@@ -519,17 +649,107 @@ function BlobGhost({
   );
 }
 
-function PerimeterGhosts({ freeze }: { freeze: boolean }) {
+function FloatingBlobGhost({
+  x,
+  y,
+  size,
+  freeze,
+  delay = 0,
+  amp = 10,
+  dur = 4.5,
+  rot = 3,
+  dx = 0,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  freeze: boolean;
+  delay?: number;
+  amp?: number;
+  dur?: number;
+  rot?: number;
+  dx?: number;
+}) {
+  const scale = size / 64;
+  const op = 0.42;
   return (
-    <g opacity={0.74}>
-      {GHOST_SLOTS.map((s, i) => (
-        <BlobGhost
+    <motion.g
+      initial={
+        freeze
+          ? false
+          : { x, y: y + 32, opacity: 0, scale: 0.82 }
+      }
+      animate={
+        freeze
+          ? { x, y, opacity: op }
+          : {
+              x: [x, x + dx, x - dx * 0.6, x],
+              y: [y, y - amp, y - amp * 0.35, y],
+              opacity: op,
+              scale: 1,
+              rotate: [-rot * 0.6, rot, -rot * 0.3, -rot * 0.6],
+            }
+      }
+      transition={
+        freeze
+          ? undefined
+          : {
+              opacity: {
+                duration: GHOST_ENTER_DUR,
+                ease: [0.22, 1, 0.36, 1],
+                delay,
+              },
+              scale: {
+                duration: GHOST_ENTER_DUR,
+                ease: [0.22, 1, 0.36, 1],
+                delay,
+              },
+              x: {
+                duration: dur,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: delay + GHOST_ENTER_DUR,
+              },
+              y: {
+                duration: dur,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: delay + GHOST_ENTER_DUR,
+              },
+              rotate: {
+                duration: dur * 1.15,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: delay + GHOST_ENTER_DUR,
+              },
+            }
+      }
+      style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
+    >
+      <g transform={`scale(${scale})`}>
+        <path d={blobPath()} fill="#f5f0ff" />
+        <circle cx={24} cy={26} r={3.2} fill="#2a2433" />
+        <circle cx={40} cy={26} r={3.2} fill="#2a2433" />
+      </g>
+    </motion.g>
+  );
+}
+
+export function RisingColumnGhosts({ freeze }: { freeze: boolean }) {
+  return (
+    <g>
+      {FLOAT_GHOST_SLOTS.map((s, i) => (
+        <FloatingBlobGhost
           key={i}
           x={s.x}
           y={s.y}
           size={s.size}
           freeze={freeze}
-          delay={-i * 0.85}
+          delay={GHOST_ENTER_STAGGER[i] ?? i * 0.4}
+          amp={s.amp}
+          dur={s.dur}
+          rot={s.rot}
+          dx={s.dx}
         />
       ))}
     </g>

@@ -2,7 +2,7 @@
 
 **Status:** Locked  
 **Date:** 2026-10-20  
-**Surfaces:** `/scrapped` API deck **list** beats (numbered 5-row entity lists) — slides that show `WrappedEntityList` / support phase. Explore lab: `docs/mocks/explorations/middeck-metaphor-kits.html`.
+**Surfaces:** `/scrapped` API deck **list** beats (numbered 5-row entity lists) — slides that show `WrappedEntityList` / support phase.
 
 ## Decision
 
@@ -18,7 +18,7 @@ On any slide whose job is a **numbered list**, peripheral art **frames** the lis
 
 ## Why
 
-Middeck exploration showed entity metaphors (e.g. 1-like beating heart) reading well as heroes, then failing when the same artwork was shrunk onto the list — it covered copy and fought the 5-row cascade. Lists need chrome that **holds the edges**, same rule as Orbit Cascade geometry ([D-007](D-007-orbit-cascade-api-deck.md)): clear mid band.
+Entity metaphors (e.g. 1-like beating heart) read well as heroes, then fail when the same artwork is shrunk onto the list — it covers copy and fights the 5-row cascade. Lists need chrome that **holds the edges**, same rule as Orbit Cascade geometry ([D-007](D-007-orbit-cascade-api-deck.md)): clear mid band.
 
 ## Displaced
 
@@ -27,10 +27,9 @@ Middeck exploration showed entity metaphors (e.g. 1-like beating heart) reading 
 
 ## Cost
 
-Each list-adjacent metaphor family needs an authored **frame** treatment (explore → promote), not only a hero kit. Slightly more art work per beat pair.
+Each list-adjacent metaphor family needs an authored **frame** treatment, not only a hero kit. Slightly more art work per beat pair.
 
 ## Source of truth
 
 - Composition rule: this decision; art-direction skill “Type owns the mid band”
-- Explore: `docs/mocks/explorations/middeck-metaphor-kits.html` (dual phones: entity vs list frame)
-- Production list chrome remains per-slide (D-010 for slide 3; classic list for others until a frame is promoted)
+- Production list chrome remains per-slide (D-018 for slide 3; classic / metaphor frames for others)

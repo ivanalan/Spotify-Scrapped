@@ -72,3 +72,4 @@ See `SPOTIFY_SCOPES` in [`src/lib/spotify/scopes.ts`](../src/lib/spotify/scopes.
 
 - Prefer `GET /tracks/{id}` over batch endpoints (restricted on many new apps).
 - Never commit `.env.local` or tokens.
+- **Development mode allowlist:** Spotify caps Dev Mode apps at **5** Dashboard users ([quota modes](https://developer.spotify.com/documentation/web-api/concepts/quota-modes)). Non-allowlisted accounts can still complete the Spotify login screen; token exchange or `/me` then fails. Callback maps that to `?spotify_error=not_allowlisted` and the home gate shows a calm beta message — it does not dump JSON-parse noise into the URL or auto-retry OAuth.

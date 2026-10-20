@@ -37,6 +37,8 @@ export type OrbitCascadeArtProps = SlideArtProps & {
   };
   /** Volume ocean tide (storyboard preview). */
   tide?: "low" | "high";
+  /** Volume school size preview (1 like = 1 fish, cap 50). */
+  fishCount?: number;
 };
 
 /** Perimeter-biased spiral — clear mid hole for copy / cover. */
@@ -76,6 +78,7 @@ export function OrbitCascadeArt({
   funkyPalette,
   paletteOverride,
   tide = "low",
+  fishCount = 12,
 }: OrbitCascadeArtProps) {
   const base = SLIDE_SPECS[slideIndex] ?? SLIDE_SPECS[0];
   const spec = {
@@ -138,6 +141,7 @@ export function OrbitCascadeArt({
             to={spec.accent2}
             tide={tide}
             freeze={!!freeze || !!reduce}
+            fishCount={fishCount}
           />
         )}
 

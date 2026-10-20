@@ -401,7 +401,7 @@ export function ApiScrappedDeck({
                 : `Out of ${long.toLocaleString()}. Suspicious.`,
         },
         {
-          headline: "One of them stings most",
+          headline: "One of them stings the most",
         },
         {
           headline: "Most ghosted song",
@@ -641,6 +641,7 @@ export function ApiScrappedDeck({
         active={!held && active === scene}
         replayKey={!held && active === scene ? visitKey : 0}
         tide={tide}
+        fishCount={pattern === "volume" ? likedThisYearCount : 0}
         beatPhase={beatPhase}
       />
     );
@@ -728,6 +729,18 @@ export function ApiScrappedDeck({
       className="wrapped-story relative min-h-dvh"
       data-wrapped-tone={chromeTone}
     >
+      {/* Ghosted list moon (D-018 C8): ink scrim so chrome stays readable */}
+      {active === 3 ? (
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-[39] h-[4.5rem]"
+          style={{
+            background:
+              "linear-gradient(to bottom, color-mix(in oklab, var(--wrapped-canvas) 92%, transparent) 0%, color-mix(in oklab, var(--wrapped-canvas) 55%, transparent) 55%, transparent 100%)",
+          }}
+          aria-hidden
+        />
+      ) : null}
+
       <div className="pointer-events-none absolute inset-x-0 top-0 z-40 px-3 pt-3 md:px-5">
         <div className="flex gap-1" aria-hidden>
           {Array.from({ length: SLIDE_COUNT }, (_, i) => {
@@ -877,7 +890,8 @@ export function ApiScrappedDeck({
               display: "hero",
             },
             {
-              headline: "One of them stings most",
+              headline: "One of them stings the most",
+              align: "center",
               display: "hero",
             },
             {

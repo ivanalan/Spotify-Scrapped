@@ -164,3 +164,19 @@ Format:
 - **Proof:** Warm gold→rose oval covered part of `MyScrapped.com` and list rows on the teal card.
 - **Avoid:** Keep moon/ghosts under type (`z-0` art, `z-[2]` content). Ghosts still read through the transparent hero band.
 - **Related:** [D-014](docs/decisions/D-014-share-finale-kit-j8.md), `ShareRecapCard`
+
+## Non-allowlisted Spotify sign-in refreshes with a JSON parse error
+
+- **Not:** Session cookie loops, lab-refresh autoStart, or quota cooldown refresh.
+- **Cause:** Dev Mode rejects users not on the Dashboard allowlist; Spotify’s token endpoint often returns **plain text** (`The user is not registered…`). `tokenRequest` called `response.json()`, threw `Unexpected token 'T'…`, and callback stuffed that into `?spotify_error=`. The home page never read the query param, so the gate still showed **Sign in**; with `show_dialog: false` each click bounced Spotify → error URL again.
+- **Proof:** `myscrapped.com/?spotify_error=Unexpected+token+%27T%27…` for accounts not among the 5 Dev Mode users.
+- **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; surface `spotify_error` on `ScrappedGate` as calm copy.
+- **Related:** [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md), `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`
+
+## Grass grows from the horizontal centerline / scales both directions
+
+- **Not:** Wrong MotifPin anchor, flipped viewBox, or missing cascade delays.
+- **Cause:** Motion `scaleY` on SVG `<g>` pivots from the group mid-box. CSS `transform-origin` / `transformBox: fill-box` and translate→scale→translate wrappers did not change the perceived origin.
+- **Proof:** Ghosted entity ridge grass expanded up **and** down from a mid band instead of emerging from the soil line.
+- **Avoid:** Do not use `scaleY` for grass grow-in. Rise each ridge from below a ground `clipPath` (`y: rise → 0`), cascade near→mid→far.
+- **Related:** [D-021](docs/decisions/D-021-ghosted-grass-rise-from-soil.md), `SpikyGrass` in `PeripheralMotifs.tsx`

@@ -1,6 +1,6 @@
 # D-010 — Ghosted songs list: ink sky / grass / ghosts
 
-**Status:** Locked  
+**Status:** Superseded by [D-018](D-018-ghosted-ground-sky-s9.md) for live slide-3 motifs (grass/clouds moved / removed; moon + rising ghosts). Kept for history.  
 **Date:** 2026-10-19  
 **Surfaces:** `/scrapped` API deck slide 3 only (`Your ghosted songs` list) — not other list beats.
 
@@ -16,7 +16,7 @@ Other list slides keep classic orb + clouds (marquee fix shared).
 
 ## Why
 
-Exploration at `docs/mocks/explorations/ghosted-list-sky-grass.html` locked this pack: night field + ghost characters reads the beat without competing with the mid-band list. Gold + BL orb was weather-without-theme.
+Night field + ghost characters reads the beat without competing with the mid-band list. Gold + BL orb was weather-without-theme.
 
 ## Locked choices
 
@@ -42,4 +42,3 @@ Two ink list-adjacent beats (slide 3 motif vs slide 6 classic list on ink) — d
 - Motifs: `src/components/scrapped/art/storyboard/PeripheralMotifs.tsx` (`GhostedListFrame`)
 - Wire: `ScrappedOrbitArt` / storyboard `OrbitCascadeArt` when `slideIndex === 3`
 - Palette: `SLIDE_SWATCH[3] = "ink"` in `scrapped-card-palette.ts`
-- Explore: `docs/mocks/explorations/ghosted-list-sky-grass.html`

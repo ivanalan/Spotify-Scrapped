@@ -13,6 +13,7 @@ type Props = {
 /**
  * Left-on-read chrome — typing pin on the entity beat, edge bubbles on the list.
  * Bubbles reuse the 5I bloom fill; pin is the one→many accent (like hearts / ghosts).
+ * Field wash + pin/frame geometry: D-019 (B1).
  */
 export function LeftOnReadChatChrome({
   mode = "pin",
@@ -32,6 +33,7 @@ export function LeftOnReadChatChrome({
       data-animate={animate}
       aria-hidden
     >
+      <div className="mm-chat-field" />
       {visualMode === "pin" ? (
         <div className="mm-chat-typing">
           <span className="mm-chat-typing-dot" />
