@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { SHARE_FINALE_KIT as SF } from "@/lib/scrapped-card-palette";
@@ -44,6 +45,74 @@ function blobPath() {
 }
 
 /**
+ * BL moon sphere — gold→mango→rose radial, no outer glow.
+ * Center pinned to the card’s bottom-left corner (D-014).
+ * Stays under type (z-0); soft breathe after enter.
+ */
+function ShareFinaleMoon({ active }: { active?: boolean }) {
+  const reduce = useReducedMotion();
+  const freeze = Boolean(reduce || !active);
+  const moonGrad = useId();
+  const m = SF.moon;
+
+  return (
+    <div
+      className="pointer-events-none absolute z-0 overflow-visible"
+      style={{
+        left: 0,
+        top: "100%",
+        width: m.sizePx,
+        height: m.sizePx,
+        // Center of the circle = bottom-left point of the card.
+        transform: "translate(-50%, -50%)",
+      }}
+      aria-hidden
+    >
+      <motion.div
+        className="size-full"
+        style={{ transformOrigin: "50% 50%" }}
+        animate={freeze ? { scale: 1 } : { scale: [1, 1.055, 1] }}
+        transition={
+          freeze
+            ? undefined
+            : {
+                duration: 5.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.2,
+              }
+        }
+      >
+        <svg viewBox="0 0 100 100" className="size-full">
+          <defs>
+            <radialGradient id={moonGrad} cx="32%" cy="28%" r="72%">
+              {m.stops.map((s) => (
+                <stop key={s.offset} offset={s.offset} stopColor={s.color} />
+              ))}
+            </radialGradient>
+          </defs>
+          <motion.circle
+            cx={50}
+            cy={50}
+            r={50}
+            fill={`url(#${moonGrad})`}
+            opacity={m.opacity}
+            initial={freeze ? false : { scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: m.opacity }}
+            transition={
+              freeze
+                ? undefined
+                : { duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.08 }
+            }
+            style={{ transformOrigin: "50px 50px" }}
+          />
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
+/**
  * Two wash ghosts framing the album art (TL + BR) — D-014 kit J8.
  * Positions/sizes from SHARE_FINALE_KIT (explore lock).
  */
@@ -58,7 +127,7 @@ function ShareFinaleGhosts({ active }: { active?: boolean }) {
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
       style={{ opacity: g.opacity }}
       aria-hidden
     >
@@ -222,7 +291,7 @@ function MinimalColumn({
         </p>
       ) : (
         <ol
-          className="flex flex-col gap-[var(--share-list-row-gap,1.1rem)]"
+          className="flex flex-col gap-[var(--share-list-row-gap,0.85rem)]"
         >
           {tracks.map((track, i) => (
             <li
@@ -288,12 +357,14 @@ export function ShareRecapCard({
         }}
       >
         {/*
-          Inset share finale (D-012 IA + D-014 kit J8): teal card, framing
-          ghosts, MyScrapped.com. Host locks 9:16; density from --share-*.
+          Inset share finale (D-012 IA + D-014 kit J8): teal card, BL moon
+          (center on corner), framing ghosts, MyScrapped.com.
+          Host locks 9:16; density from --share-*.
         */}
+        <ShareFinaleMoon active={active} />
         <ShareFinaleGhosts active={active} />
         <header
-          className="relative z-[1] flex w-full shrink-0 items-center justify-center overflow-hidden [container-type:size]"
+          className="relative z-[2] flex w-full shrink-0 items-center justify-center overflow-hidden [container-type:size]"
           style={{ height: "var(--share-hero-band, 44%)" }}
         >
           <div
@@ -316,7 +387,7 @@ export function ShareRecapCard({
         </header>
 
         <div
-          className="relative z-[1] grid min-h-0 w-full flex-1 grid-cols-2 content-start pt-0"
+          className="relative z-[2] grid min-h-0 w-full flex-1 grid-cols-2 content-start pt-0"
           style={{
             columnGap: "var(--share-list-col-gap, 0.375rem)",
             paddingInline: "var(--share-list-pad-x, 0px)",
@@ -328,12 +399,12 @@ export function ShareRecapCard({
         </div>
 
         <footer
-          className="relative z-[1] shrink-0 text-center font-semibold tracking-[-0.01em]"
+          className="relative z-[2] shrink-0 text-center font-semibold tracking-[-0.01em]"
           style={{
             paddingInline: "var(--share-list-pad-x, 0px)",
             paddingBottom: "var(--share-list-pad-y, 0px)",
             paddingTop: "10px",
-            fontSize: "0.68rem",
+            fontSize: "0.56rem",
             color: SF.cardMuted,
           }}
         >

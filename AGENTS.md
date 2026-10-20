@@ -67,11 +67,14 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - API story deck copy is **handwritten** and locked — don’t regenerate lines casually ([D-005](docs/decisions/D-005-handwritten-api-story-copy.md)).
 - API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)).
 - API deck look: Orbit Cascade palette + peripheral ovals / volume ocean ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)); each story is dark or light — deck chrome follows the active slide.
-- #1 artist beat: kit F orchid ladder spin — ink field, ink-lean opaque orchid ovals, independent slow spin ([D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)).
-- Wide viewport orbit art: corner-pinned motifs; phone keeps legacy `MotifStage` slice except intro + soft-close bookends ([D-009](docs/decisions/D-009-responsive-motif-pins.md)). Soft close: teal + funky grow-in bookends ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)).
-- Ghosted songs list (slide 3): ink field + seamless clouds + spiky grass + perimeter ghosts ([D-010](docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md)).
+- #1 artist oval ladder ([D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)) remains as grammar; live left-on-read entity uses TL typing pin ([D-017](docs/decisions/D-017-entity-list-pair-rhymes.md)).
+- Wide viewport orbit art: corner-pinned motifs; phone keeps legacy `MotifStage` slice except intro + soft-close / middeck full-bleed layers ([D-009](docs/decisions/D-009-responsive-motif-pins.md), [D-016](docs/decisions/D-016-middeck-metaphor-promote.md)).
+- Ghosted songs: entity night (moon/stars/one ghost) → list sky/grass/ghosts ([D-017](docs/decisions/D-017-entity-list-pair-rhymes.md), [D-010](docs/decisions/D-010-ghosted-list-sky-grass-ghosts.md)).
 - **Scrapped** logo / wordmark is always italic ([D-011](docs/decisions/D-011-scrapped-logo-italic.md)); body copy stays roman.
-- Share finale: inset **9:16** card + Share / Replay ([D-012](docs/decisions/D-012-share-finale-inset.md)); visual kit J8 ink stage / teal card / framing ghosts ([D-014](docs/decisions/D-014-share-finale-kit-j8.md)). Explore method: deck rhymes · stage behind / card in front ([D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
+- Share finale: inset **9:16** card + Share / Replay ([D-012](docs/decisions/D-012-share-finale-inset.md)); visual kit J8 ink stage / teal card / BL corner moon + framing ghosts ([D-014](docs/decisions/D-014-share-finale-kit-j8.md)). Explore method: deck rhymes · stage behind / card in front ([D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
+- List beats: art **frames** the list at the edges — no mid-band hero that occludes type/rows ([D-015](docs/decisions/D-015-list-art-frames-not-heroes.md)).
+- Soft close: **Teal** field · mono teal iris shrink (8B) — [D-016](docs/decisions/D-016-middeck-metaphor-promote.md).
+- Middeck metaphors (scenes 4–8): 4A heart · T1 typing pin · 7L film stutter · 8B teal iris — [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), [D-017](docs/decisions/D-017-entity-list-pair-rhymes.md).
 
 ## Layout
 

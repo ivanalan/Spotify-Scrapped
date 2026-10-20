@@ -18,9 +18,10 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 |------|--------|
 | Palette | `ink · orchid · ember · mango · gold · teal · rose` — see `src/lib/scrapped-card-palette.ts` |
 | Intro | Ink field + orchid concentric oval ladder |
-| Opening trio | ink → ember → orchid (slides 00–02); rest recycle the swatches. Ghosted songs list (slide 3) is ink again with sky/grass/ghosts — [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + funky accents; bookends grow in. Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
-| Soft close | Teal field · funky pink→gold pills · larger MotifPin bookends inset toward mid copy · slow grow+rotate enter (~2.6s) — [D-009](D-009-responsive-motif-pins.md) pins |
-| Ghosted spiral | Orchid field; gold→aqua GradOrbs on a perimeter-biased spiral; slow in-place cascade then drift |
+| Opening | ink → ember → **ink** (slides 00–02). Ghosted song entity (slide 2) + list (slide 3) share ink + purple→ember — night rhyme [D-017](D-017-entity-list-pair-rhymes.md) / list [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + iris — [D-016](D-016-middeck-metaphor-promote.md). Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
+| Soft close | Teal field · **8B mono teal iris** shrink-to-stop — [D-016](D-016-middeck-metaphor-promote.md) (displaces funky MotifPin bookends) |
+| Middeck 4–7 | 4A heart · TL typing pin + edge chat · 7L film letterbox — [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md) |
+| Ghosted entity | Ink field · TR moon · edge stars · one BL blob ghost — [D-017](D-017-entity-list-pair-rhymes.md) (displaces orchid spiral) |
 | Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year” |
 | Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |
 | Art role | Peripheral chrome behind copy; clear mid band for type and lists |

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import {
   accentsForSlide,
   INTRO_DISK_COLORS,
@@ -15,25 +15,25 @@ import {
   PointedStar,
 } from "@/components/scrapped/art/storyboard/ShapeKit";
 import {
-  FunkyOrbRain,
-  FunkyPillStack,
-  GradOrb,
-} from "@/components/scrapped/art/storyboard/FunkyShapes";
-import {
   GhostedListFrame,
+  GhostedNightEntity,
   ListClouds,
   ListCornerOrb,
   ListFrame,
   ListPerimeterGhosts,
   ListSpikyGrass,
 } from "@/components/scrapped/art/storyboard/PeripheralMotifs";
-import { ArtistOrbitOvals } from "@/components/scrapped/orbit/ArtistOrbitOvals";
+import { FilmLetterboxChrome } from "@/components/scrapped/orbit/FilmLetterboxChrome";
+import { LeftOnReadChatChrome } from "@/components/scrapped/orbit/LeftOnReadChatChrome";
 import {
   MotifCornerOrigin,
   MotifMeetStage,
   MotifPin,
   usePhoneOrbitArt,
 } from "@/components/scrapped/orbit/MotifPin";
+import { OneLikeHeartChrome } from "@/components/scrapped/orbit/OneLikeHeartChrome";
+import { SoftCloseIrisChrome } from "@/components/scrapped/orbit/SoftCloseIrisChrome";
+import "./middeck-metaphors.css";
 
 type Props = {
   slideIndex: number;
@@ -50,6 +50,11 @@ type Props = {
    * “joined this year” narrative beat lands.
    */
   tide?: "low" | "high";
+  /**
+   * Active beat within the scene (D-016 middeck metaphors).
+   * Mirrors volume `tide` — art can swap hero ↔ list frame.
+   */
+  beatPhase?: number;
 };
 
 type ChromeProps = {
@@ -61,40 +66,8 @@ type ChromeProps = {
   play: boolean;
   replayKey: number;
   tide: "low" | "high";
+  beatPhase: number;
 };
-
-/**
- * Perimeter-biased spiral (viewBox 360×640).
- * Inner hole stays clear for copy / cover; outer ring hugs the edges.
- */
-function spiralOrbs(
-  cx: number,
-  cy: number,
-  n: number,
-  turns = 2.85,
-  r0 = 168,
-  r1 = 305,
-) {
-  return Array.from({ length: n }, (_, i) => {
-    const t = i / Math.max(n - 1, 1);
-    const a = t * Math.PI * 2 * turns - Math.PI * 0.65;
-    // Slightly oval so the spiral fills the portrait frame edges.
-    const orbitR = r0 + (r1 - r0) * t;
-    const rx = orbitR * 1.12;
-    const ry = orbitR * 0.92;
-    return {
-      x: cx + Math.cos(a) * rx,
-      y: cy + Math.sin(a) * ry,
-      r: 5.5 + (i % 5) * 1.4 + t * 2,
-      // Spiral order: slow cascade along the arm (no travel).
-      delay: t * 2.4,
-      skew:
-        i % 2 === 0
-          ? "skewX(-10) scale(1.08 0.9)"
-          : "skewX(8) scale(1.04 0.94)",
-    };
-  });
-}
 
 /** Intro disks @ viewport TL center; star @ viewport BR center. */
 function IntroCornerChrome({ freeze }: { freeze: boolean }) {
@@ -129,53 +102,6 @@ function IntroCornerChrome({ freeze }: { freeze: boolean }) {
   );
 }
 
-/**
- * Soft-close bookend — pinned on every viewport.
- * Bottom uses CSS scaleY(-1) (not SVG mirror inside motion.g) — WebKit often
- * drops the nested SVG flip + Framer transform combo (SCARS soft-close).
- */
-function CloseBookendChrome({
-  a,
-  b,
-  freeze,
-}: {
-  a: string;
-  b: string;
-  freeze: boolean;
-}) {
-  // Larger pins, inset from edges so stacks sit nearer the mid-band copy.
-  return (
-    <>
-      <MotifPin
-        anchor="top-center"
-        width={1.05}
-        height={0.48}
-        viewBox="0 0 360 220"
-        preserveAspectRatio="xMidYMax meet"
-        className="!top-[16%]"
-      >
-        <FunkyPillStack a={a} b={b} freeze={freeze} closeEnter="top" />
-      </MotifPin>
-      <MotifPin
-        anchor="bottom-center"
-        width={1.05}
-        height={0.48}
-        viewBox="0 0 360 220"
-        preserveAspectRatio="xMidYMax meet"
-        className="!bottom-[16%] -scale-y-100"
-      >
-        <FunkyPillStack
-          a={a}
-          b={b}
-          freeze={freeze}
-          closeEnter="top"
-          enterDelay={0.2}
-        />
-      </MotifPin>
-    </>
-  );
-}
-
 function PhoneOrbitChrome({
   pattern,
   slideIndex,
@@ -185,14 +111,58 @@ function PhoneOrbitChrome({
   play,
   replayKey,
   tide,
+  beatPhase,
 }: ChromeProps) {
   // Edge-anchored patterns skip MotifStage — slice crops top/bottom.
   // Share finale (D-014): same intro disks + star as open, behind the inset card.
   if (pattern === "intro" || pattern === "share") {
     return <IntroCornerChrome freeze={freeze} />;
   }
-  if (pattern === "close") {
-    return <CloseBookendChrome a={accent} b={accent2} freeze={freeze} />;
+  // Soft close — full-bleed iris (D-016); MotifStage would crop the vignette.
+  if (pattern === "close" || slideIndex === 8) {
+    return (
+      <SoftCloseIrisChrome freeze={freeze} replayKey={replayKey} />
+    );
+  }
+  // Middeck metaphors (D-016) — full-bleed HTML/CSS layers.
+  if (slideIndex === 4) {
+    return (
+      <OneLikeHeartChrome
+        mode={beatPhase >= 2 ? "frame" : "hero"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 5) {
+    return (
+      <LeftOnReadChatChrome
+        mode="pin"
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 6) {
+    // List narrative starts at phase 2 (setup is title + subline = 0..1).
+    // Switching at ≥1 remounted frame mid-setup and replayed bubble enter.
+    return (
+      <LeftOnReadChatChrome
+        mode={beatPhase >= 2 ? "frame" : "quiet"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 7 || pattern === "reunion") {
+    // Setup = title + subline (0..1); list / reveal narrative starts at ≥2.
+    return (
+      <FilmLetterboxChrome
+        mode={beatPhase >= 2 ? "out" : "in"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
   }
 
   return (
@@ -202,17 +172,13 @@ function PhoneOrbitChrome({
       )}
 
       {pattern === "entity-song" && (
-        <SpiralCascadeDots
-          key={play ? `spiral-${replayKey}` : "spiral-settled"}
-          cx={180}
-          cy={290}
-          fill={accent}
-          accent={accent2}
+        <GhostedNightEntity
+          key={play ? `night-${replayKey}` : "night-settled"}
+          accent={accent}
+          accent2={accent2}
           freeze={freeze}
         />
       )}
-
-      {pattern === "entity-artist" && <ArtistOrbitOvals freeze={freeze} />}
 
       {pattern === "list" && slideIndex === 3 && (
         <GhostedListFrame
@@ -229,10 +195,6 @@ function PhoneOrbitChrome({
           animate={freeze ? "none" : "soft"}
         />
       )}
-
-      {pattern === "reunion" && (
-        <FunkyOrbRain a={accent} b={accent2} freeze={freeze} />
-      )}
     </MotifStage>
   );
 }
@@ -247,9 +209,54 @@ function WideOrbitChrome({
   play,
   replayKey,
   tide,
+  beatPhase,
 }: ChromeProps) {
   if (pattern === "share" || pattern === "intro") {
     return <IntroCornerChrome freeze={freeze} />;
+  }
+
+  // Middeck metaphors — same full-bleed layers as phone (D-016).
+  if (pattern === "close" || slideIndex === 8) {
+    return (
+      <SoftCloseIrisChrome freeze={freeze} replayKey={replayKey} />
+    );
+  }
+  if (slideIndex === 4) {
+    return (
+      <OneLikeHeartChrome
+        mode={beatPhase >= 2 ? "frame" : "hero"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 5) {
+    return (
+      <LeftOnReadChatChrome
+        mode="pin"
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 6) {
+    return (
+      <LeftOnReadChatChrome
+        mode={beatPhase >= 2 ? "frame" : "quiet"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
+  }
+  if (slideIndex === 7 || pattern === "reunion") {
+    // Setup = title + subline (0..1); list / reveal narrative starts at ≥2.
+    return (
+      <FilmLetterboxChrome
+        mode={beatPhase >= 2 ? "out" : "in"}
+        freeze={freeze}
+        replayKey={replayKey}
+      />
+    );
   }
 
   if (pattern === "volume") {
@@ -267,26 +274,14 @@ function WideOrbitChrome({
   }
 
   if (pattern === "entity-song") {
-    // meet (not slice) so spiral arms aren’t cover-cropped on wide screens.
     return (
-      <MotifMeetStage viewBox="-40 0 440 640">
-        <SpiralCascadeDots
-          key={play ? `spiral-wide-${replayKey}` : "spiral-wide-settled"}
-          cx={180}
-          cy={290}
-          fill={accent}
-          accent={accent2}
+      <MotifMeetStage viewBox="0 0 360 640">
+        <GhostedNightEntity
+          key={play ? `night-wide-${replayKey}` : "night-wide-settled"}
+          accent={accent}
+          accent2={accent2}
           freeze={freeze}
         />
-      </MotifMeetStage>
-    );
-  }
-
-  if (pattern === "entity-artist") {
-    // Expanded viewBox so outer orbit rx isn’t clipped mid-oval.
-    return (
-      <MotifMeetStage viewBox="-60 0 480 640">
-        <ArtistOrbitOvals freeze={freeze} />
       </MotifMeetStage>
     );
   }
@@ -349,121 +344,11 @@ function WideOrbitChrome({
     );
   }
 
-  if (pattern === "reunion") {
-    return <WideOrbRain a={accent} b={accent2} freeze={freeze} />;
-  }
-
-  if (pattern === "close") {
-    return <CloseBookendChrome a={accent} b={accent2} freeze={freeze} />;
-  }
-
   return null;
 }
 
-const WIDE_RAIN = [
-  {
-    anchor: "tl" as const,
-    viewBox: "0 40 120 160",
-    size: 0.28,
-    cx: 50,
-    cy: 120,
-    r: 28,
-    t: "skewX(-20) scale(1.2 0.75)",
-    d: 0,
-  },
-  {
-    anchor: "tr" as const,
-    viewBox: "250 20 120 160",
-    size: 0.3,
-    cx: 310,
-    cy: 90,
-    r: 36,
-    t: "skewX(18) scale(0.9 1.15)",
-    d: 0.12,
-  },
-  {
-    anchor: "bl" as const,
-    viewBox: "-20 420 140 160",
-    size: 0.36,
-    cx: 40,
-    cy: 500,
-    r: 48,
-    t: "skewX(-12) scale(1.1 0.85)",
-    d: 0.2,
-  },
-  {
-    anchor: "br" as const,
-    viewBox: "240 470 120 140",
-    size: 0.3,
-    cx: 300,
-    cy: 540,
-    r: 32,
-    t: "rotate(15) scale(1.15 0.8)",
-    d: 0.28,
-  },
-];
-
-function WideOrbRain({
-  a,
-  b,
-  freeze,
-}: {
-  a: string;
-  b: string;
-  freeze: boolean;
-}) {
-  return (
-    <>
-      {WIDE_RAIN.map((it, i) => (
-        <MotifPin
-          key={i}
-          anchor={it.anchor}
-          viewBox={it.viewBox}
-          size={it.size}
-          preserveAspectRatio={
-            it.anchor.includes("l") ? "xMinYMid meet" : "xMaxYMid meet"
-          }
-        >
-          <motion.g
-            initial={freeze ? false : { opacity: 0, scale: 0.6 }}
-            animate={
-              freeze
-                ? undefined
-                : {
-                    opacity: 1,
-                    scale: 1,
-                    y: [0, i % 2 === 0 ? -5 : 4, 0],
-                  }
-            }
-            transition={{
-              opacity: { duration: 0.55, delay: it.d },
-              scale: { duration: 0.55, delay: it.d },
-              y: {
-                duration: 9 + i,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1 + it.d,
-              },
-            }}
-            style={{ transformOrigin: `${it.cx}px ${it.cy}px` }}
-          >
-            <GradOrb
-              cx={it.cx}
-              cy={it.cy}
-              r={it.r}
-              from={a}
-              to={b}
-              transform={it.t}
-            />
-          </motion.g>
-        </MotifPin>
-      ))}
-    </>
-  );
-}
-
 /**
- * Production Orbit Cascade chrome for the API deck (D-007 / D-009).
+ * Production Orbit Cascade chrome for the API deck (D-007 / D-009 / D-016).
  * Canvas color comes from `data-wrapped-tone` on the slide — this layer is motifs only.
  * Phone: legacy MotifStage slice. Wide: corner-pinned layers.
  */
@@ -473,6 +358,7 @@ export function ScrappedOrbitArt({
   active = true,
   replayKey = 0,
   tide = "low",
+  beatPhase = 0,
 }: Props) {
   const { accent, accent2 } = accentsForSlide(slideIndex);
   const reduceMotion = useReducedMotion();
@@ -489,6 +375,7 @@ export function ScrappedOrbitArt({
     play,
     replayKey,
     tide,
+    beatPhase,
   };
 
   return (
@@ -502,82 +389,5 @@ export function ScrappedOrbitArt({
         <WideOrbitChrome {...chrome} />
       )}
     </div>
-  );
-}
-
-function SpiralCascadeDots({
-  cx,
-  cy,
-  fill,
-  accent,
-  freeze,
-}: {
-  cx: number;
-  cy: number;
-  fill: string;
-  accent: string;
-  freeze: boolean;
-}) {
-  const orbs = spiralOrbs(cx, cy, 32);
-
-  return (
-    <motion.g
-      animate={
-        freeze ? undefined : { x: [0, 5, 0, -4, 0], y: [0, -3, 0, 3, 0] }
-      }
-      transition={
-        freeze
-          ? undefined
-          : { duration: 18, repeat: Infinity, ease: "easeInOut" }
-      }
-    >
-      {orbs.map((d, i) => {
-        const from = i % 2 === 0 ? fill : accent;
-        const to = i % 2 === 0 ? accent : fill;
-        return (
-          <motion.g
-            key={i}
-            initial={freeze ? false : { scale: 0.55, opacity: 0 }}
-            animate={freeze ? undefined : { scale: 1, opacity: 0.92 }}
-            transition={{
-              duration: 1.35,
-              delay: d.delay,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            style={{ transformOrigin: `${d.x}px ${d.y}px` }}
-          >
-            <motion.g
-              animate={
-                freeze
-                  ? undefined
-                  : {
-                      x: [0, i % 2 === 0 ? 4 : -3, 0],
-                      y: [0, i % 3 === 0 ? -4 : 3, 0],
-                    }
-              }
-              transition={
-                freeze
-                  ? undefined
-                  : {
-                      duration: 14 + (i % 4),
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 2.8 + d.delay,
-                    }
-              }
-            >
-              <GradOrb
-                cx={d.x}
-                cy={d.y}
-                r={d.r}
-                from={from}
-                to={to}
-                transform={d.skew}
-              />
-            </motion.g>
-          </motion.g>
-        );
-      })}
-    </motion.g>
   );
 }

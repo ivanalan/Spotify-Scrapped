@@ -633,6 +633,7 @@ export function ApiScrappedDeck({
       pattern === "volume" && !held && active === scene && beatIndex >= 2
         ? "high"
         : "low";
+    const beatPhase = !held && active === scene ? beatIndex : 0;
     return (
       <ScrappedOrbitArt
         slideIndex={scene}
@@ -640,12 +641,17 @@ export function ApiScrappedDeck({
         active={!held && active === scene}
         replayKey={!held && active === scene ? visitKey : 0}
         tide={tide}
+        beatPhase={beatPhase}
       />
     );
   };
 
   // Chrome (wordmark / progress / controls) follows the active slide’s theme.
-  const chromeTone = slideTone(active);
+  // Scene 7 setup: film letterbox covers the toolbar — force ink (light
+  // glyphs) so Scrapped / progress read on the black bars (D-016). Bars stay
+  // through title + subline (phases 0..1); retract starts with list/reveal (≥2).
+  const chromeTone =
+    active === 7 && beatIndex < 2 ? "ink" : slideTone(active);
 
   // Warm the share PNG while the finale is idle so Share can call
   // navigator.share synchronously enough for iOS WebKit's user-gesture gate.
@@ -1173,7 +1179,7 @@ export function ApiScrappedDeck({
                   aspectRatio: D.aspectRatio,
                   width: "min(100cqi, calc(100cqb * 9 / 16))",
                   height: "auto",
-                  borderRadius: "var(--share-card-radius, 12px)",
+                  borderRadius: "var(--share-card-radius, 4px)",
                 }}
               >
                 <ShareRecapCard

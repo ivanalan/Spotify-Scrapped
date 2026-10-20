@@ -1,0 +1,767 @@
+/**
+ * Middeck metaphor chrome — promoted from middeck-metaphor-kits.html (D-016).
+ * Fav locks: 4A heart · 5I chat bloom · 7L film stutter · 8B teal iris.
+ */
+
+/* ── Palette stops (Orbit Cascade) ── */
+.scrapped-middeck {
+  --mm-pink: #ff4d8d;
+  --mm-rose: #c9185b;
+  --mm-gold: #ffe66d;
+  --mm-orchid: #9b4de8;
+  --mm-orchid-deep: #6b21a8;
+  --mm-teal: #1a7a6e;
+  --mm-teal-deep: #0f4c5c;
+  --mm-mango: #ff9f1c;
+  --mm-ink: #0a0810;
+}
+
+/* ── 4A · One-like heart ── */
+/* Scene keeps hero + frame mounted so list handoff can crossfade (D-016). */
+.mm-heart-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.mm-heart-hero {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 220px;
+  height: 220px;
+  margin-left: -110px;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 55%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mm-heart-hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  width: 58%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklab, var(--mm-pink) 55%, transparent) 0%,
+    color-mix(in oklab, var(--mm-rose) 28%, transparent) 42%,
+    transparent 72%
+  );
+  filter: blur(10px);
+  z-index: 0;
+  transform: translateX(-50%) scale(0.92);
+}
+
+.mm-heart-icon {
+  position: relative;
+  z-index: 1;
+  width: 128px;
+  height: 128px;
+  color: var(--mm-pink);
+  filter: drop-shadow(
+    0 10px 14px color-mix(in oklab, var(--mm-pink) 38%, transparent)
+  );
+}
+
+/* Setup — grow-in then lub-dub */
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-hero {
+  animation: mm-heart-grow-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-hero::after {
+  animation:
+    mm-underglow-grow-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) both,
+    mm-underglow-pulse 1.6s 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-icon {
+  animation: mm-heart-beat 1.6s 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95)
+    infinite;
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="0"] .mm-heart-hero::after {
+  opacity: 0.45;
+}
+
+/*
+ * List handoff — one continuous scale on the icon (replaces lub-dub) +
+ * opacity on the wrapper. No mid keyframes; no parent+child double scale.
+ */
+.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-hero {
+  animation: mm-heart-fade-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-hero::after {
+  animation: mm-underglow-fade-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-icon {
+  animation: mm-heart-scale-out 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mm-heart-scene[data-mode="frame"][data-animate="0"] .mm-heart-hero {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes mm-heart-grow-in {
+  0% {
+    transform: scale(0.12);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  72% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes mm-heart-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes mm-heart-scale-out {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.28);
+  }
+}
+
+@keyframes mm-underglow-grow-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.2);
+  }
+  100% {
+    opacity: 0.45;
+    transform: translateX(-50%) scale(0.92);
+  }
+}
+
+@keyframes mm-underglow-fade-out {
+  0% {
+    opacity: 0.45;
+    transform: translateX(-50%) scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.35);
+  }
+}
+
+@keyframes mm-underglow-pulse {
+  0%,
+  28%,
+  100% {
+    opacity: 0.45;
+    transform: translateX(-50%) scale(0.92);
+  }
+  7% {
+    opacity: 0.75;
+    transform: translateX(-50%) scale(1.06);
+  }
+  21% {
+    opacity: 0.6;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes mm-heart-beat {
+  0% {
+    transform: scale(1);
+  }
+  7% {
+    transform: scale(1.055);
+  }
+  14% {
+    transform: scale(1);
+  }
+  21% {
+    transform: scale(1.035);
+  }
+  28% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* List frame — perimeter rising hearts (D-015) */
+.mm-heart-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mm-heart-floater {
+  position: absolute;
+  bottom: -8%;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+}
+
+.mm-heart-floater ion-icon,
+.mm-heart-floater .mm-floater-ico {
+  width: var(--fs, 28px);
+  height: var(--fs, 28px);
+  color: var(--mm-pink);
+  filter: drop-shadow(
+    0 0 10px color-mix(in oklab, var(--mm-pink) 45%, transparent)
+  );
+}
+
+.mm-heart-floater:nth-child(1) {
+  left: 6%;
+  --fs: 26px;
+  --dx: -18px;
+}
+.mm-heart-floater:nth-child(2) {
+  left: 22%;
+  --fs: 22px;
+  --dx: -28px;
+}
+.mm-heart-floater:nth-child(2) .mm-floater-ico {
+  color: var(--mm-gold);
+}
+.mm-heart-floater:nth-child(3) {
+  left: 48%;
+  --fs: 20px;
+  --dx: 0px;
+}
+.mm-heart-floater:nth-child(3) .mm-floater-ico {
+  color: var(--mm-rose);
+}
+.mm-heart-floater:nth-child(4) {
+  left: 68%;
+  --fs: 24px;
+  --dx: 30px;
+}
+.mm-heart-floater:nth-child(5) {
+  left: 84%;
+  --fs: 28px;
+  --dx: 22px;
+}
+.mm-heart-floater:nth-child(5) .mm-floater-ico {
+  color: var(--mm-gold);
+}
+
+/* Setup: floaters stay parked offstage */
+.mm-heart-scene[data-mode="hero"] .mm-heart-floater {
+  animation: none;
+  opacity: 0;
+}
+
+/*
+ * List enter: positive stagger (no negative delays) so hearts rise from the
+ * bottom after the hero starts easing out — not mid-flight pops.
+ */
+.mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-floater {
+  animation: mm-heart-rise 13s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(1) {
+  animation-duration: 14s;
+  animation-delay: 0.85s;
+}
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(2) {
+  animation-duration: 15s;
+  animation-delay: 1.45s;
+}
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(3) {
+  animation-name: mm-heart-rise-soft;
+  animation-duration: 13.5s;
+  animation-delay: 2.05s;
+}
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(4) {
+  animation-duration: 14.5s;
+  animation-delay: 1.15s;
+}
+.mm-heart-scene[data-mode="frame"][data-animate="1"]
+  .mm-heart-floater:nth-child(5) {
+  animation-duration: 15.5s;
+  animation-delay: 1.75s;
+}
+
+@keyframes mm-heart-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  14% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  28% {
+    opacity: 0.85;
+  }
+  58% {
+    opacity: 0.7;
+    transform: translate(var(--dx, 0), -48vh) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.7);
+  }
+}
+
+@keyframes mm-heart-rise-soft {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  14% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  28% {
+    opacity: 0.28;
+  }
+  58% {
+    opacity: 0.22;
+    transform: translate(var(--dx, 0), -48vh) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dx, 0) * 1.35), -92vh) scale(0.7);
+  }
+}
+
+/* ── Left-on-read chat — pin (entity) + edge bloom (list) ── */
+.mm-chat {
+  --chat-col-w: 124px;
+  --chat-col-top: 13%;
+  --chat-col-left: 5%;
+  --chat-skew-y: 11deg;
+  --chat-skew-z: 0deg;
+  --chat-bubble-h: 30px;
+  --chat-gap: 13px;
+  --chat-mirror-w: 86px;
+  --chat-mirror-bottom: 6%;
+  --chat-mirror-opacity: 0.72;
+  --chat-bloom-x: 25%;
+  --chat-bloom-y: 30%;
+  --chat-bloom-w: 100%;
+  --chat-bloom-h: 145%;
+  --chat-bloom: radial-gradient(
+    var(--chat-bloom-w) var(--chat-bloom-h) at var(--chat-bloom-x)
+      var(--chat-bloom-y),
+    var(--mm-gold) 0%,
+    var(--mm-pink) 38%,
+    var(--mm-orchid) 72%,
+    var(--mm-orchid-deep) 100%
+  );
+  /* T1 compact typing pin */
+  --chat-type-w: 86px;
+  --chat-type-h: 42px;
+  --chat-type-x: 16px;
+  --chat-type-y: 72px;
+  --chat-type-dot: 8px;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Entity — one compact typing bubble, top-left (mid clear for artwork) */
+.mm-chat-typing {
+  position: absolute;
+  left: var(--chat-type-x);
+  top: var(--chat-type-y);
+  width: var(--chat-type-w);
+  height: var(--chat-type-h);
+  border-radius: 22px;
+  background: var(--chat-bloom);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--mm-orchid-deep) 45%, transparent);
+  z-index: 1;
+}
+.mm-chat-typing::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.mm-chat-typing-dot {
+  width: var(--chat-type-dot);
+  height: var(--chat-type-dot);
+  border-radius: 50%;
+  background: #f5f0ff;
+  opacity: 0.85;
+}
+.mm-chat[data-mode="pin"][data-animate="1"] .mm-chat-typing {
+  animation: mm-type-pin-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mm-chat[data-mode="pin"][data-animate="1"] .mm-chat-typing-dot {
+  animation: mm-type-bob 1.2s ease-in-out infinite;
+}
+.mm-chat[data-mode="pin"][data-animate="1"] .mm-chat-typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.mm-chat[data-mode="pin"][data-animate="1"] .mm-chat-typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes mm-type-pin-in {
+  from {
+    opacity: 0;
+    transform: translate(-6px, 8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+@keyframes mm-type-bob {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.mm-chat-col {
+  position: absolute;
+  left: var(--chat-col-left);
+  top: var(--chat-col-top);
+  width: var(--chat-col-w);
+  transform: perspective(400px) rotateY(var(--chat-skew-y))
+    rotateZ(var(--chat-skew-z));
+  transform-origin: left center;
+}
+
+.mm-chat-bubble {
+  position: relative;
+  margin: 0 0 var(--chat-gap);
+  height: var(--chat-bubble-h);
+  border-radius: 20px 20px 20px 6px;
+  background: var(--chat-bloom);
+}
+
+.mm-chat-col .mm-chat-bubble:nth-child(1) {
+  width: 100%;
+}
+.mm-chat-col .mm-chat-bubble:nth-child(2) {
+  width: 82%;
+}
+.mm-chat-col .mm-chat-bubble:nth-child(3) {
+  width: 68%;
+}
+.mm-chat-col .mm-chat-bubble:nth-child(4) {
+  width: 54%;
+}
+
+.mm-chat[data-animate="1"] .mm-chat-bubble {
+  animation: mm-skew-slide 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble:nth-child(3) {
+  animation-delay: 0.32s;
+}
+.mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble:nth-child(4) {
+  animation-delay: 0.46s;
+}
+
+.mm-chat-mirror {
+  position: absolute;
+  right: 2%;
+  bottom: var(--chat-mirror-bottom);
+  width: var(--chat-mirror-w);
+  transform: perspective(400px) rotateY(-16deg) rotateZ(3deg);
+  opacity: var(--chat-mirror-opacity);
+}
+
+.mm-chat-mirror .mm-chat-bubble {
+  width: 100%;
+  height: calc(var(--chat-bubble-h) - 2px);
+  border-radius: 20px 20px 6px 20px;
+  margin-bottom: calc(var(--chat-gap) * 0.85);
+}
+
+@keyframes mm-skew-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 0.92;
+    transform: translateX(0);
+  }
+}
+
+/* D-015 list / quiet frame — same edge geometry + opacity.
+   Quiet used larger/inboard scale (then softer opacity) before — jumped on list enter. */
+.mm-chat[data-mode="frame"] .mm-chat-col,
+.mm-chat[data-mode="quiet"] .mm-chat-col {
+  transform: perspective(400px) rotateY(14deg) rotateZ(-3deg) scale(0.55);
+  top: 10%;
+  left: 0;
+  opacity: 0.8;
+}
+.mm-chat[data-mode="frame"] .mm-chat-mirror,
+.mm-chat[data-mode="quiet"] .mm-chat-mirror {
+  transform: perspective(400px) rotateY(-12deg) rotateZ(2deg) scale(0.62);
+  bottom: 6%;
+  right: 0;
+  opacity: 0.38;
+}
+
+/* ── 7L · Film letterbox stutter ── */
+.mm-film {
+  --lb-h: 14.5%;
+  --lb-top: 0px;
+  --sprocket-inset: 26%;
+  --sprocket-w: 12px;
+  --sprocket-h: 12px;
+  --sprocket-gap: 25px;
+  --sprocket-pad-x: 10px;
+  --sprocket-row: 23px;
+  --stutter-dur: 1.7;
+  --stutter-dur-bot: 1.7;
+  --stutter-steps: 5;
+  --film-out-dur: 3.2;
+  --film-out-bot-delay: 0.12;
+  --film-field: var(--mm-mango);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mm-film-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--lb-h);
+  background: var(--mm-ink);
+  overflow: hidden;
+}
+
+.mm-film-strip.top {
+  top: var(--lb-top);
+}
+.mm-film-strip.bot {
+  bottom: 0;
+}
+
+/* Present from scene start — no animate-in; long smooth retract on list/reveal. */
+.mm-film[data-mode="in"] .mm-film-strip,
+.mm-film[data-mode="settled-in"] .mm-film-strip {
+  transform: translateY(0);
+}
+.mm-film[data-mode="out"] .mm-film-strip.top {
+  animation: mm-film-out-top calc(var(--film-out-dur) * 1s)
+    cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.mm-film[data-mode="out"] .mm-film-strip.bot {
+  animation: mm-film-out-bot calc(var(--film-out-dur) * 1s)
+    calc(var(--film-out-bot-delay) * 1s) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.mm-film[data-mode="settled-out"] .mm-film-strip.top {
+  transform: translateY(-120%);
+}
+.mm-film[data-mode="settled-out"] .mm-film-strip.bot {
+  transform: translateY(120%);
+}
+
+@keyframes mm-film-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-120%);
+  }
+}
+@keyframes mm-film-out-bot {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(120%);
+  }
+}
+
+.mm-film-perfs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--sprocket-row);
+  display: flex;
+  align-items: center;
+  gap: var(--sprocket-gap);
+  padding: 0 var(--sprocket-pad-x);
+  width: max-content;
+  min-width: 200%;
+}
+
+.mm-film-strip.top .mm-film-perfs {
+  top: auto;
+  bottom: var(--sprocket-inset);
+  margin-bottom: calc(var(--sprocket-row) / -2);
+}
+.mm-film-strip.bot .mm-film-perfs {
+  top: var(--sprocket-inset);
+  bottom: auto;
+  margin-top: calc(var(--sprocket-row) / -2);
+}
+
+.mm-film-perfs i {
+  flex: 0 0 auto;
+  width: var(--sprocket-w);
+  height: var(--sprocket-h);
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--film-field) 75%, #1a1520);
+  box-shadow: inset 0 0 0 1.5px
+    color-mix(in oklab, var(--mm-gold) 45%, transparent);
+}
+
+.mm-film[data-animate="1"] .mm-film-strip.top .mm-film-perfs {
+  animation: mm-perf-stutter calc(var(--stutter-dur) * 1s)
+    steps(var(--stutter-steps)) infinite;
+}
+.mm-film[data-animate="1"] .mm-film-strip.bot .mm-film-perfs {
+  animation: mm-perf-stutter calc(var(--stutter-dur-bot) * 1s)
+    steps(var(--stutter-steps)) infinite reverse;
+}
+
+@keyframes mm-perf-stutter {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── 8B · Soft-close mono teal iris ── */
+@property --mm-hole {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 72%;
+}
+
+.mm-iris {
+  position: absolute;
+  inset: -14%;
+  pointer-events: none;
+  --band: 7%;
+  --mm-hole: 72%;
+  --c1: var(--mm-teal);
+  --c2: color-mix(in oklab, var(--mm-teal) 80%, #0a0810);
+  --c3: color-mix(in oklab, var(--mm-teal-deep) 70%, #0a0810);
+  --c4: color-mix(in oklab, var(--mm-teal-deep) 40%, #0a0810);
+  background: radial-gradient(
+    circle at 50% 48%,
+    transparent 0%,
+    transparent var(--mm-hole),
+    var(--c1) var(--mm-hole),
+    var(--c1) calc(var(--mm-hole) + var(--band)),
+    var(--c2) calc(var(--mm-hole) + var(--band)),
+    var(--c2) calc(var(--mm-hole) + var(--band) * 2),
+    var(--c3) calc(var(--mm-hole) + var(--band) * 2),
+    var(--c3) calc(var(--mm-hole) + var(--band) * 3),
+    var(--c4) calc(var(--mm-hole) + var(--band) * 3),
+    var(--c4) calc(var(--mm-hole) + var(--band) * 4),
+    #0a0810 calc(var(--mm-hole) + var(--band) * 4 + 6%)
+  );
+}
+
+.mm-iris[data-animate="1"] {
+  animation: mm-iris-shrink 3.6s cubic-bezier(0.33, 0.02, 0.2, 1) forwards;
+}
+
+.mm-iris[data-animate="0"] {
+  --mm-hole: 10%;
+}
+
+@keyframes mm-iris-shrink {
+  from {
+    --mm-hole: 72%;
+  }
+  to {
+    --mm-hole: 10%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-heart-hero,
+  .mm-heart-hero::after,
+  .mm-heart-hero .mm-heart-icon,
+  .mm-heart-frame .mm-heart-floater,
+  .mm-chat .mm-chat-bubble,
+  .mm-chat-typing,
+  .mm-chat-typing-dot,
+  .mm-film-strip,
+  .mm-film-perfs,
+  .mm-iris {
+    animation: none !important;
+  }
+  .mm-heart-scene[data-mode="hero"] .mm-heart-hero {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .mm-heart-scene[data-mode="frame"] .mm-heart-hero {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .mm-heart-hero::after {
+    opacity: 0.45;
+    transform: translateX(-50%) scale(0.92);
+  }
+  .mm-iris {
+    --mm-hole: 10%;
+  }
+  .mm-film[data-mode="in"] .mm-film-strip,
+  .mm-film[data-mode="settled-in"] .mm-film-strip {
+    transform: translateY(0);
+  }
+  .mm-film[data-mode="out"] .mm-film-strip.top,
+  .mm-film[data-mode="settled-out"] .mm-film-strip.top {
+    transform: translateY(-120%);
+  }
+  .mm-film[data-mode="out"] .mm-film-strip.bot,
+  .mm-film[data-mode="settled-out"] .mm-film-strip.bot {
+    transform: translateY(120%);
+  }
+}

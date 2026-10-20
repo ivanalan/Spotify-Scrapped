@@ -32,13 +32,13 @@ export type StoryChromeTheme = "dark" | "light";
 export const SLIDE_SWATCH: CardSwatch[] = [
   "ink", // 0 intro
   "ember", // 1 volume (ocean)
-  "orchid", // 2 ghosted favs / #1 song
+  "ink", // 2 most ghosted song — night rhyme w/ list (D-017)
   "ink", // 3 ghosted songs list — sky/grass/ghosts (D-010)
   "teal", // 4 list
-  "ink", // 5 #1 artist (orchid ladder on ink)
-  "ink", // 6 list
-  "mango", // 7 reunion
-  "teal", // 8 soft close — bookend grow-in
+  "ink", // 5 left-on-read entity — chat bloom (D-016)
+  "ink", // 6 left-on-read list — chat frame (D-016)
+  "mango", // 7 plot twist / reunion — film letterbox (D-016)
+  "teal", // 8 soft close — mono teal iris (D-016)
   "ink", // 9 share — ink stage + teal card (D-012 / D-014 kit J8)
 ];
 
@@ -49,7 +49,7 @@ export const SLIDE_SWATCH: CardSwatch[] = [
  */
 export const SHARE_FINALE_DENSITY = {
   gutterPx: 36,
-  radiusPx: 12,
+  radiusPx: 4,
   cardActionsGapPx: 32,
   bodyTopPx: 28,
   bodyBottomPx: 16,
@@ -62,18 +62,18 @@ export const SHARE_FINALE_DENSITY = {
   heroBandPct: 46,
   heroSizePct: 48,
   listColGapPx: 18,
-  listRowGapRem: 1.1,
+  listRowGapRem: 0.85,
   listPadXPx: 19,
   listPadYPx: 16,
-  typeRem: 0.74,
+  typeRem: 0.62,
   sharePadYPx: 12,
   actionsGapPx: 12,
 } as const;
 
 /**
  * Share finale visual kit — promoted from explore `j-ink-teal-card` (D-014).
- * Stage: ink + intro disks/star. Card: teal gradient + 2 ghosts framing hero.
- * Disks/star reuse INTRO_SHARED_GRADIENT / INTRO_STAR (same stops as the lock).
+ * Stage: ink + intro disks/star. Card: teal gradient + BL corner moon sphere
+ * + 2 ghosts framing hero. Disks/star reuse INTRO_SHARED_GRADIENT / INTRO_STAR.
  */
 export const SHARE_FINALE_KIT = {
   id: "j-ink-teal-card",
@@ -87,9 +87,26 @@ export const SHARE_FINALE_KIT = {
   ghostFill: "#f5f0ff",
   ghostEye: "#0F4C5C",
   brandLine: "MyScrapped.com",
+  /**
+   * BL moon sphere — center on the card’s bottom-left corner (quarter peeks in).
+   * sizePx = diameter. Warm gold→mango→rose (not the ghost-night purple→ember).
+   * No outer glow — sphere only.
+   */
+  moon: {
+    /** Center pinned to this card corner. */
+    anchor: "bl" as const,
+    sizePx: 260,
+    /** Radial stops: highlight → mid → rim. */
+    stops: [
+      { offset: "0%", color: "#FFF4D6" },
+      { offset: "42%", color: "#FF9F1C" },
+      { offset: "100%", color: "#C9185B" },
+    ],
+    opacity: 1,
+  },
   ghosts: {
-    tl: { xPct: 6, yPct: 6, sizePx: 54 },
-    br: { xPct: 76, yPct: 36, sizePx: 66 },
+    tl: { xPct: 6, yPct: 6, sizePx: 46 },
+    br: { xPct: 76, yPct: 36, sizePx: 56 },
     bobPx: 10,
     /** Multiplier on rotate amp (1 = explore default). */
     wiggle: 1,
@@ -233,8 +250,8 @@ export const SLIDE_ACCENTS: Record<
   0: { accent: "#C9A0F5", accent2: "#6B21A8" },
   /** Volume ocean — ice crest → deep teal (black ink on flame sky / water lip). */
   1: { accent: "#A5F3FC", accent2: "#075985" },
-  /** Ghosted spiral — warm gold → aqua on orchid (Wrapped feast energy, no ribbons). */
-  2: { accent: "#FFE66D", accent2: "#5EEAD4" },
+  /** Ghosted night (entity) + list — purple → ember (D-010 / D-017). */
+  2: { accent: "#5C1A7A", accent2: "#F05A3D" },
   3: { accent: "#5C1A7A", accent2: "#F05A3D" },
   4: { accent: "#ffe66d", accent2: "#ff6b9d" },
   5: { accent: "#C9A0F5", accent2: "#6B21A8" },

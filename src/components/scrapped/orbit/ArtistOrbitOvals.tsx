@@ -77,10 +77,11 @@ export function ArtistOrbitOvals({ freeze }: { freeze: boolean }) {
           </motion.g>
         );
       })}
+      {/* Wide enough for expanded wide viewBox (-60…420) and phone 360 stage. */}
       <rect
-        x={0}
+        x={-80}
         y={washY}
-        width={360}
+        width={520}
         height={washHeight}
         fill={`url(#${uid}-wash)`}
       />
