@@ -78,7 +78,10 @@ export function ScrappedAboutPage() {
             </Link>
           </section>
 
-          <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8">
+          <section
+            id="why-waitlist"
+            className="mt-8 w-full scroll-mt-10 border-t border-[var(--wrapped-ink)]/14 pt-8"
+          >
             <h2 className="text-title w-full text-[var(--wrapped-ink)]">
               Why a waitlist?
             </h2>

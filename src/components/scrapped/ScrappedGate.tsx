@@ -24,6 +24,11 @@ type Props = {
   message?: string;
   /** OAuth failure shown on the auth gate (from `?spotify_error=`). */
   authError?: string;
+  /**
+   * Dev Mode allowlist rejection — seats-full mid band, no Sign in (D-025).
+   * Computed server-side from `?spotify_error=`.
+   */
+  seatsFull?: boolean;
   mode: "auth" | "fetch" | "error" | "ready" | "loading";
   displayName?: string | null;
   retryAfterSeconds?: number;
@@ -48,9 +53,13 @@ const gateCtaClass = cn(
   "mt-8 h-12 w-full rounded-2xl px-8 text-base font-semibold",
 );
 
+const gateAltLinkClass =
+  "font-semibold text-[var(--wrapped-ink)] underline underline-offset-4";
+
 export function ScrappedGate({
   message,
   authError,
+  seatsFull = false,
   mode,
   displayName,
   retryAfterSeconds,
@@ -63,6 +72,7 @@ export function ScrappedGate({
 }: Props) {
   const connected = mode !== "auth";
   const name = displayName?.trim() || null;
+  const showSeatsFull = mode === "auth" && seatsFull;
 
   return (
     <div
@@ -113,101 +123,128 @@ export function ScrappedGate({
           <h1 className="text-display mt-1 w-full italic text-[var(--wrapped-ink)]">
             Scrapped
           </h1>
-          <p className="text-body mt-6 w-full text-[var(--wrapped-ink)]">
-            Scrapped is your <span className="italic">anti-wrapped</span>. Songs
-            you ghosted and artists you left on read.
-          </p>
 
-          {mode === "auth" ? (
-            <div className="mt-8 w-full space-y-3">
-              {authError ? (
-                <p className="text-caption w-full text-[var(--wrapped-muted)]">
-                  {authError}
-                </p>
-              ) : null}
-              <GateWaitlistForm />
+          {showSeatsFull ? (
+            <div className="mt-6 w-full">
+              <p className="text-body w-full text-[var(--wrapped-muted)]">
+                Seats are full for now. We can only register a small set of
+                users with Spotify while Scrapped is in beta. Your sign in
+                wasn&rsquo;t kept.
+              </p>
+              <div className="mt-8 w-full">
+                <GateWaitlistForm />
+              </div>
+              <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
+                <Link href="/example" className={gateAltLinkClass}>
+                  View an example
+                </Link>
+                <span aria-hidden> · </span>
+                <Link href="/about#why-waitlist" className={gateAltLinkClass}>
+                  Why a waitlist?
+                </Link>
+              </p>
             </div>
-          ) : mode === "ready" || mode === "loading" ? (
-            <div className="mt-8 flex w-full flex-col items-stretch">
-              <button
-                type="button"
-                onPointerDown={
-                  continueEnabled && mode === "ready"
-                    ? onContinuePointerDown
-                    : undefined
-                }
-                onClick={
-                  continueEnabled && mode === "ready" ? onContinue : undefined
-                }
-                disabled={!continueEnabled || mode === "loading"}
-                aria-busy={!continueEnabled || mode === "loading"}
-                className={cn(
-                  gateCtaClass,
-                  "mt-0",
-                  (!continueEnabled || mode === "loading") &&
-                    "pointer-events-none opacity-80",
-                )}
-              >
-                {continueEnabled && mode === "ready" ? (
-                  "Continue"
-                ) : (
-                  <span className="inline-flex items-center gap-2">
-                    <span
-                      className="size-4 animate-spin rounded-full border-2 border-[var(--wrapped-canvas)] border-t-transparent"
-                      aria-hidden
-                    />
-                    Loading…
-                  </span>
-                )}
-              </button>
-              {continueEnabled && mode === "ready" && name ? (
-                <p className="text-caption mt-3 w-full text-center text-[var(--wrapped-muted)]">
-                  Signed in to Spotify as {name}
-                </p>
-              ) : null}
-              {!continueEnabled || mode === "loading" ? (
-                <p
-                  className="text-caption mt-3 w-full text-center text-[var(--wrapped-muted)]"
-                  aria-live="polite"
-                >
-                  {mode === "loading"
-                    ? "Starting soundtrack…"
-                    : "Warming the first track…"}
-                  {warmTotal > 0 ? (
-                    <span className="mt-1 block font-mono tabular-nums">
-                      {warmReady} / {warmTotal}
-                    </span>
-                  ) : null}
-                </p>
-              ) : null}
-            </div>
-          ) : retryAfterSeconds ? (
-            <SpotifyRateLimitWait
-              message={message ?? ""}
-              retryAfterSeconds={retryAfterSeconds}
-              quotaExceeded={quotaExceeded}
-              className="text-caption mt-8 w-full text-[var(--wrapped-muted)]"
-            />
           ) : (
-            <div className="mt-8 w-full space-y-3">
-              {message ? (
-                <p className="text-caption w-full text-[var(--wrapped-muted)]">
-                  {message}
-                </p>
-              ) : null}
-              <SpotifyLabFetchForm
-                next="/"
-                label={mode === "fetch" ? "Load data" : "Load from Spotify"}
-                tone="gate"
-                autoStart={mode === "fetch"}
-                className="w-full"
-              />
-              {name ? (
-                <p className="text-caption w-full text-center text-[var(--wrapped-muted)]">
-                  Signed in to Spotify as {name}
-                </p>
-              ) : null}
-            </div>
+            <>
+              <p className="text-body mt-6 w-full text-[var(--wrapped-ink)]">
+                Scrapped is your <span className="italic">anti-wrapped</span>.
+                Songs you ghosted and artists you left on read.
+              </p>
+
+              {mode === "auth" ? (
+                <div className="mt-8 w-full space-y-3">
+                  {authError ? (
+                    <p className="text-caption w-full text-[var(--wrapped-muted)]">
+                      {authError}
+                    </p>
+                  ) : null}
+                  <GateWaitlistForm />
+                </div>
+              ) : mode === "ready" || mode === "loading" ? (
+                <div className="mt-8 flex w-full flex-col items-stretch">
+                  <button
+                    type="button"
+                    onPointerDown={
+                      continueEnabled && mode === "ready"
+                        ? onContinuePointerDown
+                        : undefined
+                    }
+                    onClick={
+                      continueEnabled && mode === "ready"
+                        ? onContinue
+                        : undefined
+                    }
+                    disabled={!continueEnabled || mode === "loading"}
+                    aria-busy={!continueEnabled || mode === "loading"}
+                    className={cn(
+                      gateCtaClass,
+                      "mt-0",
+                      (!continueEnabled || mode === "loading") &&
+                        "pointer-events-none opacity-80",
+                    )}
+                  >
+                    {continueEnabled && mode === "ready" ? (
+                      "Continue"
+                    ) : (
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="size-4 animate-spin rounded-full border-2 border-[var(--wrapped-canvas)] border-t-transparent"
+                          aria-hidden
+                        />
+                        Loading…
+                      </span>
+                    )}
+                  </button>
+                  {continueEnabled && mode === "ready" && name ? (
+                    <p className="text-caption mt-3 w-full text-center text-[var(--wrapped-muted)]">
+                      Signed in to Spotify as {name}
+                    </p>
+                  ) : null}
+                  {!continueEnabled || mode === "loading" ? (
+                    <p
+                      className="text-caption mt-3 w-full text-center text-[var(--wrapped-muted)]"
+                      aria-live="polite"
+                    >
+                      {mode === "loading"
+                        ? "Starting soundtrack…"
+                        : "Warming the first track…"}
+                      {warmTotal > 0 ? (
+                        <span className="mt-1 block font-mono tabular-nums">
+                          {warmReady} / {warmTotal}
+                        </span>
+                      ) : null}
+                    </p>
+                  ) : null}
+                </div>
+              ) : retryAfterSeconds ? (
+                <SpotifyRateLimitWait
+                  message={message ?? ""}
+                  retryAfterSeconds={retryAfterSeconds}
+                  quotaExceeded={quotaExceeded}
+                  className="text-caption mt-8 w-full text-[var(--wrapped-muted)]"
+                />
+              ) : (
+                <div className="mt-8 w-full space-y-3">
+                  {message ? (
+                    <p className="text-caption w-full text-[var(--wrapped-muted)]">
+                      {message}
+                    </p>
+                  ) : null}
+                  <SpotifyLabFetchForm
+                    next="/"
+                    label={mode === "fetch" ? "Load data" : "Load from Spotify"}
+                    tone="gate"
+                    autoStart={mode === "fetch"}
+                    className="w-full"
+                  />
+                  {name ? (
+                    <p className="text-caption w-full text-center text-[var(--wrapped-muted)]">
+                      Signed in to Spotify as {name}
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            </>
           )}
         </div>
 

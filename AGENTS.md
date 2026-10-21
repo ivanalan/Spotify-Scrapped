@@ -79,6 +79,7 @@ See **[docs/DATA.md](docs/DATA.md)** and **[docs/WRAPPED.md](docs/WRAPPED.md)** 
 - Gate About (top-left) + `/about` Layout A; gate intro disks kit D6 (dim + down/outboard + top scrim) — [D-022](docs/decisions/D-022-about-page-gate-d6.md).
 - Gate chrome triad: primary fill · secondary outline glass · tertiary underline (no bg) — [D-023](docs/decisions/D-023-gate-button-triad.md).
 - Example walkthrough: frozen Guest `ScrappedApiReport` at `/example`; About “What is this?” CTA; back chrome, no sign-out X — [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md).
+- Not-allowlisted OAuth: seats-full mid band (About + Sign in; no Sign out) + waitlist + example / why links — [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md).
 
 ## Layout
 
