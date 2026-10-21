@@ -1,6 +1,6 @@
 # AGENTS.md — Spotify Scrapped
 
-Personal web app focused on **Spotify Scrapped** — an anti-Wrapped for songs that didn’t stick:
+Personal web app focused on **Spotify Scrapped** — an anti-Wrapped for songs that got ghosted:
 
 1. **Scrapped** (`/scrapped`) — story deck from Spotify Web API only (tops, recently played, liked, playlists). Affinity proxies, not true skips.
 2. **Scrapped Plus** (`/scrapped/plus`) — skip-based story deck from Extended Streaming History (SQLite after ingest).
@@ -37,7 +37,7 @@ Always-on rules: [.cursor/rules/agent-memory.mdc](.cursor/rules/agent-memory.mdc
 ## Analysis vs enrichment
 
 - **Scrapped Plus source of truth:** Extended Streaming History (skips, `ms_played`, `reason_end`).
-- **Scrapped / Scrapped Lab:** affinity windows + library timestamps — proxies for “didn’t stick,” not true skips.
+- **Scrapped / Scrapped Lab:** affinity windows + library timestamps — proxies for “got ghosted,” not true skips.
 - Access tokens stay server-side (`getSpotifyAccessToken` / `spotifyFetch`).
 
 See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.md)**, and **[docs/WRAPPED.md](docs/WRAPPED.md)** (Wrapped beat grammar → Scrapped narrative). Official Wrapped **motion** keyframes: **[docs/mocks/wrapped-ref/](docs/mocks/wrapped-ref/)** (see WRAPPED.md §10). Story copy vs 5-row list motion: **[D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)**.
@@ -74,8 +74,10 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - Share finale: inset **9:16** card + Share / Replay ([D-012](docs/decisions/D-012-share-finale-inset.md)); production: ink stage · teal nest · B1 orchid corners · lilac-rim BL moon · framing ghosts ([D-021](docs/decisions/D-021-share-finale-teal-orchid-lilac-moon.md); prior J8 [D-014](docs/decisions/D-014-share-finale-kit-j8.md)). Stage/card split: [D-013](docs/decisions/D-013-share-finale-deck-rhyme-explore.md) · spine [D-020](docs/decisions/D-020-share-finale-orchid-corners-white-moon.md).
 - List beats: art **frames** the list at the edges — no mid-band hero that occludes type/rows ([D-015](docs/decisions/D-015-list-art-frames-not-heroes.md)).
 - Soft close: **Teal** field · mono teal iris shrink (8B) — [D-016](docs/decisions/D-016-middeck-metaphor-promote.md).
-- Middeck metaphors (scenes 4–8): 4A heart · T1 typing pin · 7L film stutter · 8B teal iris — [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), [D-017](docs/decisions/D-017-entity-list-pair-rhymes.md).
+- Middeck metaphors (scenes 4–8): 4A heart · T1 typing pin · 7L film letterbox · 8B teal iris — [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), [D-017](docs/decisions/D-017-entity-list-pair-rhymes.md).
 - Left on read 5→6: ink + B1 orchid-corner wash · tuned pin/frame — [D-019](docs/decisions/D-019-left-on-read-orchid-corners.md).
+- Gate About (top-left) + `/about` Layout A; gate intro disks kit D6 (dim + down/outboard + top scrim) — [D-022](docs/decisions/D-022-about-page-gate-d6.md).
+- Gate chrome triad: primary fill · secondary outline glass · tertiary underline (no bg) — [D-023](docs/decisions/D-023-gate-button-triad.md).
 
 ## Layout
 

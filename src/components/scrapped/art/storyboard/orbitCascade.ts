@@ -107,7 +107,7 @@ export const SLIDE_SPECS: SlideSpec[] = [
     ...accents(1),
     hero: "Bottom ocean wave — ice→deep teal on flame ember; light theme (black ink)",
     motion:
-      "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s; kit-C oval fish = likedThisYear (1:1, cap 50) fade in below copy",
+      "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s; kit-C oval fish = likedThisYear (1:1, cap 15) fade in below copy",
     composition:
       "High tide waterline above centered copy; fish school from subtitle → viewport bottom (y≈390–630, even strata); aqua crest under black type; deck chrome matches light theme",
     why: "Likes as rising water on a hot orange field — dark-theme chrome + copy travel with the slide.",

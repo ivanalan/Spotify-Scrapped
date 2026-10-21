@@ -1,10 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { preloadIonIcon } from "@/components/Icon";
+import { GateWaitlistForm } from "@/components/scrapped/GateWaitlistForm";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
 import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
 import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
+import {
+  gatePrimaryChromeClass,
+  gatePrimaryTone,
+  gateSecondaryChromeClass,
+} from "@/components/scrapped/gateChrome";
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
 import { cn } from "@/lib/utils";
@@ -37,7 +44,8 @@ type Props = {
 
 const gateCtaClass = cn(
   buttonVariants({ size: "lg" }),
-  "mt-8 h-12 w-full cursor-pointer rounded-2xl bg-[var(--wrapped-ink)] px-8 text-base font-semibold text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90",
+  gatePrimaryTone,
+  "mt-8 h-12 w-full rounded-2xl px-8 text-base font-semibold",
 );
 
 export function ScrappedGate({
@@ -63,15 +71,40 @@ export function ScrappedGate({
       data-scrapped-field="intro-dusk"
     >
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-        <ScrappedOrbitArt slideIndex={0} pattern="intro" active />
+        <ScrappedOrbitArt
+          slideIndex={0}
+          pattern="intro"
+          active
+          introKit="gate-d6"
+        />
       </div>
+      {/* D-022 kit D6 — soft top scrim so About + brand stay ink-readable. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[22%] opacity-75"
+        aria-hidden
+        style={{
+          background:
+            "linear-gradient(to bottom, color-mix(in oklab, #12101a 88%, transparent) 0%, color-mix(in oklab, #12101a 45%, transparent) 55%, transparent 100%)",
+        }}
+      />
 
       <div className="relative z-10 flex min-h-dvh w-full max-w-sm flex-col items-stretch py-10 text-left">
-        {connected ? (
-          <div className="mb-8 flex w-full shrink-0 justify-end">
+        <div className="mb-8 flex w-full shrink-0 items-center justify-between gap-3">
+          <Link href="/about" className={gateSecondaryChromeClass}>
+            About
+          </Link>
+          {connected ? (
             <SignOutConfirmButton appearance="text" />
-          </div>
-        ) : null}
+          ) : (
+            <a
+              href="/api/spotify/login"
+              className={gatePrimaryChromeClass}
+              aria-label="Sign in to Spotify"
+            >
+              Sign in
+            </a>
+          )}
+        </div>
 
         <div className="flex w-full flex-1 flex-col justify-center">
           <p className="text-display w-full text-[var(--wrapped-ink)]">
@@ -84,6 +117,12 @@ export function ScrappedGate({
             Scrapped is your <span className="italic">anti-wrapped</span>. Songs
             you ghosted and artists you left on read.
           </p>
+          {mode === "auth" ? (
+            <p className="text-body mt-4 w-full text-[var(--wrapped-muted)]">
+              There’s a waitlist right now. Join below and we’ll email you a
+              link when it’s ready.
+            </p>
+          ) : null}
 
           {mode === "auth" ? (
             <div className="mt-8 w-full space-y-3">
@@ -92,9 +131,7 @@ export function ScrappedGate({
                   {authError}
                 </p>
               ) : null}
-              <a href="/api/spotify/login" className={cn(gateCtaClass, "mt-0")}>
-                Sign in to Spotify
-              </a>
+              <GateWaitlistForm />
             </div>
           ) : mode === "ready" || mode === "loading" ? (
             <div className="mt-8 flex w-full flex-col items-stretch">

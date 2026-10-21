@@ -1,6 +1,6 @@
 # Spotify Scrapped
 
-Anti-Wrapped for songs that didn’t stick.
+Anti-Wrapped for songs that got ghosted.
 
 1. **Scrapped** (`/scrapped`) — story deck from the Spotify Web API (no export)
 2. **Scrapped Plus** (`/scrapped/plus`) — skip story from your Extended Streaming History export

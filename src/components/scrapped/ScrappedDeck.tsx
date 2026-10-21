@@ -127,7 +127,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="00"
           title="Scrapped Plus"
-          blurb={`Anti-Wrapped for ${summary.year} — the skips, the almosts, and the songs that earned a rematch.`}
+          blurb={`Anti-Wrapped for ${summary.year} — the skips, the ghosted, and the songs that earned a rematch.`}
           active={active === 0}
           footer={
             <>
@@ -256,7 +256,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="05"
           title="Top skipped artists"
-          blurb="Skip volume weighted by how often you bail — the artists who didn’t stick."
+          blurb="Skip volume weighted by how often you bail — the artists that got ghosted."
           active={active === 5}
         >
           <RankBars

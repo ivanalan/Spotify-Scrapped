@@ -58,3 +58,5 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Ghosted ground→sky + S9 stars + C8 scrim: [D-018](docs/decisions/D-018-ghosted-ground-sky-s9.md)
 - Ghosted grass rise-from-soil cascade (no scaleY): [D-021](docs/decisions/D-021-ghosted-grass-rise-from-soil.md)
 - Left on read orchid corners + frame tune (B1): [D-019](docs/decisions/D-019-left-on-read-orchid-corners.md)
+- Gate About + `/about` Layout A · gate disk kit D6: [D-022](docs/decisions/D-022-about-page-gate-d6.md)
+- Gate button triad (primary fill · secondary glass · tertiary underline): [D-023](docs/decisions/D-023-gate-button-triad.md)

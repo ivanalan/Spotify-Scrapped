@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { gateSecondaryTone } from "@/components/scrapped/gateChrome";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -26,9 +27,6 @@ type Props = {
  * AlertDialog portals outside `.wrapped-story`, so dialog actions keep paper hex
  * (D-003 / D-007 contrast).
  */
-const gateOutlineTone =
-  "cursor-pointer border-[var(--wrapped-ink)]/25 !bg-transparent !text-[var(--wrapped-ink)] hover:!border-[var(--wrapped-ink)]/50 hover:!bg-[var(--wrapped-ink)]/10 hover:!text-[var(--wrapped-ink)] aria-expanded:!border-[var(--wrapped-ink)]/25 aria-expanded:!bg-transparent aria-expanded:!text-[var(--wrapped-ink)]";
-
 const dialogOutlineTone =
   "cursor-pointer border-[#1c1c1c]/20 !bg-transparent !text-[#1c1c1c] hover:!border-[#1c1c1c]/45 hover:!bg-[#1c1c1c]/15 hover:!text-[#1c1c1c] aria-expanded:!border-[#1c1c1c]/20 aria-expanded:!bg-transparent aria-expanded:!text-[#1c1c1c]";
 
@@ -51,7 +49,7 @@ export function SignOutConfirmButton({
             <Button
               variant="outline"
               size="lg"
-              className={gateOutlineTone}
+              className={gateSecondaryTone}
             />
           ) : (
             <Button

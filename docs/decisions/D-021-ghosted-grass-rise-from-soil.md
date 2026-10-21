@@ -23,9 +23,9 @@ Entity ridge grass **grows by rising from underground**, not by `scaleY`:
 
 | Ridge | Rise distance (`H − tipY`) | Delay |
 |-------|----------------------------|-------|
-| Near | ~44 | 0.08s |
-| Mid | ~58 | 0.34s |
-| Far | ~76 | 0.60s |
+| Near | ~46 | 0.08s |
+| Mid | ~70 | 0.34s |
+| Far | ~98 | 0.60s |
 
 Grow duration ≈ 0.85s, ease `[0.22, 1, 0.36, 1]`. Local band `H = 140`.
 

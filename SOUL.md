@@ -6,7 +6,7 @@ Rules tell an agent **how**. This file tells it **what to protect**.
 ## The fantasy
 
 Scrapped is an **anti-Wrapped conversation** — dry, slightly merciful, text-first.  
-It is a ritual for songs and artists that didn’t stick: affinity dips, one-likes, reunions — not a neon party and not a claim of true skips from the Web API.
+It is a ritual for songs and artists that got ghosted: affinity dips, one-likes, reunions — not a neon party and not a claim of true skips from the Web API.
 
 ## Non-negotiables
 

@@ -29,9 +29,9 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 |------|--------|
 | Direction | **Orbit Cascade** — ovals / orbs / skewed pills; hard card-cut fields |
 | Substrate | Card palette: `ink · orchid · ember · mango · gold · teal · rose` ([`scrapped-card-palette.ts`](../../../src/lib/scrapped-card-palette.ts)) |
-| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only |
+| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only. **Gate** uses kit D6 (dim + down/outboard + top scrim) — [D-022](../../../docs/decisions/D-022-about-page-gate-d6.md); story intro / share keep default ladder |
 | Opening | ink → ember → ink (ghosted: grass · entity S9 grow-in · cover-TL haunt fade → list TR-corner moon + distinct list S9 · 5 slow-fade ghosts — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md)) |
-| Volume | Flame ember field (light theme / black ink) + ice→deep teal ocean; high tide on “joined” beat; fish = liked-this-year (1:1, cap 50) from subtitle → viewport bottom |
+| Volume | Flame ember field (light theme / black ink) + ice→deep teal ocean; high tide on “joined” beat; fish = liked-this-year (1:1, cap 15) from subtitle → viewport bottom |
 | Theme | **Per-story dark or light** — swatch ink mode; deck chrome (wordmark / progress / controls) must match the active slide |
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
 | Accent | Motif gradients within the 6 swatches — not hazard neon floods / ribbons |
