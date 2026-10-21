@@ -12,12 +12,12 @@ Invert the ghosted entity→list night rhyme and lock star + chrome treatments:
 | Beat | Motifs |
 |------|--------|
 | Scene 2 (entity) | Ink · **ridge grass** · **S9** entity star map (5, grow-in + overlapping pulse) · one blob haunt at **cover TL** · **no moon** |
-| Scene 3 (list) | Ink · **TR-corner silver→ember moon** (grow-in + lilac underglow) · **S9** list star map (7, distinct slots) · **5 fade + overlapping float** edge ghosts · **no grass / no clouds** |
+| Scene 3 (list) | Ink · **TR-corner silver→ember moon** (grow-in + lilac underglow) · **no stars** · **5 fade + overlapping float** edge ghosts · **no grass / no clouds** |
 | Deck chrome on scene 3 | **C8** — ink top scrim under wordmark / progress / controls (pills already solid on ink theme) |
 
 ## Why
 
-Flipped “moon then weather” to “ground haunt → sky chorus.” Cover-TL ghost reads as the song’s haunt; list moon + staggered fade-in ghosts escalate without mid-band heroes. Separate star maps keep entity night from echoing the list sky. TR-corner moon still needs the C8 scrim so chrome stays readable. **S9** (4-point + quiet orchid glow, grow-in) won over dots/soft as the night sparkle. Slow opacity fade (not rise/scale) for ghosts keeps the pair quiet.
+Flipped “moon then weather” to “ground haunt → sky chorus.” Cover-TL ghost reads as the song’s haunt; list moon + staggered fade-in ghosts escalate without mid-band heroes. Stars stay on the entity only — list sky is moon + ghosts so the chorus doesn’t re-sparkle. TR-corner moon still needs the C8 scrim so chrome stays readable. **S9** (4-point + quiet orchid glow, grow-in) won over dots/soft as the entity night sparkle. Slow opacity fade (not rise/scale) for ghosts keeps the pair quiet.
 
 ## Locked choices
 
@@ -26,7 +26,7 @@ Flipped “moon then weather” to “ground haunt → sky chorus.” Cover-TL g
 | Entity moon | Off (displaces D-017 N4 TR moon) |
 | Entity ground | Spiky ridge grass (was list-only in D-010); enter = **rise-from-soil** cascade — [D-021](D-021-ghosted-grass-rise-from-soil.md) |
 | Entity haunt | Cover TL peek (~51, 149 · size 77 · op 0.74) — same former TR inset, mirrored — slow fade then bob |
-| Stars | S9 — 4-point · grow-in (~0.75s) with pulse overlap · opacity ≈0.11–0.58 · **entity 5 / list 7 distinct slot maps** · size ×1.05 · static SVG translate (motion scale nested) · **never under a ghost AABB** (pad for bob; stars paint behind ghosts) |
+| Stars | S9 — 4-point · grow-in (~0.75s) with pulse overlap · opacity ≈0.11–0.58 · **entity 5 only** (list off) · size ×1.05 · static SVG translate (motion scale nested) · **never under haunt AABB** (pad for bob; stars paint behind ghosts) |
 | List sky | TR-corner moon (cx 336, cy 104, r 62, op 0.8) · grow-in · lilac/ember **underglow** blur · silver→ember radial · **no hard halo ring** |
 | List ground | None |
 | List ghosts | **5** inset edge (L + R) · fade gated to list beat (“Your ghosted songs”, `beatPhase >= 1`) · +0.45s pad · opacity fade (1.7s) · float at **45%** of fade · stagger 1.3→3.1s · remount on scene visit |

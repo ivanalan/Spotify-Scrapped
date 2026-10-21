@@ -22,7 +22,6 @@ import {
   ListCornerOrb,
   ListFrame,
   ListPerimeterGhosts,
-  PointGlowStars,
 } from "@/components/scrapped/art/storyboard/PeripheralMotifs";
 import { FilmLetterboxChrome } from "@/components/scrapped/orbit/FilmLetterboxChrome";
 import { LeftOnReadChatChrome } from "@/components/scrapped/orbit/LeftOnReadChatChrome";
@@ -351,7 +350,6 @@ function WideOrbitChrome({
             accent2={accent2}
             freeze={freeze}
           />
-          <PointGlowStars layout="list" freeze={freeze} />
           <ListPerimeterGhosts
             freeze={freeze}
             enter={beatPhase >= 1}

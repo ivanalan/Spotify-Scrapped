@@ -117,12 +117,6 @@ export function ScrappedGate({
             Scrapped is your <span className="italic">anti-wrapped</span>. Songs
             you ghosted and artists you left on read.
           </p>
-          {mode === "auth" ? (
-            <p className="text-body mt-4 w-full text-[var(--wrapped-muted)]">
-              There’s a waitlist right now. Join below and we’ll email you a
-              link when it’s ready.
-            </p>
-          ) : null}
 
           {mode === "auth" ? (
             <div className="mt-8 w-full space-y-3">

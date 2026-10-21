@@ -30,7 +30,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Direction | **Orbit Cascade** — ovals / orbs / skewed pills; hard card-cut fields |
 | Substrate | Card palette: `ink · orchid · ember · mango · gold · teal · rose` ([`scrapped-card-palette.ts`](../../../src/lib/scrapped-card-palette.ts)) |
 | Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only. **Gate** uses kit D6 (dim + down/outboard + top scrim) — [D-022](../../../docs/decisions/D-022-about-page-gate-d6.md); story intro / share keep default ladder |
-| Opening | ink → ember → ink (ghosted: grass · entity S9 grow-in · cover-TL haunt fade → list TR-corner moon + distinct list S9 · 5 slow-fade ghosts — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md)) |
+| Opening | ink → ember → ink (ghosted: grass · entity S9 grow-in · cover-TL haunt fade → list TR-corner moon · 5 slow-fade ghosts — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md)) |
 | Volume | Flame ember field (light theme / black ink) + ice→deep teal ocean; high tide on “joined” beat; fish = liked-this-year (1:1, cap 15) from subtitle → viewport bottom |
 | Theme | **Per-story dark or light** — swatch ink mode; deck chrome (wordmark / progress / controls) must match the active slide |
 | Ink | Dark theme → light text (`#f5f5f5`); light theme → dark text (`#1c1c1c`) |
@@ -39,7 +39,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Viewport | **Mobile-first, responsive** — compose for phone first; canvas fills the viewport (no dark side gutters). Wide: corner pins ([D-009](../../../docs/decisions/D-009-responsive-motif-pins.md)); phone keeps legacy `MotifStage` slice except intro + soft-close bookends (pinned) |
 | Geometry | Locked ovals (`OVAL`) by default; volume uses a bottom ocean wave; art in corners / edges; **clear mid band** for copy + lists |
 | #1 artist | Oval ladder grammar — [D-008](../../../docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md). Live **left-on-read** entity uses **T1 typing pin** — [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
-| Ghosted list | **Slide 3 only** — TR-corner moon (no halo) · distinct S9 list stars (grow-in) · 5 slow-fade-then-float ghosts · C8 chrome scrim — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
+| Ghosted list | **Slide 3 only** — TR-corner moon (no halo) · 5 slow-fade-then-float ghosts · C8 chrome scrim · **no stars** — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
 | Ghosted entity | **Slide 2** — ink · grass (rise-from-soil cascade — [D-021](../../../docs/decisions/D-021-ghosted-grass-rise-from-soil.md)) · entity S9 grow-in · cover-TL haunt slow-fade · no moon — [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) |
 | List beats | Art **frames** the list (edges only) — never a mid-band hero over rows — [D-015](../../../docs/decisions/D-015-list-art-frames-not-heroes.md). Scene 4 rising hearts · scene 6 chat frame — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) |
 | Soft close | **Teal** field (flat) · **8B mono teal iris** shrink-to-stop — [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) |
