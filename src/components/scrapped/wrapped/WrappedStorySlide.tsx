@@ -490,10 +490,12 @@ export function WrappedStorySlide({
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",
         // Vertical center only — text-align lives on BeatBody per beat.
         "justify-center",
-        // Scene 4 heart (4A) owns the upper mid on setup beats — drop copy
-        // below it (same clearance idea as one-like-field explore). List beat
-        // pins top and the hero exits, so keep normal py-24.
-        field === "one-like-nest" && !isListBeat
+        // Scene 4 heart (4A) owns the upper mid — drop setup copy below it.
+        // Keep this padding for the whole field (not `!isListBeat`): flipping to
+        // py-24 when the list narrative starts yanks exiting Meet copy upward
+        // mid-fade (same class of leak as section-level align). List BeatBody
+        // is absolute pinTop, so nest padding does not affect it.
+        field === "one-like-nest"
           ? "pt-[min(40vh,20rem)] pb-24"
           : "py-24",
         className,

@@ -4,25 +4,34 @@ import { useEffect, useState, type FormEvent } from "react";
 import { gatePrimaryTone } from "@/components/scrapped/gateChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  isValidWaitlistEmail,
+  normalizeWaitlistEmail,
+} from "@/lib/waitlist/email";
 import { cn } from "@/lib/utils";
 
 const HELPER_DEFAULT =
-  "There’s a waitlist — enter the email you use for Spotify";
+  "Enter the email you use for Spotify to join the waitlist.";
 const HELPER_SUCCESS =
   "You’re signed up for the waitlist! You’ll get an email with a link when it’s ready.";
 const HELPER_EMPTY = "Enter an email to join the waitlist";
 const HELPER_INVALID = "That doesn’t look like an email";
+const HELPER_ERROR = "Something went wrong — try again in a moment.";
+const HELPER_RATE = "Too many tries — wait a few minutes and try again.";
 
 const RESET_AFTER_JOINED_MS = 5000;
 
-type Phase = "idle" | "empty" | "invalid" | "success";
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+type Phase =
+  | "idle"
+  | "empty"
+  | "invalid"
+  | "submitting"
+  | "success"
+  | "error"
+  | "rate_limited";
 
 /**
- * Gate waitlist shell — local UX only; no persistence or email send yet.
+ * Gate waitlist — Join posts to /api/waitlist (Neon + Upstash rate limit).
  * Composes shadcn Input + Button as two separate controls (D-003).
  *
  * After Join: field + Joined go read-only, then auto-reset after 5s.
@@ -31,8 +40,12 @@ export function GateWaitlistForm({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
 
-  const locked = phase === "success";
-  const isError = phase === "empty" || phase === "invalid";
+  const locked = phase === "success" || phase === "submitting";
+  const isError =
+    phase === "empty" ||
+    phase === "invalid" ||
+    phase === "error" ||
+    phase === "rate_limited";
 
   const helper =
     phase === "success"
@@ -41,7 +54,11 @@ export function GateWaitlistForm({ className }: { className?: string }) {
         ? HELPER_EMPTY
         : phase === "invalid"
           ? HELPER_INVALID
-          : HELPER_DEFAULT;
+          : phase === "rate_limited"
+            ? HELPER_RATE
+            : phase === "error"
+              ? HELPER_ERROR
+              : HELPER_DEFAULT;
 
   useEffect(() => {
     if (phase !== "success") return;
@@ -52,19 +69,38 @@ export function GateWaitlistForm({ className }: { className?: string }) {
     return () => window.clearTimeout(id);
   }, [phase]);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (locked) return;
-    const value = email.trim();
+    const value = normalizeWaitlistEmail(email);
     if (!value) {
       setPhase("empty");
       return;
     }
-    if (!isValidEmail(value)) {
+    if (!isValidWaitlistEmail(value)) {
       setPhase("invalid");
       return;
     }
-    setPhase("success");
+
+    setPhase("submitting");
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: value }),
+      });
+      if (res.status === 429) {
+        setPhase("rate_limited");
+        return;
+      }
+      if (!res.ok) {
+        setPhase(res.status === 400 ? "invalid" : "error");
+        return;
+      }
+      setPhase("success");
+    } catch {
+      setPhase("error");
+    }
   }
 
   return (
@@ -90,7 +126,12 @@ export function GateWaitlistForm({ className }: { className?: string }) {
           aria-invalid={isError || undefined}
           onChange={(event) => {
             setEmail(event.target.value);
-            if (phase === "empty" || phase === "invalid") {
+            if (
+              phase === "empty" ||
+              phase === "invalid" ||
+              phase === "error" ||
+              phase === "rate_limited"
+            ) {
               setPhase("idle");
             }
           }}
@@ -107,11 +148,15 @@ export function GateWaitlistForm({ className }: { className?: string }) {
           className={cn(
             gatePrimaryTone,
             "h-12 shrink-0 rounded-lg px-5 text-base font-semibold",
-            locked &&
+            phase === "success" &&
               "cursor-default opacity-55 hover:bg-[var(--wrapped-ink)] hover:opacity-55",
           )}
         >
-          {locked ? "Joined" : "Join"}
+          {phase === "submitting"
+            ? "Joining…"
+            : phase === "success"
+              ? "Joined"
+              : "Join"}
         </Button>
       </div>
       <p

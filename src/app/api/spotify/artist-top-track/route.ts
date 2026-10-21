@@ -35,12 +35,21 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     if (err instanceof SpotifyApiError) {
+      console.error(
+        "[artist-top-track]",
+        err.status,
+        err.message,
+        err.quotaExceeded ? "quota" : "",
+      );
       return NextResponse.json(
-        { error: err.message, body: err.body },
+        { error: err.status === 429 ? "rate_limited" : "spotify_unavailable" },
         { status: err.status === 429 ? 429 : 502 },
       );
     }
-    const message = err instanceof Error ? err.message : "Spotify request failed";
-    return NextResponse.json({ error: message }, { status: 502 });
+    console.error(
+      "[artist-top-track]",
+      err instanceof Error ? err.name : "error",
+    );
+    return NextResponse.json({ error: "spotify_unavailable" }, { status: 502 });
   }
 }

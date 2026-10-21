@@ -8,7 +8,9 @@ import { cn } from "@/lib/utils";
  * Plus/Lab keep the editorial chrome.
  */
 function isFullBleedScrapped(pathname: string): boolean {
-  return pathname === "/" || pathname === "/about";
+  return (
+    pathname === "/" || pathname === "/about" || pathname === "/example"
+  );
 }
 
 export function ProductNavShell({ children }: { children: React.ReactNode }) {

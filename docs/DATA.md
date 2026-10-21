@@ -126,7 +126,7 @@ Implemented in `src/lib/scrapped.ts` / `src/lib/load-scrapped.ts`:
 
 Prefer `sum(ms_played)` and skip heuristics over raw play counts. Entity key: `spotify_track_uri`.
 
-**Scrapped** (`/scrapped`) and **Scrapped Lab** (`/scrapped/lab`) do **not** use this export — see [SPOTIFY_API.md](SPOTIFY_API.md).
+**Scrapped** (`/scrapped`) and **Scrapped Lab** (`/scrapped/lab`) do **not** use this export — they use `src/lib/spotify/` (Web API).
 
 ---
 
@@ -145,7 +145,7 @@ Prefer `sum(ms_played)` and skip heuristics over raw play counts. Entity key: `s
 |--------|--------------|------------|
 | Spotify **Web API** (OAuth) | Liked Songs, tops, recently played, playlists | Scrapped + Scrapped Lab + Plus Liked join |
 
-OAuth setup and `spotifyFetch`: **[docs/SPOTIFY_API.md](SPOTIFY_API.md)**.
+OAuth and `spotifyFetch`: `src/lib/spotify/` (local ops runbook `docs/SPOTIFY_API.md` is gitignored).
 
 Neither API surface replaces Extended Streaming History for lifetime play-by-play / true skips.
 

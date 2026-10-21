@@ -25,7 +25,7 @@ Scrapped should feel like that same ritual for **what got ghosted** (skips, affi
 | “This defined you” | “This got ghosted — or came back” |
 | Share pride | Share honesty (same share-card ritual) |
 
-Scrapped Plus (`history.db` skips) remains source of truth for true skips. Main Scrapped and Scrapped Lab use affinity proxies only — never claim true skips there (see [DATA.md](DATA.md), [SPOTIFY_API.md](SPOTIFY_API.md)).
+Scrapped Plus (`history.db` skips) remains source of truth for true skips. Main Scrapped and Scrapped Lab use affinity proxies only — never claim true skips there (see [DATA.md](DATA.md), `src/lib/spotify/`).
 
 ---
 
@@ -240,7 +240,7 @@ Synthesized from Spotify Newsroom (Wrapped UX 2023–2025, Me in 2023, Music Evo
 |-----|------|
 | [AGENTS.md](../AGENTS.md) | Product intent, stack, non-goals |
 | [DATA.md](DATA.md) | Export schema, skip heuristics |
-| [SPOTIFY_API.md](SPOTIFY_API.md) | OAuth + Scrapped / Lab limits |
+| `src/lib/spotify/` | OAuth + Scrapped / Lab Web API (ops runbook local-only) |
 | [mocks/wrapped-ref/](mocks/wrapped-ref/) | **Official Wrapped 2023 motion capture** (keyframes + index) |
 | [mocks/wrapped-ref-2024/](mocks/wrapped-ref-2024/) | **Official Wrapped 2024 motion capture** (Music Evolution + AI podcast) |
 | `.cursor/rules/spotify-data.mdc` | Always-on data invariants |

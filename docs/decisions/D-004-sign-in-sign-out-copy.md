@@ -31,4 +31,3 @@ Docs and mocks that still say “Connect Spotify” should be updated when touch
 - `src/components/scrapped/GateWaitlistForm.tsx`
 - `src/components/scrapped/SignOutConfirmButton.tsx`
 - `src/components/AuthControls.tsx`
-- `docs/mocks/explorations/gate-waitlist-ux.html`

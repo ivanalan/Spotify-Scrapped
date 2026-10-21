@@ -10,7 +10,7 @@ Promote the locked middeck metaphor favorites into production `ScrappedOrbitArt`
 
 | Scene | Kit | Production chrome |
 |------|-----|-------------------|
-| 4 | **4A** | One-like heart — stroke-draw outline (`pathLength` + dashoffset) → opacity fill → HTML-wrapper spring pop → polar spark dots behind heart; no underglow/ring / scale-in grow. List: 5 perimeter rising hearts ([D-015](D-015-list-art-frames-not-heroes.md)). Hero + frame stay mounted; `frame` at list narrative (`beatPhase ≥ 3`) so hero fade matches copy exit (`exitTravelSec` 0.42s). Explore: `docs/mocks/explorations/one-like-heart-fill.html` |
+| 4 | **4A** | One-like heart — stroke-draw outline (`pathLength` + dashoffset) → opacity fill → HTML-wrapper spring pop → polar spark dots behind heart; no underglow/ring / scale-in grow. List: 5 perimeter rising hearts ([D-015](D-015-list-art-frames-not-heroes.md)). Hero + frame stay mounted; `frame` at list narrative (`beatPhase ≥ 3`) so hero fade matches copy exit (`exitTravelSec` 0.42s). |
 | 5 | **T1 pin** | Compact typing bubble (5I bloom fill); mid clear for artwork — [D-017](D-017-entity-list-pair-rhymes.md); field/pin place — [D-019](D-019-left-on-read-orchid-corners.md) |
 | 6 | 5I family | Quiet / edge chat frame — list half of D-017; wash + frame tune — [D-019](D-019-left-on-read-orchid-corners.md) |
 | 7 | **7L** | Film letterbox **14.5%**, `lb-top: 0`, sprocket inset 26%, holes 12×12, gap 25px, row 23px, smooth sprocket scroll **6s / 7.2s linear**, travel **−20%** (bot reverse); bars **present from scene start** (no animate-in); **long smooth retract** (~3.2s, ease `0.4,0,0.2,1`) when reunion list / reveal narrative enters (`beatPhase ≥ 2`). Toolbar forces **ink** chrome (light glyphs) while bars cover the top (setup phases 0–1) |

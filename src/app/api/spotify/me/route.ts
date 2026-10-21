@@ -21,9 +21,13 @@ export async function GET() {
     });
   } catch (error) {
     if (error instanceof SpotifyApiError) {
+      console.error("[spotify/me]", error.status, error.message);
       return NextResponse.json(
-        { connected: true, error: error.message, status: error.status },
-        { status: error.status },
+        {
+          connected: true,
+          error: error.status === 429 ? "rate_limited" : "spotify_unavailable",
+        },
+        { status: error.status === 429 ? 429 : error.status },
       );
     }
     throw error;

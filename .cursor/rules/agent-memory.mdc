@@ -60,3 +60,4 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Left on read orchid corners + frame tune (B1): [D-019](docs/decisions/D-019-left-on-read-orchid-corners.md)
 - Gate About + `/about` Layout A · gate disk kit D6: [D-022](docs/decisions/D-022-about-page-gate-d6.md)
 - Gate button triad (primary fill · secondary glass · tertiary underline): [D-023](docs/decisions/D-023-gate-button-triad.md)
+- Example walkthrough (frozen Guest snapshot · `/example` · About CTA · back chrome): [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md)

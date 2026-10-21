@@ -15,5 +15,5 @@ alwaysApply: true
 - Prefer `sum(ms_played)` over raw play counts for rankings and Scrapped Plus export features.
 - Music entity key: `spotify_track_uri` (fallback title + artist).
 - Keep `data/raw/` and `data/processed/` gitignored.
-- Spotify Web API is for Scrapped, Scrapped Lab, and Liked enrichment on Plus — use `src/lib/spotify` server-side only; never expose access tokens to the client. Setup: [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md).
+- Spotify Web API is for Scrapped, Scrapped Lab, and Liked enrichment on Plus — use `src/lib/spotify` server-side only; never expose access tokens to the client.
 - Export history remains the source of truth for skips on `/scrapped/plus`. Scrapped / Scrapped Lab use tops/library proxies only.
