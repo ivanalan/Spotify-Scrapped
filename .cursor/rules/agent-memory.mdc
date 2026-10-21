@@ -61,3 +61,4 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Gate About + `/about` Layout A · gate disk kit D6: [D-022](docs/decisions/D-022-about-page-gate-d6.md)
 - Gate button triad (primary fill · secondary glass · tertiary underline): [D-023](docs/decisions/D-023-gate-button-triad.md)
 - Example walkthrough (frozen Guest snapshot · `/example` · About CTA · back chrome): [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md)
+- Not-allowlisted seats-full gate (About + Sign in · no Sign out · waitlist · example / why): [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md)

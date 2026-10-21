@@ -185,8 +185,8 @@ Format:
 - **Not:** Session cookie loops, lab-refresh autoStart, or quota cooldown refresh.
 - **Cause:** Dev Mode rejects users not on the Dashboard allowlist; Spotify’s token endpoint often returns **plain text** (`The user is not registered…`). `tokenRequest` called `response.json()`, threw `Unexpected token 'T'…`, and callback stuffed that into `?spotify_error=`. The home page never read the query param, so the gate still showed **Sign in**; with `show_dialog: false` each click bounced Spotify → error URL again.
 - **Proof:** `myscrapped.com/?spotify_error=Unexpected+token+%27T%27…` for accounts not among the 5 Dev Mode users.
-- **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; surface `spotify_error` on `ScrappedGate` as calm copy.
-- **Related:** `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`
+- **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; on that code use the seats-full gate (explain unsigned + waitlist; **Sign in** remains for retry) — [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md).
+- **Related:** `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`, `ScrappedGate`
 
 ## Grass grows from the horizontal centerline / scales both directions
 

@@ -42,11 +42,17 @@ export class SpotifyOAuthError extends Error {
   }
 }
 
+/** True when the gate should show the seats-full / waitlist state (D-025). */
+export function isNotAllowlistedAuthError(code: string): boolean {
+  return code === "not_allowlisted" || isAllowlistFailure(code);
+}
+
 /** Gate copy for `spotify_error` query codes (and legacy ugly URL payloads). */
 export function spotifyAuthGateMessage(code: string): string {
   switch (code) {
     case "not_allowlisted":
-      return "Scrapped is in a limited Spotify beta — only a handful of testers can sign in right now. Once you’re added, try again.";
+      // Dedicated mid-band UI on the gate (D-025); this string is a fallback only.
+      return "Seats are full for now. We can only register a small set of users with Spotify while Scrapped is in beta. Your sign in wasn’t kept.";
     case "access_denied":
       return "Spotify sign-in was cancelled.";
     case "state_mismatch":
@@ -55,6 +61,9 @@ export function spotifyAuthGateMessage(code: string): string {
       return "Sign-in didn’t work. Try again in a moment.";
     default:
       // Old redirects dumped JSON-parse exceptions into the query string.
+      if (isAllowlistFailure(code)) {
+        return "Seats are full for now. We can only register a small set of users with Spotify while Scrapped is in beta. Your sign in wasn’t kept.";
+      }
       return "Sign-in didn’t work. Try again in a moment.";
   }
 }

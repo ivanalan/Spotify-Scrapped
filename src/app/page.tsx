@@ -2,7 +2,10 @@ import { ScrappedExperience } from "@/components/scrapped/ScrappedExperience";
 import { ScrappedGate } from "@/components/scrapped/ScrappedGate";
 import { loadScrappedApiLab } from "@/lib/load-scrapped-api-lab";
 import { getSpotifyConnection } from "@/lib/spotify";
-import { spotifyAuthGateMessage } from "@/lib/spotify/oauth";
+import {
+  isNotAllowlistedAuthError,
+  spotifyAuthGateMessage,
+} from "@/lib/spotify/oauth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +23,9 @@ export default async function HomePage({ searchParams }: Props) {
       <ScrappedGate
         mode="auth"
         message={result.message}
+        seatsFull={
+          Boolean(spotifyError) && isNotAllowlistedAuthError(spotifyError!)
+        }
         authError={
           spotifyError ? spotifyAuthGateMessage(spotifyError) : undefined
         }

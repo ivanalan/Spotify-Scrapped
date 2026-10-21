@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Not allowlisted — gate explorations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --canvas: #12101a;
+        --ink: #f5f5f5;
+        --muted: color-mix(in oklab, #f5f5f5 90%, transparent);
+        --muted-soft: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --accent: #c9a0f5;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: #0a0910;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        padding: 2rem 1.5rem 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .board-head {
+        max-width: 40rem;
+        margin-bottom: 2rem;
+      }
+
+      .board-head h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .board-head p {
+        margin: 0.6rem 0 0;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        color: color-mix(in oklab, #f5f5f5 70%, transparent);
+      }
+
+      .board-head code {
+        font-size: 0.8em;
+        padding: 0.1em 0.35em;
+        border-radius: 0.3em;
+        background: color-mix(in oklab, #f5f5f5 10%, transparent);
+      }
+
+      .grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        align-items: start;
+      }
+
+      .variant {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .variant-meta {
+        padding: 0 0.25rem;
+      }
+
+      .variant-meta .label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .variant-meta h2 {
+        margin: 0.25rem 0 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .variant-meta p {
+        margin: 0.35rem 0 0;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: color-mix(in oklab, #f5f5f5 65%, transparent);
+      }
+
+      /* Phone frame */
+      .phone {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        aspect-ratio: 9 / 19.5;
+        border-radius: 1.75rem;
+        overflow: hidden;
+        border: 1px solid color-mix(in oklab, #f5f5f5 14%, transparent);
+        box-shadow: 0 24px 60px color-mix(in oklab, #000 55%, transparent);
+      }
+
+      .field {
+        position: absolute;
+        inset: 0;
+        background-color: var(--canvas);
+        background-image:
+          radial-gradient(
+            125% 85% at 0% 0%,
+            color-mix(in oklab, #6b21a8 22%, transparent) 0%,
+            transparent 68%
+          ),
+          radial-gradient(
+            105% 75% at 100% 100%,
+            color-mix(in oklab, #3b0764 16%, transparent) 0%,
+            transparent 65%
+          );
+      }
+
+      /* Simplified gate-d6 disks */
+      .disks {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.55;
+      }
+
+      .disk {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          color-mix(in oklab, #9b4de8 55%, transparent),
+          color-mix(in oklab, #3b0764 25%, transparent) 70%,
+          transparent
+        );
+        filter: blur(1px);
+        transform: scaleX(1.28) scaleY(0.78);
+      }
+
+      .disk-a {
+        width: 52%;
+        height: 28%;
+        top: -4%;
+        left: -18%;
+      }
+
+      .disk-b {
+        width: 44%;
+        height: 24%;
+        top: 8%;
+        right: -16%;
+        opacity: 0.7;
+      }
+
+      .disk-c {
+        width: 38%;
+        height: 20%;
+        bottom: 12%;
+        left: -12%;
+        opacity: 0.45;
+      }
+
+      .scrim {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 22%;
+        background: linear-gradient(
+          to bottom,
+          color-mix(in oklab, #12101a 88%, transparent) 0%,
+          color-mix(in oklab, #12101a 45%, transparent) 55%,
+          transparent 100%
+        );
+        opacity: 0.75;
+        pointer-events: none;
+      }
+
+      .gate {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 2.25rem 2rem 1.5rem;
+        text-align: left;
+      }
+
+      .chrome {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1.75rem;
+        flex-shrink: 0;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.5rem;
+        padding: 0 1rem;
+        border-radius: 999px;
+        font: inherit;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: default;
+        transition:
+          background-color 300ms var(--ease),
+          border-color 300ms var(--ease),
+          color 300ms var(--ease),
+          opacity 300ms var(--ease);
+      }
+
+      .btn-primary {
+        background: var(--ink);
+        color: var(--canvas);
+        border: none;
+      }
+
+      .btn-secondary {
+        background: color-mix(in oklab, var(--ink) 10%, transparent);
+        color: var(--ink);
+        border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+        backdrop-filter: blur(12px);
+      }
+
+      .btn-tertiary {
+        background: transparent;
+        color: var(--ink);
+        border: none;
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        padding-inline: 0.25rem;
+        height: auto;
+        font-weight: 500;
+      }
+
+      .mid {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+      }
+
+      .year {
+        margin: 0;
+        font-size: clamp(2.4rem, 11vw, 2.85rem);
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+      }
+
+      .wordmark {
+        margin: 0.15rem 0 0;
+        font-size: clamp(2.4rem, 11vw, 2.85rem);
+        font-weight: 700;
+        font-style: italic;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+      }
+
+      .blurb {
+        margin: 1.25rem 0 0;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        font-weight: 400;
+        color: var(--ink);
+      }
+
+      .blurb em {
+        font-style: italic;
+      }
+
+      .status {
+        margin: 1.5rem 0 0;
+      }
+
+      .status-kicker {
+        margin: 0;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .status-title {
+        margin: 0.4rem 0 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+
+      .status-body {
+        margin: 0.65rem 0 0;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .status-body + .status-body {
+        margin-top: 0.55rem;
+      }
+
+      .rule {
+        margin: 1.35rem 0 0;
+        border: 0;
+        border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+      }
+
+      .waitlist {
+        margin-top: 1.25rem;
+      }
+
+      .waitlist-label {
+        margin: 0 0 0.55rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: stretch;
+      }
+
+      .input {
+        flex: 1;
+        min-width: 0;
+        height: 3rem;
+        padding: 0 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid color-mix(in oklab, var(--ink) 25%, transparent);
+        background: color-mix(in oklab, var(--ink) 10%, transparent);
+        color: var(--ink);
+        font: inherit;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .input::placeholder {
+        color: color-mix(in oklab, var(--ink) 45%, transparent);
+      }
+
+      .join {
+        height: 3rem;
+        padding: 0 1.15rem;
+        border: none;
+        border-radius: 0.5rem;
+        background: var(--ink);
+        color: var(--canvas);
+        font: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .helper {
+        margin: 0.6rem 0 0;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+
+      .alt {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .alt a {
+        color: var(--ink);
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 0.18em;
+      }
+
+      .signed-as {
+        margin: 0.85rem 0 0;
+        font-size: 0.75rem;
+        text-align: center;
+        color: var(--muted-soft);
+      }
+
+      .foot {
+        margin-top: auto;
+        padding-top: 1.5rem;
+        flex-shrink: 0;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* Variant B: year + wordmark; status owns the story band */
+      .v-b .wordmark {
+        margin-top: 0.15rem;
+      }
+
+      /* Variant C: compact brand, longer explanation */
+      .v-c .year {
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        opacity: 0.85;
+      }
+
+      .v-c .wordmark {
+        font-size: 2rem;
+      }
+
+      .steps {
+        margin: 1.1rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+
+      .steps li {
+        display: grid;
+        grid-template-columns: 1.5rem 1fr;
+        gap: 0.55rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+
+      .steps .n {
+        font-weight: 600;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .notes {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        max-width: 40rem;
+      }
+
+      .notes h3 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .notes ul {
+        margin: 0.75rem 0 0;
+        padding-left: 1.1rem;
+        font-size: 0.8rem;
+        line-height: 1.55;
+        color: color-mix(in oklab, #f5f5f5 68%, transparent);
+      }
+
+      .notes li + li {
+        margin-top: 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <header class="board-head">
+        <h1>Not allowlisted — gate explorations</h1>
+        <p>
+          After Spotify OAuth, Dev Mode rejects accounts that aren’t on the
+          Dashboard allowlist (<code>not_allowlisted</code>). Today that lands
+          as a muted caption on the normal auth gate. These three phones try a
+          clearer system-state story with waitlist as the forward path — no
+          “Sign in” loop.
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- A: Soft status under brand -->
+        <figure class="variant">
+          <div class="variant-meta">
+            <div class="label">A · Soft status</div>
+            <h2>Keep brand hero; name the block</h2>
+            <p>
+              Closest to today’s gate. Year + Scrapped stay; a short status block
+              explains capacity, then waitlist. Sign in is gone — Sign out /
+              About only.
+            </p>
+          </div>
+          <div class="phone" aria-label="Variant A phone mock">
+            <div class="field"></div>
+            <div class="disks" aria-hidden="true">
+              <div class="disk disk-a"></div>
+              <div class="disk disk-b"></div>
+              <div class="disk disk-c"></div>
+            </div>
+            <div class="scrim" aria-hidden="true"></div>
+            <div class="gate">
+              <div class="chrome">
+                <span class="btn btn-secondary">About</span>
+                <span class="btn btn-secondary">Sign out</span>
+              </div>
+              <div class="mid">
+                <p class="year">2025</p>
+                <h1 class="wordmark">Scrapped</h1>
+                <p class="blurb">
+                  Scrapped is your <em>anti-wrapped</em>. Songs you ghosted and
+                  artists you left on read.
+                </p>
+
+                <div class="status">
+                  <p class="status-kicker">Limited beta</p>
+                  <p class="status-title">You’re signed in — we can’t open it yet</p>
+                  <p class="status-body">
+                    Spotify only lets a handful of accounts through while we’re
+                    in development. Your sign-in worked; Scrapped just doesn’t
+                    have a seat for you yet.
+                  </p>
+                </div>
+
+                <div class="waitlist">
+                  <p class="waitlist-label">Join the waitlist</p>
+                  <div class="row">
+                    <input
+                      class="input"
+                      type="email"
+                      placeholder="Email"
+                      value="you@spotify.email"
+                      readonly
+                    />
+                    <button class="join" type="button">Join</button>
+                  </div>
+                  <p class="helper">
+                    Use the email on your Spotify account. We’ll send an invite
+                    when a slot opens.
+                  </p>
+                </div>
+                <p class="alt">
+                  Curious meanwhile?
+                  <a href="#">View an example →</a>
+                </p>
+              </div>
+              <p class="foot">Created by Alan Matias</p>
+            </div>
+          </div>
+        </figure>
+
+        <!-- B: State owns the mid band (chosen direction) -->
+        <figure class="variant">
+          <div class="variant-meta">
+            <div class="label">B · State-first · chosen</div>
+            <h2>Year + Scrapped; status as the story</h2>
+            <p>
+              Keep year + wordmark; drop marketing blurb and eyebrow. One body
+              line on capacity, then waitlist, then example / why links from C.
+            </p>
+          </div>
+          <div class="phone v-b" aria-label="Variant B phone mock">
+            <div class="field"></div>
+            <div class="disks" aria-hidden="true">
+              <div class="disk disk-a"></div>
+              <div class="disk disk-b"></div>
+              <div class="disk disk-c"></div>
+            </div>
+            <div class="scrim" aria-hidden="true"></div>
+            <div class="gate">
+              <div class="chrome">
+                <span class="btn btn-secondary">About</span>
+                <span class="btn btn-secondary">Sign out</span>
+              </div>
+              <div class="mid">
+                <p class="year">2025</p>
+                <h1 class="wordmark">Scrapped</h1>
+
+                <div class="status">
+                  <p class="status-title">Seats are full for now</p>
+                  <p class="status-body">
+                    We can only register a small set of users with Spotify while
+                    Scrapped is in beta.
+                  </p>
+                </div>
+
+                <hr class="rule" />
+
+                <div class="waitlist">
+                  <div class="row">
+                    <input
+                      class="input"
+                      type="email"
+                      placeholder="Email"
+                      readonly
+                    />
+                    <button class="join" type="button">Join waitlist</button>
+                  </div>
+                  <p class="helper">
+                    Same email as your Spotify account works best.
+                  </p>
+                </div>
+                <p class="alt">
+                  <a href="#">View an example</a>
+                  ·
+                  <a href="#">Why a waitlist?</a>
+                </p>
+              </div>
+              <p class="foot">Created by Alan Matias</p>
+            </div>
+          </div>
+        </figure>
+
+        <!-- C: Numbered system story -->
+        <figure class="variant">
+          <div class="variant-meta">
+            <div class="label">C · System story</div>
+            <h2>Three beats, then the form</h2>
+            <p>
+              Compact brand + a tiny numbered sequence (what happened → why →
+              what to do). Closest to About’s “Why a waitlist?” voice, kept
+              on-gate.
+            </p>
+          </div>
+          <div class="phone v-c" aria-label="Variant C phone mock">
+            <div class="field"></div>
+            <div class="disks" aria-hidden="true">
+              <div class="disk disk-a"></div>
+              <div class="disk disk-b"></div>
+              <div class="disk disk-c"></div>
+            </div>
+            <div class="scrim" aria-hidden="true"></div>
+            <div class="gate">
+              <div class="chrome">
+                <span class="btn btn-tertiary">← Gate</span>
+                <span class="btn btn-secondary">Sign out</span>
+              </div>
+              <div class="mid">
+                <p class="year">2025</p>
+                <h1 class="wordmark">Scrapped</h1>
+
+                <div class="status">
+                  <p class="status-title">Almost — not quite yet</p>
+                  <ol class="steps">
+                    <li>
+                      <span class="n">1</span>
+                      <span>Spotify confirmed who you are.</span>
+                    </li>
+                    <li>
+                      <span class="n">2</span>
+                      <span
+                        >Their API only allows a few registered users while
+                        we’re in development.</span
+                      >
+                    </li>
+                    <li>
+                      <span class="n">3</span>
+                      <span
+                        >Join the waitlist with your Spotify email — we’ll
+                        invite you when a seat opens.</span
+                      >
+                    </li>
+                  </ol>
+                </div>
+
+                <div class="waitlist">
+                  <div class="row">
+                    <input
+                      class="input"
+                      type="email"
+                      placeholder="Email"
+                      readonly
+                    />
+                    <button class="join" type="button">Join</button>
+                  </div>
+                  <p class="helper">
+                    You’ll get an email with a link when it’s ready.
+                  </p>
+                </div>
+                <p class="alt">
+                  <a href="#">View an example</a>
+                  ·
+                  <a href="#">Why a waitlist?</a>
+                </p>
+              </div>
+              <p class="foot">Created by Alan Matias</p>
+            </div>
+          </div>
+        </figure>
+      </div>
+
+      <aside class="notes">
+        <h3>Design notes (not locked)</h3>
+        <ul>
+          <li>
+            Hide or demote <strong>Sign in</strong> on this state — the scar was
+            a silent bounce loop back through Spotify.
+          </li>
+          <li>
+            Prefer “system capacity” language over “you’re not allowed” /
+            raw Spotify prose.
+          </li>
+          <li>
+            Waitlist helper should stress <em>Spotify account email</em> (matches
+            existing gate form + About).
+          </li>
+          <li>
+            Optional: prefill email if we ever have a display name / profile
+            hint; “Tried as @name” is exploratory only (we may not have profile
+            after a failed token exchange).
+          </li>
+          <li>
+            <strong>View an example</strong> (D-024) is a good secondary escape
+            so the moment isn’t a dead end.
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </body>
+</html>
