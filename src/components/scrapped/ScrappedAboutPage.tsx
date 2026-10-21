@@ -4,13 +4,6 @@ import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-/**
- * Replace when a hosted sample Scrapped walkthrough exists.
- * Empty string hides the CTA rather than shipping a dead link.
- */
-const EXAMPLE_WALKTHROUGH_HREF =
-  process.env.NEXT_PUBLIC_SCRAPPED_WALKTHROUGH_URL?.trim() || "";
-
 /** Tertiary — no fill; underline fades in on hover (D-023). */
 const backClass = cn(
   buttonVariants({ variant: "link", size: "lg" }),
@@ -25,6 +18,7 @@ const walkLinkClass = cn(
 /**
  * About / FAQ — Layout A long-scroll editorial (D-022).
  * Same Orbit ink field as the gate; art is blurred + frosted so body copy stays primary.
+ * Example walkthrough ingress under “What is this?” → `/example` (D-024).
  */
 export function ScrappedAboutPage() {
   return (
@@ -76,23 +70,12 @@ export function ScrappedAboutPage() {
               A short story deck built from your Spotify listening data: liked
               songs, 4 and 6 month tops, and all-time favorites.
             </p>
-            {EXAMPLE_WALKTHROUGH_HREF ? (
-              <a
-                className={walkLinkClass}
-                href={EXAMPLE_WALKTHROUGH_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View an example
-                <span aria-hidden className="text-[var(--wrapped-muted)]">
-                  →
-                </span>
-              </a>
-            ) : (
-              <p className="text-caption mt-4 w-full text-[var(--wrapped-muted)]">
-                Example walkthrough coming soon.
-              </p>
-            )}
+            <Link className={walkLinkClass} href="/example">
+              View an example
+              <span aria-hidden className="text-[var(--wrapped-muted)]">
+                →
+              </span>
+            </Link>
           </section>
 
           <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8">

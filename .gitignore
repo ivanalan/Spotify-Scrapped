@@ -46,3 +46,7 @@ next-env.d.ts
 !/data/raw/.gitkeep
 /data/processed/**
 !/data/processed/.gitkeep
+
+# Ops runbooks with env/DB wiring (keep local)
+docs/WAITLIST.md
+docs/SPOTIFY_API.md

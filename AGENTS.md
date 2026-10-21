@@ -40,7 +40,7 @@ Always-on rules: [.cursor/rules/agent-memory.mdc](.cursor/rules/agent-memory.mdc
 - **Scrapped / Scrapped Lab:** affinity windows + library timestamps — proxies for “got ghosted,” not true skips.
 - Access tokens stay server-side (`getSpotifyAccessToken` / `spotifyFetch`).
 
-See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.md)**, and **[docs/WRAPPED.md](docs/WRAPPED.md)** (Wrapped beat grammar → Scrapped narrative). Official Wrapped **motion** keyframes: **[docs/mocks/wrapped-ref/](docs/mocks/wrapped-ref/)** (see WRAPPED.md §10). Story copy vs 5-row list motion: **[D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)**.
+See **[docs/DATA.md](docs/DATA.md)** and **[docs/WRAPPED.md](docs/WRAPPED.md)** (Wrapped beat grammar → Scrapped narrative). OAuth + Web API helpers: `src/lib/spotify/` (local ops runbook gitignored). Official Wrapped **motion** keyframes: **[docs/mocks/wrapped-ref/](docs/mocks/wrapped-ref/)** (see WRAPPED.md §10). Story copy vs 5-row list motion: **[D-001](docs/decisions/D-001-story-copy-vs-list-motion.md)**.
 
 ## Non-goals (for now)
 
@@ -78,6 +78,7 @@ See **[docs/SPOTIFY_API.md](docs/SPOTIFY_API.md)**, **[docs/DATA.md](docs/DATA.m
 - Left on read 5→6: ink + B1 orchid-corner wash · tuned pin/frame — [D-019](docs/decisions/D-019-left-on-read-orchid-corners.md).
 - Gate About (top-left) + `/about` Layout A; gate intro disks kit D6 (dim + down/outboard + top scrim) — [D-022](docs/decisions/D-022-about-page-gate-d6.md).
 - Gate chrome triad: primary fill · secondary outline glass · tertiary underline (no bg) — [D-023](docs/decisions/D-023-gate-button-triad.md).
+- Example walkthrough: frozen Guest `ScrappedApiReport` at `/example`; About “What is this?” CTA; back chrome, no sign-out X — [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md).
 
 ## Layout
 
@@ -88,8 +89,8 @@ SCARS.md
 docs/agent-framework/     # portable kit
 docs/decisions/           # D-NNN locked choices
 docs/DATA.md
-docs/SPOTIFY_API.md
 docs/WRAPPED.md            # Wrapped UX → Scrapped story spine
+# docs/SPOTIFY_API.md, docs/WAITLIST.md — local ops only (gitignored)
 data/raw/                 # gitignored
 data/processed/           # gitignored
 scripts/ingest.ts

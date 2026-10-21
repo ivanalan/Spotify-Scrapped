@@ -22,6 +22,12 @@ import type { ScrappedApiReport } from "@/lib/scrapped-api";
 
 type Props = {
   report: ScrappedApiReport;
+  /**
+   * `walkthrough` — frozen fixture, no artist-top-track API, deck back chrome (D-024).
+   */
+  chromeMode?: "session" | "walkthrough";
+  /** Walkthrough toolbar back target. */
+  backHref?: string;
 };
 
 type Phase = "gate" | "loading" | "story";
@@ -46,10 +52,16 @@ async function fetchArtistTrackUri(need: {
   }
 }
 
-export function ScrappedExperience({ report }: Props) {
+export function ScrappedExperience({
+  report,
+  chromeMode = "session",
+  backHref = "/about",
+}: Props) {
+  const isWalkthrough = chromeMode === "walkthrough";
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
   const pauseApiRef = useRef<ApiScrappedPauseApi | null>(null);
-  const [phase, setPhase] = useState<Phase>("gate");
+  // Walkthrough skips the ready gate — land straight on slide 0 (D-024).
+  const [phase, setPhase] = useState<Phase>(isWalkthrough ? "story" : "gate");
   const [soundOn, setSoundOn] = useState(false);
 
   const [deckPaused, setDeckPaused] = useState(false);
@@ -59,6 +71,7 @@ export function ScrappedExperience({ report }: Props) {
   const [artistSoundtrackUri2, setArtistSoundtrackUri2] = useState<
     string | null
   >(null);
+  const resolveArtistTracks = chromeMode === "session";
   const [warm, setWarm] = useState<SoundtrackWarmState>({
     ready: 0,
     total: 0,
@@ -86,7 +99,14 @@ export function ScrappedExperience({ report }: Props) {
   );
 
   // Warm artist-act audio on the gate when tops/likes lack distinct samples.
+  // Walkthrough skips this — fixture must already carry trackIds (D-024).
   useEffect(() => {
+    if (!resolveArtistTracks) {
+      setArtistSoundtrackUri(null);
+      setArtistSoundtrackUri2(null);
+      return;
+    }
+
     let cancelled = false;
     const need1 = needsArtistSoundtrackResolve(report);
     const need2 = needsSecondArtistSoundtrackResolve(report);
@@ -115,7 +135,7 @@ export function ScrappedExperience({ report }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [report]);
+  }, [report, resolveArtistTracks]);
 
   // Fallback if Continue raced ahead of a cold embed.
   useEffect(() => {
@@ -162,11 +182,12 @@ export function ScrappedExperience({ report }: Props) {
   const started = phase === "story";
   const continueEnabled = warm.leadReady || soundtrackPreload.length === 0;
   // Mount the deck while Cueing/Continue so play() isn't fighting a remount.
-  const deckMounted = continueEnabled || phase !== "gate";
+  const deckMounted =
+    isWalkthrough || continueEnabled || phase !== "gate";
 
   return (
     <div className="relative w-full">
-      {phase !== "story" ? (
+      {!isWalkthrough && phase !== "story" ? (
         <ScrappedGate
           mode={phase === "loading" ? "loading" : "ready"}
           displayName={report.profileName}
@@ -199,6 +220,8 @@ export function ScrappedExperience({ report }: Props) {
             onSoundtrackCutTo={cutSoundtrackTo}
             held={!started}
             pauseApiRef={pauseApiRef}
+            chromeMode={chromeMode}
+            backHref={backHref}
           />
         </div>
       ) : null}

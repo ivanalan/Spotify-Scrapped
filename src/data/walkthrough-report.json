@@ -1,0 +1,997 @@
+{
+  "year": 2026,
+  "fetchedAt": "2026-10-15T03:06:56.530Z",
+  "profileName": "Guest",
+  "headlines": [
+    {
+      "id": "fell-month",
+      "percent": 74,
+      "label": "of your 6-month top songs dropped out of the last 4 weeks",
+      "detail": "37 of 50"
+    },
+    {
+      "id": "left-long",
+      "percent": 80,
+      "label": "of your multi-year top songs are out of the last 6 months and the last 4 weeks",
+      "detail": "40 of 50"
+    },
+    {
+      "id": "artists-cooled",
+      "percent": 52,
+      "label": "of your 6-month top artists cooled off in the last 4 weeks",
+      "detail": "26 of 50"
+    }
+  ],
+  "summary": {
+    "likedCount": 1001,
+    "likedThisYearCount": 62,
+    "likedNeverToppedCount": 138,
+    "shortLikedCount": 21,
+    "monthOnlyTrackCount": 34,
+    "monthOnlyArtistCount": 9,
+    "shortTrackCount": 50,
+    "mediumTrackCount": 50,
+    "longTrackCount": 50,
+    "shortArtistCount": 38,
+    "mediumArtistCount": 50,
+    "longArtistCount": 50,
+    "shortTopTrackId": "3OoEy74Z2neKejptWR4RIy"
+  },
+  "cards": [
+    {
+      "id": "liked-this-year",
+      "title": "Liked this year",
+      "calculated": "Fetched Liked Songs with an added date in 2026. Most recently liked first. The library total can be larger than the fetched sample.",
+      "means": "Saves you made this year — still on the shelf, whether or not they became rotation.",
+      "bar": "Recency among this year’s likes. Newest like is the longest bar.",
+      "source": "Liked Songs",
+      "headline": "62 liked in 2026 (of 200 fetched)",
+      "items": [
+        {
+          "id": "3OoEy74Z2neKejptWR4RIy",
+          "trackId": "3OoEy74Z2neKejptWR4RIy",
+          "label": "favorite place",
+          "sublabel": "strongboi",
+          "detail": "liked 2026-10-11",
+          "value": 5,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02d28f8f3062c2c570681270be"
+        },
+        {
+          "id": "1FvvCD9ndVDq0QUCr305zJ",
+          "trackId": "1FvvCD9ndVDq0QUCr305zJ",
+          "label": "Something to Say",
+          "sublabel": "Pool Girl",
+          "detail": "liked 2026-10-05",
+          "value": 4,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02e89bd4ee6510b8a3617fca35"
+        },
+        {
+          "id": "6oQZavCjiMN7q2tGmK8K2F",
+          "trackId": "6oQZavCjiMN7q2tGmK8K2F",
+          "label": "Fourteen Gears",
+          "sublabel": "Midland",
+          "detail": "liked 2026-09-23",
+          "value": 3,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02f7453f2aad02bad5cb1fd209"
+        },
+        {
+          "id": "6nnjjgVbWSEFHZ5zRSs97Z",
+          "trackId": "6nnjjgVbWSEFHZ5zRSs97Z",
+          "label": "If This Is Just a Game",
+          "sublabel": "Emily Nenni",
+          "detail": "liked 2026-09-23",
+          "value": 2,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02115dfb02f9d75659c902d41e"
+        },
+        {
+          "id": "7HqKenrghZWpTMZf8t5Q5v",
+          "trackId": "7HqKenrghZWpTMZf8t5Q5v",
+          "label": "Give Your Love To Me",
+          "sublabel": "Asher Kartman",
+          "detail": "liked 2026-09-23",
+          "value": 1,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02fbc06a26c57ddc29f9041c9e"
+        }
+      ]
+    },
+    {
+      "id": "saved-never-topped",
+      "title": "Saved, never topped",
+      "calculated": "Fetched Liked Songs that do not appear in any of your 4-week, 6-month, or multi-year top 50s (same song / recording counts). Oldest like first.",
+      "means": "You hearted them, and Spotify never ranked them as a top play. The shelf that never became rotation.",
+      "bar": "Days since you liked the song. Older likes get the longer bar.",
+      "source": "Liked Songs + top tracks (all three windows)",
+      "headline": "138 saved likes never made a top 50",
+      "items": [
+        {
+          "id": "3aSZtHTS5f194x1VKAjoQv",
+          "trackId": "3aSZtHTS5f194x1VKAjoQv",
+          "label": "Empty Chair",
+          "sublabel": "Indigo",
+          "detail": "liked 622d ago · never topped",
+          "value": 622,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e025e718161fecafc2259e83a28"
+        },
+        {
+          "id": "3iumIu1ZrzJV3E1q2wBvbJ",
+          "trackId": "3iumIu1ZrzJV3E1q2wBvbJ",
+          "label": "A Cruel Affair",
+          "sublabel": "beabadoobee",
+          "detail": "liked 621d ago · never topped",
+          "value": 621,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e027d9a2e7835a178df7b0153aa"
+        },
+        {
+          "id": "2G4z1KRQ0g6ndWr40zudDM",
+          "trackId": "2G4z1KRQ0g6ndWr40zudDM",
+          "label": "Runner",
+          "sublabel": "Mind Shrine",
+          "detail": "liked 621d ago · never topped",
+          "value": 621,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02ecb3b2a05dd8da34570d628b"
+        },
+        {
+          "id": "7I1kle4TNmkfednJDKo8GR",
+          "trackId": "7I1kle4TNmkfednJDKo8GR",
+          "label": "If You Want To",
+          "sublabel": "beabadoobee",
+          "detail": "liked 620d ago · never topped",
+          "value": 620,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02fe11583497b2a332995b88ed"
+        },
+        {
+          "id": "3CgZCQyuyxHRMWB9BTwmni",
+          "trackId": "3CgZCQyuyxHRMWB9BTwmni",
+          "label": "Swim Good",
+          "sublabel": "Frank Ocean",
+          "detail": "liked 620d ago · never topped",
+          "value": 620,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02ebbff7725d3ce0739be01787"
+        }
+      ]
+    },
+    {
+      "id": "month-already-liked",
+      "title": "This month already liked",
+      "calculated": "Of your 4-week top 50, how many are already in Liked Songs (same song counts). The list is the ones that are not liked yet — highest 4-week rank first.",
+      "means": "How much of right now was already on the shelf — and which current favorites you still haven’t saved.",
+      "bar": "4-week rank among unsaved songs. Higher rank, longer bar.",
+      "source": "Top tracks (4 weeks) + Liked Songs",
+      "headline": "21 of 50 four-week tops are already liked",
+      "items": [
+        {
+          "id": "3siwsiaEoU4Kuuc9WKMUy5",
+          "trackId": "3siwsiaEoU4Kuuc9WKMUy5",
+          "label": "No One Noticed",
+          "sublabel": "The Marías",
+          "detail": "4-week #3 · not liked yet",
+          "value": 48,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e028aa339341a0b0c813909c831"
+        },
+        {
+          "id": "2W9o5MXGfTTTZUb3ljk8ep",
+          "trackId": "2W9o5MXGfTTTZUb3ljk8ep",
+          "label": "In the Bosom",
+          "sublabel": "Sweet After Tears",
+          "detail": "4-week #6 · not liked yet",
+          "value": 45,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02755da8ce60d2c6b32d5be747"
+        },
+        {
+          "id": "6502BCXrWC43gV9blXfZav",
+          "trackId": "6502BCXrWC43gV9blXfZav",
+          "label": "Slowdown",
+          "sublabel": "Lunar Vacation",
+          "detail": "4-week #8 · not liked yet",
+          "value": 43,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0247dfd0e628161e709bb84696"
+        },
+        {
+          "id": "2B0X9xBipwCRCxZNXjd2dG",
+          "trackId": "2B0X9xBipwCRCxZNXjd2dG",
+          "label": "Laughter In The Rain - 1977",
+          "sublabel": "Neil Sedaka",
+          "detail": "4-week #9 · not liked yet",
+          "value": 42,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02bda72bd4a0edc825483bf05a"
+        },
+        {
+          "id": "0il7LJ828XyPqyvNx9cF5S",
+          "trackId": "0il7LJ828XyPqyvNx9cF5S",
+          "label": "You got time and I got money",
+          "sublabel": "Smerz",
+          "detail": "4-week #13 · not liked yet",
+          "value": 38,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02e8ba44fcfcaff029023e5200"
+        }
+      ]
+    },
+    {
+      "id": "fallen-rotation",
+      "title": "Fallen from rotation",
+      "calculated": "Songs in your 6-month top 50 that are absent from your 4-week top 50. Order is the 6-month rank, highest first.",
+      "means": "They were part of the last half-year and have dropped out of the last month. “Also multi-year” means the song is still in the several-years top 50 too.",
+      "bar": "How high they ranked over ~6 months. #1 is the longest bar.",
+      "source": "Top tracks (6 months and 4 weeks)",
+      "items": [
+        {
+          "id": "4MLBqAEzNN89o2M9h92Z26",
+          "trackId": "4MLBqAEzNN89o2M9h92Z26",
+          "label": "Get Back - Remastered 2009",
+          "sublabel": "The Beatles",
+          "detail": "6-month #2 · also multi-year",
+          "value": 49,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0284243a01af3c77b56fe01ab1"
+        },
+        {
+          "id": "1mZqWlT1Yh3N3efw7TkUJB",
+          "trackId": "1mZqWlT1Yh3N3efw7TkUJB",
+          "label": "Wdik",
+          "sublabel": "PLAYROOM",
+          "detail": "6-month #4 · also multi-year",
+          "value": 47,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02fee5651a8cbb275449db9938"
+        },
+        {
+          "id": "1RgY5cNoUapZDlI7VmjinV",
+          "trackId": "1RgY5cNoUapZDlI7VmjinV",
+          "label": "Fly Me To Mars",
+          "sublabel": "okaywill",
+          "detail": "6-month #5",
+          "value": 46,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02702157ccecc64e101759d857"
+        },
+        {
+          "id": "2nxsLJwW4eFDwl36fUQJWe",
+          "trackId": "2nxsLJwW4eFDwl36fUQJWe",
+          "label": "Going to Babble On",
+          "sublabel": "The Strokes",
+          "detail": "6-month #6",
+          "value": 45,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e026b458d1409d938dad4e3ba2c"
+        },
+        {
+          "id": "6GsP3uMCd0Dn5T37C93waZ",
+          "trackId": "6GsP3uMCd0Dn5T37C93waZ",
+          "label": "Sick Love",
+          "sublabel": "Red Hot Chili Peppers",
+          "detail": "6-month #7",
+          "value": 44,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0258406b3f1ac3ceaff7a64fef"
+        }
+      ]
+    },
+    {
+      "id": "second-chance",
+      "title": "Second-chance returns",
+      "calculated": "Two groups, merged, then sorted by current 4-week rank. First: in both the multi-year and 4-week top 50, missing from the 6-month list. Second: a like older than 180 days and from before this year, that is back in the 4-week top 50. Another release of the same song counts.",
+      "means": "Something you used to play, or saved a long time ago, is in this month again after a gap.",
+      "bar": "Current 4-week rank. Higher rank, longer bar.",
+      "source": "Top tracks (all three windows) + Liked Songs",
+      "items": [
+        {
+          "id": "2Lumsra3kuU61wXkEKzKaK",
+          "trackId": "2Lumsra3kuU61wXkEKzKaK",
+          "label": "Disco",
+          "sublabel": "Surf Curse",
+          "detail": "4-week #29 · long, skipped 6 months",
+          "value": 22,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02a7060ab3ca5dc05fc9552e66"
+        },
+        {
+          "id": "4t46soaqA758rbukTO5pp1",
+          "trackId": "4t46soaqA758rbukTO5pp1",
+          "label": "Mi Bello Angel",
+          "sublabel": "Natanael Cano",
+          "detail": "4-week #32 · old like, back",
+          "value": 19,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02066c67e297dd388e5b25bc3a"
+        },
+        {
+          "id": "0SC6bK22QGoX8EdgFM13Gv",
+          "trackId": "0SC6bK22QGoX8EdgFM13Gv",
+          "label": "Hereditary",
+          "sublabel": "Isaiah Rashad",
+          "detail": "4-week #46 · long, skipped 6 months",
+          "value": 5,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02986cd6b330f7405b17a604f4"
+        },
+        {
+          "id": "1L47iGkPc36XHDV1kOI9qP",
+          "trackId": "1L47iGkPc36XHDV1kOI9qP",
+          "label": "Star-Crossed",
+          "sublabel": "Grey Dugan",
+          "detail": "4-week #49 · long, skipped 6 months",
+          "value": 2,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02268e447e0ebd29cf03c3efc8"
+        },
+        {
+          "id": "6R7jCmKhrnqeLl9fZyQ9Ej",
+          "trackId": "6R7jCmKhrnqeLl9fZyQ9Ej",
+          "label": "Underworld",
+          "sublabel": "Alice Phoebe Lou",
+          "detail": "4-week #undefined · old like, back",
+          "value": 1,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02e575c2844371f9b58dfdcadf"
+        }
+      ]
+    },
+    {
+      "id": "abandoned-artists",
+      "title": "Artists on the shelf",
+      "calculated": "Group fetched likes by artist. Keep artists with at least 3 liked tracks who are missing from both your 4-week and 6-month top artists. Most liked tracks first.",
+      "means": "You keep saving them, and Spotify does not currently rank them as artists you play.",
+      "bar": "Number of liked tracks from that artist. Longer means more saves.",
+      "source": "Liked Songs + top artists (4 weeks and 6 months)",
+      "items": [
+        {
+          "id": "2TYRz7cFNZNPLUWRijsJNL",
+          "trackId": "3CgAo4gy2sKo1XHk1fgmJI",
+          "label": "Kal Banx",
+          "detail": "6 liked tracks",
+          "value": 6,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051747bef522b930c057cc575abbf"
+        },
+        {
+          "id": "4yYvor6Rq4fG82J1L47DYp",
+          "trackId": "5hFmHbLjYIVkbPrYsQgn6X",
+          "label": "MICHELLE",
+          "detail": "4 liked tracks",
+          "value": 4,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051748252dcd809b7e82414b3d04f"
+        }
+      ]
+    },
+    {
+      "id": "fallen-artists",
+      "title": "Artists who cooled off",
+      "calculated": "Artists in your 6-month top 50 who are absent from your 4-week top artists. Highest 6-month rank first.",
+      "means": "You were in them for the half-year, and they have fallen out of the last month.",
+      "bar": "How high they ranked over ~6 months. #1 is the longest bar.",
+      "source": "Top artists (6 months and 4 weeks)",
+      "items": [
+        {
+          "id": "5K4W6rqBFWDnAN6FQUkS6x",
+          "label": "Kanye West",
+          "detail": "6-month #2",
+          "value": 49,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051746e835a500e791bf9c27a422a"
+        },
+        {
+          "id": "3Nrfpe0tUJi4K4DXYWgMUX",
+          "label": "BTS",
+          "detail": "6-month #6",
+          "value": 45,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174f80ec63ea7a0ef0fba60957d"
+        },
+        {
+          "id": "6KImCVD70vtIoJWnq6nGn3",
+          "label": "Harry Styles",
+          "detail": "6-month #14",
+          "value": 37,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174e309f8c3056a59f20d0968ca"
+        },
+        {
+          "id": "1KP6TWI40m7p3QBTU6u2xo",
+          "label": "BØRNS",
+          "detail": "6-month #15",
+          "value": 36,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174252d35c84fb363ff13fc0026"
+        },
+        {
+          "id": "1U1el3k54VvEUzo3ybLPlM",
+          "label": "Kali Uchis",
+          "detail": "6-month #17",
+          "value": 34,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174deac5367816c7ab1f607e89a"
+        }
+      ]
+    },
+    {
+      "id": "left-long-run",
+      "title": "Left the long run",
+      "calculated": "Songs in your multi-year top 50 that are absent from both the 6-month and the 4-week top 50. Highest multi-year rank first.",
+      "means": "A years-long favorite that has been out of both the last six months and the last month.",
+      "bar": "How high they ranked across several years. #1 is the longest bar.",
+      "source": "Top tracks (several years, 6 months, and 4 weeks)",
+      "items": [
+        {
+          "id": "2Nh2cMryoXl7BrZoIeN2Pr",
+          "trackId": "2Nh2cMryoXl7BrZoIeN2Pr",
+          "label": "Dapper (feat. Anderson .Paak)",
+          "sublabel": "Domo Genesis, Anderson .Paak",
+          "detail": "multi-year #3",
+          "value": 48,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02085d6629aaaf7baa283d5c7d"
+        },
+        {
+          "id": "6YVajR33kCWLhWpMVD8AGD",
+          "trackId": "6YVajR33kCWLhWpMVD8AGD",
+          "label": "Calling After Me",
+          "sublabel": "Wallows",
+          "detail": "multi-year #4",
+          "value": 47,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02cf1b6ce3048a47eb8aeff03d"
+        },
+        {
+          "id": "6P0bG1wDbLvs8kNJV4hQUt",
+          "trackId": "6P0bG1wDbLvs8kNJV4hQUt",
+          "label": "My Baby (Got Nothing At All) (Materialists Original Soundtrack)",
+          "sublabel": "Japanese Breakfast",
+          "detail": "multi-year #5",
+          "value": 46,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02f64b3969a018b15d2a37cab9"
+        },
+        {
+          "id": "16gJmoOqRt2lKmlXtDpWgH",
+          "trackId": "16gJmoOqRt2lKmlXtDpWgH",
+          "label": "Cariño",
+          "sublabel": "The Marías",
+          "detail": "multi-year #6",
+          "value": 45,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e027fd42afaffee501a5872592d"
+        },
+        {
+          "id": "6bqB7idfAnJVisSMQA1mZQ",
+          "trackId": "6bqB7idfAnJVisSMQA1mZQ",
+          "label": "I'd Like To Walk Around In Your Mind",
+          "sublabel": "Vashti Bunyan",
+          "detail": "multi-year #8",
+          "value": 43,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02aa75bc2cbc0003e7ef6add7a"
+        }
+      ]
+    },
+    {
+      "id": "left-long-artists",
+      "title": "Artists who left the long run",
+      "calculated": "Artists in your multi-year top 50 who are absent from both the 6-month and the 4-week top artists. Highest multi-year rank first.",
+      "means": "Years-long favorites who are not in the last half-year or the last month.",
+      "bar": "How high they ranked across several years. #1 is the longest bar.",
+      "source": "Top artists (several years, 6 months, and 4 weeks)",
+      "items": [
+        {
+          "id": "2YZyLoL8N0Wb9xBt1NhZWg",
+          "trackId": "6IZvVAP7VPPnsGX6bvgkqg",
+          "label": "Kendrick Lamar",
+          "detail": "multi-year #22",
+          "value": 29,
+          "imageUrl": "https://i.scdn.co/image/ab6761610000517439ba6dcd4355c03de0b50918"
+        },
+        {
+          "id": "2AWfnWrfFVhRPVX4JN9a6g",
+          "trackId": "3FsEgJ3jIgTnIshPiHw65V",
+          "label": "Mamalarky",
+          "detail": "multi-year #24",
+          "value": 27,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174c9e0f6e891fee6b780ba3480"
+        },
+        {
+          "id": "4SpbR6yFEvexJuaBpgAU5p",
+          "trackId": "24Y63uAvj6Oc9jGuTlhlgf",
+          "label": "LE SSERAFIM",
+          "detail": "multi-year #37",
+          "value": 14,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174b976b6defd4f7343c78d63c0"
+        },
+        {
+          "id": "3pc0bOVB5whxmD50W79wwO",
+          "label": "keshi",
+          "detail": "multi-year #41",
+          "value": 10,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051743a0f8f319aeef1aa4115f5e8"
+        },
+        {
+          "id": "07EcmJpfAday8xGkslfanE",
+          "trackId": "0WyO63CxKjKsTBMlTsb4CP",
+          "label": "Kevin Abstract",
+          "detail": "multi-year #42",
+          "value": 9,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051744051b00c8958c03e8bf83b05"
+        }
+      ]
+    },
+    {
+      "id": "artists-back",
+      "title": "Artists back this month",
+      "calculated": "Artists in both your multi-year and 4-week top 50, missing from the 6-month list. Highest current 4-week rank first.",
+      "means": "An artist you used to play for years is in this month again, after a gap in the half-year list.",
+      "bar": "Current 4-week rank. Higher rank, longer bar.",
+      "source": "Top artists (all three windows)",
+      "items": [
+        {
+          "id": "6aaMZ3fcfLv4tEbmY7bjRM",
+          "label": "Isaiah Rashad",
+          "detail": "4-week #11 · long, skipped 6 months",
+          "value": 40,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174a43828f266967887561166c3"
+        },
+        {
+          "id": "7EEefVBNBS3ckwouEl62oB",
+          "label": "Lunar Vacation",
+          "detail": "4-week #12 · long, skipped 6 months",
+          "value": 39,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174fbf3ca06565e0a33447315f5"
+        },
+        {
+          "id": "7gW0r5CkdEUMm42w9XpyZO",
+          "label": "Laufey",
+          "detail": "4-week #13 · long, skipped 6 months",
+          "value": 38,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174c751deb23ed62e7cadfb669a"
+        },
+        {
+          "id": "0Y6dVaC9DZtPNH4591M42W",
+          "label": "TV Girl",
+          "detail": "4-week #17 · long, skipped 6 months",
+          "value": 34,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174d80695211689a9c8c3fee3b0"
+        },
+        {
+          "id": "5Bw9kFNhy019e4IBCJZlzw",
+          "label": "Jordana",
+          "detail": "4-week #22 · long, skipped 6 months",
+          "value": 29,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174856b7f7308eff9c24c17cb88"
+        }
+      ]
+    },
+    {
+      "id": "month-only-tracks",
+      "title": "This month only",
+      "calculated": "Songs in your 4-week top 50 that are absent from both the 6-month and multi-year top 50s. Highest 4-week rank first.",
+      "means": "Temporary flings — loud this month, nowhere in the longer windows.",
+      "bar": "Current 4-week rank. Higher rank, longer bar.",
+      "source": "Top tracks (all three windows)",
+      "headline": "34 of 50 four-week tops are brand new",
+      "items": [
+        {
+          "id": "6nnjjgVbWSEFHZ5zRSs97Z",
+          "trackId": "6nnjjgVbWSEFHZ5zRSs97Z",
+          "label": "If This Is Just a Game",
+          "sublabel": "Emily Nenni",
+          "detail": "4-week #7 · not in longer windows",
+          "value": 44,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02115dfb02f9d75659c902d41e"
+        },
+        {
+          "id": "2B0X9xBipwCRCxZNXjd2dG",
+          "trackId": "2B0X9xBipwCRCxZNXjd2dG",
+          "label": "Laughter In The Rain - 1977",
+          "sublabel": "Neil Sedaka",
+          "detail": "4-week #9 · not in longer windows",
+          "value": 42,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02bda72bd4a0edc825483bf05a"
+        },
+        {
+          "id": "3OoEy74Z2neKejptWR4RIy",
+          "trackId": "3OoEy74Z2neKejptWR4RIy",
+          "label": "favorite place",
+          "sublabel": "strongboi",
+          "detail": "4-week #10 · not in longer windows",
+          "value": 41,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02d28f8f3062c2c570681270be"
+        },
+        {
+          "id": "7yrJnekdlwWARt5lmVqJ6L",
+          "trackId": "7yrJnekdlwWARt5lmVqJ6L",
+          "label": "Burn Out",
+          "sublabel": "Midland",
+          "detail": "4-week #11 · not in longer windows",
+          "value": 40,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0208c3459da0ec44b7e790555d"
+        },
+        {
+          "id": "6DW27qxq1wwOXnUidkp383",
+          "trackId": "6DW27qxq1wwOXnUidkp383",
+          "label": "In My Own Way",
+          "sublabel": "Asher Kartman",
+          "detail": "4-week #12 · not in longer windows",
+          "value": 39,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0216d31acdbf14f8ce98366ce6"
+        }
+      ]
+    },
+    {
+      "id": "month-only-artists",
+      "title": "Artists new this month",
+      "calculated": "Artists in your 4-week top 50 who are absent from both the 6-month and multi-year top artists. Highest 4-week rank first.",
+      "means": "People you just started (or restarted hard) — not on the half-year or years-long lists.",
+      "bar": "Current 4-week rank. Higher rank, longer bar.",
+      "source": "Top artists (all three windows)",
+      "headline": "9 artists are new to your four-week list",
+      "items": [
+        {
+          "id": "4MoAOfV4ROWofLG3a3hhBN",
+          "trackId": "15npbUjCgwt2lRvyrJvyxw",
+          "label": "Jon Pardi",
+          "detail": "4-week #19 · not in longer windows",
+          "value": 32,
+          "imageUrl": "https://i.scdn.co/image/ab676161000051745f47b9b3519a7f3bae080731"
+        },
+        {
+          "id": "3oVcF3VdpMuvMvLLyHPT4t",
+          "trackId": "0ewKJ6eM0Z761OissISTW7",
+          "label": "Sierra Ferrell",
+          "detail": "4-week #20 · not in longer windows",
+          "value": 31,
+          "imageUrl": "https://i.scdn.co/image/ab67616100005174871c90e9904cac69a6c31697"
+        },
+        {
+          "id": "7FxWYu9zvV1JyedVjsK4HO",
+          "trackId": "6vfldKwjUc0vvoqdHgadwI",
+          "label": "韓寶儀",
+          "detail": "4-week #29 · not in longer windows",
+          "value": 22,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e020ed4cfa166ac03ce8d96b216"
+        },
+        {
+          "id": "7JPPLV24jlpVoHz5dHN6pR",
+          "label": "Dreamgirl",
+          "detail": "4-week #30 · not in longer windows",
+          "value": 21,
+          "imageUrl": "https://i.scdn.co/image/ab6761610000517478bbd6f29ba53d42ee70fed4"
+        },
+        {
+          "id": "1OMhQkdn6Ja8e2Nyj6nB88",
+          "label": "江玲",
+          "detail": "4-week #32 · not in longer windows",
+          "value": 19,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0211cb3502f3443cc980dff623"
+        }
+      ]
+    },
+    {
+      "id": "one-save-artists",
+      "title": "One-save shelf",
+      "calculated": "Artists with exactly one track in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest like first.",
+      "means": "A single heart, no rotation — the almosts you never followed up. Longest-sitting yeses lead.",
+      "bar": "Days since that one like. Older = longer bar.",
+      "source": "Liked Songs + top artists (4 weeks and 6 months)",
+      "headline": "127 artists with a single like and no current top slot",
+      "items": [
+        {
+          "id": "6iPag3KNgZKw56EnjCzcv4",
+          "trackId": "3aSZtHTS5f194x1VKAjoQv",
+          "label": "Empty Chair",
+          "detail": "Indigo · 622d ago",
+          "value": 622,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e025e718161fecafc2259e83a28",
+          "sublabel": "Indigo"
+        },
+        {
+          "id": "48UczULz1QAoYIE1bsYWgM",
+          "trackId": "2G4z1KRQ0g6ndWr40zudDM",
+          "label": "Runner",
+          "detail": "Mind Shrine · 621d ago",
+          "value": 621,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02ecb3b2a05dd8da34570d628b",
+          "sublabel": "Mind Shrine"
+        },
+        {
+          "id": "1JspXUvEv3D9ddMeLNqYWj",
+          "trackId": "0DZsd4wiKDwHChBuNFie7w",
+          "label": "breaking news",
+          "detail": "flowerovlove · 613d ago",
+          "value": 613,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e026e6b7a53b0de865a0498b52e",
+          "sublabel": "flowerovlove"
+        },
+        {
+          "id": "0jtiZkDcuWRf647co8id50",
+          "trackId": "4rYUOu5vQ8pjBCYZL24Gfx",
+          "label": "still love you (todavía)",
+          "detail": "The Two Lips · 609d ago",
+          "value": 609,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0264d1be1a04b30d4251c8dbfb",
+          "sublabel": "The Two Lips"
+        },
+        {
+          "id": "2XBiI8PjCnjJ3XKWtiKcvc",
+          "trackId": "2GcypFJcULDmhmbqFdm9qi",
+          "label": "do me right",
+          "detail": "brb. · 604d ago",
+          "value": 604,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02220f9e0b657e5f00402760e7",
+          "sublabel": "brb."
+        }
+      ]
+    },
+    {
+      "id": "two-save-artists",
+      "title": "Two-save almosts",
+      "calculated": "Artists with exactly two tracks in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest of the two likes first.",
+      "means": "One more heart than a one-save — still no rotation. The almost-almosts.",
+      "bar": "Days since the older of the two likes. Older = longer bar.",
+      "source": "Liked Songs + top artists (4 weeks and 6 months)",
+      "headline": "5 artists with exactly two likes and no current top slot",
+      "items": [
+        {
+          "id": "2AWfnWrfFVhRPVX4JN9a6g",
+          "trackId": "4hCdrbscKtHN0nUPYyue5W",
+          "label": "Mamalarky",
+          "detail": "2 likes · e.g. Nothing Lasts Forever · oldest 622d ago",
+          "value": 622,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e024de809afe504bb3f547cde33"
+        },
+        {
+          "id": "1DN9Pgv4fiAaRSSgiisj5G",
+          "trackId": "1IHF4g6n8t4N7OoKQ3ElKk",
+          "label": "FELIX!",
+          "detail": "2 likes · e.g. TECH TECH TECH · oldest 422d ago",
+          "value": 422,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0210d3f28c5d2add17e23dd35b"
+        },
+        {
+          "id": "2Au9zIICTEr0oeV1iQrJ6X",
+          "trackId": "1IHF4g6n8t4N7OoKQ3ElKk",
+          "label": "HiTech",
+          "detail": "2 likes · e.g. TECH TECH TECH · oldest 422d ago",
+          "value": 422,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0210d3f28c5d2add17e23dd35b"
+        },
+        {
+          "id": "2FXC3k01G6Gw61bmprjgqS",
+          "trackId": "4JpazKcfOhbwqZrsYhzHee",
+          "label": "Hozier",
+          "detail": "2 likes · e.g. Jackie and Wilson · oldest 365d ago",
+          "value": 365,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02bd5c6f1a9461fc68c5dc1623"
+        },
+        {
+          "id": "790FomKkXshlbRYZFtlgla",
+          "trackId": "64zQbQTwu4ppBEfWyhst9t",
+          "label": "KAROL G",
+          "detail": "2 likes · e.g. Papasito · oldest 327d ago",
+          "value": 327,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e026c0294796e2ee5cf87a47b5f"
+        }
+      ]
+    },
+    {
+      "id": "recent-never-topped",
+      "title": "Liked recently, never topped",
+      "calculated": "Fetched likes from the last 90 days that do not appear in any of your 4-week, 6-month, or multi-year top 50s. Newest like first.",
+      "means": "Impulse shelf — you hearted it this season and it never became rotation.",
+      "bar": "Recency (newer = longer). Days since like inverted among this set.",
+      "source": "Liked Songs + top tracks (all three windows)",
+      "headline": "3 recent likes never made a top 50",
+      "items": [
+        {
+          "id": "7F97HrYZGmASwLp9mDk7Fr",
+          "trackId": "7F97HrYZGmASwLp9mDk7Fr",
+          "label": "Keep a Secret",
+          "sublabel": "Cape Weather",
+          "detail": "liked 23d ago · never topped",
+          "value": 5,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0203671fc1e1605811e0656d99"
+        },
+        {
+          "id": "7kWWuhfyBBX3vl38ZHXDzq",
+          "trackId": "7kWWuhfyBBX3vl38ZHXDzq",
+          "label": "Impressions of You",
+          "sublabel": "The Virgins",
+          "detail": "liked 44d ago · never topped",
+          "value": 4,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02bdd6489726b9279ed6dbb469"
+        },
+        {
+          "id": "37ZgsOy8t4vMnGtMExr6ah",
+          "trackId": "37ZgsOy8t4vMnGtMExr6ah",
+          "label": "Threat of Joy",
+          "sublabel": "The Strokes",
+          "detail": "liked 61d ago · never topped",
+          "value": 3,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e028509ba1ecd34e1d5410b9a22"
+        }
+      ]
+    },
+    {
+      "id": "rank-freefall",
+      "title": "Rank freefall",
+      "calculated": "Songs that were in the top 10 of your 6-month list and are absent from your 4-week top 50. Highest former rank first.",
+      "means": "Not a soft fade — a hard drop from the half-year podium.",
+      "bar": "Former 6-month rank. #1 fall is the longest bar.",
+      "source": "Top tracks (6 months and 4 weeks)",
+      "headline": "7 of your half-year top 10 fell out this month",
+      "items": [
+        {
+          "id": "4MLBqAEzNN89o2M9h92Z26",
+          "trackId": "4MLBqAEzNN89o2M9h92Z26",
+          "label": "Get Back - Remastered 2009",
+          "sublabel": "The Beatles",
+          "detail": "was 6-month #2 · also multi-year",
+          "value": 9,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0284243a01af3c77b56fe01ab1"
+        },
+        {
+          "id": "1mZqWlT1Yh3N3efw7TkUJB",
+          "trackId": "1mZqWlT1Yh3N3efw7TkUJB",
+          "label": "Wdik",
+          "sublabel": "PLAYROOM",
+          "detail": "was 6-month #4 · also multi-year",
+          "value": 7,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02fee5651a8cbb275449db9938"
+        },
+        {
+          "id": "1RgY5cNoUapZDlI7VmjinV",
+          "trackId": "1RgY5cNoUapZDlI7VmjinV",
+          "label": "Fly Me To Mars",
+          "sublabel": "okaywill",
+          "detail": "was 6-month #5",
+          "value": 6,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02702157ccecc64e101759d857"
+        },
+        {
+          "id": "2nxsLJwW4eFDwl36fUQJWe",
+          "trackId": "2nxsLJwW4eFDwl36fUQJWe",
+          "label": "Going to Babble On",
+          "sublabel": "The Strokes",
+          "detail": "was 6-month #6",
+          "value": 5,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e026b458d1409d938dad4e3ba2c"
+        },
+        {
+          "id": "6GsP3uMCd0Dn5T37C93waZ",
+          "trackId": "6GsP3uMCd0Dn5T37C93waZ",
+          "label": "Sick Love",
+          "sublabel": "Red Hot Chili Peppers",
+          "detail": "was 6-month #7",
+          "value": 4,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0258406b3f1ac3ceaff7a64fef"
+        }
+      ]
+    },
+    {
+      "id": "quiet-rematch",
+      "title": "Quiet rematch",
+      "calculated": "Liked Songs older than a year that are back in your 4-week top 50, but are not in the multi-year top 50. Sorted by current 4-week rank.",
+      "means": "A random old save woke up — not a years-long staple returning, just a quiet rematch.",
+      "bar": "Current 4-week rank. Higher rank, longer bar.",
+      "source": "Liked Songs + top tracks (4 weeks and several years)",
+      "headline": "2 old likes rematched without being multi-year staples",
+      "items": [
+        {
+          "id": "4rYUOu5vQ8pjBCYZL24Gfx",
+          "trackId": "4rYUOu5vQ8pjBCYZL24Gfx",
+          "label": "still love you (todavía)",
+          "sublabel": "The Two Lips",
+          "detail": "4-week #14 · liked 2y ago",
+          "value": 37,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e0264d1be1a04b30d4251c8dbfb"
+        },
+        {
+          "id": "4t46soaqA758rbukTO5pp1",
+          "trackId": "4t46soaqA758rbukTO5pp1",
+          "label": "Mi Bello Angel",
+          "sublabel": "Natanael Cano",
+          "detail": "4-week #32 · liked 1y ago",
+          "value": 19,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02066c67e297dd388e5b25bc3a"
+        }
+      ]
+    },
+    {
+      "id": "deep-cut-saves",
+      "title": "Deep-cut saves",
+      "calculated": "Fetched likes that never appear in any top-track window, from artists who do appear in at least one of your top-artist windows. Oldest like first.",
+      "means": "You play them — you just hearted the B-side and left it on the shelf.",
+      "bar": "Days since you liked the deep cut. Older = longer bar.",
+      "source": "Liked Songs + top tracks + top artists (all windows)",
+      "headline": "68 deep cuts saved from artists you still rank",
+      "items": [
+        {
+          "id": "3iumIu1ZrzJV3E1q2wBvbJ",
+          "trackId": "3iumIu1ZrzJV3E1q2wBvbJ",
+          "label": "A Cruel Affair",
+          "sublabel": "beabadoobee",
+          "detail": "liked 621d ago · beabadoobee still tops",
+          "value": 621,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e027d9a2e7835a178df7b0153aa"
+        },
+        {
+          "id": "7I1kle4TNmkfednJDKo8GR",
+          "trackId": "7I1kle4TNmkfednJDKo8GR",
+          "label": "If You Want To",
+          "sublabel": "beabadoobee",
+          "detail": "liked 620d ago · beabadoobee still tops",
+          "value": 620,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02fe11583497b2a332995b88ed"
+        },
+        {
+          "id": "3CgZCQyuyxHRMWB9BTwmni",
+          "trackId": "3CgZCQyuyxHRMWB9BTwmni",
+          "label": "Swim Good",
+          "sublabel": "Frank Ocean",
+          "detail": "liked 620d ago · Frank Ocean still tops",
+          "value": 620,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02ebbff7725d3ce0739be01787"
+        },
+        {
+          "id": "5hFmHbLjYIVkbPrYsQgn6X",
+          "trackId": "5hFmHbLjYIVkbPrYsQgn6X",
+          "label": "Blissing",
+          "sublabel": "MICHELLE",
+          "detail": "liked 618d ago · MICHELLE still tops",
+          "value": 618,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02dea1ed10665ed067358940a7"
+        },
+        {
+          "id": "0Z9TabbOQDOZuWSUOwZ9cI",
+          "trackId": "0Z9TabbOQDOZuWSUOwZ9cI",
+          "label": "Cathy",
+          "sublabel": "MICHELLE",
+          "detail": "liked 618d ago · MICHELLE still tops",
+          "value": 618,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02dea1ed10665ed067358940a7"
+        }
+      ]
+    },
+    {
+      "id": "mainstream-ghosts",
+      "title": "Mainstream ghosts",
+      "calculated": "Songs from “Left the long run” re-sorted by Spotify popularity (0–100), highest first. Same membership: multi-year top, out of both shorter windows.",
+      "means": "Hits you used to live with that the rest of the world still knows — and you stopped ranking.",
+      "bar": "Spotify popularity score. More popular = longer bar.",
+      "source": "Top tracks (several years, 6 months, and 4 weeks) + popularity",
+      "headline": "Highest-popularity ghost: 0/100",
+      "items": [
+        {
+          "id": "2Nh2cMryoXl7BrZoIeN2Pr",
+          "trackId": "2Nh2cMryoXl7BrZoIeN2Pr",
+          "label": "Dapper (feat. Anderson .Paak)",
+          "sublabel": "Domo Genesis, Anderson .Paak",
+          "detail": "popularity 0 · was multi-year #3",
+          "value": 0,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02085d6629aaaf7baa283d5c7d"
+        },
+        {
+          "id": "6YVajR33kCWLhWpMVD8AGD",
+          "trackId": "6YVajR33kCWLhWpMVD8AGD",
+          "label": "Calling After Me",
+          "sublabel": "Wallows",
+          "detail": "popularity 0 · was multi-year #4",
+          "value": 0,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02cf1b6ce3048a47eb8aeff03d"
+        },
+        {
+          "id": "6P0bG1wDbLvs8kNJV4hQUt",
+          "trackId": "6P0bG1wDbLvs8kNJV4hQUt",
+          "label": "My Baby (Got Nothing At All) (Materialists Original Soundtrack)",
+          "sublabel": "Japanese Breakfast",
+          "detail": "popularity 0 · was multi-year #5",
+          "value": 0,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02f64b3969a018b15d2a37cab9"
+        },
+        {
+          "id": "16gJmoOqRt2lKmlXtDpWgH",
+          "trackId": "16gJmoOqRt2lKmlXtDpWgH",
+          "label": "Cariño",
+          "sublabel": "The Marías",
+          "detail": "popularity 0 · was multi-year #6",
+          "value": 0,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e027fd42afaffee501a5872592d"
+        },
+        {
+          "id": "6bqB7idfAnJVisSMQA1mZQ",
+          "trackId": "6bqB7idfAnJVisSMQA1mZQ",
+          "label": "I'd Like To Walk Around In Your Mind",
+          "sublabel": "Vashti Bunyan",
+          "detail": "popularity 0 · was multi-year #8",
+          "value": 0,
+          "imageUrl": "https://i.scdn.co/image/ab67616d00001e02aa75bc2cbc0003e7ef6add7a"
+        }
+      ]
+    },
+    {
+      "id": "genres-cooled",
+      "title": "Genres that cooled",
+      "calculated": "Genres tagged on your 6-month top artists that do not appear on any 4-week top artist. Most medium-window artist tags first.",
+      "means": "Sounds that were in the half-year mix and dropped out of this month’s artist list.",
+      "bar": "How many 6-month top artists carried that genre. More artists = longer bar.",
+      "source": "Top artists (6 months and 4 weeks) · Spotify genre tags",
+      "headline": "No genres dropped between the half-year and four-week artist lists",
+      "items": []
+    }
+  ]
+}

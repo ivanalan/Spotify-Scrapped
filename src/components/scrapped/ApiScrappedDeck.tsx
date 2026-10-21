@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useReducedMotion } from "motion/react";
 import {
   useCallback,
@@ -14,6 +15,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
+  arrowBackOutline,
   heart,
   pauseOutline,
   playOutline,
@@ -28,11 +30,12 @@ import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
 import { WrappedStorySlide } from "@/components/scrapped/wrapped/WrappedStorySlide";
 import { useStoryAutoplay } from "@/components/scrapped/wrapped/useStoryAutoplay";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
+import { cn } from "@/lib/utils";
 import {
   SHARE_FINALE_DENSITY as D,
   SLIDE_ART_PATTERN,
@@ -82,6 +85,13 @@ type Props = {
    * Parent wires DeckSoundtrack external pause/resume into these controls.
    */
   pauseApiRef?: MutableRefObject<ApiScrappedPauseApi | null>;
+  /**
+   * `walkthrough` — back (left) to About; no sign-out X (D-024).
+   * Default `session` keeps pause / volume / sign-out.
+   */
+  chromeMode?: "session" | "walkthrough";
+  /** Used when `chromeMode="walkthrough"`. */
+  backHref?: string;
 };
 
 export type ApiScrappedPauseApi = {
@@ -95,6 +105,11 @@ const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
 const INTRO_COPY_DELAY_SEC = 0.35;
+/**
+ * Cancel speculative next-act prime after this hold (audio only — no story pause).
+ * Short taps clear the timer on pointerup and keep the hot buffer for cutTo.
+ */
+const PRIME_HOLD_CANCEL_MS = 200;
 
 function cardById(
   report: ScrappedApiReport,
@@ -113,6 +128,8 @@ export function ApiScrappedDeck({
   onPausedChange,
   onSoundtrackUriChange,
   onSoundtrackPrimeTo,
+  chromeMode = "session",
+  backHref = "/about",
   onSoundtrackCancelPrime,
   onSoundtrackCutTo,
   held = false,
@@ -128,6 +145,8 @@ export function ApiScrappedDeck({
   /** Locks active index during programmatic prev/next so IO can't land mid-scroll. */
   const navigatingToRef = useRef<number | null>(null);
   const navClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Cancels speculative prime if the zone press becomes a hold (not a tap). */
+  const primeHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(0);
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
@@ -538,33 +557,55 @@ export function ApiScrappedDeck({
     };
   }, [pauseApiRef]);
 
+  const clearPrimeHoldTimer = useCallback(() => {
+    if (primeHoldTimerRef.current != null) {
+      clearTimeout(primeHoldTimerRef.current);
+      primeHoldTimerRef.current = null;
+    }
+  }, []);
+
   /** Left/right story zones: tap = prev/next. Pause is sticky button / space only. */
   const onZonePointerDown = useCallback(
     (dir: -1 | 1, e: ReactPointerEvent<HTMLButtonElement>) => {
       if (e.button !== 0) return;
       // Don't steal presses meant for chrome / the visible Spotify player.
       if (e.target !== e.currentTarget) return;
+      clearPrimeHoldTimer();
       const next = activeRef.current + dir;
       // Prime early so cutTo can resume hot when the tap commits.
       if (next >= 0 && next <= FINALE_INDEX) {
         primeSoundtrackFor(next);
+        // Long hold: kill the speculative chirp (do not pause the story).
+        primeHoldTimerRef.current = setTimeout(() => {
+          primeHoldTimerRef.current = null;
+          cancelSoundtrackPrime();
+        }, PRIME_HOLD_CANCEL_MS);
       }
     },
-    [primeSoundtrackFor],
+    [primeSoundtrackFor, cancelSoundtrackPrime, clearPrimeHoldTimer],
   );
 
   const onZoneClick = useCallback(
     (dir: -1 | 1) => {
+      clearPrimeHoldTimer();
       const next = activeRef.current + dir;
       if (next < 0 || next > FINALE_INDEX) return;
       goTo(next);
     },
-    [goTo],
+    [goTo, clearPrimeHoldTimer],
   );
 
+  const onZonePointerUp = useCallback(() => {
+    // Tap path: keep the hot prime for the click → cutTo that follows.
+    clearPrimeHoldTimer();
+  }, [clearPrimeHoldTimer]);
+
   const onZonePointerCancel = useCallback(() => {
+    clearPrimeHoldTimer();
     cancelSoundtrackPrime();
-  }, [cancelSoundtrackPrime]);
+  }, [cancelSoundtrackPrime, clearPrimeHoldTimer]);
+
+  useEffect(() => () => clearPrimeHoldTimer(), [clearPrimeHoldTimer]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -595,11 +636,12 @@ export function ApiScrappedDeck({
   useEffect(() => {
     function onVis() {
       if (!document.hidden) return;
+      clearPrimeHoldTimer();
       cancelSoundtrackPrime();
     }
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
-  }, [cancelSoundtrackPrime]);
+  }, [cancelSoundtrackPrime, clearPrimeHoldTimer]);
 
   const soundtrackUri = getApiSlideSoundtrackUri(
     report,
@@ -764,9 +806,23 @@ export function ApiScrappedDeck({
         </div>
 
         <div className="pointer-events-none mt-3 flex items-center justify-between">
-          <p className="font-sans text-sm font-semibold italic tracking-tight text-[var(--wrapped-ink)]">
-            Scrapped
-          </p>
+          <div className="pointer-events-auto flex items-center gap-1.5">
+            {chromeMode === "walkthrough" ? (
+              <Link
+                href={backHref}
+                aria-label="Back to About"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "icon" }),
+                  "size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90",
+                )}
+              >
+                <Icon icon={arrowBackOutline} className="size-4" />
+              </Link>
+            ) : null}
+            <p className="font-sans text-sm font-semibold italic tracking-tight text-[var(--wrapped-ink)]">
+              Scrapped
+            </p>
+          </div>
           <div className="pointer-events-auto flex items-center gap-1.5">
             <Button
               type="button"
@@ -798,7 +854,7 @@ export function ApiScrappedDeck({
                 className="size-4"
               />
             </Button>
-            <SignOutConfirmButton />
+            {chromeMode === "session" ? <SignOutConfirmButton /> : null}
           </div>
         </div>
       </div>
@@ -1257,6 +1313,7 @@ export function ApiScrappedDeck({
       {/*
         Stories-style tap zones above slide copy (z-10) and list beats (z-35).
         Tap → prev/next (including over list rows). Pause is sticky button / space.
+        Long press cancels speculative soundtrack prime only (no hold-pause).
         Chrome stays higher (z-40) so pause / mute / sign-out still win.
         Finale: leave bottom clear so Share / Replay receive taps.
       */}
@@ -1265,6 +1322,7 @@ export function ApiScrappedDeck({
         tabIndex={-1}
         aria-label="Previous slide"
         onPointerDown={(e) => onZonePointerDown(-1, e)}
+        onPointerUp={onZonePointerUp}
         onClick={() => onZoneClick(-1)}
         onPointerCancel={onZonePointerCancel}
         className={
@@ -1278,6 +1336,7 @@ export function ApiScrappedDeck({
         tabIndex={-1}
         aria-label="Next slide"
         onPointerDown={(e) => onZonePointerDown(1, e)}
+        onPointerUp={onZonePointerUp}
         onClick={() => onZoneClick(1)}
         onPointerCancel={onZonePointerCancel}
         className={

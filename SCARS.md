@@ -48,6 +48,14 @@ Format:
 - **Avoid:** Never put beat `align` / `text-center` on the slide section. Own `text-left` / `text-center` on `BeatBody` from that beat’s `align` so exits keep their alignment.
 - **Related:** `WrappedStorySlide.tsx`, single-cover beats in `ApiScrappedDeck.tsx`
 
+## 1 like artist text flies up a ton when fading into the list
+
+- **Not:** `STORY_MOTION.exitY` (-8px) itself, or the heart’s exit drift.
+- **Cause:** Clearing copy under the 4A heart used section padding `pt-[min(40vh,20rem)]` only while `!isListBeat`. On Meet → list, `current` flips to the list beat immediately, so the section snapped to `py-24` while `AnimatePresence` was still exiting Meet copy — flex `justify-center` recentered that outgoing text high in the viewport on top of the small exit rise.
+- **Proof:** “Meet your 1 like artists” shot upward then faded; shared exit should only nudge ~8px. Started when nest padding was gated on `!isListBeat`.
+- **Avoid:** Keep nest top padding for the whole `one-like-nest` field. Do not flip section padding from the incoming beat. List BeatBody is absolute `pinTop`, so nest padding does not layout the list.
+- **Related:** scar above (section-level beat chrome mid-exit), `WrappedStorySlide.tsx`
+
 ## Invisible API player still blocks the list on mobile
 
 - **Not:** List `bottom-24` padding alone, or `showPlayer={false}` failing to hide chrome.
@@ -141,6 +149,13 @@ Format:
 - **Proof:** Hold pause felt unreliable; users wanted pause only via the chrome button.
 - **Avoid:** Do not reintroduce zone press-hold pause. Pause is sticky button / space (and media-key API) only; zones tap to navigate.
 
+## Hold on story screen plays the next song under the current one
+
+- **Not:** Sticky pause failing, or intentional act-switch overlap cutover on a committed tap.
+- **Cause:** Zone `pointerdown` still speculative-`primeTo`s the next URI (`play()` while the current act stays solo). After hold-pause was removed, long presses no longer `cancelPrime`, and prime finish depended mainly on `playback_started` with no fallback — so an unfinished prime kept the next embed audible for the whole hold.
+- **Proof:** Press-and-hold on the right/left story tap zone (not pause chrome) layered the next slide’s sample under the current track.
+- **Avoid:** Cancel speculative prime after a short hold (`PRIME_HOLD_CANCEL_MS`) without pausing the story; finish primes from `playback_update` + a prime finish fallback timer. Do not restore zone hold-pause.
+
 ## Desktop #1 artist slide looks like a mobile-cropped background
 
 - **Not:** `ProductMain` max-width, missing `w-screen`, or the slide canvas failing to paint edge-to-edge.
@@ -171,7 +186,7 @@ Format:
 - **Cause:** Dev Mode rejects users not on the Dashboard allowlist; Spotify’s token endpoint often returns **plain text** (`The user is not registered…`). `tokenRequest` called `response.json()`, threw `Unexpected token 'T'…`, and callback stuffed that into `?spotify_error=`. The home page never read the query param, so the gate still showed **Sign in**; with `show_dialog: false` each click bounced Spotify → error URL again.
 - **Proof:** `myscrapped.com/?spotify_error=Unexpected+token+%27T%27…` for accounts not among the 5 Dev Mode users.
 - **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; surface `spotify_error` on `ScrappedGate` as calm copy.
-- **Related:** [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md), `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`
+- **Related:** `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`
 
 ## Grass grows from the horizontal centerline / scales both directions
 

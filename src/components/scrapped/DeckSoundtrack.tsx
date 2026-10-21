@@ -116,6 +116,11 @@ const URI_SWITCH_DEBOUNCE_MS = 140;
  * don't leave two embeds running.
  */
 const CUTOVER_FALLBACK_MS = 450;
+/**
+ * Speculative primeTo play() must pause once audible. If Spotify never emits
+ * playback_started / a usable update, force-finish so the current act stays solo.
+ */
+const PRIME_FINISH_FALLBACK_MS = 450;
 
 type IFrameAPI = {
   createController: (
@@ -317,6 +322,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
      * Does not cut the current act — cancelled presses won't steal the soundtrack.
      */
     const primingUriRef = useRef<string | null>(null);
+    /** Forces tryFinishPrime if Spotify never reports audible for a prime. */
+    const primeFinishTimerRef = useRef<number | null>(null);
     /** URI that played briefly and is paused near START_AT_SEC for instant resume. */
     const hotPrimedUriRef = useRef<string | null>(null);
     /** Twin is paused near START_AT_SEC for instant loop resume. */
@@ -370,6 +377,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       if (cutoverTimerRef.current != null) {
         window.clearTimeout(cutoverTimerRef.current);
         cutoverTimerRef.current = null;
+      }
+    }
+
+    function clearPrimeFinishTimer() {
+      if (primeFinishTimerRef.current != null) {
+        window.clearTimeout(primeFinishTimerRef.current);
+        primeFinishTimerRef.current = null;
       }
     }
 
@@ -566,7 +580,12 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return false;
       }
       const entry = poolRef.current.get(trackUri);
-      if (!entry) return true;
+      if (!entry) {
+        clearPrimeFinishTimer();
+        primingUriRef.current = null;
+        return true;
+      }
+      clearPrimeFinishTimer();
       entry.controller.pause();
       // Re-park at the hook so resume() doesn't continue mid-phrase from the chirp.
       entry.controller.seek(START_AT_SEC);
@@ -576,6 +595,16 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       hotPrimedUriRef.current = trackUri;
       if (incomingUriRef.current === trackUri) incomingUriRef.current = null;
       return true;
+    }
+
+    /** If Spotify never reports audible for a prime, force-pause so acts don't overlap. */
+    function schedulePrimeFinishFallback(trackUri: string) {
+      clearPrimeFinishTimer();
+      primeFinishTimerRef.current = window.setTimeout(() => {
+        primeFinishTimerRef.current = null;
+        if (primingUriRef.current !== trackUri) return;
+        tryFinishPrime(trackUri);
+      }, PRIME_FINISH_FALLBACK_MS);
     }
 
     /** Finish same-URI A/B loop cutover when the idle slot is audible. */
@@ -636,6 +665,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         // unless this is a fresh act-switch incoming.
         if (incomingUriRef.current === trackUri) {
           incomingUriRef.current = null;
+          clearPrimeFinishTimer();
           primingUriRef.current = null;
           playingSlotRef.current = "act";
           incomingLoopSlotRef.current = null;
@@ -646,6 +676,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           setVisibleUri(trackUri);
         } else {
           incomingUriRef.current = null;
+          clearPrimeFinishTimer();
           primingUriRef.current = null;
           clearCutoverTimer();
         }
@@ -654,6 +685,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       }
       clearCutoverTimer();
       incomingUriRef.current = null;
+      clearPrimeFinishTimer();
       primingUriRef.current = null;
       hotPrimedUriRef.current =
         hotPrimedUriRef.current === trackUri ? null : hotPrimedUriRef.current;
@@ -922,6 +954,9 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             }
           } else if (incomingLoopSlotRef.current === "act") {
             tryLoopCutover(trackUri, "act");
+          } else if (primingUriRef.current === trackUri) {
+            // Finish speculative primes here too — don't wait only on playback_started.
+            tryFinishPrime(trackUri);
           } else if (incomingUriRef.current === trackUri) {
             tryCutover(trackUri);
           }
@@ -1092,6 +1127,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
         const prevPrime = primingUriRef.current;
         if (prevPrime && prevPrime !== target) {
+          clearPrimeFinishTimer();
           poolRef.current.get(prevPrime)?.controller.pause();
         }
 
@@ -1102,8 +1138,10 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         primingUriRef.current = target;
         entry.host.className = HOST_WARM;
         entry.controller.play();
+        schedulePrimeFinishFallback(target);
       },
       cancelPrime() {
+        clearPrimeFinishTimer();
         const targets = new Set<string>();
         if (primingUriRef.current) targets.add(primingUriRef.current);
         if (
@@ -1168,6 +1206,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           clearLoopCutoverTimer();
 
           if (hotPrimedUriRef.current === target) {
+            clearPrimeFinishTimer();
             primingUriRef.current = null;
             hotPrimedUriRef.current = null;
             const entry = poolRef.current.get(target);
@@ -1187,12 +1226,14 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           }
 
           if (primingUriRef.current === target) {
+            clearPrimeFinishTimer();
             primingUriRef.current = null;
             incomingUriRef.current = target;
             runSync(target, true);
             return;
           }
 
+          clearPrimeFinishTimer();
           primingUriRef.current = null;
           runSync(target, true);
 
@@ -1450,6 +1491,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           return;
         }
 
+        clearPrimeFinishTimer();
         primingUriRef.current = null;
         hotPrimedUriRef.current = null;
         runSync(uri, false);
@@ -1541,6 +1583,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       clearSwitchTimer();
       clearEnforceTimers();
       clearCutoverTimer();
+      clearPrimeFinishTimer();
       clearLoopCutoverTimer();
       clearAllEndTimers();
       incomingUriRef.current = null;

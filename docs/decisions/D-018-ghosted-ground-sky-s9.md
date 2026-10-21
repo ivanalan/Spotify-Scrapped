@@ -2,8 +2,7 @@
 
 **Status:** Locked  
 **Date:** 2026-10-20  
-**Surfaces:** `/scrapped` API deck scenes 2–3. Fav **S9** on **C8** base.  
-**Tune:** Lab `docs/mocks/explorations/ghosted-pair-field.html` (slow ghost fade · separate star maps · moon/haunt geometry).
+**Surfaces:** `/scrapped` API deck scenes 2–3. Fav **S9** on **C8** base.
 
 ## Decision
 
@@ -51,4 +50,3 @@ Two consecutive ink fields still rely on motif escalation. Cover-TR ghost sits i
 - Grass enter motion: [D-021](D-021-ghosted-grass-rise-from-soil.md) (`SpikyGrass`)
 - Wide: `ScrappedOrbitArt` `WideOrbitChrome`
 - Chrome scrim: `ApiScrappedDeck` when `active === 3`
-- Lab: `docs/mocks/explorations/ghosted-pair-field.html`

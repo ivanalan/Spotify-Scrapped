@@ -6,7 +6,7 @@ Anti-Wrapped for songs that got ghosted.
 2. **Scrapped Plus** (`/scrapped/plus`) — skip story from your Extended Streaming History export
 3. **Scrapped Lab** (`/scrapped/lab`) — live metrics from the Spotify Web API as a searchable list
 
-See [AGENTS.md](AGENTS.md), [docs/DATA.md](docs/DATA.md), [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md), and [docs/WRAPPED.md](docs/WRAPPED.md) (narrative / anti-Wrapped spine).
+See [AGENTS.md](AGENTS.md), [docs/DATA.md](docs/DATA.md), and [docs/WRAPPED.md](docs/WRAPPED.md) (narrative / anti-Wrapped spine).
 
 ## Setup
 
@@ -23,7 +23,7 @@ See [AGENTS.md](AGENTS.md), [docs/DATA.md](docs/DATA.md), [docs/SPOTIFY_API.md](
    npm run ingest
    ```
 
-3. Sign in to Spotify for Scrapped / Scrapped Lab (and Liked join on Scrapped Plus) — copy `.env.example` → `.env.local`, add dashboard credentials, redirect URI `http://127.0.0.1:3000/api/spotify/callback` (not `localhost`), then **Sign in to Spotify** in the nav. Details in [docs/SPOTIFY_API.md](docs/SPOTIFY_API.md).
+3. Sign in to Spotify for Scrapped / Scrapped Lab (and Liked join on Scrapped Plus) — set `AUTH_SECRET`, `AUTH_SPOTIFY_ID`, `AUTH_SPOTIFY_SECRET`, and `AUTH_URL` in `.env.local`. Dashboard redirect URI must be exactly `http://127.0.0.1:3000/api/spotify/callback` (not `localhost`). Then **Sign in to Spotify** in the nav.
 
 4. Run the app:
 
