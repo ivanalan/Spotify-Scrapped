@@ -31,8 +31,8 @@ export function ListFrame({ accent, accent2, animate = "soft" }: MotifProps) {
 }
 
 /**
- * Ghosted songs list (slide 3) — TR moon · S9 stars · enter-then-float ghosts.
- * No grass/clouds (those live on the entity). Locked: D-018 (C8 + S9).
+ * Ghosted songs list (slide 3) — TR moon · enter-then-float ghosts.
+ * No grass/clouds/stars (stars live on the entity). Locked: D-018 (C8).
  * Ghost fade starts on the list beat (“Your ghosted songs”), not scene enter.
  */
 export function GhostedListFrame({
@@ -52,7 +52,6 @@ export function GhostedListFrame({
         accent2={accent2}
         freeze={freeze}
       />
-      <PointGlowStars layout="list" freeze={freeze} />
       <RisingColumnGhosts freeze={freeze} enter={ghostsEnter} />
     </g>
   );
@@ -137,7 +136,7 @@ export function GhostedNightEntity({
 }) {
   return (
     <g>
-      <PointGlowStars layout="entity" freeze={freeze} />
+      <PointGlowStars freeze={freeze} />
       {/* Haunt — same former TR inset, mirrored to cover TL */}
       <BlobGhost
         x={51}
@@ -250,18 +249,15 @@ export function GhostedHardMoon({
   );
 }
 
-/** S9 — 4-point stars; entity + list use distinct slot maps (D-018). */
+/** S9 — 4-point stars on entity night only (D-018). */
 export function PointGlowStars({
-  layout = "entity",
   freeze,
 }: {
-  layout?: "entity" | "list";
   freeze: boolean;
 }) {
-  const pts = layout === "list" ? STAR_SLOTS_LIST : STAR_SLOTS_ENTITY;
   return (
     <g>
-      {pts.map((s, i) => (
+      {STAR_SLOTS_ENTITY.map((s, i) => (
         <PointGlowStar
           key={i}
           cx={s.cx}
@@ -277,8 +273,8 @@ export function PointGlowStars({
 }
 
 /**
- * Star slots must clear ghost AABBs (haunt + list floats) — never spawn under a
- * ghost body (stars paint behind ghosts; a tip peeking through reads as a bug).
+ * Star slots must clear the haunt AABB — never spawn under a ghost body
+ * (stars paint behind ghosts; a tip peeking through reads as a bug).
  * Pad ≈ ghost size/2 + 18 for bob amp. Haunt rest: 51,149 · size 77 (TL).
  */
 /** Story 2 entity night — 5 stars. */
@@ -288,17 +284,6 @@ const STAR_SLOTS_ENTITY = [
   { cx: 248, cy: 220, r: 3.6 },
   { cx: 36, cy: 456, r: 4.1 },
   { cx: 312, cy: 428, r: 4.8 },
-] as const;
-
-/** Story 3 list sky — 7 stars, distinct from entity so the chorus doesn’t echo. */
-const STAR_SLOTS_LIST = [
-  { cx: 28, cy: 220, r: 4.2 },
-  { cx: 118, cy: 96, r: 3.5 },
-  { cx: 198, cy: 178, r: 5.1 },
-  { cx: 68, cy: 380, r: 3.8 },
-  { cx: 330, cy: 300, r: 4.6 },
-  { cx: 250, cy: 448, r: 3.3 },
-  { cx: 160, cy: 300, r: 4.0 },
 ] as const;
 
 const STAR_OP_MIN = 0.11;

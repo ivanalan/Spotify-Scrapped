@@ -458,8 +458,8 @@ export function ApiScrappedDeck({
       ],
       reunionBeats,
       [
-        { headline: "Thanks for sitting with the ghosted." },
-        { headline: "See you when they get ghosted." },
+        { headline: "Thanks for staying." },
+        { headline: "Same time next year?" },
       ],
       [{ headline: "Share" }],
     ];
@@ -1149,12 +1149,12 @@ export function ApiScrappedDeck({
           chrome={orbitChrome(8)}
           beats={[
             {
-              headline: "Thanks for sitting with the ghosted.",
+              headline: "Thanks for staying.",
               align: "center",
               display: "hero",
             },
             {
-              headline: "See you when they get ghosted.",
+              headline: "Same time next year?",
               align: "center",
               display: "hero",
             },

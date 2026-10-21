@@ -144,18 +144,18 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(3).bg,
     ink: card(3).ink,
     ...accents(3),
-    hero: "TR-corner silver→ember moon (no halo) · distinct S9 list stars · 5 fade-float ghosts",
+    hero: "TR-corner silver→ember moon (no halo) · 5 fade-float ghosts (no stars)",
     motion:
-      "Moon grow-in + underglow; stars grow-in with pulse overlap; ghosts fade with float blend",
+      "Moon grow-in + underglow; ghosts fade with float blend",
     composition:
-      "Ink field; no grass/clouds; moon TR-corner + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
+      "Ink field; no grass/clouds/stars; moon TR-corner + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
     why: "Sky chorus after the ground haunt — bright moon with chrome scrim.",
     iterations: [
       "D1 — Two drifting clouds + BL orb (displaced)",
       "D2 — Sky/grass pack (D-010 · displaced)",
       "D3 — Hard-TR moon · S9 · rising ghosts · C8 scrim (displaced)",
       "D4 — TR-inset moon · 5 enter-float ghosts · quiet stars (displaced)",
-      "D5 — TR-corner moon · distinct list stars · slow fade ghosts (current · D-018)",
+      "D5 — TR-corner moon · no stars · slow fade ghosts (current · D-018)",
     ],
   },
   {

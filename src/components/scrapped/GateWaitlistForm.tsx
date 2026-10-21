@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const HELPER_DEFAULT = "Enter the email you use for Spotify";
+const HELPER_DEFAULT =
+  "There’s a waitlist — enter the email you use for Spotify";
 const HELPER_SUCCESS =
   "You’re signed up for the waitlist! You’ll get an email with a link when it’s ready.";
 const HELPER_EMPTY = "Enter an email to join the waitlist";
