@@ -15,6 +15,7 @@ import {
 } from "./IntroSchemeBrainstorm";
 import { OrbitCascadeArt } from "./OrbitCascadeArt";
 import { CARD_PALETTE, ORBIT_CASCADE, SLIDE_SPECS } from "./orbitCascade";
+import { OCEAN_FISH_CAP, OCEAN_FISH_SIZE_DEFAULT } from "./ShapeKit";
 import { SlideMock } from "./SlideMocks";
 import type { FunkyShareKind } from "./FunkyShapes";
 
@@ -24,6 +25,9 @@ export function StoryboardLab() {
     useState<FunkyShareKind>("double-stack");
   const [openingTrio, setOpeningTrio] = useState("current");
   const [introSchemeId, setIntroSchemeId] = useState("ink-orchid");
+  const [fishCount, setFishCount] = useState(OCEAN_FISH_CAP);
+  const [fishSizeScale, setFishSizeScale] = useState(OCEAN_FISH_SIZE_DEFAULT);
+  const [fishReplayKey, setFishReplayKey] = useState(0);
   const introScheme = introSchemeById(introSchemeId);
   const baseSpec = SLIDE_SPECS[active] ?? SLIDE_SPECS[0];
   const opening = openingOverrideFor(openingTrio, active);
@@ -233,6 +237,7 @@ export function StoryboardLab() {
       <section className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start">
         <div className="mx-auto w-full max-w-[320px] lg:mx-0">
           <StoryChromeStage
+            key={spec.pattern === "volume" ? fishReplayKey : spec.index}
             chrome={
               <OrbitCascadeArt
                 slideIndex={spec.index}
@@ -240,6 +245,11 @@ export function StoryboardLab() {
                 shareKind={shareKind}
                 funkyPalette={sharePalette}
                 paletteOverride={paletteOverride}
+                tide={spec.pattern === "volume" ? "high" : "low"}
+                fishCount={spec.pattern === "volume" ? fishCount : undefined}
+                fishSizeScale={
+                  spec.pattern === "volume" ? fishSizeScale : undefined
+                }
               />
             }
           >
@@ -266,6 +276,75 @@ export function StoryboardLab() {
               ink {spec.ink}
             </p>
           </div>
+
+          {spec.pattern === "volume" && (
+            <div className="space-y-4 rounded-xl border border-border bg-background/50 p-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  Fish school
+                </p>
+                <Link
+                  href="/scrapped/art/volume/tune"
+                  className="text-xs text-foreground underline-offset-2 hover:underline"
+                >
+                  Full tune lab →
+                </Link>
+              </div>
+              <label className="block space-y-1.5">
+                <div className="flex items-baseline justify-between gap-3 text-xs">
+                  <span className="text-muted-foreground">
+                    Count (cap {OCEAN_FISH_CAP})
+                  </span>
+                  <span className="font-mono tabular-nums text-foreground">
+                    {fishCount}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={OCEAN_FISH_CAP}
+                  step={1}
+                  value={fishCount}
+                  onChange={(e) => {
+                    setFishCount(Number(e.target.value));
+                    setFishReplayKey((k) => k + 1);
+                  }}
+                  className="w-full accent-foreground"
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <div className="flex items-baseline justify-between gap-3 text-xs">
+                  <span className="text-muted-foreground">Size scale</span>
+                  <span className="font-mono tabular-nums text-foreground">
+                    {fishSizeScale.toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0.5}
+                  max={2.5}
+                  step={0.05}
+                  value={fishSizeScale}
+                  onChange={(e) => {
+                    setFishSizeScale(Number(e.target.value));
+                    setFishReplayKey((k) => k + 1);
+                  }}
+                  className="w-full accent-foreground"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setFishCount(OCEAN_FISH_CAP);
+                  setFishSizeScale(OCEAN_FISH_SIZE_DEFAULT);
+                  setFishReplayKey((k) => k + 1);
+                }}
+                className="w-full rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:border-foreground/40"
+              >
+                Reset fish defaults
+              </button>
+            </div>
+          )}
 
           <SpecBlock title="Hero" body={spec.hero} />
           <SpecBlock title="Motion" body={spec.motion} />

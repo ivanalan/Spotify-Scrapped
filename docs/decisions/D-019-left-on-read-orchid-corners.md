@@ -11,7 +11,7 @@ Promote the left-on-read pair tune for scenes 5→6:
 | Axis | Choice |
 |------|--------|
 | Field | Ink canvas + **B1 orchid corners** wash (orchid-deep TL · orchid-ink BR, wash op `0.75`) on both beats |
-| Scene 5 pin | Typing bubble **horizontally centered**, below “Top artist left on read” · `84×43` — `left: calc(50% - half-width)` / `top: calc(50% + 128px)` |
+| Scene 5 pin | Typing bubble **horizontally centered**, below “Top artist left on read” · `100×52` — `left: calc(50% - half-width)` / `top: calc(50% + 168px)`; tail under pill + `drop-shadow` (one silhouette) |
 | Scene 6 frame | Softer / larger edge stack — col scale `0.85` @ op `0.35`, top `8%`; mirror scale `0.9` @ op `0.21`, bottom `11.5%`; skew Y `11°` / Z `-3°` |
 | Quiet→frame | Same geometry (no remount jump — keeps prior SCARS fix) |
 

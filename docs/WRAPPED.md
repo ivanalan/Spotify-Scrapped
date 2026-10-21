@@ -16,13 +16,13 @@ Wrapped trained millions of people on one interaction grammar:
 2. One idea per card  
 3. Hero number / name → short list → optional personality beat → shareable finale  
 
-Scrapped should feel like that same ritual for **what didn’t stick** (skips, almosts, rematches). Smooth narrative = same *beats and pacing*, inverted *metrics and emotional payoff*.
+Scrapped should feel like that same ritual for **what got ghosted** (skips, affinity dips, rematches). Smooth narrative = same *beats and pacing*, inverted *metrics and emotional payoff*.
 
 | Wrapped trains | Scrapped answers |
 |----------------|------------------|
 | Celebration of affinity | Receipt for rejection / revision |
 | Minutes & play counts | Skips, skip rate, finish arcs |
-| “This defined you” | “This almost did — or came back” |
+| “This defined you” | “This got ghosted — or came back” |
 | Share pride | Share honesty (same share-card ritual) |
 
 Scrapped Plus (`history.db` skips) remains source of truth for true skips. Main Scrapped and Scrapped Lab use affinity proxies only — never claim true skips there (see [DATA.md](DATA.md), [SPOTIFY_API.md](SPOTIFY_API.md)).
@@ -114,7 +114,7 @@ Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists l
 Scene 5 (2 beats): “Now the artists” → #1 left-on-read artist
 Scene 6 (2 beats): “Get the gang back together?” → Top left-on-read artists list
 Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
-Scene 8 (2 beats): “Thanks for sitting with the almosts.” → “See you when they don’t stick.”
+Scene 8 (2 beats): “Thanks for sitting with the ghosted.” → “See you when they get ghosted.”
 Scene 9: Share finale (holds; no auto-advance)
 ```
 

@@ -532,7 +532,7 @@ const GRASS_GROW_DUR = 0.85;
 /** Near → mid → far (front grows first; deeper ridges fill in behind). */
 const GRASS_GROW_DELAY = { near: 0.08, mid: 0.34, far: 0.6 } as const;
 /** Rise distance = ground (H) − tallest tip y — fully hidden under the clip. */
-const GRASS_RISE = { far: 76, mid: 58, near: 44 } as const;
+const GRASS_RISE = { far: 98, mid: 70, near: 46 } as const;
 
 function SpikyGrass({
   from,
@@ -625,7 +625,7 @@ function SpikyGrass({
           >
             <path
               fill={`url(#${gFar})`}
-              d={`M0 ${H} L0 88 L22 72 L40 90 L58 68 L78 88 L98 70 L118 86 L140 66 L160 84 L182 68 L204 86 L226 64 L248 84 L270 70 L292 88 L314 72 L336 90 L360 78 L360 ${H} Z`}
+              d={`M0 ${H} L0 70 L28 50 L54 72 L82 46 L110 68 L138 44 L166 66 L196 42 L224 64 L254 42 L282 66 L312 48 L340 68 L360 56 L360 ${H} Z`}
             />
           </motion.g>
         </motion.g>
@@ -645,7 +645,7 @@ function SpikyGrass({
           >
             <path
               fill={`url(#${gNear})`}
-              d={`M0 ${H} L0 102 L16 88 L32 104 L48 84 L66 102 L84 86 L102 104 L120 82 L138 100 L156 88 L174 104 L192 84 L210 102 L228 86 L246 104 L264 88 L282 102 L300 84 L318 100 L338 90 L360 98 L360 ${H} Z`}
+              d={`M0 ${H} L0 96 L24 78 L50 98 L76 70 L102 94 L128 74 L154 96 L182 70 L208 92 L236 74 L262 96 L290 76 L318 92 L348 80 L360 90 L360 ${H} Z`}
             />
           </motion.g>
         </motion.g>
@@ -666,7 +666,7 @@ function SpikyGrass({
             <path
               fill={from}
               opacity={0.85}
-              d={`M-8 ${H} L-8 112 L10 100 L24 114 L40 98 L56 112 L72 96 L88 112 L104 100 L120 114 L138 98 L154 112 L170 100 L186 114 L204 96 L220 110 L238 100 L254 114 L272 98 L288 112 L306 102 L322 114 L340 100 L356 110 L372 104 L372 ${H} Z`}
+              d={`M-8 ${H} L-8 114 L16 100 L38 116 L62 94 L86 112 L110 94 L134 116 L160 94 L184 112 L208 98 L232 116 L258 94 L282 112 L308 98 L332 114 L356 100 L372 108 L372 ${H} Z`}
             />
           </motion.g>
         </motion.g>

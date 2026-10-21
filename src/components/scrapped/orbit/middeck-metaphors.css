@@ -1,6 +1,6 @@
 /**
  * Middeck metaphor chrome — promoted from middeck-metaphor-kits.html (D-016).
- * Fav locks: 4A heart · 5I chat bloom · 7L film stutter · 8B teal iris.
+ * Fav locks: 4A heart · 5I chat bloom · 7L film letterbox · 8B teal iris.
  */
 
 /* ── Palette stops (Orbit Cascade) ── */
@@ -418,11 +418,11 @@
   );
   /* Typing pin — horizontally centered, below cover-lead headline (D-019).
      Art-first stack is justify-center; 50% ± offsets track that mid. */
-  --chat-type-w: 84px;
-  --chat-type-h: 43px;
+  --chat-type-w: 100px;
+  --chat-type-h: 52px;
   --chat-type-x: calc(50% - (var(--chat-type-w) / 2));
-  --chat-type-y: calc(50% + 190px);
-  --chat-type-dot: 8px;
+  --chat-type-y: calc(50% + 168px);
+  --chat-type-dot: 10px;
   /* B1 · Orchid corners wash */
   --chat-field-wash-op: 0.75;
   position: absolute;
@@ -450,33 +450,48 @@
   z-index: 0;
 }
 
-/* Entity — one compact typing bubble (mid clear for artwork) */
+/* Entity — one compact typing bubble (mid clear for artwork).
+   Tail (::before) sits under the pill (::after) so only the tip peeks out. */
 .mm-chat-typing {
   position: absolute;
   left: var(--chat-type-x);
   top: var(--chat-type-y);
   width: var(--chat-type-w);
   height: var(--chat-type-h);
-  border-radius: 22px;
-  background: var(--chat-bloom);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  box-shadow: 0 10px 22px color-mix(in oklab, var(--mm-orchid-deep) 45%, transparent);
+  gap: 7px;
+  /* drop-shadow follows the clipped tail so bubble + tip read as one icon */
+  filter: drop-shadow(
+    0 10px 14px color-mix(in oklab, var(--mm-orchid-deep) 45%, transparent)
+  );
   z-index: 1;
+}
+.mm-chat-typing::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  bottom: -9px;
+  width: 24px;
+  height: 24px;
+  background: var(--chat-bloom);
+  background-size: var(--chat-type-w) var(--chat-type-h);
+  background-position: -14px calc(100% + 9px);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  z-index: 0;
 }
 .mm-chat-typing::after {
   content: "";
   position: absolute;
-  left: 14px;
-  bottom: -7px;
-  width: 12px;
-  height: 12px;
-  background: inherit;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
+  inset: 0;
+  border-radius: 26px;
+  background: var(--chat-bloom);
+  z-index: 1;
 }
 .mm-chat-typing-dot {
+  position: relative;
+  z-index: 2;
   width: var(--chat-type-dot);
   height: var(--chat-type-dot);
   border-radius: 50%;
@@ -596,7 +611,7 @@
 /* D-015 / D-019 — quiet + frame share .mm-chat-col / .mm-chat-mirror vars
    (no mode-specific geometry jump on list enter). */
 
-/* ── 7L · Film letterbox stutter ── */
+/* ── 7L · Film letterbox (smooth sprocket scroll) ── */
 .mm-film {
   --lb-h: 14.5%;
   --lb-top: 0px;
@@ -606,9 +621,10 @@
   --sprocket-gap: 25px;
   --sprocket-pad-x: 10px;
   --sprocket-row: 23px;
-  --stutter-dur: 1.7;
-  --stutter-dur-bot: 1.7;
-  --stutter-steps: 5;
+  --scroll-dur: 6;
+  --scroll-dur-bot: 7.2;
+  --scroll-ease: linear;
+  --scroll-travel: -20%;
   --film-out-dur: 3.2;
   --film-out-bot-delay: 0.12;
   --film-field: var(--mm-mango);
@@ -707,20 +723,20 @@
 }
 
 .mm-film[data-animate="1"] .mm-film-strip.top .mm-film-perfs {
-  animation: mm-perf-stutter calc(var(--stutter-dur) * 1s)
-    steps(var(--stutter-steps)) infinite;
+  animation: mm-perf-scroll calc(var(--scroll-dur) * 1s) var(--scroll-ease)
+    infinite;
 }
 .mm-film[data-animate="1"] .mm-film-strip.bot .mm-film-perfs {
-  animation: mm-perf-stutter calc(var(--stutter-dur-bot) * 1s)
-    steps(var(--stutter-steps)) infinite reverse;
+  animation: mm-perf-scroll calc(var(--scroll-dur-bot) * 1s) var(--scroll-ease)
+    infinite reverse;
 }
 
-@keyframes mm-perf-stutter {
+@keyframes mm-perf-scroll {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(var(--scroll-travel));
   }
 }
 

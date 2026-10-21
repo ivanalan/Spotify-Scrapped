@@ -176,10 +176,10 @@ export function SlideMock({ pattern, slideIndex, ink, muted }: Props) {
           style={{ color: ink }}
         >
           <p className="text-title max-w-[16rem] font-extrabold leading-snug">
-            Thanks for sitting with the almosts.
+            Thanks for sitting with the ghosted.
           </p>
           <p className="text-body mt-4 max-w-[14rem]" style={{ color: muted }}>
-            See you when they don’t stick.
+            See you when they get ghosted.
           </p>
         </div>
       );

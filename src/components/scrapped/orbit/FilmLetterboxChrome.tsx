@@ -20,9 +20,9 @@ function PerfRow() {
 }
 
 /**
- * 7L film letterbox — 14.5% bars present from scene start, inset sprockets,
- * 1.7s / 5-step stutter; long smooth retract when the list / reveal beat enters.
- * Locked: D-016.
+ * 7L film letterbox — bars present from scene start, inset sprockets,
+ * smooth continuous scroll; long retract when list / reveal enters.
+ * Geometry / scroll: D-016 (smooth travel 20%, ~6s / 7.2s linear).
  */
 export function FilmLetterboxChrome({
   mode,
@@ -36,9 +36,11 @@ export function FilmLetterboxChrome({
       : "settled-out"
     : mode;
 
+  // Key on replay only — including `mode` remounted the tree when retract
+  // started and snapped sprocket scroll back to translateX(0).
   return (
     <div
-      key={`film-${mode}-${replayKey}`}
+      key={`film-${replayKey}`}
       className="scrapped-middeck mm-film"
       data-mode={dataMode}
       data-animate={animate}

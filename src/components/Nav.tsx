@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AuthControls } from "@/components/AuthControls";
 
-/** Shown only on Plus/Lab (dev shell). Main Scrapped hides this via ProductNavShell. */
+/** Shown only on Plus/Lab (dev shell). Full-bleed `/` + `/about` hide this via ProductNavShell. */
 export async function Nav() {
   return (
     <header className="border-b border-border">

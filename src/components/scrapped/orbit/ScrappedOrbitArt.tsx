@@ -52,7 +52,7 @@ type Props = {
    */
   tide?: "low" | "high";
   /**
-   * Liked-this-year count for the volume school (1 like = 1 fish, cap 50).
+   * Liked-this-year count for the volume school (1 like = 1 fish, cap 15).
    */
   fishCount?: number;
   /**
@@ -60,6 +60,11 @@ type Props = {
    * Mirrors volume `tide` — art can swap hero ↔ list frame.
    */
   beatPhase?: number;
+  /**
+   * Gate-only intro disk kit (D-022 D6): dim + down/outboard nudge.
+   * Story intro + share keep the default ladder.
+   */
+  introKit?: "default" | "gate-d6";
 };
 
 type ChromeProps = {
@@ -73,26 +78,46 @@ type ChromeProps = {
   tide: "low" | "high";
   fishCount: number;
   beatPhase: number;
+  introKit: "default" | "gate-d6";
 };
 
 /** Intro disks @ viewport TL center; star @ viewport BR center. */
-function IntroCornerChrome({ freeze }: { freeze: boolean }) {
+function IntroCornerChrome({
+  freeze,
+  introKit,
+}: {
+  freeze: boolean;
+  introKit: "default" | "gate-d6";
+}) {
+  const disks = (
+    <MotifCornerOrigin corner="tl" cx={0} cy={0} radius={230} size={0.85}>
+      <ConcentricDisks
+        cx={0}
+        cy={0}
+        count={6}
+        startR={72}
+        step={26}
+        rotate={45}
+        oval={{ sx: 1.08, sy: 0.94 }}
+        colors={[...INTRO_DISK_COLORS]}
+        sharedGradient={INTRO_SHARED_GRADIENT}
+        animate={freeze ? "none" : "cascade-breathe"}
+      />
+    </MotifCornerOrigin>
+  );
+
   return (
     <>
-      <MotifCornerOrigin corner="tl" cx={0} cy={0} radius={230} size={0.85}>
-        <ConcentricDisks
-          cx={0}
-          cy={0}
-          count={6}
-          startR={72}
-          step={26}
-          rotate={45}
-          oval={{ sx: 1.08, sy: 0.94 }}
-          colors={[...INTRO_DISK_COLORS]}
-          sharedGradient={INTRO_SHARED_GRADIENT}
-          animate={freeze ? "none" : "cascade-breathe"}
-        />
-      </MotifCornerOrigin>
+      {introKit === "gate-d6" ? (
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-screen opacity-[0.7]"
+          style={{ transform: "translate(-4%, 14%)" }}
+        >
+          {disks}
+        </div>
+      ) : (
+        disks
+      )}
       <MotifCornerOrigin corner="br" cx={0} cy={0} radius={110} size={1}>
         <PointedStar
           cx={0}
@@ -119,11 +144,12 @@ function PhoneOrbitChrome({
   tide,
   fishCount,
   beatPhase,
+  introKit,
 }: ChromeProps) {
   // Edge-anchored patterns skip MotifStage — slice crops top/bottom.
   // Share finale (D-014): same intro disks + star as open, behind the inset card.
   if (pattern === "intro" || pattern === "share") {
-    return <IntroCornerChrome freeze={freeze} />;
+    return <IntroCornerChrome freeze={freeze} introKit={introKit} />;
   }
   // Soft close — full-bleed iris (D-016); MotifStage would crop the vignette.
   if (pattern === "close" || slideIndex === 8) {
@@ -228,9 +254,10 @@ function WideOrbitChrome({
   tide,
   fishCount,
   beatPhase,
+  introKit,
 }: ChromeProps) {
   if (pattern === "share" || pattern === "intro") {
-    return <IntroCornerChrome freeze={freeze} />;
+    return <IntroCornerChrome freeze={freeze} introKit={introKit} />;
   }
 
   // Middeck metaphors — same full-bleed layers as phone (D-016).
@@ -374,6 +401,7 @@ export function ScrappedOrbitArt({
   tide = "low",
   fishCount = 0,
   beatPhase = 0,
+  introKit = "default",
 }: Props) {
   const { accent, accent2 } = accentsForSlide(slideIndex);
   const reduceMotion = useReducedMotion();
@@ -392,6 +420,7 @@ export function ScrappedOrbitArt({
     tide,
     fishCount,
     beatPhase,
+    introKit,
   };
 
   return (

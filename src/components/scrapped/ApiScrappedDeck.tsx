@@ -360,7 +360,7 @@ export function ApiScrappedDeck({
         },
         {
           headline: hey,
-          subline: "This is for the songs that didn’t stick.",
+          subline: "This is for the ones you ghosted.",
         },
       ],
       [
@@ -458,8 +458,8 @@ export function ApiScrappedDeck({
       ],
       reunionBeats,
       [
-        { headline: "Thanks for sitting with the almosts." },
-        { headline: "See you when they don’t stick." },
+        { headline: "Thanks for sitting with the ghosted." },
+        { headline: "See you when they get ghosted." },
       ],
       [{ headline: "Share" }],
     ];
@@ -831,7 +831,7 @@ export function ApiScrappedDeck({
               headline: report.profileName
                 ? `Hey ${report.profileName}`
                 : "Hey there",
-              subline: "This is for the songs that didn’t stick.",
+              subline: "This is for the ones you ghosted.",
               align: "center",
               display: "hero",
             },
@@ -1149,12 +1149,12 @@ export function ApiScrappedDeck({
           chrome={orbitChrome(8)}
           beats={[
             {
-              headline: "Thanks for sitting with the almosts.",
+              headline: "Thanks for sitting with the ghosted.",
               align: "center",
               display: "hero",
             },
             {
-              headline: "See you when they don’t stick.",
+              headline: "See you when they get ghosted.",
               align: "center",
               display: "hero",
             },

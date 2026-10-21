@@ -356,10 +356,18 @@ type OceanWaveProps = {
    * School only paints on high tide.
    */
   fishCount?: number;
+  /**
+   * Multiplies glyph size after density scaling (tune lab / research).
+   * Production leaves this at 1.
+   */
+  fishSizeScale?: number;
 };
 
 /** Max fish glyphs — 1 like = 1 fish up to this ceiling. */
-export const OCEAN_FISH_CAP = 50;
+export const OCEAN_FISH_CAP = 15;
+
+/** Production size multiplier — tune lab can scale relative to this. */
+export const OCEAN_FISH_SIZE_DEFAULT = 1;
 
 /**
  * Kit C — oval + triangle tail + single eye (volume-ocean-fish-styles).
@@ -418,37 +426,60 @@ function fishSeed(i: number, salt: number) {
   return t - Math.floor(t);
 }
 
+export type OceanFishSchoolOpts = {
+  /** Extra scale on top of density-aware sizeMul (default 1). */
+  sizeScale?: number;
+};
+
+/** Irrational step so successive fish land far apart on the swim lane. */
+const FISH_PHASE_STEP = 0.618033988749895;
+
 /** Build a deterministic school: `min(likedThisYear, OCEAN_FISH_CAP)` fish. */
-export function buildOceanFishSchool(likedThisYear: number): OceanFishSpec[] {
+export function buildOceanFishSchool(
+  likedThisYear: number,
+  opts: OceanFishSchoolOpts = {},
+): OceanFishSpec[] {
   const n = Math.max(
     0,
     Math.min(OCEAN_FISH_CAP, Math.floor(likedThisYear)),
   );
   if (n === 0) return [];
 
-  let sizeMul = 1.05;
-  if (n > 20) sizeMul = 0.88;
-  if (n > 35) sizeMul = 0.72;
-  if (n >= OCEAN_FISH_CAP) sizeMul = 0.62;
+  const sizeScale = opts.sizeScale ?? OCEAN_FISH_SIZE_DEFAULT;
+
+  // Cap 15: keep fish large — light density shrink only near the ceiling.
+  let sizeMul = 1.65;
+  if (n > 8) sizeMul = 1.45;
+  if (n > 12) sizeMul = 1.3;
+  if (n >= OCEAN_FISH_CAP) sizeMul = 1.2;
 
   return Array.from({ length: n }, (_, i) => {
     const r = fishSeed(i, 3);
     const r2 = fishSeed(i, 17);
     const r3 = fishSeed(i, 41);
-    // Even strata + jitter so the school fills crest→deep, not one cluster.
+    // Even depth strata + tiny jitter — crest→floor, no vertical pile-up.
     const stratum = n === 1 ? 0.5 : i / (n - 1);
-    const depth = Math.min(1, Math.max(0, stratum * 0.92 + (r - 0.5) * 0.14));
+    const depth = Math.min(
+      1,
+      Math.max(0, stratum * 0.96 + 0.02 + (r - 0.5) * 0.05),
+    );
+    // Golden-ratio phase: neighbors in depth sit on opposite sides of the ocean.
+    // Map into ~6–94% of the lane so glyphs aren't half-clipped at rest.
+    const rawPhase =
+      ((i + 0.5) * FISH_PHASE_STEP + (r3 - 0.5) * 0.03 + 1) % 1;
+    const phase = 0.06 + rawPhase * 0.88;
     return {
       id: `f${i}`,
       depth,
-      size: sizeMul * (0.7 + r2 * 0.38),
+      size: sizeMul * sizeScale * (0.9 + r2 * 0.5),
       body: FISH_BODIES[i % FISH_BODIES.length],
-      swimSec: 36 + r * 28,
+      // Narrow speed band so relative spacing holds longer while swimming.
+      swimSec: 46 + r * 12,
       delay: r3 * 3.2,
-      dir: (r2 > 0.5 ? "ltr" : "rtl") as "ltr" | "rtl",
+      dir: (i % 2 === 0 ? "ltr" : "rtl") as "ltr" | "rtl",
       bob: 1.5 + r * 1.4,
       bobSec: 4.8 + r2 * 2.4,
-      phase: (r3 * 0.7 + (i % 9) * 0.033) % 1,
+      phase,
     };
   });
 }
@@ -460,12 +491,16 @@ function oceanFishY(depth: number): number {
 
 function OceanFishSchool({
   fishCount,
+  fishSizeScale,
   reduce,
 }: {
   fishCount: number;
+  fishSizeScale: number;
   reduce: boolean;
 }) {
-  const school = buildOceanFishSchool(fishCount);
+  const school = buildOceanFishSchool(fishCount, {
+    sizeScale: fishSizeScale,
+  });
   if (school.length === 0) return null;
 
   const xLeft = -36;
@@ -552,6 +587,7 @@ export function OceanWave({
   tide = "low",
   freeze = false,
   fishCount = 0,
+  fishSizeScale = OCEAN_FISH_SIZE_DEFAULT,
 }: OceanWaveProps) {
   const reduce = useReducedMotion() || freeze;
   const gradBack = useId();
@@ -567,6 +603,9 @@ export function OceanWave({
   } as const;
   const gradId = { back: gradBack, front: gradFront };
   const schoolCount = Math.max(0, Math.floor(fishCount));
+  const sizeScale = Number.isFinite(fishSizeScale)
+    ? Math.max(0.25, fishSizeScale)
+    : OCEAN_FISH_SIZE_DEFAULT;
 
   const paths = {
     back: oceanWavePath(crests.back, OCEAN_LAYERS[0].amp),
@@ -609,7 +648,11 @@ export function OceanWave({
           />
         ))}
         {tide === "high" && (
-          <OceanFishSchool fishCount={schoolCount} reduce />
+          <OceanFishSchool
+            fishCount={schoolCount}
+            fishSizeScale={sizeScale}
+            reduce
+          />
         )}
       </g>
     );
@@ -662,7 +705,11 @@ export function OceanWave({
         animate={{ opacity: tide === "high" ? 0.9 : 0 }}
         transition={fishReveal}
       >
-        <OceanFishSchool fishCount={schoolCount} reduce={false} />
+        <OceanFishSchool
+          fishCount={schoolCount}
+          fishSizeScale={sizeScale}
+          reduce={false}
+        />
       </motion.g>
     </motion.g>
   );
