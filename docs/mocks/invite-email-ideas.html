@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Invite email ideas: plain paper + Scrapped type</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --board: #e8e6ef;
+        --ink: #1a1a1a;
+        --muted: #555;
+        --accent: #5b21b6;
+        --btn: #12101a;
+        --btn-ink: #f5f5f5;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--board);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body[data-chrome="dark"] {
+        --board: #0a0910;
+        --ink: #f5f5f5;
+        --muted: #a8a6b3;
+        --accent: #c9a0f5;
+        --btn: #f5f5f5;
+        --btn-ink: #12101a;
+      }
+
+      .board {
+        padding: 2rem 1.25rem 4rem;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .board-head {
+        max-width: 40rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .board-head h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .board-head h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .board-head p {
+        margin: 0.6rem 0 0;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+
+      .board-head code {
+        font-size: 0.8em;
+        padding: 0.1em 0.35em;
+        border-radius: 0.3em;
+        background: color-mix(in oklab, currentColor 10%, transparent);
+      }
+
+      .note {
+        margin: 0 0 1.5rem;
+        padding: 0.9rem 1.1rem;
+        border-radius: 10px;
+        border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+        background: color-mix(in oklab, currentColor 4%, transparent);
+        font-size: 0.82rem;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .note strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      .tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        align-items: center;
+        margin-bottom: 1.75rem;
+      }
+
+      .tools label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.35rem;
+      }
+
+      .seg {
+        display: inline-flex;
+        border-radius: 8px;
+        border: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+        overflow: hidden;
+      }
+
+      .seg button {
+        appearance: none;
+        border: 0;
+        margin: 0;
+        padding: 0.45rem 0.85rem;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .seg button[aria-pressed="true"] {
+        background: color-mix(in oklab, currentColor 10%, transparent);
+        color: var(--ink);
+      }
+
+      .client {
+        width: 100%;
+        max-width: var(--preview-w, 360px);
+        border-radius: 12px;
+        border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+        background: #fff;
+        box-shadow: 0 12px 36px color-mix(in oklab, #000 12%, transparent);
+        overflow: hidden;
+        transition: max-width 220ms var(--ease);
+      }
+
+      body[data-chrome="dark"] .client {
+        background: #1c1a24;
+        box-shadow: 0 12px 36px color-mix(in oklab, #000 45%, transparent);
+      }
+
+      .client-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+        font-size: 0.68rem;
+        color: var(--muted);
+        background: #f3f2f7;
+      }
+
+      body[data-chrome="dark"] .client-bar {
+        background: #14121c;
+      }
+
+      .client-bar .from {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .client-subject {
+        padding: 0.55rem 0.85rem 0.7rem;
+        border-bottom: 1px solid color-mix(in oklab, currentColor 8%, transparent);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--ink);
+        background: #faf9fc;
+      }
+
+      body[data-chrome="dark"] .client-subject {
+        background: #18161f;
+      }
+
+      .mail {
+        padding: 40px 24px;
+        font-family: Poppins, Helvetica, Arial, sans-serif;
+        color: #1a1a1a;
+        max-width: 420px;
+        word-break: break-word;
+      }
+
+      body[data-chrome="dark"] .mail {
+        color: #f0eef5;
+      }
+
+      .mail .year,
+      .mail .brand {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.2;
+        font-weight: 700;
+      }
+
+      .mail .brand {
+        margin-top: 4px;
+        font-style: italic;
+      }
+
+      .mail .body {
+        margin: 24px 0 0;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 400;
+        color: #3d3d3d;
+      }
+
+      .mail .body + .body {
+        margin-top: 12px;
+      }
+
+      body[data-chrome="dark"] .mail .body {
+        color: #c8c6d0;
+      }
+
+      .mail .btn-wrap {
+        margin: 32px 0 0;
+      }
+
+      .mail .btn {
+        display: block;
+        padding: 14px 28px;
+        border-radius: 8px;
+        background: var(--btn);
+        color: var(--btn-ink);
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.25;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .mail .caption {
+        margin: 28px 0 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #6e6b7a;
+        word-break: break-all;
+      }
+
+      .mail .caption a {
+        color: #3d3d3d;
+      }
+
+      body[data-chrome="dark"] .mail .caption {
+        color: #8a8796;
+      }
+
+      body[data-chrome="dark"] .mail .caption a {
+        color: #c8c6d0;
+      }
+
+      body[data-width="320"] {
+        --preview-w: 320px;
+      }
+      body[data-width="360"] {
+        --preview-w: 360px;
+      }
+      body[data-width="420"] {
+        --preview-w: 420px;
+      }
+    </style>
+  </head>
+  <body data-width="360" data-chrome="light">
+    <div class="board">
+      <header class="board-head">
+        <h1>Invite email · <em>Scrapped</em> type</h1>
+        <p>
+          Client paper (no field fill). Poppins display + full-width
+          <strong>Sign in</strong>: black / white text on light; white / ink
+          text on dark. No credit line. Production: <code>email-html.ts</code>.
+        </p>
+      </header>
+
+      <p class="note">
+        <strong>Shipped shape:</strong> 28px year / italic Scrapped, body copy,
+        theme-aware button via <code>prefers-color-scheme</code>, URL backup.
+        Toggle client chrome to preview both.
+      </p>
+
+      <div class="tools">
+        <div>
+          <label>Preview width</label>
+          <div class="seg" role="group" aria-label="Preview width">
+            <button type="button" data-w="320">320</button>
+            <button type="button" data-w="360" aria-pressed="true">360</button>
+            <button type="button" data-w="420">420</button>
+          </div>
+        </div>
+        <div>
+          <label>Client chrome</label>
+          <div class="seg" role="group" aria-label="Client chrome">
+            <button type="button" data-chrome="light" aria-pressed="true">
+              Light
+            </button>
+            <button type="button" data-chrome="dark">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="client">
+        <div class="client-bar">
+          <span class="from">Scrapped · invite@…</span>
+          <span>now</span>
+        </div>
+        <div class="client-subject">You’re off the Scrapped waitlist</div>
+        <div class="mail">
+          <p class="year">2026</p>
+          <p class="brand">Scrapped</p>
+          <p class="body">
+            You’re off the waitlist. A seat is open for about 24 hours.
+          </p>
+          <p class="body">
+            Sign in with the Spotify account that matches this email to load
+            your Scrapped.
+          </p>
+          <p class="btn-wrap">
+            <a class="btn" href="#">Sign in</a>
+          </p>
+          <p class="caption">
+            Or open <a href="#">https://myscrapped.com/ready</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const body = document.body;
+      document.querySelectorAll(".seg button[data-w]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          body.setAttribute("data-width", btn.getAttribute("data-w"));
+          document
+            .querySelectorAll(".seg button[data-w]")
+            .forEach((b) => b.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+        });
+      });
+      document.querySelectorAll(".seg button[data-chrome]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          body.setAttribute("data-chrome", btn.getAttribute("data-chrome"));
+          document
+            .querySelectorAll(".seg button[data-chrome]")
+            .forEach((b) => b.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+        });
+      });
+    </script>
+  </body>
+</html>

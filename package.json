@@ -8,7 +8,8 @@
     "start": "NODE_OPTIONS='--max-http-header-size=65536' next start --hostname 127.0.0.1 --port 3000",
     "lint": "eslint",
     "test": "tsx --test src/lib/api-scrapped-soundtrack.test.ts src/lib/scrapped-api-ghosted.test.ts",
-    "ingest": "tsx scripts/ingest.ts"
+    "ingest": "tsx scripts/ingest.ts",
+    "invite": "tsx --env-file=.env.local scripts/invite.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -30,6 +31,7 @@
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "resend": "^6.34.1",
     "roughjs": "^4.6.6",
     "server-only": "^0.0.1",
     "shadcn": "^4.21.1",

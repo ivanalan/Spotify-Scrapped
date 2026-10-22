@@ -4,6 +4,10 @@ import { useId } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { SHARE_FINALE_KIT as SF } from "@/lib/scrapped-card-palette";
+import {
+  SHARE_FINALE_FOOTER_DEFAULT,
+  type ShareFinaleFooterLayout,
+} from "@/components/scrapped/ShareFinaleLayoutTune";
 import { cn } from "@/lib/utils";
 
 export type ShareRecapTrack = {
@@ -20,6 +24,15 @@ type Props = {
   stayed: ShareRecapTrack[];
   /** Used for the default export subtitle when `subtitle` is omitted. */
   skipCount?: number;
+  /** Liked Songs library total (minimal share metrics). */
+  likedCount?: number;
+  /** Liked Songs added this year (minimal share metrics). */
+  likedThisYearCount?: number;
+  /**
+   * Absolute footer slots for minimal share (liked metrics + brand).
+   * Tuned live via `ShareFinaleLayoutTune` on the finale slide.
+   */
+  footerLayout?: ShareFinaleFooterLayout;
   title?: string;
   subtitle?: string;
   leftLabel?: string;
@@ -44,22 +57,26 @@ function blobPath() {
   return "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
 }
 
-/** B1 orchid corner wash over the teal nest: D-021 / D-019 recipe. */
-function ShareFinaleOrchidWash() {
-  const w = SF.orchidWash;
+function GhostSvg() {
   return (
-    <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-      style={{ opacity: w.opacity, background: w.background }}
-      aria-hidden
-    />
+    <svg viewBox="0 0 64 64" className="size-full overflow-visible">
+      <path
+        d={blobPath()}
+        fill={SF.ghostFill}
+        stroke="#1c1c1c"
+        strokeWidth={1.6}
+        strokeLinejoin="round"
+      />
+      <ellipse cx={17} cy={34} rx={4} ry={2.2} fill="#e8a0b8" opacity={0.7} />
+      <ellipse cx={47} cy={34} rx={4} ry={2.2} fill="#e8a0b8" opacity={0.7} />
+      <circle cx={24} cy={26} r={3.2} fill={SF.ghostEye} />
+      <circle cx={40} cy={26} r={3.2} fill={SF.ghostEye} />
+    </svg>
   );
 }
 
 /**
- * BL moon sphere: white→lilac→orchid radial, no outer glow.
- * Center pinned to the card’s bottom-left corner (D-021).
- * Stays under type (z-0); soft breathe after enter.
+ * TR moon in the hero band (D-033). Soft breathe after enter.
  */
 function ShareFinaleMoon({ active }: { active?: boolean }) {
   const reduce = useReducedMotion();
@@ -69,14 +86,12 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
 
   return (
     <div
-      className="pointer-events-none absolute z-0 overflow-visible"
+      className="pointer-events-none absolute z-[1] overflow-visible"
       style={{
-        left: 0,
-        top: "100%",
+        right: m.insetXPx,
+        top: m.insetYPx,
         width: m.sizePx,
         height: m.sizePx,
-        // Center of the circle = bottom-left point of the card.
-        transform: "translate(-50%, -50%)",
       }}
       aria-hidden
     >
@@ -125,84 +140,72 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
 }
 
 /**
- * Two wash ghosts framing the album art (TL + BR): D-021.
- * Positions/sizes from SHARE_FINALE_KIT.
+ * Hero-band ghosts (D-033). `z` places each under or over the cover.
  */
-function ShareFinaleGhosts({ active }: { active?: boolean }) {
+function ShareFinaleGhosts({
+  active,
+  z,
+}: {
+  active?: boolean;
+  z: "above" | "below";
+}) {
   const reduce = useReducedMotion();
   const freeze = Boolean(reduce || !active);
-  const g = SF.ghosts;
-  const slots = [
-    { ...g.tl, delay: 0 },
-    { ...g.br, delay: g.phaseSec },
-  ] as const;
+  const motionSpec = SF.ghostMotion;
+  const slots = SF.ghosts.filter((g) => g.z === z);
+
+  if (slots.length === 0) return null;
 
   return (
-    <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-      style={{ opacity: g.opacity }}
-      aria-hidden
-    >
+    <>
       {slots.map((s, i) => (
         <motion.div
-          key={i}
-          className="absolute"
+          key={`${z}-${i}`}
+          className="pointer-events-none absolute"
           style={{
             left: `${s.xPct}%`,
             top: `${s.yPct}%`,
             width: s.sizePx,
             height: s.sizePx,
+            opacity: s.opacity,
+            transformOrigin: "50% 50%",
+            filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.28))",
           }}
           initial={false}
           animate={
             freeze
-              ? { y: 0, rotate: -2 }
+              ? { y: 0, rotate: s.rotDeg }
               : {
-                  y: [0, -g.bobPx, -g.bobPx * 0.35, 0],
-                  rotate: [-2 * g.wiggle, 3 * g.wiggle, -1 * g.wiggle, -2 * g.wiggle],
+                  y: [
+                    0,
+                    -motionSpec.bobPx,
+                    -motionSpec.bobPx * 0.35,
+                    0,
+                  ],
+                  rotate: [
+                    s.rotDeg - 2 * motionSpec.wiggle,
+                    s.rotDeg + 3 * motionSpec.wiggle,
+                    s.rotDeg - 1 * motionSpec.wiggle,
+                    s.rotDeg - 2 * motionSpec.wiggle,
+                  ],
                 }
           }
           transition={
             freeze
               ? undefined
               : {
-                  duration: g.durationSec,
+                  duration: motionSpec.durationSec,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: -s.delay,
+                  delay: -i * motionSpec.phaseSec,
                 }
           }
+          aria-hidden
         >
-          <svg viewBox="0 0 64 64" className="size-full overflow-visible">
-            <path
-              d={blobPath()}
-              fill={SF.ghostFill}
-              stroke="#1c1c1c"
-              strokeWidth={1.6}
-              strokeLinejoin="round"
-            />
-            <ellipse
-              cx={17}
-              cy={34}
-              rx={4}
-              ry={2.2}
-              fill="#e8a0b8"
-              opacity={0.7}
-            />
-            <ellipse
-              cx={47}
-              cy={34}
-              rx={4}
-              ry={2.2}
-              fill="#e8a0b8"
-              opacity={0.7}
-            />
-            <circle cx={24} cy={26} r={3.2} fill={SF.ghostEye} />
-            <circle cx={40} cy={26} r={3.2} fill={SF.ghostEye} />
-          </svg>
+          <GhostSvg />
         </motion.div>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -291,11 +294,10 @@ function TrackList({
 }
 
 /**
- * Minimal share type: size from `--share-type-size` (D-012 density).
- * Fallback 0.93rem matches the pre-inset tune.
+ * Minimal share type: size from `--share-type-size` (D-012 / D-033 density).
  */
 const MINIMAL_TYPE =
-  "font-sans text-[length:var(--share-type-size,0.93rem)] leading-[1.3] tracking-[-0.01em] text-[var(--wrapped-ink)]";
+  "font-sans text-[length:var(--share-type-size,0.78rem)] leading-[1.25] tracking-[-0.01em] text-[var(--wrapped-ink)]";
 
 function MinimalColumn({
   label,
@@ -309,7 +311,7 @@ function MinimalColumn({
       <p
         className={cn(
           MINIMAL_TYPE,
-          "mb-[var(--share-list-label-gap,1.25rem)] truncate font-bold",
+          "mb-[var(--share-list-label-gap,0.55rem)] truncate font-bold",
         )}
       >
         {label}
@@ -324,13 +326,11 @@ function MinimalColumn({
           Nothing here.
         </p>
       ) : (
-        <ol
-          className="flex flex-col gap-[var(--share-list-row-gap,0.85rem)]"
-        >
+        <ol className="flex flex-col gap-[var(--share-list-row-gap,0.42rem)]">
           {tracks.map((track, i) => (
             <li
               key={track.id}
-              className="grid min-w-0 grid-cols-[0.8rem_minmax(0,1fr)] items-center gap-1"
+              className="grid min-w-0 grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-[0.28rem]"
             >
               <span className={cn(MINIMAL_TYPE, "font-semibold tabular-nums")}>
                 {i + 1}
@@ -354,6 +354,9 @@ export function ShareRecapCard({
   skipped,
   stayed,
   skipCount,
+  likedCount,
+  likedThisYearCount,
+  footerLayout = SHARE_FINALE_FOOTER_DEFAULT,
   title = "Scrapped Plus",
   subtitle,
   leftLabel = "Top skipped",
@@ -375,6 +378,15 @@ export function ShareRecapCard({
       : "Taste under revision");
 
   if (minimal) {
+    const brandTok = SF.brand;
+    const foot = footerLayout;
+    const listBottomPad = Math.max(
+      22,
+      foot.likedSongs.bottomPct + 10,
+      foot.likedYear.bottomPct + 10,
+      foot.brand.bottomPct + 6,
+    );
+
     return (
       <div
         className={cn(
@@ -385,27 +397,27 @@ export function ShareRecapCard({
         style={{
           background: SF.cardBg,
           color: SF.cardInk,
-          // Override nested tone tokens so lists/hero panel match teal kit.
           ["--wrapped-ink" as string]: SF.cardInk,
           ["--wrapped-panel" as string]: SF.cardPanel,
+          ["--wrapped-muted" as string]: SF.cardMuted,
         }}
       >
         {/*
-          Inset share finale (D-012 IA + D-021): teal nest · B1 orchid corners ·
-          lilac-rim BL moon · framing ghosts · MyScrapped.com.
-          Host locks 9:16; density from --share-*.
+          Inset share finale (D-012 IA + D-033 B2): plain teal · TR moon ·
+          hero ghosts (mixed z) · absolute liked metrics + myscrapped.com.
         */}
-        <ShareFinaleOrchidWash />
-        <ShareFinaleMoon active={active} />
-        <ShareFinaleGhosts active={active} />
         <header
-          className="relative z-[2] flex w-full shrink-0 items-center justify-center overflow-hidden [container-type:size]"
-          style={{ height: "var(--share-hero-band, 44%)" }}
+          className="relative z-[2] flex w-full shrink-0 items-center justify-center overflow-hidden"
+          style={{ height: "var(--share-hero-band, 49%)" }}
         >
+          <div className="pointer-events-none absolute inset-0 z-[1]">
+            <ShareFinaleMoon active={active} />
+            <ShareFinaleGhosts active={active} z="below" />
+          </div>
           <div
-            className="absolute top-1/2 left-1/2 aspect-square max-h-[92%] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[var(--wrapped-panel)]"
+            className="relative z-[2] aspect-square max-h-[88%] overflow-hidden bg-[var(--wrapped-panel)]"
             style={{
-              width: "min(var(--share-hero-size, 48%), 92%)",
+              width: "min(var(--share-hero-size, 59%), 92%)",
             }}
           >
             {heroImageUrl ? (
@@ -419,32 +431,102 @@ export function ShareRecapCard({
               />
             ) : null}
           </div>
+          <div className="pointer-events-none absolute inset-0 z-[3]">
+            <ShareFinaleGhosts active={active} z="above" />
+          </div>
         </header>
 
         <div
-          className="relative z-[2] grid min-h-0 w-full flex-1 grid-cols-2 content-start pt-0"
+          className="relative z-[2] flex min-h-0 w-full flex-1 flex-col"
           style={{
-            columnGap: "var(--share-list-col-gap, 0.375rem)",
-            paddingInline: "var(--share-list-pad-x, 0px)",
-            paddingBottom: "0px",
+            paddingInline: "var(--share-list-pad-x, 14px)",
+            paddingBottom: `${listBottomPad}%`,
           }}
         >
-          <MinimalColumn label={leftLabel} tracks={skipped} />
-          <MinimalColumn label={rightLabel} tracks={stayed} />
+          <div
+            className="grid min-h-0 w-full flex-1 grid-cols-2 content-start"
+            style={{
+              columnGap: "var(--share-list-col-gap, 14px)",
+            }}
+          >
+            <MinimalColumn label={leftLabel} tracks={skipped} />
+            <MinimalColumn label={rightLabel} tracks={stayed} />
+          </div>
         </div>
 
-        <footer
-          className="relative z-[2] shrink-0 text-center font-semibold tracking-[-0.01em]"
+        <div
+          className="pointer-events-none absolute z-[3]"
           style={{
-            paddingInline: "var(--share-list-pad-x, 0px)",
-            paddingBottom: "var(--share-list-pad-y, 0px)",
-            paddingTop: "10px",
-            fontSize: "0.56rem",
-            color: SF.cardMuted,
+            left: `${foot.likedSongs.leftPct}%`,
+            bottom: `${foot.likedSongs.bottomPct}%`,
+            width: "max-content",
+            maxWidth: "46%",
+          }}
+        >
+          <p
+            className="font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+            style={{
+              fontSize: "var(--share-metric-number, 1.3rem)",
+              lineHeight: 1.05,
+            }}
+          >
+            {(likedCount ?? 0).toLocaleString()}
+          </p>
+          <p
+            className="mt-0.5 font-sans font-medium text-[var(--wrapped-muted)]"
+            style={{
+              fontSize: "var(--share-metric-label, 0.72rem)",
+              lineHeight: 1.2,
+            }}
+          >
+            Liked songs
+          </p>
+        </div>
+
+        <div
+          className="pointer-events-none absolute z-[3]"
+          style={{
+            left: `${foot.likedYear.leftPct}%`,
+            bottom: `${foot.likedYear.bottomPct}%`,
+            width: "max-content",
+            maxWidth: "46%",
+          }}
+        >
+          <p
+            className="font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+            style={{
+              fontSize: "var(--share-metric-number, 1.3rem)",
+              lineHeight: 1.05,
+            }}
+          >
+            {(likedThisYearCount ?? 0).toLocaleString()}
+          </p>
+          <p
+            className="mt-0.5 font-sans font-medium text-[var(--wrapped-muted)]"
+            style={{
+              fontSize: "var(--share-metric-label, 0.72rem)",
+              lineHeight: 1.2,
+            }}
+          >
+            Liked this year
+          </p>
+        </div>
+
+        <div
+          className="pointer-events-none absolute z-[3] font-sans font-bold text-[var(--wrapped-ink)]"
+          style={{
+            left: `${foot.brand.leftPct}%`,
+            bottom: `${foot.brand.bottomPct}%`,
+            fontSize: `${brandTok.sizeRem}rem`,
+            letterSpacing: `${brandTok.letterSpacingEm}em`,
+            lineHeight: 1.15,
+            transform:
+              foot.brand.anchor === "end" ? "translateX(-100%)" : undefined,
+            whiteSpace: "nowrap",
           }}
         >
           {SF.brandLine}
-        </footer>
+        </div>
       </div>
     );
   }

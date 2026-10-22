@@ -253,7 +253,7 @@ export const SLIDE_SPECS: SlideSpec[] = [
     hero: "Intro disks + star on ink stage; teal card; BL corner moon + 2 ghosts (D-014)",
     motion: "Intro cascade-breathe + star grow-spin; moon settle/glow; ghost float on card",
     composition:
-      "Ink stage gutters; opaque teal card in front; Share/Replay below; MyScrapped.com",
+      "Ink stage gutters; plain teal card; Share/Replay below; myscrapped.com",
     why: "Wrapped-form inset IA (D-012) + kit J8 visual promote (D-014).",
     iterations: [
       "J1: Blank on gold (displaced by D-012)",

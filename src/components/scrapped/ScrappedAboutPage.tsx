@@ -88,7 +88,7 @@ export function ScrappedAboutPage() {
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               Join with the email on your Spotify account, and when a slot opens,
-              we&rsquo;ll email you an invite link.
+              we&rsquo;ll email you a link to sign in.
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               Already have access?{" "}

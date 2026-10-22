@@ -46,7 +46,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 | Middeck 4-7 | Scene 4: **teal nest** (`TEAL_NEST_GRADIENT` / share C0) + **4A** heart · **T1** typing pin · **7L** film letterbox; [D-016](../../../docs/decisions/D-016-middeck-metaphor-promote.md) / [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
 | Left on read 5→6 field | Ink + **B1 orchid corners** wash · pin/frame geometry; [D-019](../../../docs/decisions/D-019-left-on-read-orchid-corners.md) |
 | Entity→list rhyme | Ghosted D-018 · left-on-read T1; [D-018](../../../docs/decisions/D-018-ghosted-ground-sky-s9.md) / [D-017](../../../docs/decisions/D-017-entity-list-pair-rhymes.md) |
-| Share finale | **9:16** inset card + Share / Replay; [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Production: **ink** stage + intro disks/star · **teal** nest · **B1 orchid corners** · **lilac-rim** BL moon · framing ghosts; [D-021](../../../docs/decisions/D-021-share-finale-teal-orchid-lilac-moon.md). Stage/card split; [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) · spine [D-020](../../../docs/decisions/D-020-share-finale-orchid-corners-white-moon.md) |
+| Share finale | **9:16** inset card + Share / Replay; [D-012](../../../docs/decisions/D-012-share-finale-inset.md). Production: **ink** stage · **plain teal** · TR moon · mixed-z hero ghosts · liked metrics · `myscrapped.com` BR; [D-033](../../../docs/decisions/D-033-share-finale-b2-plain-teal.md). Stage/card split; [D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md) |
 | Motion | **Text first**: same copy enter/layout/outro on every slide; only the numbered 5-row list is special ([D-001](../../../docs/decisions/D-001-story-copy-vs-list-motion.md)). Art is peripheral chrome, not a second copy-motion path |
 
 **Emotional register:** conversational, dry, slightly merciful: same as WRAPPED.md tone.
@@ -58,7 +58,7 @@ Also load when relevant: global `frontend-design`. Scrapped overrides on conflic
 3. **Type owns the mid band**: art stays TL / BL / top drift / corner rain. Prefer clear field over putting body type on vibrant disks. On **list** beats, art only frames edges: [D-015](../../../docs/decisions/D-015-list-art-frames-not-heroes.md); do not scale the entity hero onto the list.
 4. **Contrast**: every tone sets canvas + ink + muted + panel + progress together. Muted stays near ink (`INK_MUTED` ≈ 90%/88%), not washed grey. WCAG AA vs solid field (large ≥ 3:1, body ≥ 4.5:1).
 5. **Quiet chrome**: italic “Scrapped” wordmark ([D-011](../../../docs/decisions/D-011-scrapped-logo-italic.md)), story progress segments, info/close: same theme as the active story. Soundtrack stays secondary.
-6. **Share finale**: **9:16** inset card + Share / Replay ([D-012](../../../docs/decisions/D-012-share-finale-inset.md)); production art teal + orchid corners + lilac-rim moon ([D-021](../../../docs/decisions/D-021-share-finale-teal-orchid-lilac-moon.md)). Stage behind / card in front; no edge bleed ([D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
+6. **Share finale**: **9:16** inset card + Share / Replay ([D-012](../../../docs/decisions/D-012-share-finale-inset.md)); production art plain teal + TR moon + mixed-z ghosts ([D-033](../../../docs/decisions/D-033-share-finale-b2-plain-teal.md)). Stage behind / card in front; no edge bleed ([D-013](../../../docs/decisions/D-013-share-finale-deck-rhyme-explore.md)).
 
 ## Hard bans (AI-design tells)
 
