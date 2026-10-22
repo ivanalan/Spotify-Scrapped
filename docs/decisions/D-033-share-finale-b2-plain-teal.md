@@ -15,12 +15,12 @@ Promote the B2 share-finale explore recipe:
 | Card field | Plain `#1A7A6E` (no nest gradient; no orchid wash) |
 | Corners | Sharp (`radiusPx: 0`) |
 | On-screen size | Cap width at `maxWidthPx: 320` (9:16; Share column matches); export still ~1080×1920 |
-| Hero | Band 49% · cover 59% |
+| Hero | Band 49% · cover 55% |
 | Year | None (no stacked digits on the card) |
 | Moon | Lilac-rim sphere · **TR** hero inset (−44, −52) · 164px · op 1 |
 | Ghosts | Three in hero band: one **below** cover (14/4/46/−14°) · two **above** (73/24/38/8° · 59/74/48/−3°) |
-| Lists | Left on read · Ghosted songs · denser type (`0.78rem`) · row gap (`0.42rem`) |
-| Metrics | Liked songs · Liked this year (live report counts) · number 1.3rem · label 0.72rem · absolute slots `left 4.4% / bottom 10%` and `left 52% / bottom 10%` |
+| Lists | Left on read · Ghosted songs · type (`0.65rem`) · row gap (`0.42rem`) · pad X 16px · label gap 0.55rem |
+| Metrics | Liked songs · Liked this year (live report counts) · label above number · number 1.3rem · label 0.72rem · absolute slots `left 4.4% / bottom 15%` and `left 52% / bottom 14.8%` |
 | Brand | `myscrapped.com` · absolute `left 91% / bottom 4%` · right anchor (no italic Scrapped mark) |
 
 Explore source: `docs/mocks/share-finale-form.html`.
@@ -43,3 +43,4 @@ Share card no longer rhymes orchid corners with scenes 5–6. Metrics need `like
 - Footer slots: `SHARE_FINALE_FOOTER_DEFAULT` in `ShareFinaleLayoutTune.tsx`
 - Card: `ShareRecapCard` (`variant="minimal"`)
 - Host CSS vars: `ApiScrappedDeck` scene 9
+- On-story tune (research): `/scrapped?tune=share` → `ShareFinaleLayoutTune` on scene 9; copy JSON then promote into density / kit / footer defaults

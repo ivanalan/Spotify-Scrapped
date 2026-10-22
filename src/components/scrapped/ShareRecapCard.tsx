@@ -7,6 +7,8 @@ import { SHARE_FINALE_KIT as SF } from "@/lib/scrapped-card-palette";
 import {
   SHARE_FINALE_FOOTER_DEFAULT,
   type ShareFinaleFooterLayout,
+  type ShareFinaleGhostTune,
+  type ShareFinaleMoonTune,
 } from "@/components/scrapped/ShareFinaleLayoutTune";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +35,12 @@ type Props = {
    * Tuned live via `ShareFinaleLayoutTune` on the finale slide.
    */
   footerLayout?: ShareFinaleFooterLayout;
+  /** Live moon overrides from the on-story tune panel. */
+  moonTune?: ShareFinaleMoonTune;
+  /** Live ghost overrides (hero band). */
+  ghostTune?: ShareFinaleGhostTune[];
+  /** Brand type size / tracking overrides. */
+  brandTune?: { sizeRem: number; letterSpacingEm: number };
   title?: string;
   subtitle?: string;
   leftLabel?: string;
@@ -78,20 +86,29 @@ function GhostSvg() {
 /**
  * TR moon in the hero band (D-033). Soft breathe after enter.
  */
-function ShareFinaleMoon({ active }: { active?: boolean }) {
+function ShareFinaleMoon({
+  active,
+  moon,
+}: {
+  active?: boolean;
+  moon?: ShareFinaleMoonTune;
+}) {
   const reduce = useReducedMotion();
   const freeze = Boolean(reduce || !active);
   const moonGrad = useId();
-  const m = SF.moon;
+  const sizePx = moon?.sizePx ?? SF.moon.sizePx;
+  const insetXPx = moon?.insetXPx ?? SF.moon.insetXPx;
+  const insetYPx = moon?.insetYPx ?? SF.moon.insetYPx;
+  const opacity = moon?.opacity ?? SF.moon.opacity;
 
   return (
     <div
       className="pointer-events-none absolute z-[1] overflow-visible"
       style={{
-        right: m.insetXPx,
-        top: m.insetYPx,
-        width: m.sizePx,
-        height: m.sizePx,
+        right: insetXPx,
+        top: insetYPx,
+        width: sizePx,
+        height: sizePx,
       }}
       aria-hidden
     >
@@ -113,7 +130,7 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
         <svg viewBox="0 0 100 100" className="size-full">
           <defs>
             <radialGradient id={moonGrad} cx="32%" cy="28%" r="72%">
-              {m.stops.map((s) => (
+              {SF.moon.stops.map((s) => (
                 <stop key={s.offset} offset={s.offset} stopColor={s.color} />
               ))}
             </radialGradient>
@@ -123,9 +140,9 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
             cy={50}
             r={50}
             fill={`url(#${moonGrad})`}
-            opacity={m.opacity}
+            opacity={opacity}
             initial={freeze ? false : { scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: m.opacity }}
+            animate={{ scale: 1, opacity }}
             transition={
               freeze
                 ? undefined
@@ -145,14 +162,17 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
 function ShareFinaleGhosts({
   active,
   z,
+  ghosts,
 }: {
   active?: boolean;
   z: "above" | "below";
+  ghosts?: ShareFinaleGhostTune[];
 }) {
   const reduce = useReducedMotion();
   const freeze = Boolean(reduce || !active);
   const motionSpec = SF.ghostMotion;
-  const slots = SF.ghosts.filter((g) => g.z === z);
+  const source = ghosts ?? SF.ghosts;
+  const slots = source.filter((g) => g.z === z);
 
   if (slots.length === 0) return null;
 
@@ -297,7 +317,11 @@ function TrackList({
  * Minimal share type: size from `--share-type-size` (D-012 / D-033 density).
  */
 const MINIMAL_TYPE =
-  "font-sans text-[length:var(--share-type-size,0.78rem)] leading-[1.25] tracking-[-0.01em] text-[var(--wrapped-ink)]";
+  "font-sans text-[length:var(--share-type-size,0.65rem)] leading-[1.25] tracking-[-0.01em] text-[var(--wrapped-ink)]";
+
+/** Metric / list labels: muted medium type (`--share-metric-label`). */
+const MINIMAL_LABEL =
+  "font-sans font-medium text-[var(--wrapped-muted)]";
 
 function MinimalColumn({
   label,
@@ -310,9 +334,13 @@ function MinimalColumn({
     <div className="min-w-0">
       <p
         className={cn(
-          MINIMAL_TYPE,
-          "mb-[var(--share-list-label-gap,0.55rem)] truncate font-bold",
+          MINIMAL_LABEL,
+          "mb-[var(--share-list-label-gap,0.55rem)] truncate",
         )}
+        style={{
+          fontSize: "var(--share-metric-label, 0.72rem)",
+          lineHeight: 1.2,
+        }}
       >
         {label}
       </p>
@@ -357,6 +385,9 @@ export function ShareRecapCard({
   likedCount,
   likedThisYearCount,
   footerLayout = SHARE_FINALE_FOOTER_DEFAULT,
+  moonTune,
+  ghostTune,
+  brandTune,
   title = "Scrapped Plus",
   subtitle,
   leftLabel = "Top skipped",
@@ -378,7 +409,9 @@ export function ShareRecapCard({
       : "Taste under revision");
 
   if (minimal) {
-    const brandTok = SF.brand;
+    const brandSizeRem = brandTune?.sizeRem ?? SF.brand.sizeRem;
+    const brandLetterSpacingEm =
+      brandTune?.letterSpacingEm ?? SF.brand.letterSpacingEm;
     const foot = footerLayout;
     const listBottomPad = Math.max(
       22,
@@ -411,13 +444,13 @@ export function ShareRecapCard({
           style={{ height: "var(--share-hero-band, 49%)" }}
         >
           <div className="pointer-events-none absolute inset-0 z-[1]">
-            <ShareFinaleMoon active={active} />
-            <ShareFinaleGhosts active={active} z="below" />
+            <ShareFinaleMoon active={active} moon={moonTune} />
+            <ShareFinaleGhosts active={active} z="below" ghosts={ghostTune} />
           </div>
           <div
             className="relative z-[2] aspect-square max-h-[88%] overflow-hidden bg-[var(--wrapped-panel)]"
             style={{
-              width: "min(var(--share-hero-size, 59%), 92%)",
+              width: "min(var(--share-hero-size, 55%), 92%)",
             }}
           >
             {heroImageUrl ? (
@@ -432,14 +465,14 @@ export function ShareRecapCard({
             ) : null}
           </div>
           <div className="pointer-events-none absolute inset-0 z-[3]">
-            <ShareFinaleGhosts active={active} z="above" />
+            <ShareFinaleGhosts active={active} z="above" ghosts={ghostTune} />
           </div>
         </header>
 
         <div
           className="relative z-[2] flex min-h-0 w-full flex-1 flex-col"
           style={{
-            paddingInline: "var(--share-list-pad-x, 14px)",
+            paddingInline: "var(--share-list-pad-x, 16px)",
             paddingBottom: `${listBottomPad}%`,
           }}
         >
@@ -464,22 +497,22 @@ export function ShareRecapCard({
           }}
         >
           <p
-            className="font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
-            style={{
-              fontSize: "var(--share-metric-number, 1.3rem)",
-              lineHeight: 1.05,
-            }}
-          >
-            {(likedCount ?? 0).toLocaleString()}
-          </p>
-          <p
-            className="mt-0.5 font-sans font-medium text-[var(--wrapped-muted)]"
+            className={MINIMAL_LABEL}
             style={{
               fontSize: "var(--share-metric-label, 0.72rem)",
               lineHeight: 1.2,
             }}
           >
             Liked songs
+          </p>
+          <p
+            className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+            style={{
+              fontSize: "var(--share-metric-number, 1.3rem)",
+              lineHeight: 1.05,
+            }}
+          >
+            {(likedCount ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -493,22 +526,22 @@ export function ShareRecapCard({
           }}
         >
           <p
-            className="font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
-            style={{
-              fontSize: "var(--share-metric-number, 1.3rem)",
-              lineHeight: 1.05,
-            }}
-          >
-            {(likedThisYearCount ?? 0).toLocaleString()}
-          </p>
-          <p
-            className="mt-0.5 font-sans font-medium text-[var(--wrapped-muted)]"
+            className={MINIMAL_LABEL}
             style={{
               fontSize: "var(--share-metric-label, 0.72rem)",
               lineHeight: 1.2,
             }}
           >
             Liked this year
+          </p>
+          <p
+            className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+            style={{
+              fontSize: "var(--share-metric-number, 1.3rem)",
+              lineHeight: 1.05,
+            }}
+          >
+            {(likedThisYearCount ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -517,8 +550,8 @@ export function ShareRecapCard({
           style={{
             left: `${foot.brand.leftPct}%`,
             bottom: `${foot.brand.bottomPct}%`,
-            fontSize: `${brandTok.sizeRem}rem`,
-            letterSpacing: `${brandTok.letterSpacingEm}em`,
+            fontSize: `${brandSizeRem}rem`,
+            letterSpacing: `${brandLetterSpacingEm}em`,
             lineHeight: 1.15,
             transform:
               foot.brand.anchor === "end" ? "translateX(-100%)" : undefined,

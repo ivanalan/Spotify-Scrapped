@@ -3,12 +3,14 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+import { SpotifyContentCredit } from "@/components/scrapped/SpotifyContentCredit";
 import {
   DEFAULT_LIST_MOTION,
   planListRowMotion,
   type ListMotionId,
   type ListMotionOverrides,
 } from "@/lib/scrapped-list-motion";
+import { cn } from "@/lib/utils";
 
 export type WrappedEntityRow = {
   id: string;
@@ -17,6 +19,8 @@ export type WrappedEntityRow = {
   imageUrl?: string | null;
   /** Solid cover fill when there is no image (labs / empty art). */
   coverColor?: string;
+  /** open.spotify.com URL; row opens in a new tab (deck tap zones hit-test). */
+  href?: string | null;
 };
 
 type Props = {
@@ -27,6 +31,8 @@ type Props = {
   motion?: ListMotionId;
   /** Optional cascade tuning (labs). */
   motionOverrides?: ListMotionOverrides;
+  /** Caption under the list: “Content from Spotify”. */
+  showSpotifyCredit?: boolean;
 };
 
 /** Mock-style numbered rows: index · cover · title / artist. */
@@ -36,6 +42,7 @@ export function WrappedEntityList({
   empty = "Nobody in this window. Suspicious loyalty.",
   motion: motionId = DEFAULT_LIST_MOTION,
   motionOverrides,
+  showSpotifyCredit = false,
 }: Props) {
   const reduceMotion = useReducedMotion();
 
@@ -48,11 +55,14 @@ export function WrappedEntityList({
   }
 
   return (
-    // Natural height under the subtitle: gap grows with cqh up to 3.5rem
-    // (never justify-between stretch). Leftover height stays below the pack.
-    // Cover min is low so short phones can fit five rows without scrolling;
-    // parent scrollport is the overflow escape hatch.
-    <ol className="flex w-full flex-col gap-[clamp(0.375rem,6.5cqh,3.5rem)]">
+    <>
+      {/*
+        Natural height under the subtitle: gap grows with cqh up to 3.5rem
+        (never justify-between stretch). Leftover height stays below the pack.
+        Cover min is low so short phones can fit five rows without scrolling;
+        parent scrollport is the overflow escape hatch.
+      */}
+      <ol className="flex w-full flex-col gap-[clamp(0.375rem,6.5cqh,3.5rem)]">
         {items.map((item, i) => {
           const plan = planListRowMotion(motionId, i, {
             active: true,
@@ -62,19 +72,14 @@ export function WrappedEntityList({
           // Always enter from the plan’s initial state so cascade plays on mount
           // (initial={false} was skipping enter when the list appeared already active).
           const rowTarget = active ? plan.row.animate : plan.row.inactive;
-
-          return (
-            <motion.li
-              key={item.id}
-              className="flex shrink-0 items-center gap-3.5"
-              initial={plan.row.initial}
-              animate={rowTarget}
-              transition={{
-                duration: active ? plan.row.duration : reduceMotion ? 0 : 0.25,
-                delay: active ? plan.row.delay : 0,
-                ease: plan.row.ease,
-              }}
-            >
+          const href = item.href?.trim() || null;
+          const rowClass = cn(
+            "flex shrink-0 items-center gap-3.5",
+            href &&
+              "rounded-sm outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--wrapped-ink)]",
+          );
+          const rowBody = (
+            <>
               <motion.span
                 className="w-5 shrink-0 font-sans text-lg font-bold tabular-nums text-[var(--wrapped-ink)]"
                 initial={plan.index?.initial ?? false}
@@ -163,9 +168,42 @@ export function WrappedEntityList({
                   </span>
                 ) : null}
               </motion.span>
+            </>
+          );
+
+          return (
+            <motion.li
+              key={item.id}
+              className={href ? undefined : rowClass}
+              initial={plan.row.initial}
+              animate={rowTarget}
+              transition={{
+                duration: active ? plan.row.duration : reduceMotion ? 0 : 0.25,
+                delay: active ? plan.row.delay : 0,
+                ease: plan.row.ease,
+              }}
+            >
+              {href ? (
+                <a
+                  href={href}
+                  data-spotify-open=""
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={rowClass}
+                  aria-label={`Open ${item.label} on Spotify`}
+                >
+                  {rowBody}
+                </a>
+              ) : (
+                rowBody
+              )}
             </motion.li>
           );
         })}
-    </ol>
+      </ol>
+      {showSpotifyCredit ? (
+        <SpotifyContentCredit className="pointer-events-none fixed inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-[37] text-center" />
+      ) : null}
+    </>
   );
 }
