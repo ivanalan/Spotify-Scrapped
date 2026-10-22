@@ -86,7 +86,7 @@ type Props = {
    */
   pauseApiRef?: MutableRefObject<ApiScrappedPauseApi | null>;
   /**
-   * `walkthrough` — back (left) to About; no sign-out X (D-024).
+   * `walkthrough`: back (left) to About; no sign-out X (D-024).
    * Default `session` keeps pause / volume / sign-out.
    */
   chromeMode?: "session" | "walkthrough";
@@ -106,7 +106,7 @@ const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
 const INTRO_COPY_DELAY_SEC = 0.35;
 /**
- * Cancel speculative next-act prime after this hold (audio only — no story pause).
+ * Cancel speculative next-act prime after this hold (audio only: no story pause).
  * Short taps clear the timer on pointerup and keep the hot buffer for cutTo.
  */
 const PRIME_HOLD_CANCEL_MS = 200;
@@ -140,7 +140,7 @@ export function ApiScrappedDeck({
   const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const shareExportInFlightRef = useRef(false);
-  /** Pre-captured finale PNG — keeps iOS `navigator.share` inside the tap gesture. */
+  /** Pre-captured finale PNG: keeps iOS `navigator.share` inside the tap gesture. */
   const sharePrecaptureRef = useRef<Blob | null>(null);
   /** Locks active index during programmatic prev/next so IO can't land mid-scroll. */
   const navigatingToRef = useRef<number | null>(null);
@@ -158,7 +158,7 @@ export function ApiScrappedDeck({
   const [introUnlockedFor, setIntroUnlockedFor] = useState<string | null>(null);
   const introGate =
     introSessionKey != null && introUnlockedFor !== introSessionKey;
-  /** Sticky pause button / space — drives chrome icon and soundtrack. */
+  /** Sticky pause button / space: drives chrome icon and soundtrack. */
   const userPaused = pausedSticky;
   const paused = userPaused || held || introGate;
   const activeRef = useRef(active);
@@ -174,7 +174,7 @@ export function ApiScrappedDeck({
     return () => window.clearTimeout(id);
   }, [introSessionKey]);
 
-  // Latest active for IO / keyboard / goTo — sync in effect only (not during render).
+  // Latest active for IO / keyboard / goTo: sync in effect only (not during render).
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
@@ -274,7 +274,7 @@ export function ApiScrappedDeck({
         return;
       }
 
-      // Cut audio in parallel — never block the story on Spotify cutover.
+      // Cut audio in parallel: never block the story on Spotify cutover.
       if (soundOn && onSoundtrackCutTo) {
         const fromUri = getApiSlideSoundtrackUri(report, prev, soundtrackOpts);
         const toUri = getApiSlideSoundtrackUri(report, next, soundtrackOpts);
@@ -323,7 +323,7 @@ export function ApiScrappedDeck({
   }, [onSoundtrackCancelPrime]);
 
   /**
-   * Copy lines only — drives line-beat counts + reading-time durations.
+   * Copy lines only: drives line-beat counts + reading-time durations.
    * Derived entirely from `report` so React Compiler can preserve memoization
    * (object item deps like reunionSong.label are treated as mutable).
    */
@@ -386,22 +386,22 @@ export function ApiScrappedDeck({
         {
           headline:
             liked > 0
-              ? `${liked.toLocaleString()} songs in your Liked pile`
-              : "No songs in your Liked pile",
+              ? `${liked.toLocaleString()} songs in your Liked list`
+              : "No songs in your Liked list",
           subline:
             liked > 0
-              ? "Thats not a library, that's a storage unit"
-              : "Empty shelves. Bold.",
+              ? "That's not a pond. That's an ocean."
+              : "Empty pond. Bold.",
         },
         {
           headline:
             likedYear > 0
-              ? `${likedYear.toLocaleString()} of them joined this year`
-              : "None of them joined this year",
+              ? `${likedYear.toLocaleString()} new songs joined this year`
+              : "No new songs joined this year",
           subline:
             likedYear > 0
-              ? "...and you just kept adding more"
-              : "Quiet year for the heart button.",
+              ? "...and the tide just kept rising."
+              : "Quiet tide for the heart button.",
         },
       ],
       [
@@ -426,7 +426,7 @@ export function ApiScrappedDeck({
           headline: "Most ghosted song",
           subline: hasTopSong
             ? "A multi year fav that fell out of the recent rotation."
-            : "Wow — you actually still talk to your old favs.",
+            : "Wow. You actually still talk to your old favs.",
         },
       ],
       [
@@ -533,7 +533,7 @@ export function ApiScrappedDeck({
   });
 
   // RAF writes transform on the active fill; React won't re-apply scaleX(0) on
-  // back because the VDOM style never changed — force-clear future segments.
+  // back because the VDOM style never changed: force-clear future segments.
   useLayoutEffect(() => {
     for (let i = 0; i < SLIDE_COUNT; i++) {
       const el = fillRefs.current[i];
@@ -632,12 +632,13 @@ export function ApiScrappedDeck({
     return () => window.removeEventListener("keydown", onKey);
   }, [goTo, togglePaused]);
 
-  // Drop speculative prime if the tab hides mid-press.
+  // Tab / app background: sticky-pause story + audio; stay paused on return (D-031).
   useEffect(() => {
     function onVis() {
       if (!document.hidden) return;
       clearPrimeHoldTimer();
       cancelSoundtrackPrime();
+      setPausedSticky(true);
     }
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
@@ -654,7 +655,7 @@ export function ApiScrappedDeck({
   }, [soundtrackUri, onSoundtrackUriChange]);
 
   useEffect(() => {
-    // Sticky user pause mutes audio. Gate `held` must not — reveal stays warm.
+    // Sticky user pause mutes audio. Gate `held` must not; reveal stays warm.
     onPausedChange?.(userPaused);
   }, [userPaused, onPausedChange]);
 
@@ -690,7 +691,7 @@ export function ApiScrappedDeck({
   };
 
   // Chrome (wordmark / progress / controls) follows the active slide’s theme.
-  // Scene 7 setup: film letterbox covers the toolbar — force ink (light
+  // Scene 7 setup: film letterbox covers the toolbar: force ink (light
   // glyphs) so Scrapped / progress read on the black bars (D-016). Bars stay
   // through title + subline (phases 0..1); retract starts with list/reveal (≥2).
   const chromeTone =
@@ -716,7 +717,7 @@ export function ApiScrappedDeck({
           setSharePrecaptureReady(true);
         })
         .catch(() => {
-          // Leave unready — tap still tries on-demand capture (desktop OK).
+          // Leave unready: tap still tries on-demand capture (desktop OK).
         });
     }, 450);
     return () => {
@@ -736,7 +737,7 @@ export function ApiScrappedDeck({
         blob: sharePrecaptureRef.current ?? undefined,
       });
     } catch {
-      // Capture / share failed — no toast surface yet. AbortError is handled inside.
+      // Capture / share failed: no toast surface yet. AbortError is handled inside.
     } finally {
       shareExportInFlightRef.current = false;
       setShareExportBusy(false);
@@ -813,7 +814,7 @@ export function ApiScrappedDeck({
                 aria-label="Back to About"
                 className={cn(
                   buttonVariants({ variant: "default", size: "icon" }),
-                  "size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90",
+                  "rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90",
                 )}
               >
                 <Icon icon={arrowBackOutline} className="size-4" />
@@ -830,7 +831,7 @@ export function ApiScrappedDeck({
               variant="default"
               aria-label={userPaused ? "Resume story" : "Pause story"}
               onClick={togglePaused}
-              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
+              className="rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
             >
               <Icon
                 icon={userPaused ? playOutline : pauseOutline}
@@ -847,7 +848,7 @@ export function ApiScrappedDeck({
                 if (soundOn) onDisableSound();
                 else onEnableSound();
               }}
-              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90 disabled:opacity-40"
+              className="rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90 disabled:opacity-40"
             >
               <Icon
                 icon={soundOn ? volumeHighOutline : volumeMuteOutline}
@@ -863,7 +864,7 @@ export function ApiScrappedDeck({
         ref={scrollerRef}
         className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {/* 0 — year open → Hey + welcome (paired). Copy delayed for Continue audio. */}
+        {/* 0: year open → Hey + welcome (paired). Copy delayed for Continue audio. */}
         <WrappedStorySlide
           {...sceneMotion(0)}
           tone={slideTone(0)}
@@ -894,7 +895,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 1 — liked volume → liked this year */}
+        {/* 1: liked volume → liked this year */}
         <WrappedStorySlide
           {...sceneMotion(1)}
           tone={slideTone(1)}
@@ -903,29 +904,29 @@ export function ApiScrappedDeck({
             {
               headline:
                 likedCount > 0
-                  ? `${likedCount.toLocaleString()} songs in your Liked pile`
-                  : "No songs in your Liked pile",
+                  ? `${likedCount.toLocaleString()} songs in your Liked list`
+                  : "No songs in your Liked list",
               subline:
                 likedCount > 0
-                  ? "Thats not a library, that's a storage unit"
-                  : "Empty shelves. Bold.",
+                  ? "That's not a pond. That's an ocean."
+                  : "Empty pond. Bold.",
               display: "hero",
             },
             {
               headline:
                 likedThisYearCount > 0
-                  ? `${likedThisYearCount.toLocaleString()} of them joined this year`
-                  : "None of them joined this year",
+                  ? `${likedThisYearCount.toLocaleString()} new songs joined this year`
+                  : "No new songs joined this year",
               subline:
                 likedThisYearCount > 0
-                  ? "...and you just kept adding"
-                  : "Quiet year for the heart button.",
+                  ? "...and the tide just kept rising."
+                  : "Quiet tide for the heart button.",
               display: "hero",
             },
           ]}
         />
 
-        {/* 2 — ghosted ratio → one stings → #1 ghosted song */}
+        {/* 2: ghosted ratio → one stings → #1 ghosted song */}
         <WrappedStorySlide
           {...sceneMotion(2)}
           tone={slideTone(2)}
@@ -955,7 +956,7 @@ export function ApiScrappedDeck({
               headline: "Most ghosted song",
               subline: topSong
                 ? "A multi year fav that fell out of the recent rotation."
-                : "Wow — you actually still talk to your old favs.",
+                : "Wow. You actually still talk to your old favs.",
               lead: topSong ? (
                 <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topSong.imageUrl ? (
@@ -985,7 +986,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 3 — one ghost town → top ghosted songs list */}
+        {/* 3: one ghost town → top ghosted songs list */}
         <WrappedStorySlide
           {...sceneMotion(3)}
           tone={slideTone(3)}
@@ -1015,7 +1016,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 4 — one hit wonders → 1 like setup → one-save list */}
+        {/* 4: one hit wonders → 1 like setup → one-save list */}
         <WrappedStorySlide
           {...sceneMotion(4)}
           tone={slideTone(4)}
@@ -1064,7 +1065,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 5 — left on read → #1 left-on-read artist */}
+        {/* 5: left on read → #1 left-on-read artist */}
         <WrappedStorySlide
           {...sceneMotion(5)}
           tone={slideTone(5)}
@@ -1108,7 +1109,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 6 — gang back together → top left-on-read artists list */}
+        {/* 6: gang back together → top left-on-read artists list */}
         <WrappedStorySlide
           {...sceneMotion(6)}
           tone={slideTone(6)}
@@ -1140,7 +1141,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 7 — plot twist + reunion (combined) */}
+        {/* 7: plot twist + reunion (combined) */}
         <WrappedStorySlide
           {...sceneMotion(7)}
           tone={slideTone(7)}
@@ -1198,7 +1199,7 @@ export function ApiScrappedDeck({
           }
         />
 
-        {/* 8 — soft close before share (two beats) */}
+        {/* 8: soft close before share (two beats) */}
         <WrappedStorySlide
           {...sceneMotion(8)}
           tone={slideTone(8)}
@@ -1217,7 +1218,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 9 — share finale — ink stage + intro chrome + teal card (D-012 / D-014) */}
+        {/* 9: share finale: ink stage + intro chrome + teal card (D-012 / D-014) */}
         <section
           data-scrapped-slide
           data-wrapped-tone={slideTone(9)}
@@ -1233,7 +1234,7 @@ export function ApiScrappedDeck({
             style={{ gap: `${D.cardActionsGapPx}px` }}
           >
             {/*
-              9:16 island (D-012) — width = min(slot width, slot height × 9/16)
+              9:16 island (D-012): width = min(slot width, slot height × 9/16)
               so the capture node stays true portrait (Stories / Wrapped form).
             */}
             <div className="flex min-h-0 w-full flex-1 items-center justify-center [container-type:size]">
@@ -1281,8 +1282,8 @@ export function ApiScrappedDeck({
               <Button
                 type="button"
                 variant="secondary"
-                className="h-auto w-full rounded-full border-0 bg-[#f5f5f5] font-bold text-[#1c1c1c] hover:bg-[#f5f5f5]/90 disabled:opacity-70"
-                style={{ paddingBlock: `${D.sharePadYPx}px` }}
+                size="lg"
+                className="w-full rounded-full border-0 bg-[#f5f5f5] font-bold text-[#1c1c1c] hover:bg-[#f5f5f5]/90 disabled:opacity-70"
                 disabled={shareExportBusy || !sharePrecaptureReady}
                 aria-busy={shareExportBusy || !sharePrecaptureReady}
                 onClick={() => void onShareFinale()}
@@ -1293,9 +1294,11 @@ export function ApiScrappedDeck({
                     ? "Share"
                     : "Preparing…"}
               </Button>
-              <button
+              <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 py-1.5 text-[0.82rem] font-semibold text-[var(--wrapped-ink)] opacity-90 transition-opacity hover:opacity-100"
+                variant="ghost"
+                size="lg"
+                className="gap-2 text-[0.82rem] font-semibold text-[var(--wrapped-ink)] hover:bg-transparent hover:text-[var(--wrapped-ink)] hover:opacity-100 opacity-90"
                 onClick={onReplayFromBeginning}
               >
                 <Icon
@@ -1304,7 +1307,7 @@ export function ApiScrappedDeck({
                   aria-hidden
                 />
                 Replay from beginning
-              </button>
+              </Button>
             </div>
           </div>
         </section>

@@ -12,7 +12,7 @@ const BG = "#3a1560";
 const STRIPE = "#f4efe8";
 const COUNT = 14;
 
-/** Hard diagonal / chevron force field — wipe reveal like printed ink. */
+/** Hard diagonal / chevron force field: wipe reveal like printed ink. */
 export function StripeForceArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

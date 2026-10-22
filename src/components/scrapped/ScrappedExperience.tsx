@@ -23,7 +23,7 @@ import type { ScrappedApiReport } from "@/lib/scrapped-api";
 type Props = {
   report: ScrappedApiReport;
   /**
-   * `walkthrough` — frozen fixture, no artist-top-track API, deck back chrome (D-024).
+   * `walkthrough`: frozen fixture, no artist-top-track API, deck back chrome (D-024).
    */
   chromeMode?: "session" | "walkthrough";
   /** Walkthrough toolbar back target. */
@@ -60,7 +60,7 @@ export function ScrappedExperience({
   const isWalkthrough = chromeMode === "walkthrough";
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
   const pauseApiRef = useRef<ApiScrappedPauseApi | null>(null);
-  // Walkthrough skips the ready gate — land straight on slide 0 (D-024).
+  // Walkthrough skips the ready gate: land straight on slide 0 (D-024).
   const [phase, setPhase] = useState<Phase>(isWalkthrough ? "story" : "gate");
   const [soundOn, setSoundOn] = useState(false);
 
@@ -99,7 +99,7 @@ export function ScrappedExperience({
   );
 
   // Warm artist-act audio on the gate when tops/likes lack distinct samples.
-  // Walkthrough skips this — fixture must already carry trackIds (D-024).
+  // Walkthrough skips this: fixture must already carry trackIds (D-024).
   useEffect(() => {
     if (!resolveArtistTracks) {
       setArtistSoundtrackUri(null);
@@ -154,7 +154,7 @@ export function ScrappedExperience({
   }
 
   /**
-   * Spotify has no mute — arm = play until audible, pause at t=3.
+   * Spotify has no mute: arm = play until audible, pause at t=3.
    * Continue click resume()s that buffer (“unmute”).
    */
   function handleContinuePointerDown() {

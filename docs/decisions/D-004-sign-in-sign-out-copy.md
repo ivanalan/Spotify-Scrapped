@@ -1,4 +1,4 @@
-# D-004 — Sign in / sign out copy
+# D-004: Sign in / sign out copy
 
 - **Date:** 2026-10-16
 - **Status:** Locked
@@ -10,20 +10,21 @@ Auth CTAs mixed **Log in**, **Log out**, **Connect Spotify**, **Disconnect**, an
 ## Decision
 
 1. User-facing auth copy uses **sign in** and **sign out** only (sentence case as UI labels: `Sign in`, `Sign out`, `Signed in to Spotify as {name}`).
-2. Gate auth chrome (top-right) uses the short labels **Sign in** / **Sign out**. **Sign in** is primary solid (light fill on the ink field); **Sign out** stays outline secondary. Prefer `aria-label="Sign in to Spotify"` on the Sign in control when the Spotify noun is not visible in the button text. About (top-left) uses the same outline secondary as Sign out — [D-022](D-022-about-page-gate-d6.md).
+2. Gate placement: unsigned **Sign in** is the waitlist helper link (“Already have access? Sign in”); not top-right chrome ([D-027](D-027-sign-in-under-waitlist.md)). Prefer `aria-label="Sign in to Spotify"` when the Spotify noun is not in the visible label. Top-right **Sign out** (when signed in) is primary fill; About (top-left) stays outline secondary; [D-022](D-022-about-page-gate-d6.md), [D-023](D-023-gate-button-triad.md).
 3. Do not use **log in / log out**, **connect / disconnect**, or mixed pairs for the same actions.
-4. API route paths (`/api/spotify/login`, `/api/spotify/logout`) may keep technical names — they are not product copy.
+4. API route paths (`/api/spotify/login`, `/api/spotify/logout`) may keep technical names; they are not product copy.
 
 ## Displaced
 
 - `Log in to Spotify` / `Log out`
 - `Connect Spotify` / `Disconnect` as primary auth labels
 - `Logged in to Spotify as…`
-- Mid-gate primary CTA `Sign in to Spotify` (replaced by waitlist + top-right **Sign in**)
+- Mid-gate primary CTA `Sign in to Spotify` (replaced by waitlist; Sign in under the form helper; [D-027](D-027-sign-in-under-waitlist.md))
+- Top-right primary solid **Sign in** (see [D-027](D-027-sign-in-under-waitlist.md))
 
 ## Cost
 
-Docs and mocks that still say “Connect Spotify” should be updated when touched. Prefer linking here over restating the glossary. Longer `Sign in to Spotify` button labels elsewhere should migrate to chrome **Sign in** when those surfaces are touched.
+Docs and mocks that still say “Connect Spotify” should be updated when touched. Prefer linking here over restating the glossary. Longer `Sign in to Spotify` button labels elsewhere should migrate to the short **Sign in** label when those surfaces are touched.
 
 ## Key files
 

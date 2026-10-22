@@ -152,7 +152,7 @@ export function ArtMotionLab() {
           Ten directions
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
-          Research surface — click a direction, then preview Overview (looping
+          Research surface: click a direction, then preview Overview (looping
           load-in), Story, and Share. Live{" "}
           <span className="font-mono">/scrapped</span> stays text-first until
           you promote one.

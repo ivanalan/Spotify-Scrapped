@@ -1,8 +1,8 @@
-# D-018 — Ghosted pair: ground → sky + S9 stars + C8 chrome
+# D-018: Ghosted pair: ground → sky + S9 stars + C8 chrome
 
 **Status:** Locked  
 **Date:** 2026-10-20  
-**Surfaces:** `/scrapped` API deck scenes 2–3. Fav **S9** on **C8** base.
+**Surfaces:** `/scrapped` API deck scenes 2-3. Fav **S9** on **C8** base.
 
 ## Decision
 
@@ -12,23 +12,23 @@ Invert the ghosted entity→list night rhyme and lock star + chrome treatments:
 |------|--------|
 | Scene 2 (entity) | Ink · **ridge grass** · **S9** entity star map (5, grow-in + overlapping pulse) · one blob haunt at **cover TL** · **no moon** |
 | Scene 3 (list) | Ink · **TR-corner silver→ember moon** (grow-in + lilac underglow) · **no stars** · **5 fade + overlapping float** edge ghosts · **no grass / no clouds** |
-| Deck chrome on scene 3 | **C8** — ink top scrim under wordmark / progress / controls (pills already solid on ink theme) |
+| Deck chrome on scene 3 | **C8**: ink top scrim under wordmark / progress / controls (pills already solid on ink theme) |
 
 ## Why
 
-Flipped “moon then weather” to “ground haunt → sky chorus.” Cover-TL ghost reads as the song’s haunt; list moon + staggered fade-in ghosts escalate without mid-band heroes. Stars stay on the entity only — list sky is moon + ghosts so the chorus doesn’t re-sparkle. TR-corner moon still needs the C8 scrim so chrome stays readable. **S9** (4-point + quiet orchid glow, grow-in) won over dots/soft as the entity night sparkle. Slow opacity fade (not rise/scale) for ghosts keeps the pair quiet.
+Flipped “moon then weather” to “ground haunt → sky chorus.” Cover-TL ghost reads as the song’s haunt; list moon + staggered fade-in ghosts escalate without mid-band heroes. Stars stay on the entity only; list sky is moon + ghosts so the chorus doesn’t re-sparkle. TR-corner moon still needs the C8 scrim so chrome stays readable. **S9** (4-point + quiet orchid glow, grow-in) won over dots/soft as the entity night sparkle. Slow opacity fade (not rise/scale) for ghosts keeps the pair quiet.
 
 ## Locked choices
 
 | Axis | Choice |
 |------|--------|
 | Entity moon | Off (displaces D-017 N4 TR moon) |
-| Entity ground | Spiky ridge grass (was list-only in D-010); enter = **rise-from-soil** cascade — [D-021](D-021-ghosted-grass-rise-from-soil.md) |
-| Entity haunt | Cover TL peek (~51, 149 · size 77 · op 0.74) — same former TR inset, mirrored — slow fade then bob |
-| Stars | S9 — 4-point · grow-in (~0.75s) with pulse overlap · opacity ≈0.11–0.58 · **entity 5 only** (list off) · size ×1.05 · static SVG translate (motion scale nested) · **never under haunt AABB** (pad for bob; stars paint behind ghosts) |
+| Entity ground | Spiky ridge grass (was list-only in D-010); enter = **rise-from-soil** cascade; [D-021](D-021-ghosted-grass-rise-from-soil.md) |
+| Entity haunt | Cover TL peek (~51, 149 · size 77 · op 0.74); same former TR inset, mirrored; slow fade then bob |
+| Stars | S9; 4-point · grow-in (~0.75s) with pulse overlap · opacity ≈0.11-0.58 · **entity 5 only** (list off) · size ×1.05 · static SVG translate (motion scale nested) · **never under haunt AABB** (pad for bob; stars paint behind ghosts) |
 | List sky | TR-corner moon (cx 336, cy 104, r 62, op 0.8) · grow-in · lilac/ember **underglow** blur · silver→ember radial · **no hard halo ring** |
 | List ground | None |
-| List ghosts | **5** inset edge (L + R) · fade gated to list beat (“Your ghosted songs”, `beatPhase >= 1`) · +0.45s pad · opacity fade (1.7s) · float at **45%** of fade · stagger 1.3→3.1s · remount on scene visit |
+| List ghosts | **5** inset edge (L + R) · gated to list beat (“Your ghosted songs”, `beatPhase >= 1`) · **E3** outer-edge slide → land → local bob + random blink — [D-030](D-030-ghost-e3-slide-enter-random-blink.md) · remount on scene visit |
 | List clouds | Off |
 | Chrome | Scene 3 ink scrim (`ApiScrappedDeck`) |
 
@@ -42,11 +42,11 @@ Those decisions remain historical; this file is the live ghosted-pair source of 
 
 ## Cost
 
-Two consecutive ink fields still rely on motif escalation. Cover-TR ghost sits in the SVG art layer behind the HTML cover — position is approximate to the centered 160px lead. Larger TR-corner moon still benefits from the C8 scrim; removing the scrim regresses chrome contrast. Ghosts stay inset from the viewBox edges so `slice` / meet crops don’t clip them. Scene 3 chrome remounts on visit (`replayKey`) so fade/float re-enter; without that, snap-mounted slides skip the enter.
+Two consecutive ink fields still rely on motif escalation. Cover-TR ghost sits in the SVG art layer behind the HTML cover; position is approximate to the centered 160px lead. Larger TR-corner moon still benefits from the C8 scrim; removing the scrim regresses chrome contrast. Ghosts stay inset from the design edges. Wide uses left/right full-height pins (not one meet/slice stage) so all five stay visible ([D-009](D-009-responsive-motif-pins.md)). Scene 3 chrome remounts on visit (`replayKey`) so fade/float re-enter; without that, snap-mounted slides skip the enter.
 
 ## Source of truth
 
 - Motifs: `GhostedNightEntity` · `GhostedListFrame` · `PointGlowStars` · `GhostedHardMoon` · `RisingColumnGhosts` in `PeripheralMotifs.tsx`
 - Grass enter motion: [D-021](D-021-ghosted-grass-rise-from-soil.md) (`SpikyGrass`)
-- Wide: `ScrappedOrbitArt` `WideOrbitChrome`
+- Wide: `ScrappedOrbitArt` `WideOrbitChrome` (grass / haunt / moon / L+R ghost pins)
 - Chrome scrim: `ApiScrappedDeck` when `active === 3`

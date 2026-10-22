@@ -1,8 +1,8 @@
-# D-011 — Scrapped logo is always italic
+# D-011: Scrapped logo is always italic
 
 **Status:** Locked  
 **Date:** 2026-10-19  
-**Surfaces:** Product chrome wordmark (API deck toolbar, Plus/Lab nav), gate / intro display title, and any other place “Scrapped” is shown as the brand logo — not body copy.
+**Surfaces:** Product chrome wordmark (API deck toolbar, Plus/Lab nav), gate / intro display title, and any other place “Scrapped” is shown as the brand logo; not body copy.
 
 ## Decision
 
@@ -19,8 +19,8 @@ The deck toolbar wordmark was roman while the gate hero already used italic “S
 | Axis | Choice |
 |------|--------|
 | Logo / wordmark | Always `italic` (Poppins) |
-| Deck chrome | Toolbar “Scrapped” left of controls — italic |
-| Nav home link | Plus/Lab header wordmark — italic |
+| Deck chrome | Toolbar “Scrapped” left of controls; italic |
+| Nav home link | Plus/Lab header wordmark; italic |
 | Gate / intro display | `text-display` + italic (already) |
 | Body copy | Roman product name in running text |
 

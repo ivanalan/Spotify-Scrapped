@@ -240,7 +240,7 @@ function renderCell(x: number, y: number, cell: Cell) {
   }
 }
 
-/** Flat Bauhaus construct — tiles stamp in with stagger, settle. */
+/** Flat Bauhaus construct: tiles stamp in with stagger, settle. */
 export function BauhausConstructArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

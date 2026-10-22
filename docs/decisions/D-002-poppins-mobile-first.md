@@ -1,4 +1,4 @@
-# D-002 — Poppins type system + mobile-first gate
+# D-002: Poppins type system + mobile-first gate
 
 - **Date:** 2026-10-16
 - **Status:** Locked
@@ -11,8 +11,8 @@ Intro/login typography mixed Gentium (serif headings) and Fustat (sans body), an
 
 1. **Poppins** is the sole UI typeface. `--font-sans`, `--font-heading`, and `--font-display` all resolve to Poppins (`@fontsource/poppins` Latin weights 400/500/600/700 + italics).
 2. Shared type roles live in `src/app/globals.css`: `text-display`, `text-title`, `text-body`, `text-caption`. Prefer these over one-off clamp stacks on new UI.
-3. **Mobile-first, responsive** — design for the phone first, then scale. Surfaces **fill the viewport** (full-bleed paper/canvas). Do not letterbox with dark gutters. Content stays left-aligned; do not center-stack as a marketing poster.
-4. **Gate** (`ScrappedGate`) is a left-aligned stack on a full-bleed Orbit ink field: top-left `About` → top-right auth chrome (`Sign in` / `Sign out`) → year → *Scrapped* → blurb → mid CTA (waitlist join when signed out; `Continue` when ready) → optional “Signed in to Spotify as {name}” → footer credit. Auth verbs: [D-004](D-004-sign-in-sign-out-copy.md). About page + gate disk kit D6: [D-022](D-022-about-page-gate-d6.md).
+3. **Mobile-first, responsive**: design for the phone first, then scale. Surfaces **fill the viewport** (full-bleed paper/canvas). Do not letterbox with dark gutters. Content stays left-aligned; do not center-stack as a marketing poster.
+4. **Gate** (`ScrappedGate`) is a left-aligned stack on a full-bleed Orbit ink field: top-left `About` → top-right primary `Sign out` when signed in (unsigned: no top-right Sign in: [D-027](D-027-sign-in-under-waitlist.md)) → year → *Scrapped* → blurb → mid CTA (waitlist join when signed out; `Continue` when ready) → optional “Signed in to Spotify as {name}” → footer credit. Auth verbs: [D-004](D-004-sign-in-sign-out-copy.md). About page + gate disk kit D6: [D-022](D-022-about-page-gate-d6.md).
 
 ## Displaced
 
@@ -23,7 +23,7 @@ Intro/login typography mixed Gentium (serif headings) and Fustat (sans body), an
 
 ## Cost
 
-Agents must not reintroduce a second display face “for contrast.” Identity under the CTA (logged-in caption) replaces year-line personalization on the gate. Mobile-first means composition order and density — not clipping the canvas to a phone frame on large screens.
+Agents must not reintroduce a second display face “for contrast.” Identity under the CTA (logged-in caption) replaces year-line personalization on the gate. Mobile-first means composition order and density; not clipping the canvas to a phone frame on large screens.
 
 ## Key files
 

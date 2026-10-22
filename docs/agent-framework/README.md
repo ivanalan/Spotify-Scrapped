@@ -23,16 +23,16 @@ Optional later: `docs/systems/<System>/README.md` (how it works today), slice do
    - Add an always-on agent rule (Cursor: `.cursor/rules/agent-memory.mdc`) that points at those files
 2. In `AGENTS.md`, add the reading-list table above and the contribution loop below
 3. Fill `SOUL.md` with **this** product’s fantasy, non-negotiables, kill switch, and audience
-4. Leave `SCARS.md` / decisions empty except a one-line “how to append” note — or seed from a real incident
+4. Leave `SCARS.md` / decisions empty except a one-line “how to append” note; or seed from a real incident
 5. Ship framework files in git next to the code
 
 ## Five rules
 
 1. **Keep docs in the repo**, and ship them in the **same commit** as the change.
 2. **Split by system** (how it works today) and by **slice** (what we’re proving, with a stop line).
-3. **One fact, one place** — status on the board, not buried in old plans; decisions in `D-NNN`, not restated everywhere.
+3. **One fact, one place**: status on the board, not buried in old plans; decisions in `D-NNN`, not restated everywhere.
 4. **Write scars down**, with the **symptom as the title**.
-5. **Enforce** with rules, hooks, and checks — or expect drift.
+5. **Enforce** with rules, hooks, and checks: or expect drift.
 
 ## Contribution loop (every agent)
 
@@ -63,7 +63,7 @@ See [docs/decisions/README.md](../decisions/README.md). IDs: `D-001`, `D-002`, �
 ## AGENTS.md style
 
 - Short and pointed; **every rule has a story** (name the incident).
-- **Point, don’t copy** — link to the source of truth.
+- **Point, don’t copy**: link to the source of truth.
 - Scope heavy rules to paths when possible so they load when relevant.
 
 ## SOUL.md style
@@ -76,4 +76,4 @@ Rules tell an agent how. The soul tells it what to protect when the rules run ou
 - Rely on prior chat transcripts as project memory
 - Duplicate standards into five places that will diverge
 - Automate giant checkpoint logs nobody reads (prune or don’t add)
-- Leave an approved plan only in a temp folder — copy it into the repo
+- Leave an approved plan only in a temp folder; copy it into the repo

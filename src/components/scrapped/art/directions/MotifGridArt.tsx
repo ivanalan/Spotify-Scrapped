@@ -13,7 +13,7 @@ const MOTIF = "#f2a7c3";
 const COLS = 8;
 const ROWS = 14;
 
-/** City-poster density — one glyph cascaded into a field. */
+/** City-poster density: one glyph cascaded into a field. */
 export function MotifGridArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

@@ -45,7 +45,7 @@ export type OrbitCascadeArtProps = SlideArtProps & {
   fishSizeScale?: number;
 };
 
-/** Perimeter-biased spiral — clear mid hole for copy / cover. */
+/** Perimeter-biased spiral: clear mid hole for copy / cover. */
 function spiralOrbs(
   cx: number,
   cy: number,
@@ -73,7 +73,7 @@ function spiralOrbs(
   });
 }
 
-/** Single solidified direction — Orbit Cascade. */
+/** Single solidified direction: Orbit Cascade. */
 export function OrbitCascadeArt({
   slideIndex,
   pattern,
@@ -198,13 +198,13 @@ export function OrbitCascadeArt({
           />
         )}
 
-        {/* 09 share — blank canvas; card only */}
+        {/* 09 share: blank canvas; card only */}
       </MotifStage>
     </div>
   );
 }
 
-/** Slide 2 — perimeter spiral orbs; spiral-in, then drift. */
+/** Slide 2: perimeter spiral orbs; spiral-in, then drift. */
 function SpiralCascadeDots({
   cx,
   cy,

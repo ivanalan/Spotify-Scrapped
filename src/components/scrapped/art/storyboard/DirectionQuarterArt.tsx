@@ -5,7 +5,7 @@ import { MotifStage, QuarterDisk } from "./ShapeKit";
 import type { SlideArtProps } from "./types";
 import { themeFor } from "./themes";
 
-/** Direction C — Quarter Construct (light conversational). */
+/** Direction C: Quarter Construct (light conversational). */
 export function DirectionQuarterArt({
   slideIndex,
   pattern,

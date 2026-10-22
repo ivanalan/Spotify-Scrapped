@@ -20,7 +20,7 @@ function PerfRow() {
 }
 
 /**
- * 7L film letterbox — bars present from scene start, inset sprockets,
+ * 7L film letterbox: bars present from scene start, inset sprockets,
  * smooth continuous scroll; long retract when list / reveal enters.
  * Geometry / scroll: D-016 (smooth travel 20%, ~6s / 7.2s linear).
  */
@@ -36,7 +36,7 @@ export function FilmLetterboxChrome({
       : "settled-out"
     : mode;
 
-  // Key on replay only — including `mode` remounted the tree when retract
+  // Key on replay only: including `mode` remounted the tree when retract
   // started and snapped sprocket scroll back to translateX(0).
   return (
     <div

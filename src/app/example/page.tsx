@@ -7,14 +7,14 @@ import {
 } from "@/lib/scrapped-api";
 
 export const metadata: Metadata = {
-  title: "Example — Scrapped",
+  title: "Example: Scrapped",
   description:
     "A sample Scrapped story deck from a frozen affinity snapshot. No sign-in required.",
 };
 
 /**
  * Anonymous example walkthrough (D-024).
- * Serves a Guest-redacted ScrappedApiReport — no Spotify Web API per visitor.
+ * Serves a Guest-redacted ScrappedApiReport: no Spotify Web API per visitor.
  * `ensureApiReportSummary` migrates older one-save row shapes (label=artist).
  */
 export default function ExampleWalkthroughPage() {

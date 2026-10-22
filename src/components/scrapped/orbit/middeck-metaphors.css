@@ -1,5 +1,5 @@
 /**
- * Middeck metaphor chrome — promoted from middeck-metaphor-kits.html (D-016).
+ * Middeck metaphor chrome: promoted from middeck-metaphor-kits.html (D-016).
  * Fav locks: 4A heart · 5I chat bloom · 7L film letterbox · 8B teal iris.
  */
 
@@ -29,9 +29,9 @@
   pointer-events: none;
   overflow: hidden;
   --mm-heart-ease: cubic-bezier(0.33, 1, 0.68, 1);
-  /* Linear draw — constant stroke speed (no mid-path rush) */
+  /* Linear draw: constant stroke speed (no mid-path rush) */
   --mm-heart-draw-ease: linear;
-  /* Smooth settle — no aggressive overshoot ease (that stuttered at the peak) */
+  /* Smooth settle: no aggressive overshoot ease (that stuttered at the peak) */
   --mm-heart-pop-ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* 1) Linear draw  2) 1s hold  3) like (fill+pop) */
   --mm-heart-draw-dur: 1.9s;
@@ -55,7 +55,7 @@
   overflow: visible;
 }
 
-/* Pop scale wrapper — never transform the <svg> itself (hi-DPI crispness). */
+/* Pop scale wrapper: never transform the <svg> itself (hi-DPI crispness). */
 .mm-heart-pop {
   position: relative;
   z-index: 2;
@@ -80,7 +80,7 @@
   stroke-width: 22;
   stroke-linejoin: round;
   stroke-linecap: round;
-  /* pathLength=1 on the element — dash 1 = full perimeter */
+  /* pathLength=1 on the element: dash 1 = full perimeter */
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   opacity: 1;
@@ -123,7 +123,7 @@
   background: var(--mm-rose);
 }
 
-/* Idle / freeze — full outline drawn, no fill */
+/* Idle / freeze: full outline drawn, no fill */
 .mm-heart-scene[data-mode="hero"][data-animate="0"] .mm-heart-outline {
   stroke-dashoffset: 0;
   opacity: 0.9;
@@ -133,7 +133,7 @@
   opacity: 0;
 }
 
-/* Setup enter — slow draw, then like (fill + short smooth pop + sparks) */
+/* Setup enter: slow draw, then like (fill + short smooth pop + sparks) */
 .mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-outline {
   animation:
     mm-heart-draw var(--mm-heart-draw-dur) var(--mm-heart-draw-ease) both,
@@ -152,7 +152,7 @@
 }
 
 /*
- * List handoff — match story copy exit opacity (STORY_MOTION.exitFadeSec /
+ * List handoff: match story copy exit opacity (STORY_MOTION.exitFadeSec /
  * exitEase). Keep fill painted during exit (base .mm-heart-fill is opacity 0;
  * dropping the enter animation used to snap the heart off before the fade).
  */
@@ -170,7 +170,7 @@
 }
 
 .mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-pop {
-  /* Soft rise with copy exitY — no shrink-to-vanish */
+  /* Soft rise with copy exitY: no shrink-to-vanish */
   animation: mm-heart-exit-drift 0.42s cubic-bezier(0.4, 0, 0.6, 1) both;
 }
 
@@ -197,7 +197,7 @@
   }
 }
 
-/* Full-size opacity fill — never scale(tiny) (that was the mid disc). */
+/* Full-size opacity fill: never scale(tiny) (that was the mid disc). */
 @keyframes mm-heart-fill {
   from {
     opacity: 0;
@@ -208,8 +208,7 @@
 }
 
 /*
- * Short like-pop after draw. Two-stop scale (peak → settle) + soft ease —
- * the old 1→peak→0.94→1 on a long timeline stuttered at the crest.
+ * Short like-pop after draw. Two-stop scale (peak → settle) + soft ease: * the old 1→peak→0.94→1 on a long timeline stuttered at the crest.
  */
 @keyframes mm-heart-pop {
   0% {
@@ -241,7 +240,7 @@
   }
 }
 
-/* List frame — perimeter rising hearts (D-015) */
+/* List frame: perimeter rising hearts (D-015) */
 .mm-heart-frame {
   position: absolute;
   inset: 0;
@@ -349,7 +348,7 @@
   animation-delay: 2s;
 }
 
-/* Continuous float — transform moves from frame 0; opacity only fades in/out */
+/* Continuous float: transform moves from frame 0; opacity only fades in/out */
 @keyframes mm-heart-rise {
   0% {
     opacity: 0;
@@ -388,7 +387,7 @@
   }
 }
 
-/* ── Left-on-read chat — pin (entity) + edge bloom (list) · D-019 ── */
+/* ── Left-on-read chat: pin (entity) + edge bloom (list) · D-019 ── */
 .mm-chat {
   --chat-col-w: 124px;
   --chat-col-top: 8%;
@@ -416,7 +415,7 @@
     var(--mm-orchid) 72%,
     var(--mm-orchid-deep) 100%
   );
-  /* Typing pin — horizontally centered, below cover-lead headline (D-019).
+  /* Typing pin: horizontally centered, below cover-lead headline (D-019).
      Art-first stack is justify-center; 50% ± offsets track that mid. */
   --chat-type-w: 100px;
   --chat-type-h: 52px;
@@ -431,7 +430,7 @@
   overflow: hidden;
 }
 
-/* Soft orchid TL / orchid-ink BR — ink canvas stays under (D-019) */
+/* Soft orchid TL / orchid-ink BR: ink canvas stays under (D-019) */
 .mm-chat-field {
   position: absolute;
   inset: 0;
@@ -450,7 +449,7 @@
   z-index: 0;
 }
 
-/* Entity — one compact typing bubble (mid clear for artwork).
+/* Entity: one compact typing bubble (mid clear for artwork).
    Tail (::before) sits under the pill (::after) so only the tip peeks out. */
 .mm-chat-typing {
   position: absolute;
@@ -608,7 +607,7 @@
   }
 }
 
-/* D-015 / D-019 — quiet + frame share .mm-chat-col / .mm-chat-mirror vars
+/* D-015 / D-019: quiet + frame share .mm-chat-col / .mm-chat-mirror vars
    (no mode-specific geometry jump on list enter). */
 
 /* ── 7L · Film letterbox (smooth sprocket scroll) ── */
@@ -651,7 +650,7 @@
   bottom: 0;
 }
 
-/* Present from scene start — no animate-in; long smooth retract on list/reveal. */
+/* Present from scene start: no animate-in; long smooth retract on list/reveal. */
 .mm-film[data-mode="in"] .mm-film-strip,
 .mm-film[data-mode="settled-in"] .mm-film-strip {
   transform: translateY(0);

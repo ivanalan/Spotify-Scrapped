@@ -40,7 +40,7 @@ const MOCK_ROWS = [
 
 const HEADLINE = "The reunion setlist";
 const SUBLINE =
-  "Old multi-year favorites — or old likes — back in your 4-week tops after a gap.";
+  "Old multi-year favorites; or old likes; back in your 4-week tops after a gap.";
 
 const ease = [0.33, 1, 0.68, 1] as const;
 
@@ -372,7 +372,7 @@ export function ListSlideTuneLab() {
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
           Direct view of slide 08 (list beat). Sliders retune title, subtitle,
-          and cascade — loops from blank. Live deck stays on shipped defaults
+          and cascade: loops from blank. Live deck stays on shipped defaults
           until you promote values.
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">

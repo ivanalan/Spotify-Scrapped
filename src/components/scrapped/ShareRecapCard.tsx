@@ -28,23 +28,23 @@ type Props = {
   brandLine?: string;
   active?: boolean;
   /**
-   * `default` — Plus share card.
-   * `receipt` — industrial API look.
-   * `minimal` — art + two equal columns (API story finale).
+   * `default`: Plus share card.
+   * `receipt`: industrial API look.
+   * `minimal`: art + two equal columns (API story finale).
    */
   variant?: "default" | "receipt" | "minimal";
-  /** Hero art for `minimal` — typically #1 On sabbatical from the user’s API. */
+  /** Hero art for `minimal`: typically #1 On sabbatical from the user’s API. */
   heroImageUrl?: string | null;
   heroAlt?: string;
   className?: string;
 };
 
-/** Blob ghost — same path as D-010 perimeter ghosts. */
+/** Blob ghost: same path as perimeter ghosts (D-028 hem · D-029 face). */
 function blobPath() {
-  return "M12 48 Q20 54 32 48 Q44 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+  return "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
 }
 
-/** B1 orchid corner wash over the teal nest — D-021 / D-019 recipe. */
+/** B1 orchid corner wash over the teal nest: D-021 / D-019 recipe. */
 function ShareFinaleOrchidWash() {
   const w = SF.orchidWash;
   return (
@@ -57,7 +57,7 @@ function ShareFinaleOrchidWash() {
 }
 
 /**
- * BL moon sphere — white→lilac→orchid radial, no outer glow.
+ * BL moon sphere: white→lilac→orchid radial, no outer glow.
  * Center pinned to the card’s bottom-left corner (D-021).
  * Stays under type (z-0); soft breathe after enter.
  */
@@ -125,7 +125,7 @@ function ShareFinaleMoon({ active }: { active?: boolean }) {
 }
 
 /**
- * Two wash ghosts framing the album art (TL + BR) — D-021.
+ * Two wash ghosts framing the album art (TL + BR): D-021.
  * Positions/sizes from SHARE_FINALE_KIT.
  */
 function ShareFinaleGhosts({ active }: { active?: boolean }) {
@@ -174,7 +174,29 @@ function ShareFinaleGhosts({ active }: { active?: boolean }) {
           }
         >
           <svg viewBox="0 0 64 64" className="size-full overflow-visible">
-            <path d={blobPath()} fill={SF.ghostFill} />
+            <path
+              d={blobPath()}
+              fill={SF.ghostFill}
+              stroke="#1c1c1c"
+              strokeWidth={1.6}
+              strokeLinejoin="round"
+            />
+            <ellipse
+              cx={17}
+              cy={34}
+              rx={4}
+              ry={2.2}
+              fill="#e8a0b8"
+              opacity={0.7}
+            />
+            <ellipse
+              cx={47}
+              cy={34}
+              rx={4}
+              ry={2.2}
+              fill="#e8a0b8"
+              opacity={0.7}
+            />
             <circle cx={24} cy={26} r={3.2} fill={SF.ghostEye} />
             <circle cx={40} cy={26} r={3.2} fill={SF.ghostEye} />
           </svg>
@@ -269,7 +291,7 @@ function TrackList({
 }
 
 /**
- * Minimal share type — size from `--share-type-size` (D-012 density).
+ * Minimal share type: size from `--share-type-size` (D-012 density).
  * Fallback 0.93rem matches the pre-inset tune.
  */
 const MINIMAL_TYPE =
@@ -326,7 +348,7 @@ function MinimalColumn({
   );
 }
 
-/** Portrait share card — screenshot like Wrapped’s closing slide. */
+/** Portrait share card: screenshot like Wrapped’s closing slide. */
 export function ShareRecapCard({
   year,
   skipped,

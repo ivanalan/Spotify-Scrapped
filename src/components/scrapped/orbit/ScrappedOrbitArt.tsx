@@ -15,6 +15,7 @@ import {
   PointedStar,
 } from "@/components/scrapped/art/storyboard/ShapeKit";
 import {
+  GhostedCoverHaunt,
   GhostedHardMoon,
   GhostedListFrame,
   GhostedNightEntity,
@@ -22,6 +23,8 @@ import {
   ListCornerOrb,
   ListFrame,
   ListPerimeterGhosts,
+  ListSpikyGrass,
+  PointGlowStars,
 } from "@/components/scrapped/art/storyboard/PeripheralMotifs";
 import { FilmLetterboxChrome } from "@/components/scrapped/orbit/FilmLetterboxChrome";
 import { LeftOnReadChatChrome } from "@/components/scrapped/orbit/LeftOnReadChatChrome";
@@ -42,7 +45,7 @@ type Props = {
   active?: boolean;
   /**
    * Bumps when the scene is (re)visited so enter motion remounts.
-   * Required for spiral-in — chrome stays mounted in the snap scroller.
+   * Required for spiral-in: chrome stays mounted in the snap scroller.
    */
   replayKey?: number;
   /**
@@ -56,7 +59,7 @@ type Props = {
   fishCount?: number;
   /**
    * Active beat within the scene (D-016 middeck metaphors).
-   * Mirrors volume `tide` — art can swap hero ↔ list frame.
+   * Mirrors volume `tide`: art can swap hero ↔ list frame.
    */
   beatPhase?: number;
   /**
@@ -145,18 +148,18 @@ function PhoneOrbitChrome({
   beatPhase,
   introKit,
 }: ChromeProps) {
-  // Edge-anchored patterns skip MotifStage — slice crops top/bottom.
+  // Edge-anchored patterns skip MotifStage: slice crops top/bottom.
   // Share finale (D-014): same intro disks + star as open, behind the inset card.
   if (pattern === "intro" || pattern === "share") {
     return <IntroCornerChrome freeze={freeze} introKit={introKit} />;
   }
-  // Soft close — full-bleed iris (D-016); MotifStage would crop the vignette.
+  // Soft close: full-bleed iris (D-016); MotifStage would crop the vignette.
   if (pattern === "close" || slideIndex === 8) {
     return (
       <SoftCloseIrisChrome freeze={freeze} replayKey={replayKey} />
     );
   }
-  // Middeck metaphors (D-016) — full-bleed HTML/CSS layers.
+  // Middeck metaphors (D-016): full-bleed HTML/CSS layers.
   // Scene 4 phases: 0 1-hit · 1–2 Meet 1-like (+sub) · ≥3 list narrative.
   if (slideIndex === 4) {
     return (
@@ -259,7 +262,7 @@ function WideOrbitChrome({
     return <IntroCornerChrome freeze={freeze} introKit={introKit} />;
   }
 
-  // Middeck metaphors — same full-bleed layers as phone (D-016).
+  // Middeck metaphors: same full-bleed layers as phone (D-016).
   if (pattern === "close" || slideIndex === 8) {
     return (
       <SoftCloseIrisChrome freeze={freeze} replayKey={replayKey} />
@@ -324,38 +327,93 @@ function WideOrbitChrome({
     );
   }
 
+  // Ghosted pair (scenes 2–3): edge pins (D-009). Meet letterboxed a phone
+  // column; slice cropped floor grass + most edge ghosts on landscape.
   if (pattern === "entity-song") {
     return (
-      <MotifMeetStage viewBox="0 0 360 640">
-        <GhostedNightEntity
-          key={play ? `night-wide-${replayKey}` : "night-wide-settled"}
-          accent={accent}
-          accent2={accent2}
-          freeze={freeze}
-        />
-      </MotifMeetStage>
+      <div
+        key={play ? `night-wide-${replayKey}` : "night-wide-settled"}
+        className="pointer-events-none absolute inset-0"
+      >
+        {/* Stars: meet is fine (dots on ink; no visible gutters). */}
+        <MotifMeetStage
+          viewBox="0 0 360 640"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <PointGlowStars freeze={freeze} />
+        </MotifMeetStage>
+        {/* Haunt near centered 160px cover TL */}
+        <MotifPin
+          anchor="center"
+          width={0.2}
+          height={0.2}
+          viewBox="0 0 90 90"
+          preserveAspectRatio="xMidYMid meet"
+          className="!left-[calc(50%-6.75rem)] !top-[min(28vh,12rem)] !translate-x-0 !translate-y-0"
+        >
+          <GhostedCoverHaunt freeze={freeze} />
+        </MotifPin>
+        <MotifPin
+          anchor="bottom"
+          width="100%"
+          height={0.3}
+          viewBox="0 0 360 140"
+          preserveAspectRatio="xMidYMax slice"
+        >
+          <ListSpikyGrass from={accent} to={accent2} freeze={freeze} />
+        </MotifPin>
+      </div>
     );
   }
 
   if (pattern === "list" && slideIndex === 3) {
     return (
-      <MotifMeetStage viewBox="0 0 360 640">
-        <g
-          key={
-            play ? `ghost-list-wide-${replayKey}` : "ghost-list-wide-settled"
-          }
+      <div
+        key={
+          play ? `ghost-list-wide-${replayKey}` : "ghost-list-wide-settled"
+        }
+        className="pointer-events-none absolute inset-0"
+      >
+        <MotifPin
+          anchor="tr"
+          size={0.42}
+          viewBox="250 0 130 200"
+          preserveAspectRatio="xMaxYMin meet"
         >
           <GhostedHardMoon
             accent={accent}
             accent2={accent2}
             freeze={freeze}
           />
+        </MotifPin>
+        {/* Full-height edge pins: all five ghosts keep their Y band. */}
+        <MotifPin
+          anchor="left"
+          width={0.22}
+          height="100%"
+          viewBox="0 0 100 640"
+          preserveAspectRatio="xMinYMid meet"
+        >
           <ListPerimeterGhosts
             freeze={freeze}
             enter={beatPhase >= 1}
+            side="left"
           />
-        </g>
-      </MotifMeetStage>
+        </MotifPin>
+        <MotifPin
+          anchor="right"
+          width={0.22}
+          height="100%"
+          viewBox="260 0 100 640"
+          preserveAspectRatio="xMaxYMid meet"
+        >
+          <ListPerimeterGhosts
+            freeze={freeze}
+            enter={beatPhase >= 1}
+            side="right"
+          />
+        </MotifPin>
+      </div>
     );
   }
 
@@ -388,7 +446,7 @@ function WideOrbitChrome({
 
 /**
  * Production Orbit Cascade chrome for the API deck (D-007 / D-009 / D-016).
- * Canvas color comes from `data-wrapped-tone` on the slide — this layer is motifs only.
+ * Canvas color comes from `data-wrapped-tone` on the slide; this layer is motifs only.
  * Phone: legacy MotifStage slice. Wide: corner-pinned layers.
  */
 export function ScrappedOrbitArt({

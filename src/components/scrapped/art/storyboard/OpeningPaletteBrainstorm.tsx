@@ -19,7 +19,7 @@ export type OpeningTrio = {
   slides: [OpeningSlideColors, OpeningSlideColors, OpeningSlideColors];
 };
 
-/** Many opening-trio brainstorms — no white / paper. Click to apply on 00–02. */
+/** Many opening-trio brainstorms: no white / paper. Click to apply on 00–02. */
 export const OPENING_TRIOS: OpeningTrio[] = [
   {
     id: "current",
@@ -114,7 +114,7 @@ export const OPENING_TRIOS: OpeningTrio[] = [
   {
     id: "azure-orchid-mango",
     title: "Azure · orchid · mango",
-    note: "Alt open — azure field (intro lock is ink·orchid)",
+    note: "Alt open; azure field (intro lock is ink·orchid)",
     slides: [
       { bg: "#1E6FBA", ink: "dark", accent: "#FF6BCB", accent2: "#A855F7" },
       { bg: "#9B4DE8", ink: "dark", accent: "#ffe66d", accent2: "#ff8c42" },
@@ -144,7 +144,7 @@ export const OPENING_TRIOS: OpeningTrio[] = [
   {
     id: "pine-terracotta-cream-no",
     title: "Pine · terracotta · clay",
-    note: "Muted craft — still solid fields",
+    note: "Muted craft; still solid fields",
     slides: [
       { bg: "#234E3A", ink: "dark", accent: "#E07A5F", accent2: "#F2CC8F" },
       { bg: "#C45C26", ink: "light", accent: "#1B2A6B", accent2: "#F2CC8F" },
@@ -220,7 +220,7 @@ export function OpeningPaletteBrainstorm({ selected, onSelect }: Props) {
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Click a row to apply backgrounds + accents on the first three slides.
-          Solid fields only — no white / cream / mist. Live deck strip updates
+          Solid fields only: no white / cream / mist. Live deck strip updates
           immediately.
         </p>
       </header>

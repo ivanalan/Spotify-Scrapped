@@ -22,7 +22,7 @@ function orbitDots(cx: number, cy: number, r: number, n: number, size: number) {
   });
 }
 
-/** Direction B — Dot Orbit (mid soft). */
+/** Direction B: Dot Orbit (mid soft). */
 export function DirectionDotOrbitArt({
   slideIndex,
   pattern,

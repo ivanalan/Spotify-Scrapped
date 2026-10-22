@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { isValidElement } from "react";
 import { listMotionSettleSec } from "@/lib/scrapped-list-motion";
 
-/** Soft enter / exit — transform + opacity only. */
+/** Soft enter / exit: transform + opacity only. */
 export const STORY_MOTION = {
   copyEnterDelaySec: 0.04,
   titleY: 14,
@@ -49,7 +49,7 @@ export function plainText(node: ReactNode): string {
 }
 
 /**
- * On-screen reading pace for story beats — brisk, still readable.
+ * On-screen reading pace for story beats: brisk, still readable.
  * Clamped so short titles get a beat and long lines don’t stall.
  */
 export function estimateReadingMs(text: string): number {

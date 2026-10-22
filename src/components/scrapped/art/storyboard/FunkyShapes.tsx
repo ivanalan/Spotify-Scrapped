@@ -55,7 +55,7 @@ export function GradOrb({
   );
 }
 
-/** Elongated ellipse — the “funky pill” from the hand ref. */
+/** Elongated ellipse: the “funky pill” from the hand ref. */
 export function SkewPill({
   cx,
   cy,
@@ -106,14 +106,14 @@ type FunkyProps = {
   enterDelay?: number;
   /**
    * Soft-close enter: slow grow + rotate while drifting toward mid copy.
-   * Motion is in screen space — pass `mirrored` for the bottom bookend.
+   * Motion is in screen space: pass `mirrored` for the bottom bookend.
    */
   closeEnter?: "top" | "bottom";
   /** Flip stack for bottom bookend (applied under the enter motion). */
   mirrored?: boolean;
 };
 
-/** Stacked skewed pills — matches the hand ref top. Soft close: slow grow + rotate. */
+/** Stacked skewed pills: matches the hand ref top. Soft close: slow grow + rotate. */
 export function FunkyPillStack({
   a,
   b,
@@ -149,7 +149,7 @@ export function FunkyPillStack({
 
   if (reduce) return body;
 
-  // Soft close — slow grow + rotate while drifting toward the mid-band copy.
+  // Soft close: slow grow + rotate while drifting toward the mid-band copy.
   // Keep opacity at 1: WebKit has dropped opacity-enter on the bottom bookend
   // when nested under SVG mirror / CSS flip (shapes stayed invisible).
   if (closeEnter) {
@@ -187,7 +187,7 @@ export function FunkyPillStack({
   );
 }
 
-/** Three orbs in a row — hand ref bottom. */
+/** Three orbs in a row: hand ref bottom. */
 export function FunkyOrbRow({ a, b, freeze }: FunkyProps) {
   const reduce = useReducedMotion() || freeze;
   const orbs = [
@@ -220,7 +220,7 @@ export function FunkyOrbRow({ a, b, freeze }: FunkyProps) {
   );
 }
 
-/** Corner peek — one skewed pill cropped TL + one orb BL. */
+/** Corner peek: one skewed pill cropped TL + one orb BL. */
 export function FunkyCorners({ a, b, freeze }: FunkyProps) {
   const reduce = useReducedMotion() || freeze;
   return (
@@ -322,7 +322,7 @@ export function FunkyExitPill({ a, b, freeze }: FunkyProps) {
   );
 }
 
-/** Share stamp — skewed pill + orb pair behind card. */
+/** Share stamp: skewed pill + orb pair behind card. */
 export function FunkyShareStamp({ a, b, freeze }: FunkyProps) {
   const reduce = useReducedMotion() || freeze;
   return (
@@ -351,7 +351,7 @@ export function FunkyShareStamp({ a, b, freeze }: FunkyProps) {
   );
 }
 
-/** Orb rain — few orbs with different skews/scales, cascade then drift. */
+/** Orb rain: few orbs with different skews/scales, cascade then drift. */
 export function FunkyOrbRain({ a, b, freeze }: FunkyProps) {
   const reduce = useReducedMotion() || freeze;
   const items = [
@@ -401,7 +401,7 @@ export function FunkyOrbRain({ a, b, freeze }: FunkyProps) {
   );
 }
 
-/** Double pill stack — top + mirrored bottom bookend. */
+/** Double pill stack: top + mirrored bottom bookend. */
 export function FunkyDoubleStack({ a, b, freeze }: FunkyProps) {
   return (
     <g>

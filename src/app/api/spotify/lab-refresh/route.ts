@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   if (result.kind === "ready" && result.stored) {
     const res = NextResponse.redirect(`${base}${next}`, { status: 303 });
-    // Always clear first — old multi-chunk jars are what trigger HTTP 431.
+    // Always clear first: old multi-chunk jars are what trigger HTTP 431.
     await clearApiLabSnapshotCookies(res);
     await attachApiLabSnapshotCookies(res, result.stored);
     return res;

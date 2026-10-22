@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ghost character ideas: whole-body explorations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #1a1624;
+        --card: #2a2433;
+        --ink: #f5f0ff;
+        --muted: color-mix(in oklab, #f5f0ff 62%, transparent);
+        --ghost: #f5f0ff;
+        --eye: #2a2433;
+        --accent: #c9a0f5;
+        --blush: #e8a0b8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        max-width: 44rem;
+        margin: 0 0 1rem;
+      }
+
+      .lock {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 560;
+        color: #1a1624;
+        background: var(--accent);
+        border-radius: 999px;
+        padding: 0.2rem 0.65rem;
+        margin-bottom: 1.5rem;
+      }
+
+      h2 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 1.75rem 0 0.75rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+        gap: 0.85rem;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 0.9rem 0.65rem 0.75rem;
+        text-align: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s ease, transform 0.15s ease;
+      }
+
+      .card:hover {
+        border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+        transform: translateY(-1px);
+      }
+
+      .card.selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .card.baseline {
+        outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent);
+        outline-offset: 2px;
+      }
+
+      .card svg {
+        width: 96px;
+        height: 96px;
+        display: block;
+        margin: 0 auto 0.5rem;
+      }
+
+      .card .id {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .card .name {
+        font-size: 0.78rem;
+        margin-top: 0.1rem;
+      }
+
+      .card .note {
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+        line-height: 1.35;
+      }
+
+      .path-panel {
+        position: sticky;
+        bottom: 0;
+        margin-top: 1.5rem;
+        background: #12101a;
+        border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1.15rem 1.25rem;
+        box-shadow: 0 -8px 32px color-mix(in oklab, black 45%, transparent);
+      }
+
+      .path-panel .label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+
+      .path-panel .desc {
+        font-size: 0.85rem;
+        margin-bottom: 0.55rem;
+      }
+
+      .path-panel pre {
+        margin: 0 0 0.65rem;
+        padding: 0.65rem 0.75rem;
+        background: #0a0910;
+        border-radius: 8px;
+        font-size: 0.68rem;
+        line-height: 1.45;
+        color: #d4c8f0;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .path-panel button {
+        font-family: inherit;
+        font-size: 0.8rem;
+        font-weight: 560;
+        border: none;
+        border-radius: 8px;
+        padding: 0.45rem 0.9rem;
+        background: var(--accent);
+        color: #1a1624;
+        cursor: pointer;
+      }
+
+      .toast {
+        display: none;
+        margin-left: 0.65rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .toast.show {
+        display: inline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Ghost character · <em>whole body</em></h1>
+      <p class="lede">
+        Hem is locked (D-028 · four tiny scallops). Everything else is fair game:
+        eyes, mouth, cheeks, arms, proportions, outline. Same SVG craft as the
+        app; click to inspect markup you could drop into
+        <code>GhostBody</code>.
+      </p>
+      <span class="lock">Hem locked · 02 four scallops</span>
+
+      <div id="sections"></div>
+
+      <div class="path-panel">
+        <div class="label" id="sel-label">Selected</div>
+        <div class="desc" id="sel-desc"></div>
+        <pre id="sel-markup"></pre>
+        <button type="button" id="copy">Copy SVG inner</button>
+        <span class="toast" id="toast">Copied</span>
+      </div>
+    </div>
+
+    <script>
+      /** Locked hem + crown (D-028). */
+      const BODY =
+        "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+
+      /** Wider / taller / pear crowns: hem still four scallops, remapped. */
+      const BODY_WIDE =
+        "M8 48 Q14 54 20 48 Q26 54 32 48 Q38 54 44 48 Q50 54 56 48 C60 30 54 8 32 6 C10 4 4 28 8 48 Z";
+      const BODY_TALL =
+        "M14 50 Q18 56 23 50 Q27 56 32 50 Q37 56 41 50 Q46 56 50 50 C54 28 50 4 32 2 C14 0 10 26 14 50 Z";
+      const BODY_PEAR =
+        "M10 46 Q16 54 22 48 Q27 56 32 48 Q37 56 42 48 Q48 54 54 46 C58 30 52 10 32 8 C12 6 6 28 10 46 Z";
+      const BODY_NO_ARMS =
+        "M14 48 Q18 54 23 48 Q27 54 32 48 Q37 54 41 48 Q46 54 50 48 C53 32 48 10 32 8 C16 6 11 30 14 48 Z";
+
+      const sections = [
+        {
+          title: "Baseline",
+          items: [
+            {
+              id: "A0",
+              name: "Current (locked hem)",
+              baseline: true,
+              note: "Wash + two dots · no mouth",
+              faces: "dots",
+            },
+          ],
+        },
+        {
+          title: "Eyes",
+          items: [
+            {
+              id: "E1",
+              name: "Bigger ovals",
+              note: "Softer, more baby",
+              faces: "bigOvals",
+            },
+            {
+              id: "E2",
+              name: "Tiny dots",
+              note: "Quieter at deck scale",
+              faces: "tinyDots",
+            },
+            {
+              id: "E3",
+              name: "Sleepy arcs",
+              note: "Happy / restful",
+              faces: "sleepy",
+            },
+            {
+              id: "E4",
+              name: "Sparkle eyes",
+              note: "White catchlight",
+              faces: "sparkle",
+            },
+            {
+              id: "E5",
+              name: "Wide surprised",
+              note: "Rounder whites",
+              faces: "surprised",
+            },
+            {
+              id: "E6",
+              name: "Uneven wink",
+              note: "One open, one arc",
+              faces: "wink",
+            },
+          ],
+        },
+        {
+          title: "Face extras",
+          items: [
+            {
+              id: "F1",
+              name: "Soft smile",
+              note: "Mouth arc only",
+              faces: "smile",
+            },
+            {
+              id: "F2",
+              name: "Dot nose",
+              note: "Like your cream ref",
+              faces: "nose",
+            },
+            {
+              id: "F3",
+              name: "Blush cheeks",
+              note: "Pink ovals",
+              faces: "blush",
+            },
+            {
+              id: "F4",
+              name: "Smile + blush",
+              note: "Cuteness stack",
+              faces: "smileBlush",
+            },
+            {
+              id: "F5",
+              name: "Nose + smile",
+              note: "Full tiny face",
+              faces: "noseSmile",
+            },
+            {
+              id: "F6",
+              name: "X eyes (playful)",
+              note: "Scrapped energy",
+              faces: "xEyes",
+            },
+          ],
+        },
+        {
+          title: "Body / arms",
+          items: [
+            {
+              id: "B1",
+              name: "No side bumps",
+              note: "Cleaner silhouette",
+              body: BODY_NO_ARMS,
+              faces: "dots",
+            },
+            {
+              id: "B2",
+              name: "Wide + stubby",
+              note: "Chonkier",
+              body: BODY_WIDE,
+              faces: "dots",
+            },
+            {
+              id: "B3",
+              name: "Tall sheet",
+              note: "More classic ghost",
+              body: BODY_TALL,
+              faces: "dots",
+            },
+            {
+              id: "B4",
+              name: "Pear body",
+              note: "Weight low",
+              body: BODY_PEAR,
+              faces: "dots",
+            },
+            {
+              id: "B5",
+              name: "Wave arm",
+              note: "One raised hand",
+              faces: "dots",
+              extras: "waveArm",
+            },
+            {
+              id: "B6",
+              name: "Both arms out",
+              note: "Hug pose",
+              faces: "dots",
+              extras: "armsOut",
+            },
+          ],
+        },
+        {
+          title: "Outline / fill treatments",
+          items: [
+            {
+              id: "S1",
+              name: "Ink outline",
+              note: "Matches cream ref",
+              faces: "dots",
+              stroke: true,
+            },
+            {
+              id: "S2",
+              name: "Outline + smile",
+              note: "Icon sticker",
+              faces: "smile",
+              stroke: true,
+            },
+            {
+              id: "S3",
+              name: "Outline + blush",
+              note: "Sticker cute",
+              faces: "blush",
+              stroke: true,
+            },
+            {
+              id: "S4",
+              name: "Hollow eyes",
+              note: "Ring eyes + fill",
+              faces: "hollow",
+              stroke: true,
+            },
+          ],
+        },
+        {
+          title: "Combos (opinionated)",
+          items: [
+            {
+              id: "C1",
+              name: "Quiet Scrapped",
+              note: "Tiny dots · no mouth · wash",
+              faces: "tinyDots",
+            },
+            {
+              id: "C2",
+              name: "Cream-ref rhyme",
+              note: "Ovals · nose · outline",
+              faces: "nose",
+              stroke: true,
+              eyesOverride: "bigOvals",
+            },
+            {
+              id: "C3",
+              name: "Merciful smile",
+              note: "Sleepy + blush",
+              faces: "sleepyBlush",
+            },
+            {
+              id: "C4",
+              name: "Chonk friend",
+              note: "Wide · smile · blush",
+              body: BODY_WIDE,
+              faces: "smileBlush",
+            },
+            {
+              id: "C5",
+              name: "Tall + wink",
+              note: "Sheet with personality",
+              body: BODY_TALL,
+              faces: "wink",
+            },
+            {
+              id: "C6",
+              name: "Pear + sparkle",
+              note: "Soft + alive",
+              body: BODY_PEAR,
+              faces: "sparkle",
+            },
+          ],
+        },
+      ];
+
+      function faceMarkup(kind, eyesOverride) {
+        const k = eyesOverride || kind;
+        const eye = "var(--eye)";
+        const blush = "var(--blush)";
+        switch (k) {
+          case "bigOvals":
+            return `<ellipse cx="23" cy="26" rx="5" ry="6.2" fill="${eye}"/><ellipse cx="41" cy="26" rx="5" ry="6.2" fill="${eye}"/>`;
+          case "tinyDots":
+            return `<circle cx="24" cy="26" r="2.1" fill="${eye}"/><circle cx="40" cy="26" r="2.1" fill="${eye}"/>`;
+          case "sleepy":
+            return `<path d="M19 27 Q24 22 29 27" fill="none" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/><path d="M35 27 Q40 22 45 27" fill="none" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/>`;
+          case "sparkle":
+            return `<circle cx="24" cy="26" r="4" fill="${eye}"/><circle cx="40" cy="26" r="4" fill="${eye}"/><circle cx="22.5" cy="24.5" r="1.3" fill="#fff"/><circle cx="38.5" cy="24.5" r="1.3" fill="#fff"/>`;
+          case "surprised":
+            return `<circle cx="24" cy="26" r="5.5" fill="#fff"/><circle cx="40" cy="26" r="5.5" fill="#fff"/><circle cx="24" cy="26" r="2.8" fill="${eye}"/><circle cx="40" cy="26" r="2.8" fill="${eye}"/>`;
+          case "wink":
+            return `<circle cx="24" cy="26" r="3.4" fill="${eye}"/><path d="M36 27 Q40 23 44 27" fill="none" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/>`;
+          case "smile":
+            return `<circle cx="24" cy="26" r="3.2" fill="${eye}"/><circle cx="40" cy="26" r="3.2" fill="${eye}"/><path d="M26 36 Q32 41 38 36" fill="none" stroke="${eye}" stroke-width="1.8" stroke-linecap="round"/>`;
+          case "nose":
+            return `<circle cx="24" cy="26" r="3.2" fill="${eye}"/><circle cx="40" cy="26" r="3.2" fill="${eye}"/><circle cx="32" cy="32" r="1.6" fill="${eye}"/>`;
+          case "blush":
+            return `<ellipse cx="17" cy="34" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><ellipse cx="47" cy="34" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><circle cx="24" cy="26" r="3.2" fill="${eye}"/><circle cx="40" cy="26" r="3.2" fill="${eye}"/>`;
+          case "smileBlush":
+            return `<ellipse cx="17" cy="33" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><ellipse cx="47" cy="33" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><circle cx="24" cy="26" r="3.2" fill="${eye}"/><circle cx="40" cy="26" r="3.2" fill="${eye}"/><path d="M26 36 Q32 41 38 36" fill="none" stroke="${eye}" stroke-width="1.8" stroke-linecap="round"/>`;
+          case "noseSmile":
+            return `<circle cx="24" cy="25" r="3.2" fill="${eye}"/><circle cx="40" cy="25" r="3.2" fill="${eye}"/><circle cx="32" cy="31" r="1.5" fill="${eye}"/><path d="M26 37 Q32 41 38 37" fill="none" stroke="${eye}" stroke-width="1.7" stroke-linecap="round"/>`;
+          case "xEyes":
+            return `<path d="M20 22 L28 30 M28 22 L20 30" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/><path d="M36 22 L44 30 M44 22 L36 30" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/>`;
+          case "hollow":
+            return `<circle cx="24" cy="26" r="4.2" fill="none" stroke="${eye}" stroke-width="2"/><circle cx="40" cy="26" r="4.2" fill="none" stroke="${eye}" stroke-width="2"/>`;
+          case "sleepyBlush":
+            return `<ellipse cx="17" cy="34" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><ellipse cx="47" cy="34" rx="4" ry="2.2" fill="${blush}" opacity="0.7"/><path d="M19 27 Q24 22 29 27" fill="none" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/><path d="M35 27 Q40 22 45 27" fill="none" stroke="${eye}" stroke-width="2.2" stroke-linecap="round"/><path d="M27 37 Q32 40 37 37" fill="none" stroke="${eye}" stroke-width="1.6" stroke-linecap="round"/>`;
+          case "dots":
+          default:
+            return `<circle cx="24" cy="26" r="3.2" fill="${eye}"/><circle cx="40" cy="26" r="3.2" fill="${eye}"/>`;
+        }
+      }
+
+      function extrasMarkup(kind) {
+        const eye = "var(--eye)";
+        if (kind === "waveArm") {
+          return `<path d="M50 28 Q58 22 56 34" fill="none" stroke="var(--ghost)" stroke-width="5" stroke-linecap="round"/><path d="M50 28 Q58 22 56 34" fill="none" stroke="${eye}" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>`;
+        }
+        if (kind === "armsOut") {
+          return `<ellipse cx="6" cy="34" rx="5" ry="3.5" fill="var(--ghost)" transform="rotate(-20 6 34)"/><ellipse cx="58" cy="34" rx="5" ry="3.5" fill="var(--ghost)" transform="rotate(20 58 34)"/>`;
+        }
+        return "";
+      }
+
+      function buildInner(item) {
+        const body = item.body || BODY;
+        const stroke = item.stroke
+          ? ` stroke="#1c1c1c" stroke-width="2.2" stroke-linejoin="round"`
+          : "";
+        let face = faceMarkup(item.faces);
+        if (item.eyesOverride) {
+          // C2: ovals + nose
+          face =
+            faceMarkup(item.eyesOverride) +
+            `<circle cx="32" cy="32" r="1.6" fill="var(--eye)"/>`;
+        }
+        const extras = extrasMarkup(item.extras);
+        return `<path d="${body}" fill="var(--ghost)"${stroke}/>
+${extras}
+${face}`;
+      }
+
+      const flat = sections.flatMap((s) => s.items);
+      let selected = flat[0];
+
+      const root = document.getElementById("sections");
+
+      function paint() {
+        root.innerHTML = "";
+        sections.forEach((sec) => {
+          const h = document.createElement("h2");
+          h.textContent = sec.title;
+          root.appendChild(h);
+          const grid = document.createElement("div");
+          grid.className = "grid";
+          sec.items.forEach((item) => {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className =
+              "card" +
+              (item.baseline ? " baseline" : "") +
+              (item === selected ? " selected" : "");
+            card.innerHTML = `
+              <svg viewBox="0 0 64 64" aria-hidden="true">${buildInner(item)}</svg>
+              <div class="id">${item.id}</div>
+              <div class="name">${item.name}</div>
+              <div class="note">${item.note || ""}</div>
+            `;
+            card.addEventListener("click", () => {
+              selected = item;
+              updatePanel();
+              root.querySelectorAll(".card").forEach((c) =>
+                c.classList.remove("selected")
+              );
+              card.classList.add("selected");
+            });
+            grid.appendChild(card);
+          });
+          root.appendChild(grid);
+        });
+        updatePanel();
+      }
+
+      function updatePanel() {
+        document.getElementById("sel-label").textContent =
+          `Selected; ${selected.id} ${selected.name}`;
+        document.getElementById("sel-desc").textContent =
+          selected.note || "";
+        document.getElementById("sel-markup").textContent =
+          buildInner(selected).trim();
+      }
+
+      document.getElementById("copy").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(buildInner(selected).trim());
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1200);
+      });
+
+      paint();
+    </script>
+  </body>
+</html>

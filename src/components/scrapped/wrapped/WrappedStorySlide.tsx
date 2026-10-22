@@ -61,7 +61,7 @@ type Props = {
   copyEnterDelaySec?: number;
   /** Soft blur-in on copy (open slide). Ignored when reduced-motion. */
   copyBlurIn?: boolean;
-  /** Peripheral Orbit Cascade art — behind copy, pointer-events none. */
+  /** Peripheral Orbit Cascade art: behind copy, pointer-events none. */
   chrome?: ReactNode;
   /**
    * Optional field kit on the slide canvas (e.g. intro orchid corners).
@@ -71,7 +71,7 @@ type Props = {
   className?: string;
   /** Multi-beat scene (same canvas; text enters then exits). */
   beats?: WrappedStoryBeat[];
-  /** Single-beat shorthand — same as one entry in `beats`. */
+  /** Single-beat shorthand: same as one entry in `beats`. */
   headline?: ReactNode;
   subline?: ReactNode;
   aside?: ReactNode;
@@ -170,12 +170,12 @@ function BeatBody({
   const align = beat.align ?? "start";
   const display = beat.display ?? "sentence";
   const isListBeat = Boolean(beat.children);
-  // Layout springs title upward when subtitle/rows mount — same as other slides.
+  // Layout springs title upward when subtitle/rows mount: same as other slides.
   const useLayout = !reduceMotion;
   const copyLineCount = countCopyLineBeats(beat);
 
   // Remount (parent key) resets this. Only delay if the beat clock jumped past
-  // the title-only frame — normal 1→2 advances follow the deck clock.
+  // the title-only frame: normal 1→2 advances follow the deck clock.
   const [titleHoldDone, setTitleHoldDone] = useState(false);
   const sawTitleOnlyRef = useRef(false);
   useEffect(() => {
@@ -185,13 +185,13 @@ function BeatBody({
     }
     if (titleHoldDone) return;
 
-    // Already showed title-only — release subtitle with the clock (no re-hold).
+    // Already showed title-only: release subtitle with the clock (no re-hold).
     if (sawTitleOnlyRef.current) {
       setTitleHoldDone(true);
       return;
     }
 
-    // Clock jumped past title-only on this mount — hold then catch up.
+    // Clock jumped past title-only on this mount: hold then catch up.
     const holdMs =
       estimateReadingMs(plainText(beat.headline)) +
       timing.titleTravelSec * 1000;
@@ -206,7 +206,7 @@ function BeatBody({
 
   const showSubline = Boolean(beat.subline) && shownLines >= 2;
   const showAside = Boolean(beat.aside) && shownLines >= 3;
-  // List/footer is its own phase after copy — not simultaneous with the subline.
+  // List/footer is its own phase after copy: not simultaneous with the subline.
   const showSupport =
     Boolean(beat.children || beat.footer) && shownLines > copyLineCount;
 
@@ -280,7 +280,7 @@ function BeatBody({
       {beat.lead ? (
         <motion.div
           className={cn(
-            // Don’t stretch full width when centered — parent items-center
+            // Don’t stretch full width when centered: parent items-center
             // places the cover on the true horizontal mid.
             align === "center" ? "shrink-0" : "w-full",
             // Cover art → title (tuned).
@@ -471,7 +471,7 @@ export function WrappedStorySlide({
     phases[0]!;
   const current = resolvedBeats[phase.narrativeIndex]!;
   // Resolve on the beat so BeatBody owns align for enter + exit (never the
-  // section — section text-align would jump the outgoing beat mid-fade).
+  // section: section text-align would jump the outgoing beat mid-fade).
   const beatAlign = current.align ?? align;
   const isListBeat = Boolean(current.children);
   const enterDelay = copyEnterDelaySec ?? timing.copyEnterDelaySec;
@@ -488,9 +488,9 @@ export function WrappedStorySlide({
       className={cn(
         "relative flex h-dvh min-h-dvh w-full min-w-full shrink-0 snap-start snap-always flex-col px-7 md:px-14",
         "bg-[var(--wrapped-canvas)] text-[var(--wrapped-ink)]",
-        // Vertical center only — text-align lives on BeatBody per beat.
+        // Vertical center only: text-align lives on BeatBody per beat.
         "justify-center",
-        // Scene 4 heart (4A) owns the upper mid — drop setup copy below it.
+        // Scene 4 heart (4A) owns the upper mid: drop setup copy below it.
         // Keep this padding for the whole field (not `!isListBeat`): flipping to
         // py-24 when the list narrative starts yanks exiting Meet copy upward
         // mid-fade (same class of leak as section-level align). List BeatBody

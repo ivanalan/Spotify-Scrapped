@@ -120,7 +120,7 @@ export function ApiMetricsLab(props: Props) {
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
           Songs and artists that fell out of rotation, came back, or stayed
-          on the shelf — including likes that never topped. Tops and Liked
+          on the shelf: including likes that never topped. Tops and Liked
           Songs only.
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">

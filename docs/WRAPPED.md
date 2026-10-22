@@ -1,6 +1,6 @@
-# Spotify Wrapped — Narrative Reference for Scrapped
+# Spotify Wrapped: Narrative Reference for Scrapped
 
-**Purpose:** Capture how official Spotify Wrapped tells a year-in-listening story (2023–2025), so **Spotify Scrapped** can stay familiar in *form* while staying opposite in *meaning*.
+**Purpose:** Capture how official Spotify Wrapped tells a year-in-listening story (2023-2025), so **Spotify Scrapped** can stay familiar in *form* while staying opposite in *meaning*.
 
 Agents should read this before changing deck order, slide copy, share cards, or “anti-Wrapped” framing on `/scrapped`, `/scrapped/plus`, or `/scrapped/lab`.
 
@@ -22,10 +22,10 @@ Scrapped should feel like that same ritual for **what got ghosted** (skips, affi
 |----------------|------------------|
 | Celebration of affinity | Receipt for rejection / revision |
 | Minutes & play counts | Skips, skip rate, finish arcs |
-| “This defined you” | “This got ghosted — or came back” |
+| “This defined you” | “This got ghosted; or came back” |
 | Share pride | Share honesty (same share-card ritual) |
 
-Scrapped Plus (`history.db` skips) remains source of truth for true skips. Main Scrapped and Scrapped Lab use affinity proxies only — never claim true skips there (see [DATA.md](DATA.md), `src/lib/spotify/`).
+Scrapped Plus (`history.db` skips) remains source of truth for true skips. Main Scrapped and Scrapped Lab use affinity proxies only; never claim true skips there (see [DATA.md](DATA.md), `src/lib/spotify/`).
 
 ---
 
@@ -61,7 +61,7 @@ Do not pack multiple competing reveals on one slide. If a beat needs setup + pun
 
 ### Eligibility / personalization
 
-Wrapped drops cards when the user doesn’t qualify (Sound Town, Fan Leaderboard, clips, AI features, Music Evolution, etc.). Scrapped should likewise **omit or soft-empty** slides when gates fail — don’t invent filler that breaks the mirror.
+Wrapped drops cards when the user doesn’t qualify (Sound Town, Fan Leaderboard, clips, AI features, Music Evolution, etc.). Scrapped should likewise **omit or soft-empty** slides when gates fail; don’t invent filler that breaks the mirror.
 
 ---
 
@@ -79,10 +79,10 @@ These recur; Scrapped already mirrors most of them.
 | 5 | **Top 5 artists** | Broader taste map | `05` Top skipped artists |
 | 6 | Genre / podcast / extras | Texture | Optional; don’t force |
 | 7 | **Personality / era / club** | Shareable identity label | Prefer arcs (`07`–`08`) over fake “types” unless data-backed |
-| 8 | Creator thank-you clip | Parasocial warmth | Skip — not our product |
+| 8 | Creator thank-you clip | Parasocial warmth | Skip; not our product |
 | 9 | **Share finale** | Portable summary | `09` ShareRecapCard |
 
-**Smoothness rule:** Keep this spine order. Add Scrapped-only beats *between* artist lists and the finale (liked-but-scrapped, second chance, stayed-for) — not before the inverted “Wrapped classics,” or the anti-ritual won’t land.
+**Smoothness rule:** Keep this spine order. Add Scrapped-only beats *between* artist lists and the finale (liked-but-scrapped, second chance, stayed-for); not before the inverted “Wrapped classics,” or the anti-ritual won’t land.
 
 Current export order that already follows this:
 
@@ -101,9 +101,9 @@ Current export order that already follows this:
 
 ### Scrapped conversational spine (`/scrapped`)
 
-Mocks in `docs/mocks/` set the voice: **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines. API deck **look** is Orbit Cascade (card fields + peripheral ovals / volume ocean) — [D-007](decisions/D-007-orbit-cascade-api-deck.md); still not Wrapped neon ribbons.
+Mocks in `docs/mocks/` set the voice: **text lands in sequence**. Same emotional spine as Wrapped (open → volume → #1 → list → artists → redemption → share), but written as short conversational lines. API deck **look** is Orbit Cascade (card fields + peripheral ovals / volume ocean); [D-007](decisions/D-007-orbit-cascade-api-deck.md); still not Wrapped neon ribbons.
 
-Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle→aside lines on one narrative block stay on **one scene** — each line is its own beat (reading-time paced); later lines accumulate without wiping the title.
+Mock filenames `{act}.{frame}` are **animation frames within one progress segment**, not separate slides. Title→subtitle→aside lines on one narrative block stay on **one scene**: each line is its own beat (reading-time paced); later lines accumulate without wiping the title.
 
 ```
 Scene 0 (2 beats, ~8s): year / Scrapped → Hey {name} + welcome
@@ -118,15 +118,15 @@ Scene 8 (2 beats): “Thanks for staying.” → “Same time next year?”
 Scene 9: Share finale (holds; no auto-advance)
 ```
 
-API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop — the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Pause button / space pauses (sticky); hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
+API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop; the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Pause button / space pauses (sticky); hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
 
-Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails — keep the beat. Slide copy lives in `ApiScrappedDeck.tsx` — handwritten lock: [D-005](decisions/D-005-handwritten-api-story-copy.md); headline style: [D-006](decisions/D-006-api-story-headline-style.md).
+Copy rules for this deck: one job per phase; headline then subline then optional aside; never claim true skips (affinity windows only). Soft-empty when a gate fails; keep the beat. Slide copy lives in `ApiScrappedDeck.tsx`: handwritten lock: [D-005](decisions/D-005-handwritten-api-story-copy.md); headline style: [D-006](decisions/D-006-api-story-headline-style.md).
 
 ---
 
 ## 4. Year themes (what to learn, not copy)
 
-### 2023 — Identity + place
+### 2023; Identity + place
 
 **Headline features:** genre “sandwich,” **Sound Town**, **Me in 2023** (12 flip-to-reveal characters), artist clips, Blend, short-lived DJ: Wrapped.
 
@@ -136,17 +136,17 @@ Copy rules for this deck: one job per phase; headline then subline then optional
 
 **Example characters (Wrapped):** Hypnotist, Vampire, Fanatic, Time Traveler, Alchemist, …
 
-### 2024 — Eras + AI narrators
+### 2024; Eras + AI narrators
 
 **Headline features:** **Music Evolution** (up to 3 named phases), top-artist streak / top-listener %, NotebookLM AI podcast, AI DJ, AI Playlist, TikTok share.
 
-**Narrative lesson:** Time is a second axis — “you weren’t one taste all year.” Phases are short titled eras with artists/genres, not a spreadsheet.
+**Narrative lesson:** Time is a second axis: “you weren’t one taste all year.” Phases are short titled eras with artists/genres, not a spreadsheet.
 
-**Scrapped guidance:** `secondChanceHeroes` / `fellOff` *are* our era story — H1 reject → H2 finish (or the reverse). Keep copy in that register (“Hard no… Actually finished later”), not Wrapped’s cute phase-name generator unless we have a real descriptor pipeline.
+**Scrapped guidance:** `secondChanceHeroes` / `fellOff` *are* our era story; H1 reject → H2 finish (or the reverse). Keep copy in that register (“Hard no… Actually finished later”), not Wrapped’s cute phase-name generator unless we have a real descriptor pipeline.
 
 **Example phases (Wrapped):** “Light Academia Soft Piano Classical” → “Roller Skating Pop” → “Hallyu Catwalk K-pop.”
 
-### 2025 — Games + social
+### 2025; Games + social
 
 **Headline features:** **Top Song Quiz**, Listening Age, top albums, **Artist Sprint**, Fan Leaderboard, **Clubs** + roles, Listening Archive (AI day reports), **Wrapped Party**, speed/replay controls.
 
@@ -154,11 +154,11 @@ Copy rules for this deck: one job per phase; headline then subline then optional
 
 **Scrapped guidance:**
 
-- A “guess your most-skipped” beat is on-brand *if* it stays one tap and sits immediately before `02` — don’t bury the skip leader.  
+- A “guess your most-skipped” beat is on-brand *if* it stays one tap and sits immediately before `02`: don’t bury the skip leader.  
 - Clubs / Party-style social is out of scope unless we build multiplayer later (AGENTS non-goals).  
 - Fan Leaderboard energy maps better to “how often you abandoned this artist” than global rank cosplay.
 
-**Example Clubs (Wrapped):** Soft Hearts Club, Grit Collective, Full Charge Crew, Cosmic Stereo Club, Club Serotonin, Cloud State Society — each with a role (Loyalist, Scout, Curator, …).
+**Example Clubs (Wrapped):** Soft Hearts Club, Grit Collective, Full Charge Crew, Cosmic Stereo Club, Club Serotonin, Cloud State Society; each with a role (Loyalist, Scout, Curator, …).
 
 ---
 
@@ -168,13 +168,13 @@ Use these when writing or reordering slides.
 
 ### Do
 
-1. **Open with brand + thesis** — product name is the hero; one line of anti-Wrapped framing.  
+1. **Open with brand + thesis**: product name is the hero; one line of anti-Wrapped framing.  
 2. **Volume → singular → list** for songs, then the same for artists (Wrapped muscle memory).  
-3. **One job per slide** — if the blurb needs “and also…”, split or cut.  
-4. **Bridge before redemption** — liked-but-scrapped / second-chance come *after* the roast lists so the emotional arc is reject → complicate → forgive → share.  
-5. **Counterweight before share** — “stayed for” / finishes prevent the finale from being only dunking.  
-6. **Share card = portable thesis** — year + a few leaders + tagline; match Wrapped’s “screenshot the last slide” habit (`ShareRecapCard`).  
-7. **Empty states that keep rhythm** — short honest line, same layout chrome; don’t delete the beat number mid-deck if we can help it.
+3. **One job per slide**: if the blurb needs “and also…”, split or cut.  
+4. **Bridge before redemption**: liked-but-scrapped / second-chance come *after* the roast lists so the emotional arc is reject → complicate → forgive → share.  
+5. **Counterweight before share**: “stayed for” / finishes prevent the finale from being only dunking.  
+6. **Share card = portable thesis**: year + a few leaders + tagline; match Wrapped’s “screenshot the last slide” habit (`ShareRecapCard`).  
+7. **Empty states that keep rhythm**: short honest line, same layout chrome; don’t delete the beat number mid-deck if we can help it.
 
 ### Don’t
 
@@ -186,9 +186,9 @@ Use these when writing or reordering slides.
 
 ### Tone
 
-- Dry, specific, slightly merciful — not mean-spirited dunking and not fake self-help.  
+- Dry, specific, slightly merciful: not mean-spirited dunking and not fake self-help.  
 - Prefer verbs of revision (*scrapped*, *stayed*, *rematch*) over Wrapped’s coronation language (*top*, *biggest fan*, *your year*).  
-- When mirroring a Wrapped phrase, invert once and move on (“Wrapped’s top-song beat, inverted”) — don’t narrate the satire every slide.
+- When mirroring a Wrapped phrase, invert once and move on (“Wrapped’s top-song beat, inverted”); don’t narrate the satire every slide.
 
 ---
 
@@ -207,7 +207,7 @@ Use these when writing or reordering slides.
 
 ---
 
-## 7. Quick reference — year feature matrix
+## 7. Quick reference; year feature matrix
 
 | Beat / feature | 2023 | 2024 | 2025 | Scrapped relevance |
 |----------------|:----:|:----:|:----:|--------------------|
@@ -215,10 +215,10 @@ Use these when writing or reordering slides.
 | Top song / top 5 | ✓ | ✓ | ✓ | Invert → most skipped |
 | Top artist / top 5 | ✓ | ✓ | ✓ | Invert → skip-weighted artists |
 | Genres | sandwich | via Evolution | ✓ return | Low priority |
-| Identity label | Me in 2023 | — | Clubs | Only if data-backed, late |
-| Place / social graph | Sound Town | — | Party | Out of scope |
+| Identity label | Me in 2023 |; | Clubs | Only if data-backed, late |
+| Place / social graph | Sound Town |; | Party | Out of scope |
 | Time arcs | peak months | Music Evolution | Artist Sprint | Second chance / fell off |
-| Interactive reveal | flip card | — | Top Song Quiz | Optional before #1 skip |
+| Interactive reveal | flip card |; | Top Song Quiz | Optional before #1 skip |
 | AI narration | DJ: Wrapped | AI Podcast / DJ | Listening Archive | Out of scope |
 | Share finale | ✓ | ✓ | ✓ | Keep |
 
@@ -226,7 +226,7 @@ Use these when writing or reordering slides.
 
 ## 8. Sources & caveats
 
-Synthesized from Spotify Newsroom (Wrapped UX 2023–2025, Me in 2023, Music Evolution, Clubs, How Wrapped is made) plus contemporary walkthroughs (Business Insider, HowToGeek, Gizbot, Mashable, Xataka, etc.).
+Synthesized from Spotify Newsroom (Wrapped UX 2023-2025, Me in 2023, Music Evolution, Clubs, How Wrapped is made) plus contemporary walkthroughs (Business Insider, HowToGeek, Gizbot, Mashable, Xataka, etc.).
 
 - Card **order is personalized**; tables above are the *typical eligible-user spine*, not a guarantee.  
 - Data windows end mid/late November; Private Mode / taste exclusions affect taste stories vs totals.  
@@ -250,37 +250,37 @@ When changing Scrapped Plus (export deck), also skim `src/components/scrapped/Sc
 
 ---
 
-## 10. Motion capture — Wrapped vs Scrapped today
+## 10. Motion capture; Wrapped vs Scrapped today
 
 **Agents:** before changing story motion, list stagger, progress timing, or “feel more like Wrapped,” read this section and open [mocks/wrapped-ref/named/](mocks/wrapped-ref/named/) (2023) and/or [mocks/wrapped-ref-2024/named/](mocks/wrapped-ref-2024/named/) (2024 eras / AI podcast). Full frame indexes: [wrapped-ref/README.md](mocks/wrapped-ref/README.md), [wrapped-ref-2024/README.md](mocks/wrapped-ref-2024/README.md).
 
 **Sources (local, not committed):**
-- `~/Downloads/My-Spotify-Wrapped-SnapYT.App.mp4` — ~4.5 min **Wrapped 2023** (SnapYT chrome). Stills: `docs/mocks/wrapped-ref/`.
-- `~/Downloads/Spotify Wrapped 2024.mp4` — ~4.2 min **Wrapped 2024**. Stills: `docs/mocks/wrapped-ref-2024/`.
+- `~/Downloads/My-Spotify-Wrapped-SnapYT.App.mp4`: ~4.5 min **Wrapped 2023** (SnapYT chrome). Stills: `docs/mocks/wrapped-ref/`.
+- `~/Downloads/Spotify Wrapped 2024.mp4`: ~4.2 min **Wrapped 2024**. Stills: `docs/mocks/wrapped-ref-2024/`.
 
 ### 10.1 What Wrapped motion does in this capture
 
 Observed grammar (form to mirror; look to invert):
 
-1. **Art-first canvas** — Full-bleed illustration / ribbon / map / character art is the hero. Copy sits *on* the art; backgrounds change color and motif per card.
-2. **Card = one idea, then cut** — Hard cuts between solid color fields. Setup lines and punchlines are often **separate cards** (e.g. feast setup → genres reveal; list bridge → top-5 list), not progressive lines on one canvas.
-3. **Dwell ~8–15s per card**, then auto-advance (Stories). User can hold/pause; many mid-deck cards also offer **Share this story**.
-4. **Numbers land as a finished block** — Hero numeral + supporting line appear together (or after a short art sting), not title → wait → subtitle → wait.
-5. **Lists** — Numbered rows with covers; rows cascade in, but chrome (decorated frame, share CTA) stays rich.
-6. **Interactive reveal** — Personality beat is tap-to-reveal (`23-tap-to-reveal` → `24-me-in-2023`), not a third copy line.
-7. **Extras Wrapped owns** — Sound Town map, artist thank-you clip, podcast CTA, playlist “Add to Library,” finale collage + Replay. Scrapped omits most of these (see §3 / §5 Don’t).
+1. **Art-first canvas**: Full-bleed illustration / ribbon / map / character art is the hero. Copy sits *on* the art; backgrounds change color and motif per card.
+2. **Card = one idea, then cut**: Hard cuts between solid color fields. Setup lines and punchlines are often **separate cards** (e.g. feast setup → genres reveal; list bridge → top-5 list), not progressive lines on one canvas.
+3. **Dwell ~8-15s per card**, then auto-advance (Stories). User can hold/pause; many mid-deck cards also offer **Share this story**.
+4. **Numbers land as a finished block**: Hero numeral + supporting line appear together (or after a short art sting), not title → wait → subtitle → wait.
+5. **Lists**: Numbered rows with covers; rows cascade in, but chrome (decorated frame, share CTA) stays rich.
+6. **Interactive reveal**: Personality beat is tap-to-reveal (`23-tap-to-reveal` → `24-me-in-2023`), not a third copy line.
+7. **Extras Wrapped owns**: Sound Town map, artist thank-you clip, podcast CTA, playlist “Add to Library,” finale collage + Replay. Scrapped omits most of these (see §3 / §5 Don’t).
 
 Rough spine timing in this file (wall-clock ≈ filename `tNNN`):
 
 ```
-0–6s     Hub → load → brand open
-10–22s   Hello → feast / genres
-48–64s   Sound Town → volume (songs) → #1 song
-72–88s   List bridge → top 5 songs → playlist CTA
-96–120s  Minutes volume → #1 artist
-130–180s Artist rank details → top 5 artists
-190–220s Artist clip → podcast
-230–260s Me-in-2023 reveal → share finale + replay
+0-6s     Hub → load → brand open
+10-22s   Hello → feast / genres
+48-64s   Sound Town → volume (songs) → #1 song
+72-88s   List bridge → top 5 songs → playlist CTA
+96-120s  Minutes volume → #1 artist
+130-180s Artist rank details → top 5 artists
+190-220s Artist clip → podcast
+230-260s Me-in-2023 reveal → share finale + replay
 ```
 
 ### 10.2 What Scrapped motion does today (`/scrapped`)
@@ -293,7 +293,7 @@ Implementation: `ApiScrappedDeck.tsx` + `WrappedStorySlide.tsx` + `src/lib/scrap
 | In-scene pacing | One card, short dwell, auto next | **Line beats** on one scene: headline → subline → aside (reading-time @ ~260 wpm + enter travel) |
 | Enter motion | Art sting + copy already composed | Soft rise + fade (`titleY` 14px, ~0.32s fade / ~0.52s travel); optional blur on open |
 | Exit | Hard cut to new art | Soft fade / slight `-8px` rise; setup→list can **fade-only** so title slot doesn’t jump |
-| Progress | Stories segments; deck auto-walks | Segment fills over **scene** duration then **stops** — user advances (`useStoryAutoplay`) |
+| Progress | Stories segments; deck auto-walks | Segment fills over **scene** duration then **stops**: user advances (`useStoryAutoplay`) |
 | Lists | Numbered + covers + share chrome | Cascade default: 150ms stagger, 0.52s+ per row (`CASCADE_DEFAULTS`); +2s hold on list scenes |
 | Share | Per-card “Share this story” | Finale-first (`ShareRecapCard`); mid-deck share not primary |
 | Interaction | Tap-to-reveal personality; hold pause | Pause button / space (sticky); no flip-card identity beat |
@@ -301,9 +301,9 @@ Implementation: `ApiScrappedDeck.tsx` + `WrappedStorySlide.tsx` + `src/lib/scrap
 
 Constants that matter when tuning “Wrapped feel” without cloning art:
 
-- `STORY_MOTION` — enter/exit distances and durations  
-- `estimateReadingMs` / `storyLineBeatDurationsMs` — how long each line holds  
-- `CASCADE_DEFAULTS` — list stagger  
+- `STORY_MOTION`: enter/exit distances and durations  
+- `estimateReadingMs` / `storyLineBeatDurationsMs`: how long each line holds  
+- `CASCADE_DEFAULTS`: list stagger  
 - `INTRO_COPY_DELAY_SEC` / list `+2000` hold in `ApiScrappedDeck`
 
 ### 10.3 Guidance when matching Wrapped *form*
@@ -311,7 +311,7 @@ Constants that matter when tuning “Wrapped feel” without cloning art:
 **Do borrow**
 
 - Same emotional spine (open → volume → #1 → list → artists → late identity/redemption → share).  
-- Setup card → reveal card *or* our progressive lines — pick one rhythm per beat; don’t mix both on the same reveal.  
+- Setup card → reveal card *or* our progressive lines; pick one rhythm per beat; don’t mix both on the same reveal.  
 - List cascade + numbered rows.  
 - Progress segments + sticky pause (button / space).  
 - Share ritual at the end (and only add mid-deck share if it stays optional).
@@ -322,4 +322,4 @@ Constants that matter when tuning “Wrapped feel” without cloning art:
 - Auto-walking the whole deck without a user advance (our progress-fill-then-wait is intentional).  
 - Claiming true skips from API affinity proxies.
 
-**Closest gap vs Wrapped today:** Wrapped feels *art-led and card-cut*; Scrapped is *text-led* on Orbit Cascade card cuts ([D-007](decisions/D-007-orbit-cascade-api-deck.md)). Closing the motion gap means tighter reading clocks — not porting Wrapped ribbons or Sound Town.
+**Closest gap vs Wrapped today:** Wrapped feels *art-led and card-cut*; Scrapped is *text-led* on Orbit Cascade card cuts ([D-007](decisions/D-007-orbit-cascade-api-deck.md)). Closing the motion gap means tighter reading clocks; not porting Wrapped ribbons or Sound Town.

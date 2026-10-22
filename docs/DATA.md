@@ -1,4 +1,4 @@
-# Spotify Extended Streaming History — Data Knowledge Base
+# Spotify Extended Streaming History: Data Knowledge Base
 
 **Export path (local, gitignored):** `data/raw/Spotify Extended Streaming History/`  
 **Export mtime:** 2025-09-30  
@@ -14,7 +14,7 @@ Agents should read this before changing ingest, skip logic, or analytics.
 |------|---------|-------------------|
 | Audio | `Streaming_History_Audio_YYYY[_N].json` | 205,180 |
 | Video | `Streaming_History_Video_YYYY.json` | 480 |
-| Docs | `ReadMeFirst_ExtendedStreamingHistory.pdf` | — |
+| Docs | `ReadMeFirst_ExtendedStreamingHistory.pdf` |; |
 
 **Date range:** 2017-11-23 → 2026 (partial at both ends).  
 **Naming:** When a year exceeds ~15k events, Spotify splits with `_1` (continuous in time).
@@ -44,7 +44,7 @@ Top-level: JSON **array** of objects. One object = one ended stream (not a uniqu
 | `platform` | string | Values drift (`Android OS …` → `ios` / `osx` / `windows`). |
 | `ms_played` | integer | Milliseconds listened. Some rows are `0`. |
 | `conn_country` | string | ISO country code. |
-| `ip_addr` | string | **PII** — never commit, log, or show in UI. Strip at ingest. |
+| `ip_addr` | string | **PII**: never commit, log, or show in UI. Strip at ingest. |
 | `master_metadata_track_name` | string \| null | Track title. |
 | `master_metadata_album_artist_name` | string \| null | Primary artist. |
 | `master_metadata_album_album_name` | string \| null | Album. |
@@ -59,7 +59,7 @@ Top-level: JSON **array** of objects. One object = one ended stream (not a uniqu
 | `reason_start` | string | Why playback started. |
 | `reason_end` | string | Why playback ended. |
 | `shuffle` | boolean | Shuffle mode. |
-| `skipped` | boolean | Explicit skip flag — **unreliable before ~2022**. |
+| `skipped` | boolean | Explicit skip flag; **unreliable before ~2022**. |
 | `offline` | boolean \| null | Nullable on some video rows. |
 | `offline_timestamp` | integer \| null | Unix seconds; may be set even when `offline` is false. |
 | `incognito_mode` | boolean | Private session. |
@@ -95,7 +95,7 @@ Rough corpus mix: ~46% `trackdone`, ~23% `fwdbtn`, ~21% `endplay`.
 ### `skipped` boolean caveats
 
 - Pre-~2022: `skipped` is almost always `false`, even when `reason_end == "fwdbtn"`.
-- From 2022 onward, `skipped` becomes meaningful; skip rates climb (roughly 30–40% of rows in 2023–2026).
+- From 2022 onward, `skipped` becomes meaningful; skip rates climb (roughly 30-40% of rows in 2023-2026).
 
 **Do not use `skipped` alone for historical skip analytics.**
 
@@ -119,14 +119,14 @@ Video rows are disproportionately skip-flagged (~68%); exclude or separate for m
 
 Implemented in `src/lib/scrapped.ts` / `src/lib/load-scrapped.ts`:
 
-1. Label each play as skip/not-skip at ingest (`is_skip` — see §4).
+1. Label each play as skip/not-skip at ingest (`is_skip`: see §4).
 2. Filter `content_kind = 'track'` with non-null `spotify_track_uri` for the year window.
 3. Aggregate appearances, skips, finish rates (`reason_end = trackdone`), H1/H2 arcs.
 4. Optional Liked join via Web API (`GET /me/tracks`) for “liked but scrapped.”
 
 Prefer `sum(ms_played)` and skip heuristics over raw play counts. Entity key: `spotify_track_uri`.
 
-**Scrapped** (`/scrapped`) and **Scrapped Lab** (`/scrapped/lab`) do **not** use this export — they use `src/lib/spotify/` (Web API).
+**Scrapped** (`/scrapped`) and **Scrapped Lab** (`/scrapped/lab`) do **not** use this export; they use `src/lib/spotify/` (Web API).
 
 ---
 
@@ -157,7 +157,7 @@ Neither API surface replaces Extended Streaming History for lifetime play-by-pla
 2. Classify `track` / `episode` / `audiobook`.
 3. Strip `ip_addr`.
 4. Apply skip heuristic; store both raw signals and derived `is_skip`.
-5. Write SQLite (`data/processed/history.db`) — `plays` plus analytics rollups.
+5. Write SQLite (`data/processed/history.db`); `plays` plus analytics rollups.
 6. Dedup policy: rows are not guaranteed unique; decide per aggregate whether duplicates matter.
 
 ### Analytics tables (built at ingest)

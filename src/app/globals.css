@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-/* Latin-only faces — full package index.css references missing *-all-*.woff files under Turbopack. */
+/* Latin-only faces: full package index.css references missing *-all-*.woff files under Turbopack. */
 @import "@fontsource/poppins/latin-400.css";
 @import "@fontsource/poppins/latin-400-italic.css";
 @import "@fontsource/poppins/latin-500.css";
@@ -236,7 +236,7 @@
   }
 }
 
-/* Scrapped type roles — mobile-first scale (D-002) */
+/* Scrapped type roles: mobile-first scale (D-002) */
 @utility text-display {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 12vw, 3rem);
@@ -267,7 +267,7 @@
   line-height: 1.4;
 }
 
-/* Scrapped story canvas — Orbit Cascade on API deck (D-007); legacy paper for gate/labs */
+/* Scrapped story canvas: Orbit Cascade on API deck (D-007); legacy paper for gate/labs */
 .wrapped-story {
   --wrapped-canvas: #12101a;
   --wrapped-ink: #f5f5f5;
@@ -280,7 +280,7 @@
   background: var(--wrapped-canvas);
 }
 
-/* Orbit Cascade tones — each sets canvas + ink + muted + panel + progress */
+/* Orbit Cascade tones: each sets canvas + ink + muted + panel + progress */
 .wrapped-story[data-wrapped-tone="ink"],
 .wrapped-story [data-wrapped-tone="ink"] {
   --wrapped-canvas: #12101a;
@@ -317,7 +317,7 @@
   color-scheme: light;
 }
 
-/* Field fill only on the slide — not chrome/host (avoids a second header gradient). */
+/* Field fill only on the slide: not chrome/host (avoids a second header gradient). */
 .wrapped-story [data-scrapped-slide][data-wrapped-tone="ember"] {
   background-color: var(--wrapped-canvas);
   background-image: linear-gradient(
@@ -328,7 +328,7 @@
   );
 }
 
-/* Intro / gate — A3 orchid corners (INTRO_FIELD_GRADIENT). */
+/* Intro / gate: A3 orchid corners (INTRO_FIELD_GRADIENT). */
 .wrapped-story[data-scrapped-field="intro-dusk"],
 .wrapped-story [data-scrapped-slide][data-scrapped-field="intro-dusk"] {
   background-color: var(--wrapped-canvas);
@@ -345,7 +345,7 @@
     );
 }
 
-/* Scene 4 one-like — teal nest C0 (TEAL_NEST_GRADIENT). Soft-close stays flat. */
+/* Scene 4 one-like: teal nest C0 (TEAL_NEST_GRADIENT). Soft-close stays flat. */
 .wrapped-story [data-scrapped-slide][data-scrapped-field="one-like-nest"] {
   background-color: var(--wrapped-canvas);
   background-image: linear-gradient(
@@ -404,7 +404,7 @@
   color-scheme: dark;
 }
 
-/* Legacy paper tones — Gate / loading / list labs only (not API deck) */
+/* Legacy paper tones: Gate / loading / list labs only (not API deck) */
 .wrapped-story[data-wrapped-tone="paper"],
 .wrapped-story [data-wrapped-tone="paper"] {
   --wrapped-canvas: #f4f4f2;

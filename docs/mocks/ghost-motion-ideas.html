@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ghost motion ideas: blink + enter→persist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #12101a;
+        --ink: #f5f5f5;
+        --muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --ghost: #f5f0ff;
+        --eye: #2a2433;
+        --blush: #e8a0b8;
+        --accent: #c9a0f5;
+        --card: #2a2433;
+        --row: color-mix(in oklab, #f5f5f5 8%, transparent);
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 3.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        max-width: 46rem;
+        margin: 0 0 0.75rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .lock {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 560;
+        color: #1a1624;
+        background: var(--accent);
+        border-radius: 999px;
+        padding: 0.2rem 0.65rem;
+        margin-bottom: 1.75rem;
+      }
+
+      h2 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 0.5rem;
+      }
+
+      .hint {
+        margin: 0 0 0.85rem;
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.45;
+        max-width: 44rem;
+      }
+
+      section {
+        margin-bottom: 2.75rem;
+      }
+
+      /* :: Eye lab :: */
+      .eye-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.85rem;
+      }
+
+      .eye-card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 1rem 0.75rem 0.85rem;
+        text-align: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+      }
+
+      .eye-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .eye-card .stage {
+        height: 112px;
+        display: grid;
+        place-items: center;
+      }
+
+      .eye-card svg {
+        width: 96px;
+        height: 96px;
+        overflow: visible;
+      }
+
+      .eye-card .id {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .eye-card .name {
+        font-size: 0.8rem;
+        margin-top: 0.15rem;
+      }
+
+      .eye-card .note {
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin-top: 0.2rem;
+        line-height: 1.35;
+      }
+
+      .eye-l,
+      .eye-r {
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      @keyframes blink-both {
+        0%,
+        88%,
+        100% {
+          transform: scaleY(1);
+        }
+        92%,
+        96% {
+          transform: scaleY(0.08);
+        }
+      }
+
+      @keyframes blink-slow {
+        0%,
+        82%,
+        100% {
+          transform: scaleY(1);
+        }
+        88%,
+        94% {
+          transform: scaleY(0.08);
+        }
+      }
+
+      @keyframes blink-double {
+        0%,
+        70%,
+        100% {
+          transform: scaleY(1);
+        }
+        74%,
+        78% {
+          transform: scaleY(0.08);
+        }
+        82% {
+          transform: scaleY(1);
+        }
+        86%,
+        90% {
+          transform: scaleY(0.08);
+        }
+      }
+
+      @keyframes wink-one {
+        0%,
+        85%,
+        100% {
+          transform: scaleY(1);
+        }
+        90%,
+        95% {
+          transform: scaleY(0.08);
+        }
+      }
+
+      @keyframes blink-flutter {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        18%,
+        38%,
+        58% {
+          transform: scaleY(0.12);
+        }
+        28%,
+        48%,
+        68% {
+          transform: scaleY(1);
+        }
+      }
+
+      .m-blink .eye-l,
+      .m-blink .eye-r {
+        animation: blink-both 3.2s ease-in-out infinite;
+      }
+      .m-slow .eye-l,
+      .m-slow .eye-r {
+        animation: blink-slow 4.8s ease-in-out infinite;
+      }
+      .m-double .eye-l,
+      .m-double .eye-r {
+        animation: blink-double 4s ease-in-out infinite;
+      }
+      .m-wink-l .eye-l {
+        animation: wink-one 3.6s ease-in-out infinite;
+      }
+      .m-wink-r .eye-r {
+        animation: wink-one 3.6s ease-in-out infinite;
+      }
+      .m-flutter .eye-l,
+      .m-flutter .eye-r {
+        animation: blink-flutter 2.4s ease-in-out infinite;
+      }
+      .m-stagger .eye-l {
+        animation: blink-both 3.2s ease-in-out infinite;
+      }
+      .m-stagger .eye-r {
+        animation: blink-both 3.2s ease-in-out 0.08s infinite;
+      }
+      .m-rare .eye-l,
+      .m-rare .eye-r {
+        animation: blink-both 7.5s ease-in-out infinite;
+      }
+
+      /* :: List enter→persist lab :: */
+      .list-lab {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      @media (min-width: 820px) {
+        .list-lab {
+          grid-template-columns: 240px 1fr;
+          align-items: start;
+        }
+      }
+
+      .enter-modes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .enter-modes button {
+        font-family: inherit;
+        font-size: 0.8rem;
+        text-align: left;
+        padding: 0.55rem 0.75rem;
+        border-radius: 10px;
+        border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+        background: var(--card);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .enter-modes button.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .enter-modes button .mode-id {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.7rem;
+        display: block;
+      }
+
+      .enter-modes button .mode-note {
+        color: var(--muted);
+        font-size: 0.68rem;
+        margin-top: 0.15rem;
+        line-height: 1.35;
+      }
+
+      .phone {
+        position: relative;
+        aspect-ratio: 9 / 16;
+        max-height: 560px;
+        width: min(100%, 320px);
+        margin: 0 auto;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #0e0c14;
+        border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+      }
+
+      .phone-art {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .phone-ui {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 1.1rem 1rem 1.25rem;
+        pointer-events: none;
+      }
+
+      .phone-ui .wordmark {
+        font-style: italic;
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 1.1rem;
+      }
+
+      .phone-ui .headline {
+        font-size: 1.35rem;
+        font-weight: 700;
+        line-height: 1.15;
+        margin: 0 0 0.35rem;
+      }
+
+      .phone-ui .sub {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 0 0 1rem;
+      }
+
+      .rows {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        flex: 1;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1.4rem 1fr;
+        gap: 0.55rem;
+        align-items: center;
+        padding: 0.55rem 0.65rem;
+        border-radius: 10px;
+        background: var(--row);
+      }
+
+      .row .n {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .row .t {
+        font-size: 0.82rem;
+        font-weight: 560;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .row .a {
+        font-size: 0.68rem;
+        color: var(--muted);
+      }
+
+      .status {
+        margin-top: 0.75rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.45;
+      }
+
+      .status strong {
+        color: var(--accent);
+        font-weight: 560;
+      }
+
+      /*
+       * Nested layers fix the E3 jump-to-top bug:
+       *   .ghost-floater → fixed landing slot (top never animates on settle modes)
+       *                    only opacity + enter translate
+       *   .ghost-bob     → local bob forever at that landing spot
+       */
+      .ghost-frame {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .ghost-floater {
+        position: absolute;
+        top: var(--rest-y);
+        width: var(--gs, 48px);
+        height: var(--gs, 48px);
+        opacity: 0;
+        will-change: transform, opacity;
+      }
+
+      .ghost-bob {
+        width: 100%;
+        height: 100%;
+        transform-origin: center;
+        will-change: transform;
+        animation: bob-idle var(--float-dur, 4.5s) ease-in-out infinite;
+      }
+
+      .ghost-floater svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        display: block;
+      }
+
+      .ghost-floater .eye-l,
+      .ghost-floater .eye-r {
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: transform 0.08s ease;
+      }
+
+      /* One-shot blink (JS schedules at random intervals — no cascade) */
+      .ghost-floater.is-blinking .eye-l,
+      .ghost-floater.is-blinking .eye-r {
+        transform: scaleY(0.08);
+      }
+
+      .ghost-floater:nth-child(1) {
+        left: 4%;
+        --gs: 46px;
+        --rest-y: 22%;
+        --side: -1;
+        --bob: 11px;
+        --float-dur: 4.6s;
+      }
+      .ghost-floater:nth-child(2) {
+        left: 7%;
+        --gs: 40px;
+        --rest-y: 44%;
+        --side: -1;
+        --bob: 14px;
+        --float-dur: 5.4s;
+      }
+      .ghost-floater:nth-child(3) {
+        left: 5%;
+        --gs: 42px;
+        --rest-y: 66%;
+        --side: -1;
+        --bob: 9px;
+        --float-dur: 3.9s;
+      }
+      .ghost-floater:nth-child(4) {
+        right: 5%;
+        left: auto;
+        --gs: 46px;
+        --rest-y: 26%;
+        --side: 1;
+        --bob: 13px;
+        --float-dur: 5.1s;
+      }
+      .ghost-floater:nth-child(5) {
+        right: 7%;
+        left: auto;
+        --gs: 40px;
+        --rest-y: 55%;
+        --side: 1;
+        --bob: 10px;
+        --float-dur: 4.3s;
+      }
+
+      @keyframes bob-idle {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-2deg);
+        }
+        50% {
+          transform: translateY(calc(var(--bob) * -1)) rotate(3deg);
+        }
+      }
+
+      /* Enter on outer only — hold at identity while .ghost-bob floats locally */
+
+      @keyframes e0-enter {
+        0% { opacity: 0; transform: none; }
+        12% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e1-enter {
+        0% { opacity: 0; transform: translate(0, 55vh) scale(0.78); }
+        16% {
+          opacity: 0.85;
+          transform: translate(calc(var(--side) * -6px), 0) scale(1)
+            rotate(calc(var(--side) * -4deg));
+        }
+        22% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e2-enter {
+        0% {
+          opacity: 0;
+          transform: translate(calc(var(--side) * -28px), 58vh) scale(0.72);
+        }
+        14% {
+          opacity: 0.8;
+          transform: translate(calc(var(--side) * -10px), 6vh) scale(0.92);
+        }
+        22% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e3-enter {
+        0% {
+          opacity: 0;
+          transform: translateX(calc(var(--side) * -56px)) scale(0.9);
+        }
+        14% {
+          opacity: 0.6;
+          transform: translateX(0) scale(1) rotate(calc(var(--side) * 4deg));
+        }
+        20% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e4-enter {
+        0% { opacity: 0; transform: scale(0.2) rotate(-8deg); }
+        10% { opacity: 0.7; transform: scale(1.12) rotate(3deg); }
+        16% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e5-enter {
+        0% {
+          opacity: 0;
+          transform: translateY(-42vh) scale(0.85) rotate(6deg);
+        }
+        14% {
+          opacity: 0.75;
+          transform: translateY(0) scale(1.05) rotate(-3deg);
+        }
+        20% { opacity: 0.42; transform: none; }
+        88% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      @keyframes e6-rise {
+        0% {
+          opacity: 0;
+          top: 108%;
+          transform: translateX(0) scale(0.78);
+        }
+        10% {
+          opacity: 0.85;
+          transform: translateX(calc(var(--side) * 6px)) scale(0.9);
+        }
+        55% {
+          opacity: 0.55;
+          top: 35%;
+          transform: translateX(calc(var(--side) * 18px)) scale(0.95);
+        }
+        100% {
+          opacity: 0;
+          top: -8%;
+          transform: translateX(calc(var(--side) * 28px)) scale(0.72);
+        }
+      }
+
+      @keyframes e7-enter {
+        0% { opacity: 0; transform: translateY(18vh) scale(0.88); }
+        10% { opacity: 0.42; transform: none; }
+        92% { opacity: 0.42; transform: none; }
+        100% { opacity: 0; transform: none; }
+      }
+
+      .mode-e0 .ghost-floater { animation: e0-enter 11s var(--ease) infinite; }
+      .mode-e1 .ghost-floater { animation: e1-enter 12s var(--ease) infinite; }
+      .mode-e2 .ghost-floater { animation: e2-enter 12s var(--ease) infinite; }
+      .mode-e3 .ghost-floater { animation: e3-enter 11s var(--ease) infinite; }
+      .mode-e4 .ghost-floater { animation: e4-enter 10s var(--ease) infinite; }
+      .mode-e5 .ghost-floater { animation: e5-enter 11s var(--ease) infinite; }
+      .mode-e6 .ghost-floater { animation: e6-rise 13s linear infinite; }
+      .mode-e6 .ghost-bob { animation: none; }
+      .mode-e7 .ghost-floater { animation: e7-enter 14s var(--ease) infinite; }
+
+      .mode-e1 .ghost-floater:nth-child(1),
+      .mode-e2 .ghost-floater:nth-child(1) { animation-delay: 0s; }
+      .mode-e1 .ghost-floater:nth-child(4),
+      .mode-e2 .ghost-floater:nth-child(4) { animation-delay: 0.85s; }
+      .mode-e1 .ghost-floater:nth-child(2),
+      .mode-e2 .ghost-floater:nth-child(2) { animation-delay: 1.7s; }
+      .mode-e1 .ghost-floater:nth-child(5),
+      .mode-e2 .ghost-floater:nth-child(5) { animation-delay: 2.55s; }
+      .mode-e1 .ghost-floater:nth-child(3),
+      .mode-e2 .ghost-floater:nth-child(3) { animation-delay: 3.4s; }
+
+      .mode-e0 .ghost-floater:nth-child(1) { animation-delay: 0s; }
+      .mode-e0 .ghost-floater:nth-child(2) { animation-delay: 0.45s; }
+      .mode-e0 .ghost-floater:nth-child(3) { animation-delay: 0.9s; }
+      .mode-e0 .ghost-floater:nth-child(4) { animation-delay: 1.35s; }
+      .mode-e0 .ghost-floater:nth-child(5) { animation-delay: 1.8s; }
+
+      .mode-e3 .ghost-floater:nth-child(1) { animation-delay: 0s; }
+      .mode-e3 .ghost-floater:nth-child(4) { animation-delay: 0.35s; }
+      .mode-e3 .ghost-floater:nth-child(2) { animation-delay: 0.7s; }
+      .mode-e3 .ghost-floater:nth-child(5) { animation-delay: 1.05s; }
+      .mode-e3 .ghost-floater:nth-child(3) { animation-delay: 1.4s; }
+
+      .mode-e4 .ghost-floater:nth-child(n) {
+        animation-delay: calc(var(--i, 0) * 0.35s);
+      }
+
+      .mode-e5 .ghost-floater:nth-child(1) { animation-delay: 0.2s; }
+      .mode-e5 .ghost-floater:nth-child(4) { animation-delay: 0s; }
+      .mode-e5 .ghost-floater:nth-child(2) { animation-delay: 0.55s; }
+      .mode-e5 .ghost-floater:nth-child(5) { animation-delay: 0.9s; }
+      .mode-e5 .ghost-floater:nth-child(3) { animation-delay: 1.25s; }
+
+      .mode-e6 .ghost-floater:nth-child(1) {
+        animation-duration: 14s;
+        animation-delay: -2s;
+      }
+      .mode-e6 .ghost-floater:nth-child(4) {
+        animation-duration: 15.5s;
+        animation-delay: -1s;
+      }
+      .mode-e6 .ghost-floater:nth-child(2) {
+        animation-duration: 15s;
+        animation-delay: 0s;
+      }
+      .mode-e6 .ghost-floater:nth-child(5) {
+        animation-duration: 14.5s;
+        animation-delay: 1s;
+      }
+      .mode-e6 .ghost-floater:nth-child(3) {
+        animation-duration: 13.5s;
+        animation-delay: 2s;
+      }
+
+      .mode-e7 .ghost-floater:nth-child(1) { animation-delay: 0s; }
+      .mode-e7 .ghost-floater:nth-child(2) { animation-delay: 0.5s; }
+      .mode-e7 .ghost-floater:nth-child(3) { animation-delay: 1s; }
+      .mode-e7 .ghost-floater:nth-child(4) { animation-delay: 0.25s; }
+      .mode-e7 .ghost-floater:nth-child(5) { animation-delay: 0.75s; }
+
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Ghost motion · <em>enter → persist</em></h1>
+      <p class="lede">
+        No hover. Eyes are idle loops only. List ghosts follow the same idea as
+        scene-4 hearts (<code>mm-heart-rise</code>): move in from offstage, then
+        keep living; except most options
+        <strong>settle at the edge and bob</strong> (list frame) instead of
+        exiting the top. Each cycle restarts so you can re-watch the enter.
+      </p>
+      <span class="lock">S3 face · D-028 hem · no hover</span>
+
+      <section>
+        <h2>1 · Blink / wink (idle)</h2>
+        <p class="hint">
+          Repeating eye loops on the locked S3 face. Click to mark a favorite.
+        </p>
+        <div class="eye-grid" id="eye-grid"></div>
+      </section>
+
+      <section>
+        <h2>2 · Ghosted songs list · enter → persist</h2>
+        <p class="hint">
+          Reference: hearts list floaters rise from bottom on a staggered L/R
+          cascade and keep looping. Pick a ghost enter grammar; all five edge
+          ghosts replay on a loop.
+        </p>
+        <div class="list-lab">
+          <div class="enter-modes" id="enter-modes"></div>
+          <div>
+            <div class="phone">
+              <div class="phone-art">
+                <div class="ghost-frame mode-e3" id="ghost-frame"></div>
+              </div>
+              <div class="phone-ui">
+                <div class="wordmark">Scrapped</div>
+                <p class="headline">Your ghosted songs</p>
+                <p class="sub">Enter loops forever: watch the settle</p>
+                <div class="rows" id="rows"></div>
+              </div>
+            </div>
+            <p class="status">
+              Mode <strong id="mode-label">E3</strong> — <span id="mode-desc">Slide from outer edge → land → bob in place</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const BODY =
+        "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+
+      function ghostSvg() {
+        return `<svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="${BODY}" fill="var(--ghost)" stroke="#1c1c1c" stroke-width="2.2" stroke-linejoin="round"/>
+          <ellipse cx="17" cy="34" rx="4" ry="2.2" fill="var(--blush)" opacity="0.7"/>
+          <ellipse cx="47" cy="34" rx="4" ry="2.2" fill="var(--blush)" opacity="0.7"/>
+          <g class="eye-l"><circle cx="24" cy="26" r="3.2" fill="var(--eye)"/></g>
+          <g class="eye-r"><circle cx="40" cy="26" r="3.2" fill="var(--eye)"/></g>
+        </svg>`;
+      }
+
+      /* :: Eyes :: */
+      const eyeModes = [
+        { id: "M1", name: "Soft blink", note: "Both · ~3.2s", cls: "m-blink" },
+        { id: "M2", name: "Slow blink", note: "Lazier hold", cls: "m-slow" },
+        { id: "M3", name: "Double blink", note: "Two shutters", cls: "m-double" },
+        { id: "M4", name: "Wink left", note: "Left only", cls: "m-wink-l" },
+        { id: "M5", name: "Wink right", note: "Right only", cls: "m-wink-r" },
+        { id: "M6", name: "Flutter", note: "Nervous rapid", cls: "m-flutter" },
+        { id: "M7", name: "Stagger", note: "Eyes 80ms apart", cls: "m-stagger" },
+        { id: "M8", name: "Rare blink", note: "Quiet · ~7.5s", cls: "m-rare" },
+      ];
+
+      const eyeGrid = document.getElementById("eye-grid");
+      eyeModes.forEach((m) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `eye-card ${m.cls}`;
+        card.innerHTML = `
+          <div class="stage">${ghostSvg()}</div>
+          <div class="id">${m.id}</div>
+          <div class="name">${m.name}</div>
+          <div class="note">${m.note}</div>
+        `;
+        card.addEventListener("click", () => {
+          eyeGrid.querySelectorAll(".eye-card").forEach((c) =>
+            c.classList.remove("active"),
+          );
+          card.classList.add("active");
+        });
+        eyeGrid.appendChild(card);
+      });
+
+      /* :: List :: */
+      const tracks = [
+        { t: "Are You Bored Yet?", a: "Wallows" },
+        { t: "Motion Sickness", a: "Phoebe Bridgers" },
+        { t: "Kyoto", a: "Phoebe Bridgers" },
+        { t: "Somebody Else", a: "The 1975" },
+        { t: "Silver Springs", a: "Fleetwood Mac" },
+      ];
+
+      const rowsEl = document.getElementById("rows");
+      tracks.forEach((tr, i) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <div class="n">${i + 1}</div>
+          <div>
+            <div class="t">${tr.t}</div>
+            <div class="a">${tr.a}</div>
+          </div>
+        `;
+        rowsEl.appendChild(row);
+      });
+
+      const enterModes = [
+        {
+          id: "E0",
+          name: "Live today (D-018)",
+          note: "Fade in place → bob · current app",
+          cls: "mode-e0",
+          desc: "Opacity fade at rest slots, then bob (what ships now)",
+        },
+        {
+          id: "E1",
+          name: "Heart rhyme · rise→settle",
+          note: "From below · L/R stagger · then bob",
+          cls: "mode-e1",
+          desc: "Heart rise grammar, but settle at edge and keep floating",
+        },
+        {
+          id: "E2",
+          name: "Heart cascade · scale",
+          note: "Bigger L/R offset on enter",
+          cls: "mode-e2",
+          desc: "Same stagger as mm-heart-floater with stronger side drift",
+        },
+        {
+          id: "E3",
+          name: "Slide from outer edge",
+          note: "In from left/right · settle · bob",
+          cls: "mode-e3",
+          desc: "Slide from outer edge, land at slot, bob in place (fixed)",
+        },
+        {
+          id: "E4",
+          name: "Pop scale",
+          note: "Springy appear · then soft float",
+          cls: "mode-e4",
+          desc: "Scale pop at slot, then bob",
+        },
+        {
+          id: "E5",
+          name: "Drop from sky",
+          note: "Haunt drops in · settle · bob",
+          cls: "mode-e5",
+          desc: "Enter from above (moon side), settle, persist",
+        },
+        {
+          id: "E6",
+          name: "Continuous rise (hearts)",
+          note: "Exact heart loop · exit top · no settle",
+          cls: "mode-e6",
+          desc: "Closest to mm-heart-rise; continuous rise + fade out, infinite",
+        },
+        {
+          id: "E7",
+          name: "Short enter · long persist",
+          note: "Quick rise · long bob before restart",
+          cls: "mode-e7",
+          desc: "Enter is brief; most of the loop is living/floating",
+        },
+      ];
+
+      const frame = document.getElementById("ghost-frame");
+      const blinkTimers = [];
+
+      function clearBlinkTimers() {
+        while (blinkTimers.length) clearTimeout(blinkTimers.pop());
+      }
+
+      function rand(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      /** Independent random blinks per ghost — both eyes together, no stagger wave. */
+      function armRandomBlink(el) {
+        const schedule = () => {
+          const wait = rand(1.8, 7.5) * 1000;
+          const t = setTimeout(() => {
+            el.classList.add("is-blinking");
+            const shut = setTimeout(() => {
+              el.classList.remove("is-blinking");
+              // Occasional double-blink
+              if (Math.random() < 0.18) {
+                const again = setTimeout(() => {
+                  el.classList.add("is-blinking");
+                  const shut2 = setTimeout(() => {
+                    el.classList.remove("is-blinking");
+                    schedule();
+                  }, rand(70, 110));
+                  blinkTimers.push(shut2);
+                }, rand(90, 160));
+                blinkTimers.push(again);
+              } else {
+                schedule();
+              }
+            }, rand(70, 120));
+            blinkTimers.push(shut);
+          }, wait);
+          blinkTimers.push(t);
+        };
+        schedule();
+      }
+
+      function makeFloater(i) {
+        const el = document.createElement("div");
+        el.className = "ghost-floater";
+        el.style.setProperty("--i", String(i));
+        el.innerHTML = `<div class="ghost-bob">${ghostSvg()}</div>`;
+        armRandomBlink(el);
+        return el;
+      }
+
+      for (let i = 0; i < 5; i++) frame.appendChild(makeFloater(i));
+
+      let mode = enterModes.find((m) => m.id === "E3") || enterModes[1];
+      const modesEl = document.getElementById("enter-modes");
+
+      function applyMode(m) {
+        mode = m;
+        frame.className = `ghost-frame ${m.cls}`;
+        clearBlinkTimers();
+        // Remount floaters so enter restarts; each gets a fresh random blink clock
+        frame.replaceChildren(
+          ...[0, 1, 2, 3, 4].map((i) => makeFloater(i)),
+        );
+
+        document.getElementById("mode-label").textContent = m.id;
+        document.getElementById("mode-desc").textContent = m.desc;
+        modesEl.querySelectorAll("button").forEach((b) =>
+          b.classList.toggle("active", b.dataset.id === m.id),
+        );
+      }
+
+      enterModes.forEach((m) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.id = m.id;
+        b.innerHTML = `<span class="mode-id">${m.id}</span>${m.name}<div class="mode-note">${m.note}</div>`;
+        if (m === mode) b.classList.add("active");
+        b.addEventListener("click", () => applyMode(m));
+        modesEl.appendChild(b);
+      });
+
+      applyMode(mode);
+    </script>
+  </body>
+</html>

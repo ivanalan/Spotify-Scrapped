@@ -127,7 +127,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="00"
           title="Scrapped Plus"
-          blurb={`Anti-Wrapped for ${summary.year} — the skips, the ghosted, and the songs that earned a rematch.`}
+          blurb={`Anti-Wrapped for ${summary.year}; the skips, the ghosted, and the songs that earned a rematch.`}
           active={active === 0}
           footer={
             <>
@@ -151,7 +151,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="01"
           title="Times skipped"
-          blurb="How often you bounced — every forward, early end, back, or under-30s bail in 2026."
+          blurb="How often you bounced; every forward, early end, back, or under-30s bail in 2026."
           active={active === 1}
           footer={`${formatPct(summary.skipRate)} of ${summary.playCount.toLocaleString()} track plays`}
         >
@@ -165,7 +165,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="02"
           title="Most skipped song"
-          blurb="The one track that collected the most skips — Wrapped’s top-song beat, inverted."
+          blurb="The one track that collected the most skips; Wrapped’s top-song beat, inverted."
           active={active === 2}
         >
           {topSong ? (
@@ -216,7 +216,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="04"
           title="Top skipped artist"
-          blurb="The artist you kept starting and kept leaving — one name."
+          blurb="The artist you kept starting and kept leaving; one name."
           active={active === 4}
         >
           {topArtist ? (
@@ -256,7 +256,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="05"
           title="Top skipped artists"
-          blurb="Skip volume weighted by how often you bail — the artists that got ghosted."
+          blurb="Skip volume weighted by how often you bail; the artists that got ghosted."
           active={active === 5}
         >
           <RankBars
@@ -336,7 +336,7 @@ export function ScrappedDeck({ report }: Props) {
         <StorySlide
           index="08"
           title="Songs you stayed for"
-          blurb="Among songs you played a lot — these are the ones you let end."
+          blurb="Among songs you played a lot; these are the ones you let end."
           active={active === 8}
         >
           <RankBars
@@ -351,7 +351,7 @@ export function ScrappedDeck({ report }: Props) {
           />
         </StorySlide>
 
-        {/* 9 — shareable Wrapped-style recap */}
+        {/* 9: shareable Wrapped-style recap */}
         <section
           data-scrapped-slide
           className="flex h-[calc(100dvh-3.75rem)] min-h-[calc(100dvh-3.75rem)] w-full snap-start snap-always flex-col items-center justify-center px-6 py-10 md:px-10"

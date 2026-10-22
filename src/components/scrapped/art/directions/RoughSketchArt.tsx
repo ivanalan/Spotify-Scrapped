@@ -17,7 +17,7 @@ const ACCENT = "#e85d3a";
 const SECONDARY = "#2a6f6a";
 
 /**
- * Hand-drawn anti-Wrapped notebook — Rough.js strokes drawn start→finish
+ * Hand-drawn anti-Wrapped notebook: Rough.js strokes drawn start→finish
  * via Anime.js createDrawable, then erase/redraw loop on overview.
  */
 export function RoughSketchArt({ surface }: DirectionArtProps) {

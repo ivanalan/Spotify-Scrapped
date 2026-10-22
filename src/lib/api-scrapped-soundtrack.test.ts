@@ -247,7 +247,7 @@ describe("getApiSlideSoundtrackUri", () => {
     assert.equal(uris[2], "spotify:track:dapperAnderson");
     assert.equal(uris[3], "spotify:track:callingAfterMeWallows");
     // Open slide may fall back to leftover ghosted (#3), but must not claim #1
-    // before the content pin — so #1 stays on scene 2.
+    // before the content pin: so #1 stays on scene 2.
     assert.notEqual(uris[0], "spotify:track:dapperAnderson");
   });
 

@@ -8,7 +8,7 @@ import { limitWaitlistJoin } from "@/lib/waitlist/rate-limit";
 
 const BODY_MAX_BYTES = 2_048;
 
-/** Same success shape whether new or duplicate — avoid email enumeration. */
+/** Same success shape whether new or duplicate: avoid email enumeration. */
 function ok() {
   return NextResponse.json({ ok: true });
 }

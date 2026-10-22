@@ -8,7 +8,6 @@ import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton
 import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
 import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
 import {
-  gatePrimaryChromeClass,
   gatePrimaryTone,
   gateSecondaryChromeClass,
 } from "@/components/scrapped/gateChrome";
@@ -25,7 +24,7 @@ type Props = {
   /** OAuth failure shown on the auth gate (from `?spotify_error=`). */
   authError?: string;
   /**
-   * Dev Mode allowlist rejection — seats-full mid band, no Sign in (D-025).
+   * Dev Mode allowlist rejection: seats-full mid band (D-025).
    * Computed server-side from `?spotify_error=`.
    */
   seatsFull?: boolean;
@@ -50,7 +49,7 @@ type Props = {
 const gateCtaClass = cn(
   buttonVariants({ size: "lg" }),
   gatePrimaryTone,
-  "mt-8 h-12 w-full rounded-2xl px-8 text-base font-semibold",
+  "mt-8 w-full",
 );
 
 const gateAltLinkClass =
@@ -88,7 +87,7 @@ export function ScrappedGate({
           introKit="gate-d6"
         />
       </div>
-      {/* D-022 kit D6 — soft top scrim so About + brand stay ink-readable. */}
+      {/* D-022 kit D6: soft top scrim so About + brand stay ink-readable. */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[22%] opacity-75"
         aria-hidden
@@ -103,17 +102,7 @@ export function ScrappedGate({
           <Link href="/about" className={gateSecondaryChromeClass}>
             About
           </Link>
-          {connected ? (
-            <SignOutConfirmButton appearance="text" />
-          ) : (
-            <a
-              href="/api/spotify/login"
-              className={gatePrimaryChromeClass}
-              aria-label="Sign in to Spotify"
-            >
-              Sign in
-            </a>
-          )}
+          {connected ? <SignOutConfirmButton appearance="text" /> : null}
         </div>
 
         <div className="flex w-full flex-1 flex-col justify-center">
@@ -152,7 +141,7 @@ export function ScrappedGate({
               </p>
 
               {mode === "auth" ? (
-                <div className="mt-8 w-full space-y-3">
+                <div className="mt-12 w-full space-y-3">
                   {authError ? (
                     <p className="text-caption w-full text-[var(--wrapped-muted)]">
                       {authError}

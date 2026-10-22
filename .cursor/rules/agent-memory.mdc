@@ -1,5 +1,5 @@
 ---
-description: Portable agent memory — SOUL, SCARS, decisions, contribution loop
+description: Portable agent memory; SOUL, SCARS, decisions, contribution loop
 alwaysApply: true
 ---
 
@@ -20,17 +20,17 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 
 ## Loop
 
-1. **Start** — For non-trivial work, read `SOUL.md`. If diagnosing or changing behavior that hurt before, skim `SCARS.md` and recent `D-NNN` decisions.
-2. **Plan** — Multi-step work: keep the plan in the repo when it must survive the session.
-3. **Build** — Ship docs in the **same change** as the feature/fix.
-4. **Decide** — When locking a tradeoff under uncertainty, add `docs/decisions/D-NNN-*.md` (why, displaced, cost).
-5. **Hand off** — If something non-obvious hurt, append `SCARS.md` (symptom as title). Do not leave traps only in chat.
+1. **Start**: For non-trivial work, read `SOUL.md`. If diagnosing or changing behavior that hurt before, skim `SCARS.md` and recent `D-NNN` decisions.
+2. **Plan**: Multi-step work: keep the plan in the repo when it must survive the session.
+3. **Build**: Ship docs in the **same change** as the feature/fix.
+4. **Decide**: When locking a tradeoff under uncertainty, add `docs/decisions/D-NNN-*.md` (why, displaced, cost).
+5. **Hand off**: If something non-obvious hurt, append `SCARS.md` (symptom as title). Do not leave traps only in chat.
 
 ## Five rules
 
 1. Docs live in the repo; same commit as the change.
 2. Split system docs (how it works) from slice docs (what we’re proving + stop line) when you add them.
-3. One fact, one place — link; don’t restate.
+3. One fact, one place; link; don’t restate.
 4. Scars titled with the symptom.
 5. Enforce via rules/hooks/checks, or expect drift.
 
@@ -61,4 +61,11 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Gate About + `/about` Layout A · gate disk kit D6: [D-022](docs/decisions/D-022-about-page-gate-d6.md)
 - Gate button triad (primary fill · secondary glass · tertiary underline): [D-023](docs/decisions/D-023-gate-button-triad.md)
 - Example walkthrough (frozen Guest snapshot · `/example` · About CTA · back chrome): [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md)
-- Not-allowlisted seats-full gate (About + Sign in · no Sign out · waitlist · example / why): [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md)
+- Not-allowlisted seats-full gate (About only · no Sign out · waitlist · helper Sign in · example / why): [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md)
+- Button tap target 40px (shared `h-10` / `size-10`; no height overrides): [D-026](docs/decisions/D-026-button-tap-target-40.md)
+- Unsigned Sign in under waitlist helper (no top-right primary): [D-027](docs/decisions/D-027-sign-in-under-waitlist.md)
+- Blob ghost four-scallop hem: [D-028](docs/decisions/D-028-ghost-four-scallop-hem.md)
+- Blob ghost outline + blush face: [D-029](docs/decisions/D-029-ghost-outline-blush.md)
+- List ghost E3 slide enter + random blink: [D-030](docs/decisions/D-030-ghost-e3-slide-enter-random-blink.md)
+- No dash punctuation in writing: [D-030](docs/decisions/D-030-no-dash-punctuation.md)
+- Pause story on tab/app hide; stay paused on return: [D-031](docs/decisions/D-031-pause-on-tab-hide.md)

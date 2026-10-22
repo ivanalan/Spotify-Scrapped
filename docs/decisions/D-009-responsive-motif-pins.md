@@ -1,8 +1,8 @@
-# D-009 — Responsive motif pins (mobile-locked)
+# D-009: Responsive motif pins (mobile-locked)
 
 **Status:** Locked  
 **Date:** 2026-10-19  
-**Surfaces:** `/scrapped` API deck orbit chrome (`ScrappedOrbitArt`) — gate + loading included  
+**Surfaces:** `/scrapped` API deck orbit chrome (`ScrappedOrbitArt`): gate + loading included  
 **Parent:** [D-007](D-007-orbit-cascade-api-deck.md)
 
 ## Decision
@@ -12,8 +12,8 @@ On **wide** viewports, Orbit Cascade chrome uses **corner-pinned motif layers** 
 On **phone** viewports, most patterns keep the legacy full-slide `MotifStage` (`viewBox 0 0 360 640` + `preserveAspectRatio="xMidYMid slice"`).
 
 **Pin exceptions (every viewport):**
-- **Intro** — orchid disks + pointed star via `MotifCornerOrigin` (disk center → TL, star center → BR)
-- **Soft close** — double pill bookend via `MotifPin` top-center + bottom-center (`CloseBookendChrome`). MotifStage `slice` crops the mirrored bottom stack on tall phones.
+- **Intro**: orchid disks + pointed star via `MotifCornerOrigin` (disk center → TL, star center → BR)
+- **Soft close**: double pill bookend via `MotifPin` top-center + bottom-center (`CloseBookendChrome`). MotifStage `slice` crops the mirrored bottom stack on tall phones.
 
 Phone wins whenever `(max-width: 480px)` **or** `(max-aspect-ratio: 3/4)`. SSR and first paint default to the phone path.
 
@@ -28,12 +28,12 @@ Mobile is protected by a **separate render path**, not by hoping pin math matche
 | Axis | Choice |
 |------|--------|
 | Phone path | Legacy `MotifStage` for non-exception patterns; intro + soft close use pins (see above) |
-| Wide path | Same intro / close pins; `MotifMeetStage` (song meet / artist slice); `MotifPin` (volume/list/reunion) |
+| Wide path | Same intro / close pins; ghosted pair **edge pins** (grass bottom · haunt near cover · moon TR · L/R ghost columns); `MotifPin` (volume/list/reunion) |
 | Breakpoint | Phone if `max-width: 480px` **or** `max-aspect-ratio: 3/4` |
 | Sizing | Motif boxes from short side (`min(100vw, 100dvh)`); mid band stays clear |
-| Motifs | Reuse ShapeKit / Funky / List / ArtistOrbit components — do not redraw |
+| Motifs | Reuse ShapeKit / Funky / List / ArtistOrbit components; do not redraw |
 | Canvas | Full-bleed; no letterbox gutters |
-| Copy motion | Unchanged — [D-001](D-001-story-copy-vs-list-motion.md) |
+| Copy motion | Unchanged; [D-001](D-001-story-copy-vs-list-motion.md) |
 
 ## Displaced
 
@@ -41,7 +41,7 @@ Using `xMidYMid slice` alone as the wide-viewport scaling model for **edge-ancho
 
 ## Cost
 
-Two composition paths to maintain; wide pins need visual QA when motifs change. `entity-song` uses meet for night moon/ghost (D-017). `entity-artist` uses slice (full-bleed field; may crop oval tops/bottoms on ultrawide).
+Two composition paths to maintain; wide pins need visual QA when motifs change. Ghosted pair (`entity-song` + scene 3 list) uses **edge pins**, not a single meet/slice stage: meet letterboxed a phone column; slice cropped floor grass and most edge ghosts on landscape. Left/right ghost pins keep all five Y slots; grass pins to the floor ([D-018](D-018-ghosted-ground-sky-s9.md)).
 
 ## Source of truth
 

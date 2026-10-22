@@ -1,7 +1,7 @@
 # SCARS.md
 
 What has already hurt us. **Title each entry with the symptom** (reporter’s words).  
-Read before diagnosing. Append-only — never delete; supersede with a newer scar if needed.
+Read before diagnosing. Append-only; never delete; supersede with a newer scar if needed.
 
 Format:
 
@@ -21,7 +21,7 @@ Format:
 - **Not:** List layout reflow, MotifStage crop, or another remount of `LeftOnReadChatChrome`.
 - **Cause:** `quiet` and `frame` used different column scale / `top` / `left` (and mirror size). Setup looked larger and more inboard; list beat snapped to the edge frame.
 - **Proof:** “Get the gang back together?” bubbles sat mid-left; “Top artists you left on read” had the same pills smaller and hard against the edges.
-- **Avoid:** Quiet and frame share edge geometry **and** opacity — no second layout, no fade-up on list enter. (Supersedes earlier “quiet only lowers opacity.”)
+- **Avoid:** Quiet and frame share edge geometry **and** opacity: no second layout, no fade-up on list enter. (Supersedes earlier “quiet only lowers opacity.”)
 - **Related:** [D-015](docs/decisions/D-015-list-art-frames-not-heroes.md), `middeck-metaphors.css`
 
 ## Left-on-read chats start dimmer than on the list
@@ -36,7 +36,7 @@ Format:
 
 - **Not:** Copy `visitKey` / `BeatBody` remounting, or the list cascade playing early.
 - **Cause:** Scene 6 chat chrome used `beatPhase >= 1` for quiet→frame, so the edge bubbles remounted when the setup *subline* landed. `LeftOnReadChatChrome` keyed on `visualMode`, which re-ran `mm-skew-slide` enter.
-- **Proof:** Bubbles slid in on “Get the gang back together?”, then slid in again as “They’ll take you back.” appeared — before the list beat.
+- **Proof:** Bubbles slid in on “Get the gang back together?”, then slid in again as “They’ll take you back.” appeared: before the list beat.
 - **Avoid:** Frame mode only when the list narrative starts (`beatPhase >= 2` for this scene’s 2-line setup). Key chat chrome on `replayKey` only; flip `data-mode` for quiet→frame. Quiet/frame must share edge geometry (see scar above).
 - **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), [D-017](docs/decisions/D-017-entity-list-pair-rhymes.md), `LeftOnReadChatChrome.tsx`, `ScrappedOrbitArt.tsx`
 
@@ -51,7 +51,7 @@ Format:
 ## 1 like artist text flies up a ton when fading into the list
 
 - **Not:** `STORY_MOTION.exitY` (-8px) itself, or the heart’s exit drift.
-- **Cause:** Clearing copy under the 4A heart used section padding `pt-[min(40vh,20rem)]` only while `!isListBeat`. On Meet → list, `current` flips to the list beat immediately, so the section snapped to `py-24` while `AnimatePresence` was still exiting Meet copy — flex `justify-center` recentered that outgoing text high in the viewport on top of the small exit rise.
+- **Cause:** Clearing copy under the 4A heart used section padding `pt-[min(40vh,20rem)]` only while `!isListBeat`. On Meet → list, `current` flips to the list beat immediately, so the section snapped to `py-24` while `AnimatePresence` was still exiting Meet copy: flex `justify-center` recentered that outgoing text high in the viewport on top of the small exit rise.
 - **Proof:** “Meet your 1 like artists” shot upward then faded; shared exit should only nudge ~8px. Started when nest padding was gated on `!isListBeat`.
 - **Avoid:** Keep nest top padding for the whole `one-like-nest` field. Do not flip section padding from the incoming beat. List BeatBody is absolute `pinTop`, so nest padding does not layout the list.
 - **Related:** scar above (section-level beat chrome mid-exit), `WrappedStorySlide.tsx`
@@ -61,21 +61,21 @@ Format:
 - **Not:** List `bottom-24` padding alone, or `showPlayer={false}` failing to hide chrome.
 - **Cause:** `DeckSoundtrack` kept the warm embed shell in the fixed bottom stage at `h-20` with `opacity-[0.01]` so iOS would buffer. Nearly invisible, but still painted over the list / bottom of the slide.
 - **Proof:** Ghosted-songs list on `/scrapped` showed empty/smudged space above the browser chrome where the Spotify embed sat; API deck passes `showPlayer={false}`.
-- **Avoid:** When the player is not on stage, park the pool shell out of flex flow and off-viewport (`absolute` + large negative translate). Keep a real painted size/opacity for buffering — do not leave a near-invisible `h-20` on the content stage.
+- **Avoid:** When the player is not on stage, park the pool shell out of flex flow and off-viewport (`absolute` + large negative translate). Keep a real painted size/opacity for buffering: do not leave a near-invisible `h-20` on the content stage.
 - **Related:** `DeckSoundtrack.tsx`, `ScrappedExperience.tsx`
 
 ## Numbered entity list is not scrollable on the live deck
 
 - **Not:** Missing `overflow-y-auto` on the list wrapper, or covers/gaps alone causing the clip.
-- **Cause:** List region used `z-[35]` inside BeatBody’s `z-10` stacking context, while Stories tap zones sit at `z-30` on the deck root — so every vertical pan hit prev/next instead of the scrollport. Horizontal scroller also uses `overflow-y-hidden`, so clipped rows had nowhere to go.
+- **Cause:** List region used `z-[35]` inside BeatBody’s `z-10` stacking context, while Stories tap zones sit at `z-30` on the deck root: so every vertical pan hit prev/next instead of the scrollport. Horizontal scroller also uses `overflow-y-hidden`, so clipped rows had nowhere to go.
 - **Proof:** Ghosted songs list cut off the 5th row; swipe on the list did not scroll. Labs scrolled because they have no overlay tap zones.
-- **Avoid:** Superseded for live-deck tap priority — see [Cannot tap to advance on list content](#cannot-tap-to-advance-on-list-content). Labs still use list `pointer-events-auto` + overflow scroll without overlay zones.
+- **Avoid:** Superseded for live-deck tap priority: see [Cannot tap to advance on list content](#cannot-tap-to-advance-on-list-content). Labs still use list `pointer-events-auto` + overflow scroll without overlay zones.
 - **Related:** `WrappedStorySlide.tsx`, `ApiScrappedDeck.tsx` tap zones
 
 ## Cannot tap to advance on list content
 
 - **Not:** Missing `onClick` on list rows, or pause/hold eating the gesture.
-- **Cause:** List BeatBody was raised to `z-[35]` with scrollport `pointer-events-auto` so pans could scroll above Stories tap zones at `z-30` — so taps on rows never reached prev/next.
+- **Cause:** List BeatBody was raised to `z-[35]` with scrollport `pointer-events-auto` so pans could scroll above Stories tap zones at `z-30`: so taps on rows never reached prev/next.
 - **Proof:** On ghosted songs / artist list beats, tapping a row did nothing; tapping empty chrome still advanced.
 - **Avoid:** Keep live-deck tap zones above the list (`z-[36]`), under chrome (`z-40`). Do not put the list scrollport above tap zones on `/scrapped`. Accept that row-area touch-scroll loses to Stories tap-to-advance on the live deck; labs without overlay zones still scroll.
 - **Related:** `ApiScrappedDeck.tsx` tap zones, `WrappedStorySlide.tsx` pinTop list beat
@@ -129,8 +129,8 @@ Format:
 ## Soft-close bottom pill stack missing on mobile, visible on web
 
 - **Not:** Missing bottom art in the double-stack markup, or a mobile-only CSS `display:none`.
-- **Cause (1):** Phone soft close used full-frame `MotifStage` (`xMidYMid slice`) with `FunkyDoubleStack`. Tall portrait viewports cover-scale the 360×640 design space and crop top/bottom equally — the mirrored bottom bookend sits near the viewBox floor and disappears. Wide path already pinned stacks to `top-center` / `bottom-center`.
-- **Cause (2, after pins):** Bottom bookend still flaky on deployed iOS — SVG `translate+scale(1,-1)` nested inside Framer `motion.g` (opacity enter) often failed to paint under WebKit. Top (unmirrored) was fine.
+- **Cause (1):** Phone soft close used full-frame `MotifStage` (`xMidYMid slice`) with `FunkyDoubleStack`. Tall portrait viewports cover-scale the 360×640 design space and crop top/bottom equally: the mirrored bottom bookend sits near the viewBox floor and disappears. Wide path already pinned stacks to `top-center` / `bottom-center`.
+- **Cause (2, after pins):** Bottom bookend still flaky on deployed iOS: SVG `translate+scale(1,-1)` nested inside Framer `motion.g` (opacity enter) often failed to paint under WebKit. Top (unmirrored) was fine.
 - **Proof:** Phone Safari showed only the top bookend on slide 8; desktop wide (and fixed-frame mocks) showed both.
 - **Avoid:** Edge-anchored bookends must use Motif pins on every viewport. Mirror the bottom pin with CSS `scaleY(-1)` on the pin box, same unmirrored `FunkyPillStack` as top; don’t animate opacity on close enter.
 - **Related:** [D-009](docs/decisions/D-009-responsive-motif-pins.md), `CloseBookendChrome` in `ScrappedOrbitArt.tsx`
@@ -138,7 +138,7 @@ Format:
 ## Share button does nothing on iOS Safari
 
 - **Not:** Tap zones eating the Share hit target, or missing `navigator.share` support entirely.
-- **Cause:** (1) Capture (`domToBlob`) ran inside the click before `navigator.share`, so WebKit dropped the user-gesture token. (2) `ShareData` included `title`/`text` with `files` — WebKit `canShare`/`share` rejects that combo.
+- **Cause:** (1) Capture (`domToBlob`) ran inside the click before `navigator.share`, so WebKit dropped the user-gesture token. (2) `ShareData` included `title`/`text` with `files`: WebKit `canShare`/`share` rejects that combo.
 - **Proof:** Share no-op on iPhone Safari; desktop download fallback still worked.
 - **Avoid:** Pre-capture the PNG while the finale is idle; on tap share **files-only** with the warmed blob. Gate the button on precapture ready.
 
@@ -149,17 +149,24 @@ Format:
 - **Proof:** Hold pause felt unreliable; users wanted pause only via the chrome button.
 - **Avoid:** Do not reintroduce zone press-hold pause. Pause is sticky button / space (and media-key API) only; zones tap to navigate.
 
+## Switching Chrome tabs does not pause Scrapped audio
+
+- **Not:** Missing `visibilitychange` entirely, or spacebar sticky pause failing while the tab stays focused.
+- **Cause:** (1) Sticky pause only flipped React `enabled` via effects; background tabs throttle renders while audio-playing tabs keep running, so Spotify embeds kept playing. (2) `playback_update` while still audible after disable called `onExternalResume` (media-key path), which cleared sticky pause.
+- **Proof:** Tab switch with sound on: story/audio continued until returning.
+- **Avoid:** Pause embeds synchronously in `visibilitychange`; latch `enabledRef` false until parent `enabled` catches up; only `onExternalResume` after a paused update while disabled. See [D-031](docs/decisions/D-031-pause-on-tab-hide.md).
+
 ## Hold on story screen plays the next song under the current one
 
 - **Not:** Sticky pause failing, or intentional act-switch overlap cutover on a committed tap.
-- **Cause:** Zone `pointerdown` still speculative-`primeTo`s the next URI (`play()` while the current act stays solo). After hold-pause was removed, long presses no longer `cancelPrime`, and prime finish depended mainly on `playback_started` with no fallback — so an unfinished prime kept the next embed audible for the whole hold.
+- **Cause:** Zone `pointerdown` still speculative-`primeTo`s the next URI (`play()` while the current act stays solo). After hold-pause was removed, long presses no longer `cancelPrime`, and prime finish depended mainly on `playback_started` with no fallback: so an unfinished prime kept the next embed audible for the whole hold.
 - **Proof:** Press-and-hold on the right/left story tap zone (not pause chrome) layered the next slide’s sample under the current track.
 - **Avoid:** Cancel speculative prime after a short hold (`PRIME_HOLD_CANCEL_MS`) without pausing the story; finish primes from `playback_update` + a prime finish fallback timer. Do not restore zone hold-pause.
 
 ## Desktop #1 artist slide looks like a mobile-cropped background
 
 - **Not:** `ProductMain` max-width, missing `w-screen`, or the slide canvas failing to paint edge-to-edge.
-- **Cause:** Wide `entity-artist` used `MotifMeetStage` with `preserveAspectRatio="xMidYMid meet"`. That letterboxes the 9:16 design into the landscape slide — solid ink still filled the viewport, but the orbit read as a phone-sized frame with empty side flanks.
+- **Cause:** Wide `entity-artist` used `MotifMeetStage` with `preserveAspectRatio="xMidYMid meet"`. That letterboxes the 9:16 design into the landscape slide: solid ink still filled the viewport, but the orbit read as a phone-sized frame with empty side flanks.
 - **Proof:** “Artists you left on read” on desktop showed a centered portrait oval stack with flat ink gutters L/R.
 - **Avoid:** On wide, cover-scale the artist orbit (`slice`), not `meet`. Keep `meet` only where showing the whole motif matters more than filling (e.g. song spiral arms).
 - **Related:** [D-009](docs/decisions/D-009-responsive-motif-pins.md), `ScrappedOrbitArt` WideOrbitChrome
@@ -167,9 +174,9 @@ Format:
 ## 1-like heart vanishes too early / list hearts pop in too fast
 
 - **Not:** Story autoplay advancing before the setup beat finishes, or copy motion stealing the handoff.
-- **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Scene 4 used `beatPhase >= 2` (copied from 2-line setups) — with a 3-block spine that is the Meet 1-like *subtitle*, so the hero fade began while “Meet your 1 like artists” was still on screen. (3) An extra `LIST_HANDOFF_HOLD_MS` then postponed the fade past the copy exit it was meant to match.
+- **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Scene 4 used `beatPhase >= 2` (copied from 2-line setups): with a 3-block spine that is the Meet 1-like *subtitle*, so the hero fade began while “Meet your 1 like artists” was still on screen. (3) An extra `LIST_HANDOFF_HOLD_MS` then postponed the fade past the copy exit it was meant to match.
 - **Proof:** Heart left during “Meet your 1 like artists” reading; advancing Meet → list looked cut / misaligned with shared copy exit.
-- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Flip `frame` only when the list narrative starts (`beatPhase >= 3` on scene 4). Start the CSS hero fade with that flip (same moment Meet copy exits) — no second hold. List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise. Enter uses outline→fill opacity + polar sparks — never a tiny scaled fill or underglow disc (reads as a mid spinner).
+- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Flip `frame` only when the list narrative starts (`beatPhase >= 3` on scene 4). Start the CSS hero fade with that flip (same moment Meet copy exits): no second hold. List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise. Enter uses outline→fill opacity + polar sparks: never a tiny scaled fill or underglow disc (reads as a mid spinner).
 - **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), `OneLikeHeartChrome.tsx`, `middeck-metaphors.css`
 
 ## MyScrapped.com clipped by the share moon
@@ -185,7 +192,7 @@ Format:
 - **Not:** Session cookie loops, lab-refresh autoStart, or quota cooldown refresh.
 - **Cause:** Dev Mode rejects users not on the Dashboard allowlist; Spotify’s token endpoint often returns **plain text** (`The user is not registered…`). `tokenRequest` called `response.json()`, threw `Unexpected token 'T'…`, and callback stuffed that into `?spotify_error=`. The home page never read the query param, so the gate still showed **Sign in**; with `show_dialog: false` each click bounced Spotify → error URL again.
 - **Proof:** `myscrapped.com/?spotify_error=Unexpected+token+%27T%27…` for accounts not among the 5 Dev Mode users.
-- **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; on that code use the seats-full gate (explain unsigned + waitlist; **Sign in** remains for retry) — [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md).
+- **Avoid:** Parse token bodies as text first; map allowlist failures to `not_allowlisted`; redirect only stable codes; on that code use the seats-full gate (explain unsigned + waitlist; retry via waitlist helper **Sign in**: [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md), [D-027](docs/decisions/D-027-sign-in-under-waitlist.md)).
 - **Related:** `src/lib/spotify/oauth.ts`, `src/app/api/spotify/callback/route.ts`, `ScrappedGate`
 
 ## Grass grows from the horizontal centerline / scales both directions
