@@ -27,7 +27,6 @@ import { Icon } from "@/components/Icon";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
 import {
   ShareFinaleLayoutTune,
-  footerLayoutFromTune,
   shareFinaleCssVars,
   shareFinaleTuneDefaults,
   type ShareFinaleTuneState,
@@ -784,10 +783,6 @@ export function ApiScrappedDeck({
     () => shareFinaleCssVars(shareTune),
     [shareTune],
   );
-  const shareFooterLayout = useMemo(
-    () => footerLayoutFromTune(shareTune),
-    [shareTune],
-  );
   const shareBrandTune = useMemo(
     () => ({
       sizeRem: shareTune.brandSizeRem,
@@ -1298,14 +1293,14 @@ export function ApiScrappedDeck({
             }}
           >
             {/*
-              9:16 island (D-012): width = min(slot, leftover×9/16, maxWidthPx)
-              so the capture node stays true portrait at phone density.
-              Export scales the capture up to exportWidthPx (~1080).
+              9:16 island (D-012 / D-033): shell sizes to the slot; inner capture
+              node is a fixed design canvas (maxWidthPx × designHeightPx) scaled
+              uniformly so type and spacing match every viewport. Export captures
+              the unscaled design node → ~1080×1920.
             */}
             <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center [container-type:size]">
               <div
-                ref={shareCardRef}
-                className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+                className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)] [container-type:size]"
                 style={{
                   aspectRatio: D.aspectRatio,
                   width: `min(100cqi, calc(100cqb * 9 / 16), ${shareTune.maxWidthPx}px)`,
@@ -1313,36 +1308,60 @@ export function ApiScrappedDeck({
                   borderRadius: "var(--share-card-radius, 0px)",
                 }}
               >
-                <ShareRecapCard
-                  year={report.year}
-                  variant="minimal"
-                  active={active === FINALE_INDEX}
-                  leftLabel="Left on read"
-                  rightLabel="Ghosted songs"
-                  likedCount={likedCount}
-                  likedThisYearCount={likedThisYearCount}
-                  footerLayout={shareFooterLayout}
-                  moonTune={shareTune.moon}
-                  ghostTune={shareTune.ghosts}
-                  brandTune={shareBrandTune}
-                  heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
-                  heroAlt={topArtist?.label ?? topSong?.label ?? ""}
-                  skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
-                    (item) => ({
-                      id: item.id,
-                      title: item.label,
-                      artist: item.detail ?? "—",
-                    }),
-                  )}
-                  stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
-                    (item) => ({
-                      id: item.id,
-                      title: item.label,
-                      artist: item.sublabel ?? "—",
-                    }),
-                  )}
-                  className="h-full w-full"
-                />
+                {/*
+                  Scaler fits the fixed design canvas into the shell.
+                  Capture ref stays on the unscaled poster so export is
+                  always designWidth → exportWidthPx (~1080).
+                */}
+                <div
+                  className="absolute top-0 left-0 origin-top-left"
+                  style={{
+                    width: D.maxWidthPx,
+                    height: D.designHeightPx,
+                    transform: `scale(calc(100cqw / ${D.maxWidthPx}))`,
+                  }}
+                >
+                  <div
+                    ref={shareCardRef}
+                    className="h-full w-full"
+                    style={{
+                      width: D.maxWidthPx,
+                      height: D.designHeightPx,
+                    }}
+                  >
+                    <ShareRecapCard
+                      year={report.year}
+                      variant="minimal"
+                      active={active === FINALE_INDEX}
+                      leftLabel="Left on read"
+                      rightLabel="Ghosted songs"
+                      likedCount={likedCount}
+                      likedThisYearCount={likedThisYearCount}
+                      moonTune={shareTune.moon}
+                      ghostTune={shareTune.ghosts}
+                      brandTune={shareBrandTune}
+                      heroImageUrl={
+                        topArtist?.imageUrl ?? topSong?.imageUrl ?? null
+                      }
+                      heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+                      skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
+                        (item) => ({
+                          id: item.id,
+                          title: item.label,
+                          artist: item.detail ?? "—",
+                        }),
+                      )}
+                      stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
+                        (item) => ({
+                          id: item.id,
+                          title: item.label,
+                          artist: item.sublabel ?? "—",
+                        }),
+                      )}
+                      className="h-full w-full"
+                    />
+                  </div>
+                </div>
               </div>
               <SpotifyContentCredit className="mt-2 w-full shrink-0 text-center" />
             </div>

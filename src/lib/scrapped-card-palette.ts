@@ -53,6 +53,9 @@ export const SLIDE_SWATCH: CardSwatch[] = [
 /**
  * Share finale inset density: B2 explore lock (D-012 IA · D-033 art).
  * Card is always 9:16 (Wrapped share ritual): on screen and in the export PNG.
+ *
+ * Authored at a fixed design canvas (`designWidthPx` × `designHeightPx`); the
+ * stage shell scales that poster uniformly so type/spacing match every viewport.
  */
 export const SHARE_FINALE_DENSITY = {
   gutterPx: 36,
@@ -64,20 +67,29 @@ export const SHARE_FINALE_DENSITY = {
   /** Portrait share island: Stories / Reels friendly (Wrapped 25-share-finale). */
   aspectRatio: "9 / 16",
   /**
-   * On-screen max width for the 9:16 island (and Share column).
-   * Caps desktop growth so rem/px density stays phone-tuned; export still
-   * scales the capture up to `exportWidthPx`.
+   * Locked design width (phone density). Capture node is always this wide;
+   * stage shell scales it to fit. Also caps shell max width (Share column).
+   * Tuned lock: 300 (was 320).
    */
-  maxWidthPx: 320,
-  /** Target PNG width; height follows on-screen 9:16 via capture scale. */
+  maxWidthPx: 300,
+  /** Design height for 9:16 at `maxWidthPx` (300 × 16/9). */
+  designHeightPx: 533,
+  /** Target PNG width; height follows design 9:16 via capture scale. */
   exportWidthPx: 1080,
   exportHeightPx: 1920,
-  heroBandPct: 49,
-  heroSizePct: 55,
+  heroBandPct: 46,
+  heroSizePct: 54,
   listColGapPx: 14,
-  listRowGapRem: 0.42,
+  listRowGapRem: 0.51,
   listPadXPx: 16,
-  listPadYPx: 12,
+  listPadYPx: 0,
+  listLabelGapRem: 0.55,
+  /** Gap between list block and liked-metrics row (flow, not bottom %). */
+  metricsGapAfterListPx: 29,
+  /** Gap between liked-metrics row and brand line. */
+  brandGapAfterMetricsPx: 39,
+  /** Bottom padding under brand inside the card body. */
+  brandPadBottomPx: 16,
   typeRem: 0.65,
   /** Metric number / label on the share card body. */
   metricNumberRem: 1.3,
@@ -87,7 +99,7 @@ export const SHARE_FINALE_DENSITY = {
 
 /**
  * Share finale visual kit: D-033 · B2 plain teal · TR moon ·
- * three hero ghosts (mixed z) · liked metrics · myscrapped.com BR.
+ * three hero ghosts (mixed z) · liked metrics · myscrapped.com centered.
  * Stage: ink + intro disks/star. No orchid wash; gradients only on moon.
  * No year digits on the card.
  */
@@ -104,7 +116,7 @@ export const SHARE_FINALE_KIT = {
   ghostEye: "#2a2433",
   brandLine: "myscrapped.com",
   brand: {
-    position: "br" as const,
+    position: "center" as const,
     sizeRem: 0.72,
     letterSpacingEm: -0.015,
   },
