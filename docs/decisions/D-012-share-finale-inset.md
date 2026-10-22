@@ -25,12 +25,13 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 | Axis | Choice |
 |------|--------|
 | IA | Inset card + Share + Replay below |
-| Card aspect | **9:16** always; width = min(slot, leftover×9/16, `maxWidthPx` **320**); no flex-stretch to non-portrait |
-| Export PNG | Scale capture so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16; on-screen rem/px stay phone-tuned via the max-width cap |
-| Card thesis | Hero + Left on read / Ghosted songs |
+| Card aspect | **9:16** always; shell width = min(slot, leftover×9/16, `maxWidthPx` **300**); no flex-stretch to non-portrait |
+| Design canvas | Locked **300 × 533** poster; shell scales it uniformly (`scale(shellW/300)`). Type/spacing identical on every viewport; [D-033](D-033-share-finale-b2-plain-teal.md) |
+| Export PNG | Capture the **unscaled** design node; scale so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16 |
+| Card thesis | Hero + Left on read / Ghosted songs + liked metrics under lists + centered brand |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
 | Replay | `goTo(0)`: same as keyboard `R` |
-| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 0, maxWidth 320, card↔actions 32, hero 49%/55%, type 0.65rem, …); art kit [D-033](D-033-share-finale-b2-plain-teal.md) |
+| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 0, design 300×533, card↔actions 32, hero 46%/54%, type 0.65rem, metrics gap 29, …); art kit [D-033](D-033-share-finale-b2-plain-teal.md) |
 | Tap zones | Bottom cleared on finale so CTAs receive presses |
 | Visual kit | [D-033](D-033-share-finale-b2-plain-teal.md) (prior [D-021](D-021-share-finale-teal-orchid-lilac-moon.md) / [D-014](D-014-share-finale-kit-j8.md)) |
 | Form ref | `docs/mocks/wrapped-ref/named/25-share-finale.png` |
@@ -41,7 +42,7 @@ Gold full-bleed share slide with edge-to-edge `ShareRecapCard` and no Share / Re
 
 ## Cost
 
-Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). iOS requires files-only ShareData + precapture before tap (see SCARS). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Wide / tall viewports leave more stage around a capped 320px-wide 9:16 island (Share column matches). Agents must not restore URL-only share, title/text+files ShareData, silent auto-download-as-primary, uncapped desktop growth, or non-9:16 stretch cards without revisiting this decision.
+Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). iOS requires files-only ShareData + precapture before tap (see SCARS). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Wide / tall viewports leave more stage around a capped 9:16 shell (Share column matches); the poster inside stays 300×533 scaled down. Agents must not restore URL-only share, title/text+files ShareData, silent auto-download-as-primary, uncapped desktop growth, rem-reflowing islands without uniform scale, or non-9:16 stretch cards without revisiting this decision.
 
 ## Source of truth
 

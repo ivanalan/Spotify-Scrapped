@@ -38,18 +38,18 @@ async function waitForImages(node: HTMLElement): Promise<void> {
 }
 
 /**
- * Scale so the shared PNG is ~`exportWidthPx` wide (still 9:16). Avoids
- * forcing absolute width/height on the node (that would crush rem density).
+ * Scale so the shared PNG is ~`exportWidthPx` wide (still 9:16).
+ * Capture node is the fixed design canvas (`maxWidthPx` × `designHeightPx`);
+ * stage CSS scale is on a parent wrapper and does not affect this math.
  */
 function scaleForExportWidth(node: HTMLElement): number {
-  const w = node.offsetWidth;
-  if (!w) return 2;
+  const w = node.offsetWidth || D.maxWidthPx;
   return Math.max(1, D.exportWidthPx / w);
 }
 
 /**
  * Capture the inset share card as a PNG blob (no share sheet).
- * Node must already be 9:16; output stays 9:16 at ~1080×1920.
+ * Node is the locked design canvas (9:16 at phone density); output ~1080×1920.
  */
 export async function captureShareCardBlob(
   node: HTMLElement,

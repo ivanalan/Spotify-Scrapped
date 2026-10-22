@@ -8,32 +8,9 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Share finale footer slot layout (D-033).
- * Absolute % placement inside the 9:16 card for liked metrics + brand.
+ * Share finale body spacing (D-033).
+ * Metrics sit under the lists in document flow; brand is centered under metrics.
  */
-
-export type ShareFinaleFooterSlot = {
-  /** % from the card’s left edge. */
-  leftPct: number;
-  /** % from the card’s bottom edge. */
-  bottomPct: number;
-};
-
-export type ShareFinaleFooterLayout = {
-  likedSongs: ShareFinaleFooterSlot;
-  likedYear: ShareFinaleFooterSlot;
-  brand: ShareFinaleFooterSlot & {
-    /** `end` = right edge of text at leftPct (BR default). */
-    anchor: "start" | "end";
-  };
-};
-
-/** Locked footer slots: liked metrics + myscrapped.com. */
-export const SHARE_FINALE_FOOTER_DEFAULT: ShareFinaleFooterLayout = {
-  likedSongs: { leftPct: 4.4, bottomPct: 15 },
-  likedYear: { leftPct: 52, bottomPct: 14.8 },
-  brand: { leftPct: 91, bottomPct: 4, anchor: "end" },
-};
 
 export type ShareFinaleMoonTune = {
   sizePx: number;
@@ -59,16 +36,15 @@ export type ShareFinaleTuneState = {
   listRowGapRem: number;
   listColGapPx: number;
   listPadXPx: number;
+  listPadYPx: number;
   listLabelGapRem: number;
   metricNumberRem: number;
   metricLabelRem: number;
-  likedSongsLeftPct: number;
-  likedSongsBottomPct: number;
-  likedYearLeftPct: number;
-  likedYearBottomPct: number;
-  brandLeftPct: number;
-  brandBottomPct: number;
-  brandAnchor: "start" | "end";
+  /** Gap between list block and liked-metrics row. */
+  metricsGapAfterListPx: number;
+  /** Gap between liked-metrics row and brand line. */
+  brandGapAfterMetricsPx: number;
+  brandPadBottomPx: number;
   brandSizeRem: number;
   brandLetterSpacingEm: number;
   moon: ShareFinaleMoonTune;
@@ -85,16 +61,13 @@ export function shareFinaleTuneDefaults(): ShareFinaleTuneState {
     listRowGapRem: D.listRowGapRem,
     listColGapPx: D.listColGapPx,
     listPadXPx: D.listPadXPx,
-    listLabelGapRem: 0.55,
+    listPadYPx: D.listPadYPx,
+    listLabelGapRem: D.listLabelGapRem,
     metricNumberRem: D.metricNumberRem,
     metricLabelRem: D.metricLabelRem,
-    likedSongsLeftPct: SHARE_FINALE_FOOTER_DEFAULT.likedSongs.leftPct,
-    likedSongsBottomPct: SHARE_FINALE_FOOTER_DEFAULT.likedSongs.bottomPct,
-    likedYearLeftPct: SHARE_FINALE_FOOTER_DEFAULT.likedYear.leftPct,
-    likedYearBottomPct: SHARE_FINALE_FOOTER_DEFAULT.likedYear.bottomPct,
-    brandLeftPct: SHARE_FINALE_FOOTER_DEFAULT.brand.leftPct,
-    brandBottomPct: SHARE_FINALE_FOOTER_DEFAULT.brand.bottomPct,
-    brandAnchor: SHARE_FINALE_FOOTER_DEFAULT.brand.anchor,
+    metricsGapAfterListPx: D.metricsGapAfterListPx,
+    brandGapAfterMetricsPx: D.brandGapAfterMetricsPx,
+    brandPadBottomPx: D.brandPadBottomPx,
     brandSizeRem: SF.brand.sizeRem,
     brandLetterSpacingEm: SF.brand.letterSpacingEm,
     moon: {
@@ -132,26 +105,6 @@ export function shareFinaleTuneDefaults(): ShareFinaleTuneState {
   };
 }
 
-export function footerLayoutFromTune(
-  tune: ShareFinaleTuneState,
-): ShareFinaleFooterLayout {
-  return {
-    likedSongs: {
-      leftPct: tune.likedSongsLeftPct,
-      bottomPct: tune.likedSongsBottomPct,
-    },
-    likedYear: {
-      leftPct: tune.likedYearLeftPct,
-      bottomPct: tune.likedYearBottomPct,
-    },
-    brand: {
-      leftPct: tune.brandLeftPct,
-      bottomPct: tune.brandBottomPct,
-      anchor: tune.brandAnchor,
-    },
-  };
-}
-
 /** CSS custom properties for scene 9 host + card density. */
 export function shareFinaleCssVars(tune: ShareFinaleTuneState): CSSProperties {
   return {
@@ -160,8 +113,11 @@ export function shareFinaleCssVars(tune: ShareFinaleTuneState): CSSProperties {
     "--share-list-col-gap": `${tune.listColGapPx}px`,
     "--share-list-row-gap": `${tune.listRowGapRem}rem`,
     "--share-list-pad-x": `${tune.listPadXPx}px`,
-    "--share-list-pad-y": `${D.listPadYPx}px`,
+    "--share-list-pad-y": `${tune.listPadYPx}px`,
     "--share-list-label-gap": `${tune.listLabelGapRem}rem`,
+    "--share-metrics-gap": `${tune.metricsGapAfterListPx}px`,
+    "--share-brand-gap": `${tune.brandGapAfterMetricsPx}px`,
+    "--share-brand-pad-bottom": `${tune.brandPadBottomPx}px`,
     "--share-type-size": `${tune.typeRem}rem`,
     "--share-metric-number": `${tune.metricNumberRem}rem`,
     "--share-metric-label": `${tune.metricLabelRem}rem`,
@@ -177,18 +133,23 @@ export function shareFinaleRecipe(tune: ShareFinaleTuneState) {
     kit: SF.id,
     density: {
       maxWidthPx: tune.maxWidthPx,
+      designHeightPx: D.designHeightPx,
       heroBandPct: tune.heroBandPct,
       heroSizePct: tune.heroSizePct,
       typeRem: tune.typeRem,
       listRowGapRem: tune.listRowGapRem,
       listColGapPx: tune.listColGapPx,
       listPadXPx: tune.listPadXPx,
+      listPadYPx: tune.listPadYPx,
       listLabelGapRem: tune.listLabelGapRem,
       metricNumberRem: tune.metricNumberRem,
       metricLabelRem: tune.metricLabelRem,
+      metricsGapAfterListPx: tune.metricsGapAfterListPx,
+      brandGapAfterMetricsPx: tune.brandGapAfterMetricsPx,
+      brandPadBottomPx: tune.brandPadBottomPx,
     },
-    footer: footerLayoutFromTune(tune),
     brand: {
+      position: "center" as const,
       sizeRem: tune.brandSizeRem,
       letterSpacingEm: tune.brandLetterSpacingEm,
     },
@@ -278,7 +239,7 @@ const SLIDER_GROUPS: SliderGroup[] = [
     sliders: [
       {
         key: "maxWidth",
-        label: "Max width",
+        label: "Shell max width",
         min: 240,
         max: 420,
         step: 4,
@@ -309,6 +270,91 @@ const SLIDER_GROUPS: SliderGroup[] = [
     ],
   },
   {
+    title: "Gaps",
+    sliders: [
+      {
+        key: "padY",
+        label: "Hero → lists",
+        min: 0,
+        max: 36,
+        step: 1,
+        unit: "px",
+        get: (t) => t.listPadYPx,
+        set: (t, v) => ({ ...t, listPadYPx: v }),
+      },
+      {
+        key: "metricsGap",
+        label: "Lists → metrics",
+        min: 4,
+        max: 48,
+        step: 1,
+        unit: "px",
+        get: (t) => t.metricsGapAfterListPx,
+        set: (t, v) => ({ ...t, metricsGapAfterListPx: v }),
+      },
+      {
+        key: "brandGap",
+        label: "Metrics → brand",
+        min: 4,
+        max: 48,
+        step: 1,
+        unit: "px",
+        get: (t) => t.brandGapAfterMetricsPx,
+        set: (t, v) => ({ ...t, brandGapAfterMetricsPx: v }),
+      },
+      {
+        key: "brandPad",
+        label: "Card bottom pad",
+        min: 4,
+        max: 48,
+        step: 1,
+        unit: "px",
+        get: (t) => t.brandPadBottomPx,
+        set: (t, v) => ({ ...t, brandPadBottomPx: v }),
+      },
+      {
+        key: "rowGap",
+        label: "List row gap",
+        min: 0.15,
+        max: 0.9,
+        step: 0.02,
+        unit: "rem",
+        get: (t) => t.listRowGapRem,
+        set: (t, v) => ({ ...t, listRowGapRem: v }),
+      },
+      {
+        key: "colGap",
+        label: "Column gap",
+        min: 6,
+        max: 28,
+        step: 1,
+        unit: "px",
+        get: (t) => t.listColGapPx,
+        set: (t, v) => ({ ...t, listColGapPx: v }),
+      },
+      {
+        key: "padX",
+        label: "Side pad",
+        min: 6,
+        max: 28,
+        step: 1,
+        unit: "px",
+        get: (t) => t.listPadXPx,
+        set: (t, v) => ({ ...t, listPadXPx: v }),
+      },
+      {
+        key: "labelGap",
+        label: "Label → rows",
+        min: 0.2,
+        max: 1,
+        step: 0.05,
+        unit: "rem",
+        get: (t) => t.listLabelGapRem,
+        set: (t, v) => ({ ...t, listLabelGapRem: v }),
+      },
+    ],
+  },
+  {
     title: "Lists",
     sliders: [
       {
@@ -320,46 +366,6 @@ const SLIDER_GROUPS: SliderGroup[] = [
         unit: "rem",
         get: (t) => t.typeRem,
         set: (t, v) => ({ ...t, typeRem: v }),
-      },
-      {
-        key: "rowGap",
-        label: "Row gap",
-        min: 0.15,
-        max: 0.9,
-        step: 0.02,
-        unit: "rem",
-        get: (t) => t.listRowGapRem,
-        set: (t, v) => ({ ...t, listRowGapRem: v }),
-      },
-      {
-        key: "colGap",
-        label: "Col gap",
-        min: 6,
-        max: 28,
-        step: 1,
-        unit: "px",
-        get: (t) => t.listColGapPx,
-        set: (t, v) => ({ ...t, listColGapPx: v }),
-      },
-      {
-        key: "padX",
-        label: "Pad X",
-        min: 6,
-        max: 28,
-        step: 1,
-        unit: "px",
-        get: (t) => t.listPadXPx,
-        set: (t, v) => ({ ...t, listPadXPx: v }),
-      },
-      {
-        key: "labelGap",
-        label: "Label gap",
-        min: 0.2,
-        max: 1,
-        step: 0.05,
-        unit: "rem",
-        get: (t) => t.listLabelGapRem,
-        set: (t, v) => ({ ...t, listLabelGapRem: v }),
       },
     ],
   },
@@ -386,46 +392,6 @@ const SLIDER_GROUPS: SliderGroup[] = [
         get: (t) => t.metricLabelRem,
         set: (t, v) => ({ ...t, metricLabelRem: v }),
       },
-      {
-        key: "likedL",
-        label: "Liked songs L",
-        min: 0,
-        max: 60,
-        step: 0.2,
-        unit: "%",
-        get: (t) => t.likedSongsLeftPct,
-        set: (t, v) => ({ ...t, likedSongsLeftPct: v }),
-      },
-      {
-        key: "likedB",
-        label: "Liked songs B",
-        min: 2,
-        max: 28,
-        step: 0.2,
-        unit: "%",
-        get: (t) => t.likedSongsBottomPct,
-        set: (t, v) => ({ ...t, likedSongsBottomPct: v }),
-      },
-      {
-        key: "yearL",
-        label: "Liked year L",
-        min: 30,
-        max: 80,
-        step: 0.2,
-        unit: "%",
-        get: (t) => t.likedYearLeftPct,
-        set: (t, v) => ({ ...t, likedYearLeftPct: v }),
-      },
-      {
-        key: "yearB",
-        label: "Liked year B",
-        min: 2,
-        max: 28,
-        step: 0.2,
-        unit: "%",
-        get: (t) => t.likedYearBottomPct,
-        set: (t, v) => ({ ...t, likedYearBottomPct: v }),
-      },
     ],
   },
   {
@@ -450,26 +416,6 @@ const SLIDER_GROUPS: SliderGroup[] = [
         unit: "em",
         get: (t) => t.brandLetterSpacingEm,
         set: (t, v) => ({ ...t, brandLetterSpacingEm: v }),
-      },
-      {
-        key: "brandL",
-        label: "Left",
-        min: 0,
-        max: 100,
-        step: 1,
-        unit: "%",
-        get: (t) => t.brandLeftPct,
-        set: (t, v) => ({ ...t, brandLeftPct: v }),
-      },
-      {
-        key: "brandB",
-        label: "Bottom",
-        min: 0,
-        max: 16,
-        step: 0.2,
-        unit: "%",
-        get: (t) => t.brandBottomPct,
-        set: (t, v) => ({ ...t, brandBottomPct: v }),
       },
     ],
   },
@@ -632,35 +578,6 @@ export function ShareFinaleLayoutTune({ tune, onChange, onReset }: Props) {
           <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-white/45">
             Share finale · D-033 tune
           </p>
-
-          <div className="mb-3 flex gap-1">
-            <button
-              type="button"
-              aria-pressed={tune.brandAnchor === "end"}
-              onClick={() => onChange({ ...tune, brandAnchor: "end" })}
-              className={cn(
-                "flex-1 rounded border px-1.5 py-1 text-[0.62rem] font-semibold",
-                tune.brandAnchor === "end"
-                  ? "border-[#C9A0F5] text-[#f5f5f5]"
-                  : "border-white/10 text-white/55",
-              )}
-            >
-              Brand end
-            </button>
-            <button
-              type="button"
-              aria-pressed={tune.brandAnchor === "start"}
-              onClick={() => onChange({ ...tune, brandAnchor: "start" })}
-              className={cn(
-                "flex-1 rounded border px-1.5 py-1 text-[0.62rem] font-semibold",
-                tune.brandAnchor === "start"
-                  ? "border-[#C9A0F5] text-[#f5f5f5]"
-                  : "border-white/10 text-white/55",
-              )}
-            >
-              Brand start
-            </button>
-          </div>
 
           <div className="space-y-4">
             {SLIDER_GROUPS.map((group) => (

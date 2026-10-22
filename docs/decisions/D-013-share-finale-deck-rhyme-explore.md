@@ -27,7 +27,7 @@ Near-identical kits (same layout, palette-only diffs, overlapping bleed art) was
 | Z-axis | Stage `z=0` backdrop · opaque card in front · actions below |
 | Edge bleed | Forbidden; motifs stay fully on stage **or** fully inside the card |
 | Density / chrome | Frozen to D-012 |
-| Card footer | `myscrapped.com` bottom-right; no italic Scrapped mark ([D-033](D-033-share-finale-b2-plain-teal.md)) |
+| Card footer | Liked metrics in flow under lists; `myscrapped.com` centered under metrics; no italic Scrapped mark ([D-033](D-033-share-finale-b2-plain-teal.md)) |
 | Production art | [D-033](D-033-share-finale-b2-plain-teal.md); plain teal · TR moon · mixed-z ghosts |
 
 ## Displaced

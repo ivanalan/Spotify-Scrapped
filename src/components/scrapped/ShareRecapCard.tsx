@@ -5,8 +5,6 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { SHARE_FINALE_KIT as SF } from "@/lib/scrapped-card-palette";
 import {
-  SHARE_FINALE_FOOTER_DEFAULT,
-  type ShareFinaleFooterLayout,
   type ShareFinaleGhostTune,
   type ShareFinaleMoonTune,
 } from "@/components/scrapped/ShareFinaleLayoutTune";
@@ -30,11 +28,6 @@ type Props = {
   likedCount?: number;
   /** Liked Songs added this year (minimal share metrics). */
   likedThisYearCount?: number;
-  /**
-   * Absolute footer slots for minimal share (liked metrics + brand).
-   * Tuned live via `ShareFinaleLayoutTune` on the finale slide.
-   */
-  footerLayout?: ShareFinaleFooterLayout;
   /** Live moon overrides from the on-story tune panel. */
   moonTune?: ShareFinaleMoonTune;
   /** Live ghost overrides (hero band). */
@@ -354,7 +347,7 @@ function MinimalColumn({
           Nothing here.
         </p>
       ) : (
-        <ol className="flex flex-col gap-[var(--share-list-row-gap,0.42rem)]">
+        <ol className="flex flex-col gap-[var(--share-list-row-gap,0.51rem)]">
           {tracks.map((track, i) => (
             <li
               key={track.id}
@@ -384,7 +377,6 @@ export function ShareRecapCard({
   skipCount,
   likedCount,
   likedThisYearCount,
-  footerLayout = SHARE_FINALE_FOOTER_DEFAULT,
   moonTune,
   ghostTune,
   brandTune,
@@ -412,13 +404,6 @@ export function ShareRecapCard({
     const brandSizeRem = brandTune?.sizeRem ?? SF.brand.sizeRem;
     const brandLetterSpacingEm =
       brandTune?.letterSpacingEm ?? SF.brand.letterSpacingEm;
-    const foot = footerLayout;
-    const listBottomPad = Math.max(
-      22,
-      foot.likedSongs.bottomPct + 10,
-      foot.likedYear.bottomPct + 10,
-      foot.brand.bottomPct + 6,
-    );
 
     return (
       <div
@@ -437,7 +422,7 @@ export function ShareRecapCard({
       >
         {/*
           Inset share finale (D-012 IA + D-033 B2): plain teal · TR moon ·
-          hero ghosts (mixed z) · absolute liked metrics + myscrapped.com.
+          hero ghosts (mixed z) · flow liked metrics under lists · brand center.
         */}
         <header
           className="relative z-[2] flex w-full shrink-0 items-center justify-center overflow-hidden"
@@ -473,11 +458,12 @@ export function ShareRecapCard({
           className="relative z-[2] flex min-h-0 w-full flex-1 flex-col"
           style={{
             paddingInline: "var(--share-list-pad-x, 16px)",
-            paddingBottom: `${listBottomPad}%`,
+            paddingTop: "var(--share-list-pad-y, 0px)",
+            paddingBottom: "var(--share-brand-pad-bottom, 16px)",
           }}
         >
           <div
-            className="grid min-h-0 w-full flex-1 grid-cols-2 content-start"
+            className="grid w-full shrink-0 grid-cols-2 content-start"
             style={{
               columnGap: "var(--share-list-col-gap, 14px)",
             }}
@@ -485,80 +471,68 @@ export function ShareRecapCard({
             <MinimalColumn label={leftLabel} tracks={skipped} />
             <MinimalColumn label={rightLabel} tracks={stayed} />
           </div>
-        </div>
 
-        <div
-          className="pointer-events-none absolute z-[3]"
-          style={{
-            left: `${foot.likedSongs.leftPct}%`,
-            bottom: `${foot.likedSongs.bottomPct}%`,
-            width: "max-content",
-            maxWidth: "46%",
-          }}
-        >
-          <p
-            className={MINIMAL_LABEL}
+          <div
+            className="grid w-full shrink-0 grid-cols-2"
             style={{
-              fontSize: "var(--share-metric-label, 0.72rem)",
-              lineHeight: 1.2,
+              columnGap: "var(--share-list-col-gap, 14px)",
+              marginTop: "var(--share-metrics-gap, 29px)",
             }}
           >
-            Liked songs
-          </p>
-          <p
-            className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
-            style={{
-              fontSize: "var(--share-metric-number, 1.3rem)",
-              lineHeight: 1.05,
-            }}
-          >
-            {(likedCount ?? 0).toLocaleString()}
-          </p>
-        </div>
+            <div className="min-w-0">
+              <p
+                className={MINIMAL_LABEL}
+                style={{
+                  fontSize: "var(--share-metric-label, 0.72rem)",
+                  lineHeight: 1.2,
+                }}
+              >
+                Liked songs
+              </p>
+              <p
+                className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+                style={{
+                  fontSize: "var(--share-metric-number, 1.3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {(likedCount ?? 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p
+                className={MINIMAL_LABEL}
+                style={{
+                  fontSize: "var(--share-metric-label, 0.72rem)",
+                  lineHeight: 1.2,
+                }}
+              >
+                Liked this year
+              </p>
+              <p
+                className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
+                style={{
+                  fontSize: "var(--share-metric-number, 1.3rem)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {(likedThisYearCount ?? 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
 
-        <div
-          className="pointer-events-none absolute z-[3]"
-          style={{
-            left: `${foot.likedYear.leftPct}%`,
-            bottom: `${foot.likedYear.bottomPct}%`,
-            width: "max-content",
-            maxWidth: "46%",
-          }}
-        >
-          <p
-            className={MINIMAL_LABEL}
+          <div
+            className="w-full shrink-0 text-center font-sans font-bold text-[var(--wrapped-ink)]"
             style={{
-              fontSize: "var(--share-metric-label, 0.72rem)",
-              lineHeight: 1.2,
+              marginTop: "var(--share-brand-gap, 39px)",
+              fontSize: `${brandSizeRem}rem`,
+              letterSpacing: `${brandLetterSpacingEm}em`,
+              lineHeight: 1.15,
+              whiteSpace: "nowrap",
             }}
           >
-            Liked this year
-          </p>
-          <p
-            className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em] text-[var(--wrapped-ink)]"
-            style={{
-              fontSize: "var(--share-metric-number, 1.3rem)",
-              lineHeight: 1.05,
-            }}
-          >
-            {(likedThisYearCount ?? 0).toLocaleString()}
-          </p>
-        </div>
-
-        <div
-          className="pointer-events-none absolute z-[3] font-sans font-bold text-[var(--wrapped-ink)]"
-          style={{
-            left: `${foot.brand.leftPct}%`,
-            bottom: `${foot.brand.bottomPct}%`,
-            fontSize: `${brandSizeRem}rem`,
-            letterSpacing: `${brandLetterSpacingEm}em`,
-            lineHeight: 1.15,
-            transform:
-              foot.brand.anchor === "end" ? "translateX(-100%)" : undefined,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {SF.brandLine}
+            {SF.brandLine}
+          </div>
         </div>
       </div>
     );
