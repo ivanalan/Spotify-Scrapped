@@ -123,7 +123,7 @@ export function shareFinaleCssVars(tune: ShareFinaleTuneState): CSSProperties {
     "--share-metric-label": `${tune.metricLabelRem}rem`,
     "--share-card-radius": `${D.radiusPx}px`,
     paddingTop: `calc(3.5rem + ${D.bodyTopPx}px)`,
-    paddingBottom: `${D.bodyBottomPx}px`,
+    paddingBottom: `max(${D.bodyBottomPx}px, env(safe-area-inset-bottom, 0px))`,
     paddingInline: `${D.gutterPx}px`,
   } as CSSProperties;
 }

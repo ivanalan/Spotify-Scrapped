@@ -187,6 +187,14 @@ Format:
 - **Avoid:** Keep moon/ghosts under type (`z-0` art, `z-[2]` content). Ghosts still read through the transparent hero band.
 - **Related:** [D-014](docs/decisions/D-014-share-finale-kit-j8.md), `ShareRecapCard`
 
+## Share preview clips myscrapped.com on short phones
+
+- **Not:** Export PNG density, list ellipsis, or moon z-order over the brand.
+- **Cause:** Scene 9 put `SpotifyContentCredit` inside the `[container-type:size]` slot and sized the 9:16 shell with `100cqb` of that whole box. The shell claimed the full leftover height; the credit still needed ~24px underneath; section `overflow-hidden` chopped the teal card bottom.
+- **Proof:** iPhone 13 Pro Safari showed Share / Replay and “Content from Spotify,” but `myscrapped.com` was cut at the card edge. Saved PNG (unscaled 300×533 capture) looked complete.
+- **Avoid:** Size container is shell-only. Credit is a sibling under the island (still outside capture). Height-first shell: `min(100cqb, 100cqi×16/9, maxWidth×16/9)`. Do not put stage chrome inside the cqb box.
+- **Related:** [D-012](docs/decisions/D-012-share-finale-inset.md), `ApiScrappedDeck` scene 9
+
 ## Non-allowlisted Spotify sign-in refreshes with a JSON parse error
 
 - **Not:** Session cookie loops, lab-refresh autoStart, or quota cooldown refresh.
