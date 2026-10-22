@@ -26,13 +26,13 @@ export type ListMotionGroup = {
 export const LIST_MOTION_GROUPS: ListMotionGroup[] = [
   {
     title: "Stagger rise",
-    note: "Same family as the live deck — opacity + travel.",
+    note: "Same family as the live deck; opacity + travel.",
     styles: [
       {
         id: "rise",
         label: "Rise",
         technique: "Fade + short rise; 70ms row gap",
-        when: "Quieter alternate — shorter stagger than cascade",
+        when: "Quieter alternate; shorter stagger than cascade",
       },
       {
         id: "cascade",
@@ -68,7 +68,7 @@ export const LIST_MOTION_GROUPS: ListMotionGroup[] = [
         id: "pop",
         label: "Soft pop",
         technique: "Subtle scale + fade per row",
-        when: "Covers matter — a touch of presence",
+        when: "Covers matter; a touch of presence",
       },
     ],
   },
@@ -125,7 +125,7 @@ export type ListRowMotionPlan = {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-/** Live cascade defaults — also the slider lab’s starting point. */
+/** Live cascade defaults: also the slider lab’s starting point. */
 export const CASCADE_DEFAULTS = {
   rowY: 14,
   startDelaySec: 0.06,

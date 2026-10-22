@@ -35,7 +35,7 @@ export const STORYBOARD_DIRECTIONS: DirectionMeta[] = [
     label: "Quarter Construct",
     short: "C · Light conversational",
     thesis:
-      "Flat light canvases with graphic quarters and semis as corner marks — geometry as accent, type still primary.",
+      "Flat light canvases with graphic quarters and semis as corner marks; geometry as accent, type still primary.",
     register: "Light solids · Bauhaus accents · no neon glow",
   },
 ];

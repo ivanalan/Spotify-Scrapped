@@ -65,7 +65,7 @@ export type ScrappedApiReport = {
     shortArtistCount: number;
     mediumArtistCount: number;
     longArtistCount: number;
-    /** #1 four-week top track — open-slide soundtrack. */
+    /** #1 four-week top track: open-slide soundtrack. */
     shortTopTrackId: string | null;
   };
   cards: ApiMetricCard[];
@@ -110,7 +110,7 @@ const TOP_N = 5;
 
 /**
  * One-save rows are artist-keyed, but a collab credits every artist on the
- * track — so the same song can appear twice (e.g. Pothole × Brettin + Jaden).
+ * track: so the same song can appear twice (e.g. Pothole × Brettin + Jaden).
  * Prefer unique tracks for the story/Lab list; keep oldest / earlier sort.
  */
 function takeUniqueTrackRows<T extends { oldestSaved: { track: { id: string } } }>(
@@ -232,8 +232,7 @@ function countFromDetail(detail: string | undefined): number | null {
  * Multi-year tops that left both recent windows (`left-long` / left-long-run).
  *
  * Cookie-safe: older seals wiped headline `detail` but kept `percent` and
- * card items. Prefer exact detail, then percent×long, then visible rows —
- * never claim zero when the top-ghosted list still has songs.
+ * card items. Prefer exact detail, then percent×long, then visible rows: * never claim zero when the top-ghosted list still has songs.
  */
 export function leftLongGhostedCount(report: ScrappedApiReport): number | null {
   const headline = report.headlines.find((h) => h.id === "left-long");
@@ -272,7 +271,7 @@ function formatOneSaveDetail(artist: string, ageDays: number): string {
 /**
  * Recover song title from legacy one-save `detail` shapes:
  * - `Song · 622d on the shelf`
- * - `1 like · Song · 622d on the shelf` (metric stub — do not treat as title)
+ * - `1 like · Song · 622d on the shelf` (metric stub; do not treat as title)
  */
 function songFromOneSaveDetail(
   detail: string | undefined,
@@ -516,8 +515,7 @@ export function buildScrappedApiReport(
     );
 
   /**
-   * Old like back in the 4-week list, but never a multi-year staple —
-   * a quiet rematch, not a years-long reunion.
+   * Old like back in the 4-week list, but never a multi-year staple: * a quiet rematch, not a years-long reunion.
    */
   const quietRematch = snap.liked
     .filter((saved) => {
@@ -675,7 +673,7 @@ export function buildScrappedApiReport(
       id: "liked-this-year",
       title: "Liked this year",
       calculated: `Liked Songs with an added date in ${year} (full library fetch). Most recently liked first.`,
-      means: "Saves you made this year — still on the shelf, whether or not they became rotation.",
+      means: "Saves you made this year: still on the shelf, whether or not they became rotation.",
       bar: "Recency among this year’s likes. Newest like is the longest bar.",
       source: "Liked Songs",
       headline:
@@ -716,8 +714,8 @@ export function buildScrappedApiReport(
       id: "month-already-liked",
       title: "This month already liked",
       calculated:
-        "Of your 4-week top 50, how many are already in Liked Songs (same song counts). The list is the ones that are not liked yet — highest 4-week rank first.",
-      means: "How much of right now was already on the shelf — and which current favorites you still haven’t saved.",
+        "Of your 4-week top 50, how many are already in Liked Songs (same song counts). The list is the ones that are not liked yet; highest 4-week rank first.",
+      means: "How much of right now was already on the shelf, and which current favorites you still haven’t saved.",
       bar: "4-week rank among unsaved songs. Higher rank, longer bar.",
       source: "Top tracks (4 weeks) + Liked Songs",
       headline:
@@ -883,7 +881,7 @@ export function buildScrappedApiReport(
       title: "This month only",
       calculated:
         "Songs in your 4-week top 50 that are absent from both the 6-month and multi-year top 50s. Highest 4-week rank first.",
-      means: "Temporary flings — loud this month, nowhere in the longer windows.",
+      means: "Temporary flings: loud this month, nowhere in the longer windows.",
       bar: "Current 4-week rank. Higher rank, longer bar.",
       source: "Top tracks (all three windows)",
       headline:
@@ -899,7 +897,7 @@ export function buildScrappedApiReport(
       title: "Artists new this month",
       calculated:
         "Artists in your 4-week top 50 who are absent from both the 6-month and multi-year top artists. Highest 4-week rank first.",
-      means: "People you just started (or restarted hard) — not on the half-year or years-long lists.",
+      means: "People you just started (or restarted hard), not on the half-year or years-long lists.",
       bar: "Current 4-week rank. Higher rank, longer bar.",
       source: "Top artists (all three windows)",
       headline:
@@ -928,7 +926,7 @@ export function buildScrappedApiReport(
       title: "One-save shelf",
       calculated:
         "Artists with exactly one track in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest like first. List rows are unique by track so a collab does not list the same song twice.",
-      means: "A single heart, no rotation — the almosts you never followed up. Longest-sitting yeses lead.",
+      means: "A single heart, no rotation: the almosts you never followed up. Longest-sitting yeses lead.",
       bar: "Days since that one like. Older = longer bar.",
       source: "Liked Songs + top artists (4 weeks and 6 months)",
       headline:
@@ -956,7 +954,7 @@ export function buildScrappedApiReport(
       title: "Two-save almosts",
       calculated:
         "Artists with exactly two tracks in the fetched Liked Songs who are missing from both your 4-week and 6-month top artists. Oldest of the two likes first.",
-      means: "One more heart than a one-save — still no rotation. The almost-almosts.",
+      means: "One more heart than a one-save; still no rotation. The almost-almosts.",
       bar: "Days since the older of the two likes. Older = longer bar.",
       source: "Liked Songs + top artists (4 weeks and 6 months)",
       headline:
@@ -983,7 +981,7 @@ export function buildScrappedApiReport(
       title: "Liked recently, never topped",
       calculated:
         "Fetched likes from the last 90 days that do not appear in any of your 4-week, 6-month, or multi-year top 50s. Newest like first.",
-      means: "Impulse shelf — you hearted it this season and it never became rotation.",
+      means: "Impulse shelf: you hearted it this season and it never became rotation.",
       bar: "Recency (newer = longer). Days since like inverted among this set.",
       source: "Liked Songs + top tracks (all three windows)",
       headline:
@@ -1005,7 +1003,7 @@ export function buildScrappedApiReport(
       title: "Rank freefall",
       calculated:
         "Songs that were in the top 10 of your 6-month list and are absent from your 4-week top 50. Highest former rank first.",
-      means: "Not a soft fade — a hard drop from the half-year podium.",
+      means: "Not a soft fade; a hard drop from the half-year podium.",
       bar: "Former 6-month rank. #1 fall is the longest bar.",
       source: "Top tracks (6 months and 4 weeks)",
       headline:
@@ -1027,7 +1025,7 @@ export function buildScrappedApiReport(
       title: "Quiet rematch",
       calculated:
         "Liked Songs older than a year that are back in your 4-week top 50, but are not in the multi-year top 50. Sorted by current 4-week rank.",
-      means: "A random old save woke up — not a years-long staple returning, just a quiet rematch.",
+      means: "A random old save woke up: not a years-long staple returning, just a quiet rematch.",
       bar: "Current 4-week rank. Higher rank, longer bar.",
       source: "Liked Songs + top tracks (4 weeks and several years)",
       headline:
@@ -1047,7 +1045,7 @@ export function buildScrappedApiReport(
       title: "Deep-cut saves",
       calculated:
         "Fetched likes that never appear in any top-track window, from artists who do appear in at least one of your top-artist windows. Oldest like first.",
-      means: "You play them — you just hearted the B-side and left it on the shelf.",
+      means: "You play them; you just hearted the B-side and left it on the shelf.",
       bar: "Days since you liked the deep cut. Older = longer bar.",
       source: "Liked Songs + top tracks + top artists (all windows)",
       headline:
@@ -1072,7 +1070,7 @@ export function buildScrappedApiReport(
       title: "Mainstream ghosts",
       calculated:
         "Songs from “Left the long run” re-sorted by Spotify popularity (0–100), highest first. Same membership: multi-year top, out of both shorter windows.",
-      means: "Hits you used to live with that the rest of the world still knows — and you stopped ranking.",
+      means: "Hits you used to live with that the rest of the world still knows, and you stopped ranking.",
       bar: "Spotify popularity score. More popular = longer bar.",
       source: "Top tracks (several years, 6 months, and 4 weeks) + popularity",
       headline:

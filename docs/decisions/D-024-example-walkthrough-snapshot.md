@@ -1,4 +1,4 @@
-# D-024 — Example walkthrough (frozen Guest snapshot)
+# D-024: Example walkthrough (frozen Guest snapshot)
 
 - **Date:** 2026-10-21
 - **Status:** Locked
@@ -9,10 +9,10 @@ About needed a real “View an example” path for waitlisted visitors. Hitting 
 
 ## Decision
 
-1. **Data** — Commit a redacted `ScrappedApiReport` at [`src/data/walkthrough-report.json`](../../src/data/walkthrough-report.json). `profileName` is **Guest**; no `userId` / `likedUris`. Music entity labels + `trackId`s stay (needed for copy + embeds). One-save rows use current shape (`label`=song, `sublabel`=artist); `/example` also runs `ensureApiReportSummary` so older sealed shapes still migrate. Refresh by re-exporting a Load snapshot and re-redacting.
-2. **Route** — `/example` mounts [`ScrappedExperience`](../../src/components/scrapped/ScrappedExperience.tsx) with `chromeMode="walkthrough"`. No OAuth, no artist-top-track resolve. Full-bleed via `ProductChrome` like `/` and `/about`. **No ready gate** — open on slide 0; sound starts when the visitor taps volume (autoplay policy).
-3. **Chrome** — Toolbar: back (left) → `/about`; pause + volume on the right; **no** sign-out X.
-4. **Ingress** — About “What is this?” section → in-app `Link` to `/example` (replaces `NEXT_PUBLIC_SCRAPPED_WALKTHROUGH_URL` stub).
+1. **Data**: Commit a redacted `ScrappedApiReport` at [`src/data/walkthrough-report.json`](../../src/data/walkthrough-report.json). `profileName` is **Guest**; no `userId` / `likedUris`. Music entity labels + `trackId`s stay (needed for copy + embeds). One-save rows use current shape (`label`=song, `sublabel`=artist); `/example` also runs `ensureApiReportSummary` so older sealed shapes still migrate. Refresh by re-exporting a Load snapshot and re-redacting.
+2. **Route**: `/example` mounts [`ScrappedExperience`](../../src/components/scrapped/ScrappedExperience.tsx) with `chromeMode="walkthrough"`. No OAuth, no artist-top-track resolve. Full-bleed via `ProductChrome` like `/` and `/about`. **No ready gate**: open on slide 0; sound starts when the visitor taps volume (autoplay policy).
+3. **Chrome**: Toolbar: back (left) → `/about`; pause + volume on the right; **no** sign-out X.
+4. **Ingress**: About “What is this?” section → in-app `Link` to `/example` (replaces `NEXT_PUBLIC_SCRAPPED_WALKTHROUGH_URL` stub).
 
 ## Displaced
 

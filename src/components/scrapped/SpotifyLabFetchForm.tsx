@@ -40,7 +40,7 @@ function SubmitButton({
         tone === "gate"
           ? cn(
               gatePrimaryTone,
-              "h-12 w-full gap-2 rounded-2xl px-8 text-base font-semibold",
+              "w-full gap-2",
             )
           : "h-auto gap-1.5 p-0 text-foreground",
         pending && tone === "gate" && "pointer-events-none opacity-80",

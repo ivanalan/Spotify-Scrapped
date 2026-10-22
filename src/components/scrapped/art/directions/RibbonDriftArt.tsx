@@ -8,7 +8,7 @@ import {
   type DirectionArtProps,
 } from "./types";
 
-/** Organic Wrapped ribbon grammar — stroke-draw then slow float. */
+/** Organic Wrapped ribbon grammar: stroke-draw then slow float. */
 export function RibbonDriftArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

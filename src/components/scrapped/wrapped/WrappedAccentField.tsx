@@ -1,6 +1,6 @@
 "use client";
 
-/** Orbit Cascade tones — see D-007 / scrapped-card-palette. */
+/** Orbit Cascade tones: see D-007 / scrapped-card-palette. */
 export type WrappedSlideTone =
   | "ink"
   | "orchid"

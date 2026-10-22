@@ -65,7 +65,7 @@ const SLABS: Slab[] = [
   },
 ];
 
-/** Fake-3D tumbling panels — fly in on rails, settle, slow orbit. */
+/** Fake-3D tumbling panels: fly in on rails, settle, slow orbit. */
 export function PerspectiveSlabsArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

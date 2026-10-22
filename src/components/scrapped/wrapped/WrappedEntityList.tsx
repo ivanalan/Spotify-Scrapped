@@ -23,7 +23,7 @@ type Props = {
   items: WrappedEntityRow[];
   active?: boolean;
   empty?: string;
-  /** Discrete enter style — see List Motion Lab. */
+  /** Discrete enter style: see List Motion Lab. */
   motion?: ListMotionId;
   /** Optional cascade tuning (labs). */
   motionOverrides?: ListMotionOverrides;
@@ -48,9 +48,11 @@ export function WrappedEntityList({
   }
 
   return (
-    // Natural height inside a sized @container parent so rows can overflow and
-    // scroll instead of flex-shrinking away. Preferred gap (cqh) is what phones use.
-    <ol className="flex w-full flex-col gap-[clamp(0.5rem,5.5cqh,2.5rem)]">
+    // Natural height under the subtitle: gap grows with cqh up to 3.5rem
+    // (never justify-between stretch). Leftover height stays below the pack.
+    // Cover min is low so short phones can fit five rows without scrolling;
+    // parent scrollport is the overflow escape hatch.
+    <ol className="flex w-full flex-col gap-[clamp(0.375rem,6.5cqh,3.5rem)]">
         {items.map((item, i) => {
           const plan = planListRowMotion(motionId, i, {
             active: true,
@@ -96,7 +98,7 @@ export function WrappedEntityList({
                 {i + 1}
               </motion.span>
               <motion.span
-                className="relative size-[clamp(2.75rem,12cqh,3.75rem)] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
+                className="relative size-[clamp(2.25rem,11cqh,3.75rem)] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]"
                 style={
                   !item.imageUrl && item.coverColor
                     ? { backgroundColor: item.coverColor }

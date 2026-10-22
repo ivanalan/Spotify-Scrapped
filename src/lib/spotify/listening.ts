@@ -182,7 +182,7 @@ export async function getTopArtists(
 
 /**
  * Playable tracks for an artist when tops/likes don't credit them.
- * Uses Search — `/artists/{id}/top-tracks` returns 403 for many apps.
+ * Uses Search: `/artists/{id}/top-tracks` returns 403 for many apps.
  */
 export async function getArtistSampleTracks(
   artistId: string,
@@ -220,7 +220,7 @@ export async function getArtistSampleTracks(
     .slice(0, limit);
 }
 
-/** @deprecated Use getArtistSampleTracks — top-tracks is 403 for many apps. */
+/** @deprecated Use getArtistSampleTracks: top-tracks is 403 for many apps. */
 export async function getArtistTopTracks(
   artistId: string,
   _market = "US",

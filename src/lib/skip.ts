@@ -11,7 +11,7 @@ export const DEFAULT_SHORT_PLAY_MS = 30_000;
 
 /**
  * Era-aware skip classification.
- * `skipped` alone is unreliable before ~2022 — combine with reason_end + duration.
+ * `skipped` alone is unreliable before ~2022: combine with reason_end + duration.
  */
 export function isSkip(
   event: Pick<RawStreamEvent, "skipped" | "reason_end" | "ms_played">,

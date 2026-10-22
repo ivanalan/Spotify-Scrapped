@@ -12,7 +12,7 @@ export type IntroScheme = {
   disks: [string, string, string, string, string, string];
 };
 
-/** 40 intro brainstorms — bg field + short concentric ladder. No white paper. */
+/** 40 intro brainstorms: bg field + short concentric ladder. No white paper. */
 export const INTRO_SCHEMES: IntroScheme[] = [
   {
     id: "azure-magenta",
@@ -329,7 +329,7 @@ export const INTRO_SCHEMES: IntroScheme[] = [
   {
     id: "volt-ink",
     title: "Volt · ink",
-    note: "Invert — acid field",
+    note: "Invert; acid field",
     bg: "#A8E10C",
     ink: "light",
     disks: ["#1A1423", "#222222", "#2A1A3A", "#3D1A4A", "#1B2A6B", "#12101A"],
@@ -353,7 +353,7 @@ export function IntroSchemeBrainstorm({ selected, onSelect }: Props) {
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Each cell is a background field plus a short concentric ladder. Click to
-          apply on slide 00. Solid colors only — no white paper.
+          apply on slide 00. Solid colors only: no white paper.
         </p>
       </header>
 

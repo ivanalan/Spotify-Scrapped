@@ -22,7 +22,7 @@ export const SHARE_SHORTLIST: {
   {
     id: "orb-rain",
     title: "Orb rain frame",
-    motion: "Four skewed orbs at corners — cascade then drift",
+    motion: "Four skewed orbs at corners; cascade then drift",
     bg: CARD_PALETTE.ink.bg,
     ink: CARD_PALETTE.ink.ink,
     a: "#ff4d8d",
@@ -40,7 +40,7 @@ export const SHARE_SHORTLIST: {
   {
     id: "big-corner-orb",
     title: "Big corner orb",
-    motion: "One loud skewed orb BR — screenshot safe",
+    motion: "One loud skewed orb BR; screenshot safe",
     bg: CARD_PALETTE.mango.bg,
     ink: CARD_PALETTE.mango.ink,
     a: "#1B2A6B",
@@ -58,7 +58,7 @@ export const SHARE_SHORTLIST: {
   {
     id: "corner-rain",
     title: "Corner rain",
-    motion: "Same rain verb — mango field",
+    motion: "Same rain verb; mango field",
     bg: CARD_PALETTE.mango.bg,
     ink: CARD_PALETTE.mango.ink,
     a: "#1B2A6B",
@@ -71,7 +71,7 @@ type Props = {
   onSelect: (id: FunkyShareKind) => void;
 };
 
-/** Shortlist only — your picks for 07/09 peripheral art. */
+/** Shortlist only: your picks for 07/09 peripheral art. */
 export function FinaleIdeasGrid({ selected, onSelect }: Props) {
   const reduce = useReducedMotion();
 
@@ -86,7 +86,7 @@ export function FinaleIdeasGrid({ selected, onSelect }: Props) {
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Click a cell to apply it on soft close (08). Corner rain also lands on
-          reunion (07). Slide 09 stays blank. Same skew-orb system —{" "}
+          reunion (07). Slide 09 stays blank. Same skew-orb system;{" "}
           <span className="font-mono">hand-skew-orbs.png</span>.
         </p>
       </header>

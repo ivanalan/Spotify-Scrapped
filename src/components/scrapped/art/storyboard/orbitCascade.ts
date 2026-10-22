@@ -8,7 +8,7 @@ import {
 } from "@/lib/scrapped-card-palette";
 
 /**
- * Orbit Cascade — research storyboard specs.
+ * Orbit Cascade: research storyboard specs.
  * Production tokens: `src/lib/scrapped-card-palette.ts` (D-007).
  */
 
@@ -90,12 +90,12 @@ export const SLIDE_SPECS: SlideSpec[] = [
       "cascade-breathe: each disk settles at peak, then idle shrinks (~0.945) staggered outer→inner",
     composition:
       "Large disk stack anchored top-left; copy left-aligned in clear field; Continue as solid ink chip",
-    why: "Ink open — orchid oval ladder (vibrant short range on near-black field).",
+    why: "Ink open; orchid oval ladder (vibrant short range on near-black field).",
     iterations: [
-      "A1 — Orchid ladder on ink",
-      "A2 — Single-hue orchid with opacity steps only",
-      "A3 — Whisper idle breathe after settle (current)",
-      "A4 — Origin TL vs slightly inset (x=40,y=40) for less crop on desktop",
+      "A1: Orchid ladder on ink",
+      "A2: Single-hue orchid with opacity steps only",
+      "A3: Whisper idle breathe after settle (current)",
+      "A4: Origin TL vs slightly inset (x=40,y=40) for less crop on desktop",
     ],
   },
   {
@@ -105,17 +105,17 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(1).bg,
     ink: card(1).ink,
     ...accents(1),
-    hero: "Bottom ocean wave — ice→deep teal on flame ember; light theme (black ink)",
+    hero: "Bottom ocean wave; ice→deep teal on flame ember; light theme (black ink)",
     motion:
       "Layered swell trains: continuous linear phase scroll (dispersion, no ping-pong) + soft bob; high tide crest rises ~4.2s; kit-C oval fish = likedThisYear (1:1, cap 15) fade in below copy",
     composition:
       "High tide waterline above centered copy; fish school from subtitle → viewport bottom (y≈390–630, even strata); aqua crest under black type; deck chrome matches light theme",
-    why: "Likes as rising water on a hot orange field — dark-theme chrome + copy travel with the slide.",
+    why: "Likes as rising water on a hot orange field; dark-theme chrome + copy travel with the slide.",
     iterations: [
-      "B1 — Bottom semi + linear gradient + enter-breathe",
-      "B2 — Ice→deep teal ocean on flame ember; tide rises on joined beat (current)",
-      "B3 — Stronger multi-crest foam line",
-      "B4 — Tide keyed to subline instead of narrative beat",
+      "B1: Bottom semi + linear gradient + enter-breathe",
+      "B2: Ice→deep teal ocean on flame ember; tide rises on joined beat (current)",
+      "B3: Stronger multi-crest foam line",
+      "B4: Tide keyed to subline instead of narrative beat",
     ],
   },
   {
@@ -130,11 +130,11 @@ export const SLIDE_SPECS: SlideSpec[] = [
       "Grass rise-from-soil cascade; stars grow-in then pulse; haunt slow-fade then bob",
     composition:
       "Ink field; purple→ember accents; grass floor; mid clear for cover + copy (D-018)",
-    why: "Ground haunt first — sky (moon + fade-float ghosts) arrives on the list.",
+    why: "Ground haunt first; sky (moon + fade-float ghosts) arrives on the list.",
     iterations: [
-      "C1 — Orchid + gold/aqua spiral (displaced)",
-      "C2 — Ink night · moon · stars · one BL ghost (D-017 N4 · displaced)",
-      "C3 — Grass · cover-TR haunt · S9 stars · no moon (current · D-018)",
+      "C1: Orchid + gold/aqua spiral (displaced)",
+      "C2: Ink night · moon · stars · one BL ghost (D-017 N4 · displaced)",
+      "C3: Grass · cover-TR haunt · S9 stars · no moon (current · D-018)",
     ],
   },
   {
@@ -149,13 +149,13 @@ export const SLIDE_SPECS: SlideSpec[] = [
       "Moon grow-in + underglow; ghosts fade with float blend",
     composition:
       "Ink field; no grass/clouds/stars; moon TR-corner + inset edge ghosts; mid clear for list (D-018); C8 chrome scrim",
-    why: "Sky chorus after the ground haunt — bright moon with chrome scrim.",
+    why: "Sky chorus after the ground haunt; bright moon with chrome scrim.",
     iterations: [
-      "D1 — Two drifting clouds + BL orb (displaced)",
-      "D2 — Sky/grass pack (D-010 · displaced)",
-      "D3 — Hard-TR moon · S9 · rising ghosts · C8 scrim (displaced)",
-      "D4 — TR-inset moon · 5 enter-float ghosts · quiet stars (displaced)",
-      "D5 — TR-corner moon · no stars · slow fade ghosts (current · D-018)",
+      "D1: Two drifting clouds + BL orb (displaced)",
+      "D2: Sky/grass pack (D-010 · displaced)",
+      "D3: Hard-TR moon · S9 · rising ghosts · C8 scrim (displaced)",
+      "D4: TR-inset moon · 5 enter-float ghosts · quiet stars (displaced)",
+      "D5: TR-corner moon · no stars · slow fade ghosts (current · D-018)",
     ],
   },
   {
@@ -170,8 +170,8 @@ export const SLIDE_SPECS: SlideSpec[] = [
     composition: "TEAL_NEST_GRADIENT field; mid clear for copy + list (D-015 / D-016)",
     why: "Nest rhymes share card; soft-close stays flat teal.",
     iterations: [
-      "E1 — Flat teal (displaced)",
-      "E2 — Teal nest C0 / share cardBg (current)",
+      "E1: Flat teal (displaced)",
+      "E2: Teal nest C0 / share cardBg (current)",
     ],
   },
   {
@@ -184,12 +184,12 @@ export const SLIDE_SPECS: SlideSpec[] = [
     hero: "Typing pin (5I bloom) · orchid corner wash (D-019 B1)",
     motion: "Pin settle + typing-dot bob; freeze on reduced motion",
     composition: "Ink + B1 wash; pin mid-left clear of artwork (D-017 T1 / D-019)",
-    why: "One→many with list edge bubbles — same grammar as hearts/ghosts.",
+    why: "One→many with list edge bubbles; same grammar as hearts/ghosts.",
     iterations: [
-      "F1 — D-008 orchid ladder (displaced on live deck)",
-      "F2 — 5I dual skew bloom hero (displaced)",
-      "F3 — Compact TL typing pin (D-017)",
-      "F4 — B1 orchid corners + pin place (current · D-019)",
+      "F1: D-008 orchid ladder (displaced on live deck)",
+      "F2: 5I dual skew bloom hero (displaced)",
+      "F3: Compact TL typing pin (D-017)",
+      "F4: B1 orchid corners + pin place (current · D-019)",
     ],
   },
   {
@@ -202,11 +202,11 @@ export const SLIDE_SPECS: SlideSpec[] = [
     hero: "Softer large edge chat (quiet → frame) · B1 wash",
     motion: "Same bubble bloom as pin fill; edge frame only (D-015)",
     composition: "Ink + B1 wash; chat frames edges; mid clear for list (D-019)",
-    why: "List half of typing-pin pair — mini chorus, not a second pin.",
+    why: "List half of typing-pin pair; mini chorus, not a second pin.",
     iterations: [
-      "G1 — Classic orb + cloud (displaced on live deck)",
-      "G2 — Edge chat frame (D-016 / D-017)",
-      "G3 — B1 wash + softer large frame (current · D-019)",
+      "G1: Classic orb + cloud (displaced on live deck)",
+      "G2: Edge chat frame (D-016 / D-017)",
+      "G3: B1 wash + softer large frame (current · D-019)",
     ],
   },
   {
@@ -216,13 +216,13 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(7).bg,
     ink: card(7).ink,
     ...accents(7),
-    hero: "Corner rain — skewed orbs cascade then drift",
+    hero: "Corner rain; skewed orbs cascade then drift",
     motion: "Four corner orbs enter with stagger, slow idle drift",
     composition: "Mango field; mid clear for reunion list; rain at edges",
-    why: "Shortlist pick — same funky orb atom as soft-close variants.",
+    why: "Shortlist pick; same funky orb atom as soft-close variants.",
     iterations: [
-      "H1 — Corner rain (locked from shortlist)",
-      "H2 — Swap to another shortlist cell via storyboard",
+      "H1: Corner rain (locked from shortlist)",
+      "H2: Swap to another shortlist cell via storyboard",
     ],
   },
   {
@@ -232,15 +232,15 @@ export const SLIDE_SPECS: SlideSpec[] = [
     bg: card(8).bg,
     ink: card(8).ink,
     ...accents(8),
-    hero: "Shortlist funky art — default double stack bookend",
+    hero: "Shortlist funky art; default double stack bookend",
     motion: "Click shortlist to swap: rain / stack / corner orb / row",
     composition: "Soft-close copy centered; funky frame from shortlist",
-    why: "Thank-you as the art beat — orchid recycle (volume moved to ember ocean).",
+    why: "Thank-you as the art beat; orchid recycle (volume moved to ember ocean).",
     iterations: [
-      "I1 — Double stack bookend (default)",
-      "I2 — Orb rain frame",
-      "I3 — Big corner orb",
-      "I4 — Orb row footer",
+      "I1: Double stack bookend (default)",
+      "I2: Orb rain frame",
+      "I3: Big corner orb",
+      "I4: Orb row footer",
     ],
   },
   {
@@ -256,10 +256,10 @@ export const SLIDE_SPECS: SlideSpec[] = [
       "Ink stage gutters; opaque teal card in front; Share/Replay below; MyScrapped.com",
     why: "Wrapped-form inset IA (D-012) + kit J8 visual promote (D-014).",
     iterations: [
-      "J1 — Blank on gold (displaced by D-012)",
-      "J2 — Ember stage + ink card (D-012, displaced by D-014)",
-      "J3 — Ink stage + teal card + framing ghosts (D-014)",
-      "J3b — + large BL gold→mango→rose sphere (current / D-014)",
+      "J1: Blank on gold (displaced by D-012)",
+      "J2: Ember stage + ink card (D-012, displaced by D-014)",
+      "J3: Ink stage + teal card + framing ghosts (D-014)",
+      "J3b; + large BL gold→mango→rose sphere (current / D-014)",
     ],
   },
 ];

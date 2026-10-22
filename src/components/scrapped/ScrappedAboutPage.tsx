@@ -1,22 +1,19 @@
 import Link from "next/link";
-import { gateTertiaryTone } from "@/components/scrapped/gateChrome";
+import { gateTertiaryChromeClass } from "@/components/scrapped/gateChrome";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-/** Tertiary — no fill; underline fades in on hover (D-023). */
-const backClass = cn(
-  buttonVariants({ variant: "link", size: "lg" }),
-  gateTertiaryTone,
-  "-ml-3 h-10 px-3",
-);
+/** Tertiary: no fill; underline fades in on hover (D-023). */
+const backClass = cn(gateTertiaryChromeClass, "-ml-3 px-3");
 
 const walkLinkClass = cn(
-  "mt-4 inline-flex items-center gap-1.5 rounded-xl border border-[var(--wrapped-ink)]/22 bg-[var(--wrapped-ink)]/6 px-3 py-2.5 text-sm font-semibold text-[var(--wrapped-ink)] no-underline transition-colors hover:bg-[var(--wrapped-ink)]/12",
+  buttonVariants({ variant: "outline", size: "lg" }),
+  "mt-4 border-[var(--wrapped-ink)]/22 !bg-[var(--wrapped-ink)]/6 !text-[var(--wrapped-ink)] no-underline hover:!bg-[var(--wrapped-ink)]/12 hover:!text-[var(--wrapped-ink)]",
 );
 
 /**
- * About / FAQ — Layout A long-scroll editorial (D-022).
+ * About / FAQ: Layout A long-scroll editorial (D-022).
  * Same Orbit ink field as the gate; art is blurred + frosted so body copy stays primary.
  * Example walkthrough ingress under “What is this?” → `/example` (D-024).
  */
@@ -68,7 +65,7 @@ export function ScrappedAboutPage() {
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               A short story deck built from your Spotify listening data: liked
-              songs, 4 and 6 month tops, and all-time favorites.
+              songs, 4-week and 6-month tops, and multi-year favorites.
             </p>
             <Link className={walkLinkClass} href="/example">
               View an example
@@ -86,11 +83,22 @@ export function ScrappedAboutPage() {
               Why a waitlist?
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              The Spotify API limits the amount of users that are able to log in.
+              The Spotify API limits the amount of users that are able to sign
+              in.
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               Join with the email on your Spotify account, and when a slot opens,
               we&rsquo;ll email you an invite link.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              Already have access?{" "}
+              <a
+                href="/api/spotify/login"
+                className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+                aria-label="Sign in to Spotify"
+              >
+                Sign in
+              </a>
             </p>
           </section>
 
@@ -109,13 +117,27 @@ export function ScrappedAboutPage() {
             </p>
           </section>
 
-          <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8 pb-6">
+          <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8">
             <h2 className="text-title w-full text-[var(--wrapped-ink)]">
               Do you store my password?
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               No. Sign-in goes through Spotify OAuth. Access tokens stay
               server-side.
+            </p>
+          </section>
+
+          <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8 pb-6">
+            <h2 className="text-title w-full text-[var(--wrapped-ink)]">
+              Is this all of 2026?
+            </h2>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              Not really :/
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              Spotify only gives us your tops for ~4 weeks, ~6
+              months, all-time, and Liked Songs. Ghosted
+              and left on read compare on those time frames.
             </p>
           </section>
         </div>

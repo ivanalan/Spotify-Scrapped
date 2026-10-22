@@ -12,7 +12,7 @@ import {
 import type { SlideArtProps } from "./types";
 import { themeFor } from "./themes";
 
-/** Direction A — Cascade Rings (dark carnival). */
+/** Direction A: Cascade Rings (dark carnival). */
 export function DirectionCascadeArt({
   slideIndex,
   pattern,

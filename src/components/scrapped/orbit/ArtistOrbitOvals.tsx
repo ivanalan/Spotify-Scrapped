@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { ARTIST_ORBIT } from "@/lib/scrapped-card-palette";
 
 /**
- * #1 artist chrome — D-008 kit F (orchid ladder spin).
+ * #1 artist chrome: D-008 kit F (orchid ladder spin).
  * Center-aligned eccentric ovals, opaque gradients, independent slow spin.
  */
 export function ArtistOrbitOvals({ freeze }: { freeze: boolean }) {

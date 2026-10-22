@@ -29,7 +29,7 @@ export function usePhoneOrbitArt(): boolean {
   );
 }
 
-/** Short viewport side — pin sizing basis (full-bleed slides). */
+/** Short viewport side: pin sizing basis (full-bleed slides). */
 const SHORT = "min(100vw, 100dvh)";
 
 export type MotifPinAnchor =
@@ -39,6 +39,8 @@ export type MotifPinAnchor =
   | "br"
   | "top"
   | "bottom"
+  | "left"
+  | "right"
   | "top-center"
   | "bottom-center"
   | "center";
@@ -50,6 +52,8 @@ const ANCHOR_CLASS: Record<MotifPinAnchor, string> = {
   br: "right-0 bottom-0",
   top: "inset-x-0 top-0",
   bottom: "inset-x-0 bottom-0",
+  left: "left-0 inset-y-0",
+  right: "right-0 inset-y-0",
   "top-center": "left-1/2 top-0 -translate-x-1/2",
   "bottom-center": "left-1/2 bottom-0 -translate-x-1/2",
   center: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
@@ -122,7 +126,7 @@ type MotifCornerOriginProps = {
   /** Motif center in design units (matches phone MotifStage coords). */
   cx: number;
   cy: number;
-  /** Half-extent from center — viewBox includes the full motif. */
+  /** Half-extent from center: viewBox includes the full motif. */
   radius: number;
   /** Pin diameter as a fraction of the short side. */
   size?: number;
@@ -131,7 +135,7 @@ type MotifCornerOriginProps = {
 };
 
 /**
- * Pin box centered on the viewport corner — motif design-space center
+ * Pin box centered on the viewport corner: motif design-space center
  * lands exactly on TL / TR / BL / BR of the slide.
  */
 const CORNER_ORIGIN_CLASS: Record<MotifCornerOriginProps["corner"], string> = {
@@ -178,9 +182,10 @@ export function MotifCornerOrigin({
 }
 
 /**
- * Full-slide SVG stage for centered systems (spiral / artist) on wide viewports.
- * Default `meet` shows the whole portrait design (may letterbox).
- * Pass `slice` when the field must cover the slide (no phone-frame gutters).
+ * Full-slide SVG stage for centered systems on wide viewports.
+ * Default `meet` shows the whole portrait design (may letterbox: banned for
+ * production ghosted/orbit fields). Pass `slice` so the field covers the
+ * slide with no phone-frame gutters (SOUL / D-009).
  */
 export function MotifMeetStage({
   children,

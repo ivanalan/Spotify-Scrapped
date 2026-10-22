@@ -1,14 +1,14 @@
-# D-010 — Ghosted songs list: ink sky / grass / ghosts
+# D-010: Ghosted songs list: ink sky / grass / ghosts
 
 **Status:** Superseded by [D-018](D-018-ghosted-ground-sky-s9.md) for live slide-3 motifs (grass/clouds moved / removed; moon + rising ghosts). Kept for history.  
 **Date:** 2026-10-19  
-**Surfaces:** `/scrapped` API deck slide 3 only (`Your ghosted songs` list) — not other list beats.
+**Surfaces:** `/scrapped` API deck slide 3 only (`Your ghosted songs` list); not other list beats.
 
 ## Decision
 
 The ghosted-songs top-5 list uses an **ink** field with **purple→ember** accents and peripheral chrome of:
 
-1. **Seamless marquee clouds** at the top (32s loop — duplicate sprites, travel = spacing; no jump-reset)
+1. **Seamless marquee clouds** at the top (32s loop: duplicate sprites, travel = spacing; no jump-reset)
 2. **Spiky grass** along the floor with light wind (`windStrength` 0.4, gust ~5s)
 3. **Four blob ghosts** on the perimeter (wash fill, float, no wavy hem, opacity ~0.74)
 
@@ -22,10 +22,10 @@ Night field + ghost characters reads the beat without competing with the mid-ban
 
 | Axis | Choice |
 |------|--------|
-| Field | `ink` (`#12101A`) — displaces gold for slide 3 only |
+| Field | `ink` (`#12101A`); displaces gold for slide 3 only |
 | Accents | `#5C1A7A` → `#F05A3D` (unchanged list-3 accents) |
 | Clouds | Marquee; sky placement via `GHOSTED_LIST_CLOUDS` (`scale`, `yOffset`) in `scrapped-card-palette.ts` |
-| Ground | Short spiky grass — grow-in on enter; soft long-period flow sway (not jagged gusts) |
+| Ground | Short spiky grass; grow-in on enter; soft long-period flow sway (not jagged gusts) |
 | Ghosts | Blob · perimeter · wash · float · hem off · count 4 |
 | Scope | Slide index 3 only (`GhostedListFrame`) |
 
@@ -35,7 +35,7 @@ Gold field + bottom-left orb on the ghosted songs list.
 
 ## Cost
 
-Two ink list-adjacent beats (slide 3 motif vs slide 6 classic list on ink) — differentiated by chrome, not field alone. Ghost characters must stay peripheral or they fight the list. Slide 2 entity now shares the ink + ghost language ([D-017](D-017-entity-list-pair-rhymes.md)) without copying clouds/grass.
+Two ink list-adjacent beats (slide 3 motif vs slide 6 classic list on ink); differentiated by chrome, not field alone. Ghost characters must stay peripheral or they fight the list. Slide 2 entity now shares the ink + ghost language ([D-017](D-017-entity-list-pair-rhymes.md)) without copying clouds/grass.
 
 ## Source of truth
 

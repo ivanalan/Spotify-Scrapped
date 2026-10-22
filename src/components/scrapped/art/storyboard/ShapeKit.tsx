@@ -6,7 +6,7 @@ import { useId, type ReactNode } from "react";
 const VB = "0 0 360 640";
 
 /**
- * Locked Orbit Cascade oval — wider than tall.
+ * Locked Orbit Cascade oval: wider than tall.
  * Every disk / orb / ring uses this aspect; never perfect circles.
  */
 export const OVAL = { sx: 1.28, sy: 0.78 } as const;
@@ -53,7 +53,7 @@ type CascadeRingsProps = {
   delayBase?: number;
 };
 
-/** Concentric stroke rings — cascade-in or idle breathe. */
+/** Concentric stroke rings: cascade-in or idle breathe. */
 export function CascadeRings({
   cx,
   cy,
@@ -234,7 +234,7 @@ export function SemiDisk({
     );
   }
   if (animate === "enter-breathe") {
-    // One-shot rise/fade, then soft breathe — volume “pile” intro
+    // One-shot rise/fade, then soft breathe: volume “pile” intro
     return (
       <motion.g
         initial={{ scale: 0.7, y: 56, opacity: 0 }}
@@ -271,21 +271,21 @@ export function SemiDisk({
 }
 
 const OCEAN_FLOOR_Y = 720;
-/** One tiled crest period — x scroll by this amount loops seamlessly. */
+/** One tiled crest period: x scroll by this amount loops seamlessly. */
 const OCEAN_WAVE_LEN = 180;
 /** Extra width so continuous phase scroll never shows a hard edge. */
 const OCEAN_PATH_W = 720;
 
 /**
- * Wide rolling crest — trochoid-ish (sharper crest, broader trough).
+ * Wide rolling crest: trochoid-ish (sharper crest, broader trough).
  * Fills below the path down to a fixed floor (bottom pinned).
  * Calm steepness: keep amp modest (Σ steepness budget, Gerstner-style).
  */
 function oceanWavePath(baseY: number, amp: number, width = OCEAN_PATH_W): string {
-  const step = OCEAN_WAVE_LEN / 2; // 90 — two half-waves per tile
+  const step = OCEAN_WAVE_LEN / 2; // 90: two half-waves per tile
   let d = `M ${-OCEAN_WAVE_LEN} ${baseY}`;
   for (let x = -OCEAN_WAVE_LEN; x < width; x += step) {
-    // Crest half (pinched up) then trough half (wider) — sine looks like jelly;
+    // Crest half (pinched up) then trough half (wider): sine looks like jelly;
     // this approximates the Gerstner crest/trough asymmetry in 2D.
     d += ` c ${step * 0.28} ${-amp}, ${step * 0.42} ${-amp * 0.12}, ${step * 0.5} 0`;
     d += ` c ${step * 0.18} ${amp * 0.85}, ${step * 0.38} ${amp * 0.55}, ${step * 0.5} 0`;
@@ -295,7 +295,7 @@ function oceanWavePath(baseY: number, amp: number, width = OCEAN_PATH_W): string
 }
 
 /**
- * Crest Y per layer — lower Y = taller water. Floor stays at OCEAN_FLOOR_Y.
+ * Crest Y per layer: lower Y = taller water. Floor stays at OCEAN_FLOOR_Y.
  * High tide crest sits above the centered copy band (~y 300–360).
  */
 const OCEAN_TIDE = {
@@ -307,14 +307,14 @@ const OCEAN_TIDE = {
  * Layered swell trains (NVIDIA / Tessendorf practice, stylized SVG):
  * long low swell + shorter foreground chop, different phase speeds so the
  * surface separates instead of moving as one mechanical slab.
- * Durations are deliberately calm — slow graceful roll, not a storm.
+ * Durations are deliberately calm: slow graceful roll, not a storm.
  */
 const OCEAN_LAYERS = [
   {
     id: "back" as const,
     amp: 26,
     opacity: 0.72,
-    /** Long swell — slow continuous phase travel. */
+    /** Long swell: slow continuous phase travel. */
     scrollSec: 32,
     bob: 4,
     bobSec: 13,
@@ -363,14 +363,14 @@ type OceanWaveProps = {
   fishSizeScale?: number;
 };
 
-/** Max fish glyphs — 1 like = 1 fish up to this ceiling. */
+/** Max fish glyphs: 1 like = 1 fish up to this ceiling. */
 export const OCEAN_FISH_CAP = 15;
 
-/** Production size multiplier — tune lab can scale relative to this. */
+/** Production size multiplier: tune lab can scale relative to this. */
 export const OCEAN_FISH_SIZE_DEFAULT = 1;
 
 /**
- * Kit C — oval + triangle tail + single eye (volume-ocean-fish-styles).
+ * Kit C: oval + triangle tail + single eye (volume-ocean-fish-styles).
  * Local coords face right; caller flips via scaleX for rtl.
  */
 function CuteFishGlyph({ body, size }: { body: string; size: number }) {
@@ -394,7 +394,7 @@ type OceanFishSpec = {
   depth: number;
   size: number;
   body: string;
-  /** Full-width crossing duration — keep slow / calm. */
+  /** Full-width crossing duration: keep slow / calm. */
   swimSec: number;
   delay: number;
   dir: "ltr" | "rtl";
@@ -417,7 +417,7 @@ const FISH_BODIES = [
 /**
  * High-tide school: from the subtitle band down to the viewport floor
  * (MotifStage 360×640; centered copy puts subline ~y 380–400).
- * Depth 0 = at subtitle; 1 = bottom. Even strata — no pile-up.
+ * Depth 0 = at subtitle; 1 = bottom. Even strata: no pile-up.
  */
 const OCEAN_FISH_BAND = { top: 390, bottom: 630 } as const;
 
@@ -447,7 +447,7 @@ export function buildOceanFishSchool(
 
   const sizeScale = opts.sizeScale ?? OCEAN_FISH_SIZE_DEFAULT;
 
-  // Cap 15: keep fish large — light density shrink only near the ceiling.
+  // Cap 15: keep fish large: light density shrink only near the ceiling.
   let sizeMul = 1.65;
   if (n > 8) sizeMul = 1.45;
   if (n > 12) sizeMul = 1.3;
@@ -457,7 +457,7 @@ export function buildOceanFishSchool(
     const r = fishSeed(i, 3);
     const r2 = fishSeed(i, 17);
     const r3 = fishSeed(i, 41);
-    // Even depth strata + tiny jitter — crest→floor, no vertical pile-up.
+    // Even depth strata + tiny jitter: crest→floor, no vertical pile-up.
     const stratum = n === 1 ? 0.5 : i / (n - 1);
     const depth = Math.min(
       1,
@@ -572,13 +572,13 @@ function OceanFishSchool({
 }
 
 /**
- * Bottom ocean band — aqua crest → navy deep, soft roll, rises on high tide.
+ * Bottom ocean band: aqua crest → navy deep, soft roll, rises on high tide.
  * Tide morphs crest Y upward (path `d`) so the waterline sits above copy;
  * floor stays pinned. Volume slide exception to the oval-only chrome rule.
  *
  * Motion follows CG water practice (Gerstner / GPU Gems): continuous phase
  * travel (not ping-pong), layered trains with dispersion, low steepness.
- * Kit-C oval fish school — 1 like = 1 fish (cap {@link OCEAN_FISH_CAP}),
+ * Kit-C oval fish school: 1 like = 1 fish (cap {@link OCEAN_FISH_CAP}),
  * hidden at low tide; fades in below copy as the crest rises.
  */
 export function OceanWave({
@@ -669,7 +669,7 @@ export function OceanWave({
         <motion.g
           key={layer.id}
           animate={{
-            // Continuous phase travel — linear loop, never easeInOut ping-pong
+            // Continuous phase travel: linear loop, never easeInOut ping-pong
             // (ping-pong reads as a wave pool, not a sea).
             x: [0, -OCEAN_WAVE_LEN],
             // Soft vertical orbit (calm Gerstner parcel motion).
@@ -699,7 +699,7 @@ export function OceanWave({
           />
         </motion.g>
       ))}
-      {/* High-tide only — fade with the rise; school swims below copy. */}
+      {/* High-tide only: fade with the rise; school swims below copy. */}
       <motion.g
         initial={false}
         animate={{ opacity: tide === "high" ? 0.9 : 0 }}
@@ -1117,15 +1117,14 @@ type ConcentricDisksProps = {
   ringWidth?: number;
   animate?: "cascade" | "cascade-soft" | "cascade-breathe" | "breathe" | "none";
   delayBase?: number;
-  /** Degrees — rotate major axis around (cx, cy). 45 ≈ peak toward BR diagonal. */
+  /** Degrees: rotate major axis around (cx, cy). 45 ≈ peak toward BR diagonal. */
   rotate?: number;
   /** Override OVAL aspect (default = locked OVAL). Closer to 1 = more circle-like. */
   oval?: { sx: number; sy: number };
 };
 
 /**
- * Filled concentric ovals (not stroke rings, never perfect circles) —
- * or stroke rings when `asRings` + `sharedGradient`.
+ * Filled concentric ovals (not stroke rings, never perfect circles): * or stroke rings when `asRings` + `sharedGradient`.
  * Outer disks drawn first; cascade scales from center with soft overshoot.
  */
 export function ConcentricDisks({
@@ -1151,7 +1150,7 @@ export function ConcentricDisks({
   const sharedId = `${uid}-shared`;
   const paint = sharedGradient ? `url(#${sharedId})` : null;
 
-  // Bounds for userSpaceOnUse (stroke rings) — cover the outermost oval.
+  // Bounds for userSpaceOnUse (stroke rings): cover the outermost oval.
   const maxR = startR + (count - 1) * step;
   const maxRx = maxR * sx;
   const maxRy = maxR * sy;
@@ -1347,12 +1346,12 @@ export function ConcentricDisks({
   );
 }
 
-/** Stable SVG coord string — avoids SSR/client float / scientific-notation drift. */
+/** Stable SVG coord string: avoids SSR/client float / scientific-notation drift. */
 function svgCoord(n: number): string {
   return n.toFixed(3);
 }
 
-/** n-pointed star polygon (default 7) — outer tip radius `r`, inner notch `r * innerRatio`. */
+/** n-pointed star polygon (default 7): outer tip radius `r`, inner notch `r * innerRatio`. */
 export function pointedStarPoints(
   cx: number,
   cy: number,
@@ -1376,7 +1375,7 @@ type PointedStarProps = {
   cx: number;
   cy: number;
   r: number;
-  /** Tip count — intro uses 7. */
+  /** Tip count: intro uses 7. */
   points?: number;
   innerRatio?: number;
   from: string;
@@ -1387,8 +1386,7 @@ type PointedStarProps = {
 };
 
 /**
- * Authored peripheral star (hand-sun-star motif). Corner subject only —
- * grow-in once, then rotate slowly. Settles static under reduced-motion.
+ * Authored peripheral star (hand-sun-star motif). Corner subject only: * grow-in once, then rotate slowly. Settles static under reduced-motion.
  */
 export function PointedStar({
   cx,

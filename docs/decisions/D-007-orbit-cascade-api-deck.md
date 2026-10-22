@@ -1,8 +1,8 @@
-# D-007 — Orbit Cascade on the API Scrapped deck
+# D-007: Orbit Cascade on the API Scrapped deck
 
 **Status:** Locked  
 **Date:** 2026-10-18  
-**Surfaces:** `/scrapped` API deck (`ApiScrappedDeck`) + landing gate / home loading — not Plus or Lab.
+**Surfaces:** `/scrapped` API deck (`ApiScrappedDeck`) + landing gate / home loading; not Plus or Lab.
 
 ## Decision
 
@@ -16,25 +16,25 @@ Storyboard research at `/scrapped/art/storyboard` locked a Wrapped-*form* look (
 
 | Axis | Choice |
 |------|--------|
-| Palette | `ink · orchid · ember · mango · gold · teal · rose` — see `src/lib/scrapped-card-palette.ts` |
-| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder — gate + slide 0 only |
-| Scene 4 (1 like) | Teal nest field (`TEAL_NEST_GRADIENT` = share C0) + 4A heart — soft-close stays flat teal |
-| Opening | ink → ember → **ink** (slides 00–02). Ghosted song entity (slide 2) + list (slide 3) share ink + purple→ember — night rhyme [D-017](D-017-entity-list-pair-rhymes.md) / list [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + iris — [D-016](D-016-middeck-metaphor-promote.md). Share finale (slide 9) is **ink** stage + teal card — [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
-| Soft close | Teal field · **8B mono teal iris** shrink-to-stop — [D-016](D-016-middeck-metaphor-promote.md) (displaces funky MotifPin bookends) |
-| Middeck 4–7 | 4A heart · TL typing pin + edge chat · 7L film letterbox — [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md); left-on-read field/frame — [D-019](D-019-left-on-read-orchid-corners.md) |
-| Ghosted entity | Ink field · TR moon · edge stars · one BL blob ghost — [D-017](D-017-entity-list-pair-rhymes.md) (displaces orchid spiral) |
+| Palette | `ink · orchid · ember · mango · gold · teal · rose`: see `src/lib/scrapped-card-palette.ts` |
+| Intro | A3 orchid corners (`INTRO_FIELD_GRADIENT`) + orchid concentric oval ladder; gate + slide 0 only |
+| Scene 4 (1 like) | Teal nest field (`TEAL_NEST_GRADIENT` = share C0) + 4A heart; soft-close stays flat teal |
+| Opening | ink → ember → **ink** (slides 00-02). Ghosted song entity (slide 2) + list (slide 3) share ink + purple→ember; night rhyme [D-017](D-017-entity-list-pair-rhymes.md) / list [D-010](D-010-ghosted-list-sky-grass-ghosts.md). Soft close (slide 8) is **teal** + iris; [D-016](D-016-middeck-metaphor-promote.md). Share finale (slide 9) is **ink** stage + teal card; [D-012](D-012-share-finale-inset.md) / [D-014](D-014-share-finale-kit-j8.md) |
+| Soft close | Teal field · **8B mono teal iris** shrink-to-stop; [D-016](D-016-middeck-metaphor-promote.md) (displaces funky MotifPin bookends) |
+| Middeck 4-7 | 4A heart · TL typing pin + edge chat · 7L film letterbox; [D-016](D-016-middeck-metaphor-promote.md) / [D-017](D-017-entity-list-pair-rhymes.md); left-on-read field/frame; [D-019](D-019-left-on-read-orchid-corners.md) |
+| Ghosted entity | Ink field · TR moon · edge stars · one BL blob ghost; [D-017](D-017-entity-list-pair-rhymes.md) (displaces orchid spiral) |
 | Volume | Flame ember field (**light theme** / black ink) + ice→deep teal ocean; tide rises on “joined this year”; school = `likedThisYearCount` (1 like = 1 fish, cap 15) from subtitle → viewport bottom |
 | Geometry | Ovals (`OVAL` sx/sy) by default; volume may use a bottom ocean wave (not a disk). **#1 artist** orbit mechanic: [D-008](D-008-entity-artist-opaque-orbit-ovals.md) |
 | Art role | Peripheral chrome behind copy; clear mid band for type and lists |
-| Motion | D-001 unchanged — shared copy motion; only the 5-row list is special. Volume tide is art chrome keyed to narrative beat, not a copy-motion fork. |
-| Theme | **Each story is dark or light** — from the swatch’s ink mode (`dark` = light foreground, `light` = dark foreground). See `slideChromeTheme()`. |
+| Motion | D-001 unchanged; shared copy motion; only the 5-row list is special. Volume tide is art chrome keyed to narrative beat, not a copy-motion fork. |
+| Theme | **Each story is dark or light**: from the swatch’s ink mode (`dark` = light foreground, `light` = dark foreground). See `slideChromeTheme()`. |
 | Ink | Dark theme → `#f5f5f5` text; light theme → `#1c1c1c` text |
 | Deck chrome | Wordmark, progress, pause/sound/close **follow the active slide’s theme** (`data-wrapped-tone` on the chrome host in `ApiScrappedDeck`) |
 
 ## Contrast rules
 
 - Every tone sets `--wrapped-canvas`, `--wrapped-ink`, `--wrapped-muted`, `--wrapped-panel`, and progress vars together.
-- `--wrapped-muted` stays near ink (dark ≈ 90% `#f5f5f5`, light ≈ 88% `#1c1c1c`) — soft hierarchy for sublines, not washed grey. Source: `INK_MUTED` in `scrapped-card-palette.ts`.
+- `--wrapped-muted` stays near ink (dark ≈ 90% `#f5f5f5`, light ≈ 88% `#1c1c1c`); soft hierarchy for sublines, not washed grey. Source: `INK_MUTED` in `scrapped-card-palette.ts`.
 - Target WCAG AA: large display ≥ 3:1, body ≥ 4.5:1 vs the solid field (not vs decorative disks).
 - Prefer clear mid-band over darkening vibrant art under type.
 - No white / cream / mist paper fills on the API deck.

@@ -12,7 +12,7 @@ import {
 const CELL = 18;
 const COLORS = [...PIXEL_COLORS];
 
-/** Chunked digital assembly — cells rain in, then idle pulse. */
+/** Chunked digital assembly: cells rain in, then idle pulse. */
 export function PixelFieldArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);

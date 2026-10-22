@@ -1,16 +1,16 @@
-# D-012 — Share finale inset card + Share / Replay
+# D-012: Share finale inset card + Share / Replay
 
 **Status:** Locked  
 **Date:** 2026-10-19  
-**Surfaces:** `/scrapped` API deck scene 9 (`ApiScrappedDeck`) — not Plus or Lab.
+**Surfaces:** `/scrapped` API deck scene 9 (`ApiScrappedDeck`): not Plus or Lab.
 
 ## Decision
 
 The share finale uses **Wrapped-form information architecture** on Scrapped Orbit Cascade tokens:
 
-1. **Full-bleed stage** — slide field fills the viewport (gutters are stage, not letterboxing).
-2. **Inset shareable card** — always **9:16** portrait island (Wrapped `25-share-finale` form) with hero + Left on read / Ghosted songs.
-3. **Actions below the card** (not inside it) — primary **Share** pill, secondary **Replay from beginning**.
+1. **Full-bleed stage**: slide field fills the viewport (gutters are stage, not letterboxing).
+2. **Inset shareable card**: always **9:16** portrait island (Wrapped `25-share-finale` form) with hero + Left on read / Ghosted songs.
+3. **Actions below the card** (not inside it): primary **Share** pill, secondary **Replay from beginning**.
 
 Density is locked via `SHARE_FINALE_DENSITY` in `scrapped-card-palette.ts`.
 
@@ -18,18 +18,18 @@ Density is locked via `SHARE_FINALE_DENSITY` in `scrapped-card-palette.ts`.
 
 ## Why
 
-Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed screenshot-only slide. Keeping the stage full-bleed preserves SOUL’s “canvas fills the viewport” rule while the *card* is inset. Locking the card to **9:16** (on screen and in the export PNG) matches Stories / Reels share crops — same form as Wrapped’s closing share island.
+Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed screenshot-only slide. Keeping the stage full-bleed preserves SOUL’s “canvas fills the viewport” rule while the *card* is inset. Locking the card to **9:16** (on screen and in the export PNG) matches Stories / Reels share crops; same form as Wrapped’s closing share island.
 
 ## Locked choices
 
 | Axis | Choice |
 |------|--------|
 | IA | Inset card + Share + Replay below |
-| Card aspect | **9:16** always — stage leftover height caps the island; width follows aspect (no flex-stretch to non-portrait) |
+| Card aspect | **9:16** always; stage leftover height caps the island; width follows aspect (no flex-stretch to non-portrait) |
 | Export PNG | Scale capture so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16; rem density stays phone-tuned |
 | Card thesis | Hero + Left on read / Ghosted songs |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
-| Replay | `goTo(0)` — same as keyboard `R` |
+| Replay | `goTo(0)`: same as keyboard `R` |
 | Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 4, card↔actions 32, hero 46%/48%, type 0.62rem, …) |
 | Tap zones | Bottom cleared on finale so CTAs receive presses |
 | Visual kit | [D-014](D-014-share-finale-kit-j8.md) |

@@ -11,7 +11,7 @@ type Props = {
 };
 
 /**
- * Left-on-read chrome — typing pin on the entity beat, edge bubbles on the list.
+ * Left-on-read chrome: typing pin on the entity beat, edge bubbles on the list.
  * Bubbles reuse the 5I bloom fill; pin is the one→many accent (like hearts / ghosts).
  * Field wash + pin/frame geometry: D-019 (B1).
  */
@@ -24,7 +24,7 @@ export function LeftOnReadChatChrome({
   /** Legacy `hero` maps to the promoted typing pin. */
   const visualMode = mode === "hero" ? "pin" : mode;
 
-  // Key on replay only — quiet→frame must not remount or bubble enter plays twice.
+  // Key on replay only: quiet→frame must not remount or bubble enter plays twice.
   return (
     <div
       key={`chat-${replayKey}`}

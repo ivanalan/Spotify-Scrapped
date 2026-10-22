@@ -13,7 +13,7 @@ export type ShareCardImageOptions = {
   text?: string;
   /**
    * Pre-captured PNG from `captureShareCardBlob`. When set, Share runs without
-   * awaiting capture — required for iOS WebKit user-gesture → `navigator.share`.
+   * awaiting capture: required for iOS WebKit user-gesture → `navigator.share`.
    */
   blob?: Blob;
 };
@@ -100,8 +100,7 @@ async function tryNativeFileShare(file: File): Promise<boolean> {
   if (typeof navigator.share !== "function") return false;
 
   const data = filesOnlyShareData(file);
-  // Prefer canShare when present; if it throws/false, still try share once —
-  // some iOS builds lie about canShare for image files.
+  // Prefer canShare when present; if it throws/false, still try share once: // some iOS builds lie about canShare for image files.
   if (typeof navigator.canShare === "function") {
     try {
       if (!navigator.canShare(data)) return false;
@@ -114,7 +113,7 @@ async function tryNativeFileShare(file: File): Promise<boolean> {
     await navigator.share(data);
     return true;
   } catch (err) {
-    if (isAbortError(err)) return true; // user dismissed — not a failure
+    if (isAbortError(err)) return true; // user dismissed: not a failure
     // NotAllowedError / TypeError → caller may download
     return false;
   }
@@ -130,7 +129,7 @@ async function tryNativeFileShare(file: File): Promise<boolean> {
  *
  * iOS: pass a pre-captured `blob` (from `captureShareCardBlob` while the finale
  * is idle) so `navigator.share` stays inside the tap gesture. Files-only
- * ShareData — WebKit breaks when title/text ride along with files.
+ * ShareData: WebKit breaks when title/text ride along with files.
  */
 export async function shareCardImage(
   node: HTMLElement,
@@ -143,6 +142,6 @@ export async function shareCardImage(
 
   if (await tryNativeFileShare(file)) return;
 
-  // No file share sheet (e.g. many desktop browsers) — last-resort download.
+  // No file share sheet (e.g. many desktop browsers): last-resort download.
   downloadBlob(blob, fileName);
 }

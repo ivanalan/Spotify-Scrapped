@@ -20,11 +20,11 @@ export type DeckSoundtrackHandle = {
   playFromUserGesture: () => void;
   /**
    * Gate-only: play the lead until audible, then pause near START_AT_SEC.
-   * Spotify has no mute — this is the “pre-roll then unmute” stand-in.
+   * Spotify has no mute: this is the “pre-roll then unmute” stand-in.
    * Call from Continue pointerdown; playFromUserGesture resume()s the hot buffer.
    */
   armLeadFromGesture: () => void;
-  /** Sync read — true when the lead URI has produced audio (not React-warm lag). */
+  /** Sync read: true when the lead URI has produced audio (not React-warm lag). */
   isLeadAudible: () => boolean;
   /**
    * Speculatively start the next act, then pause it once audible so the
@@ -38,7 +38,7 @@ export type DeckSoundtrackHandle = {
   cancelPrime: () => void;
   /**
    * Make uri exclusively own audio (resumes a hot prime when possible) and
-   * resolve when the cut is done. Fire alongside the slide change — do not
+   * resolve when the cut is done. Fire alongside the slide change: do not
    * block story advance on this promise.
    */
   cutTo: (uri: string | null) => Promise<void>;
@@ -81,7 +81,7 @@ type PlaybackUpdateEvent = {
 
 /**
  * Near-end window for fallback same-embed restart when the loop twin isn't ready.
- * Slack is wide — playback_update is sparse (~0.5–1s).
+ * Slack is wide: playback_update is sparse (~0.5–1s).
  */
 const END_RESTART_MS = 2500;
 /** Playback / loop restart offset (seconds into the track). */
@@ -90,7 +90,7 @@ const START_AT_SEC = 0;
 const LOOP_COOLDOWN_MS = 1200;
 /**
  * Start the idle A/B slot this many ms before the preview ends so cutover can
- * overlap the dying tail (Spotify has no mute — brief double-audio is OK).
+ * overlap the dying tail (Spotify has no mute: brief double-audio is OK).
  */
 const LOOP_CUT_LEAD_MS = 1000;
 /**
@@ -147,7 +147,7 @@ type PoolEntry = {
   slot: PlaySlot;
 };
 
-/** Hidden but still painted — opacity:0 iframes often won't buffer on iOS. */
+/** Hidden but still painted: opacity:0 iframes often won't buffer on iOS. */
 const HOST_WARM =
   "absolute inset-0 w-full overflow-hidden opacity-[0.02] pointer-events-none";
 const HOST_LIVE =
@@ -300,7 +300,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const playingSlotRef = useRef<PlaySlot>("act");
     /**
      * Next act already play()-ing while the previous act stays audible.
-     * Spotify embeds have no mute API — overlap + cut on audible is the
+     * Spotify embeds have no mute API: overlap + cut on audible is the
      * closest thing to "pre-start muted, unmute on slide."
      */
     const incomingUriRef = useRef<string | null>(null);
@@ -319,7 +319,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const aheadUriRef = useRef<string | null>(null);
     /**
      * Speculative next act: play() started, pause on first audible (hot prime).
-     * Does not cut the current act — cancelled presses won't steal the soundtrack.
+     * Does not cut the current act: cancelled presses won't steal the soundtrack.
      */
     const primingUriRef = useRef<string | null>(null);
     /** Forces tryFinishPrime if Spotify never reports audible for a prime. */
@@ -336,9 +336,19 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       promise: Promise<void>;
     } | null>(null);
     const cutWaitersRef = useRef<Map<string, Array<() => void>>>(new Map());
-    /** True after we pause() while a URI was active — next enable should resume(). */
+    /** True after we pause() while a URI was active: next enable should resume(). */
     const needsResumeRef = useRef(false);
-    /** Continue tapped before the embed was warm — play on the next ready tick. */
+    /**
+     * Tab/app hide: hold playback off until React `enabled` catches up.
+     * Background tabs throttle renders; without this, Spotify keeps playing.
+     */
+    const hidePauseLatchRef = useRef(false);
+    /**
+     * True after we saw a paused update while disabled. Media-key play after
+     * that can clear sticky pause; "still playing" right after we disable must not.
+     */
+    const sawPausedWhileDisabledRef = useRef(false);
+    /** Continue tapped before the embed was warm: play on the next ready tick. */
     const pendingGesturePlayRef = useRef(false);
     /**
      * Gate arm: play→pause hot-prime while sound is still “off”.
@@ -352,7 +362,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         {
           lastPlayingPosition: number;
           cooldownUntil: number;
-          /** False until we see mid-sample progress — blocks stale end-position re-cuts. */
+          /** False until we see mid-sample progress: blocks stale end-position re-cuts. */
           seenHealthyProgress: boolean;
         }
       >
@@ -518,7 +528,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
     /** Slot-aware: act URI allowed for act switch / prime / owning act slot. */
     function isActPlaybackAllowed(trackUri: string): boolean {
-      // Gate arm may run before soundOn — still allow the lead chirp→pause.
+      // Gate arm may run before soundOn: still allow the lead chirp→pause.
       if (
         armingLeadRef.current &&
         primingUriRef.current === trackUri
@@ -567,12 +577,12 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }
 
     /**
-     * Priming path: next act became audible — pause it hot so the current act
+     * Priming path: next act became audible: pause it hot so the current act
      * stays solo until cutTo commits the switch.
      */
     function tryFinishPrime(trackUri: string) {
       if (primingUriRef.current !== trackUri) return false;
-      // cutTo / Continue took over — let tryCutover / live play own this audible event.
+      // cutTo / Continue took over: let tryCutover / live play own this audible event.
       if (
         aheadUriRef.current === trackUri ||
         incomingUriRef.current === trackUri
@@ -648,7 +658,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }
 
     /**
-     * Incoming act embed is producing sound — kill the previous act (overlap cutover).
+     * Incoming act embed is producing sound: kill the previous act (overlap cutover).
      */
     function tryCutover(trackUri: string) {
       if (!enabledRef.current) return;
@@ -661,7 +671,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return;
       }
       if (playingUriRef.current === trackUri) {
-        // Same URI already playing on some slot — don't yank back to act mid-loop
+        // Same URI already playing on some slot: don't yank back to act mid-loop
         // unless this is a fresh act-switch incoming.
         if (incomingUriRef.current === trackUri) {
           incomingUriRef.current = null;
@@ -715,7 +725,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       );
     }
 
-    /** Same-embed restart — only when the idle twin/act slot isn't usable. */
+    /** Same-embed restart: only when the idle twin/act slot isn't usable. */
     function fallbackLoopRestart(trackUri: string, slot: PlaySlot) {
       if (!canBeginLoop(trackUri)) return false;
       const entry = getSlotEntry(slot, trackUri);
@@ -929,13 +939,15 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
           if (!allowed) {
             clearEndTimersFor(`${slot}:${trackUri}`);
-            // Media-key / OS resume while story sticky-pause left us disabled —
-            // ask the parent to clear pause instead of fighting the play.
+            // Media-key play after a real pause-while-disabled: clear sticky pause.
+            // Do not treat "still playing right after we disabled" as resume (D-031).
             if (
               !enabledRef.current &&
+              sawPausedWhileDisabledRef.current &&
               playingUriRef.current === trackUri &&
               playingSlotRef.current === slot
             ) {
+              sawPausedWhileDisabledRef.current = false;
               notifyExternalResume();
               return;
             }
@@ -955,7 +967,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           } else if (incomingLoopSlotRef.current === "act") {
             tryLoopCutover(trackUri, "act");
           } else if (primingUriRef.current === trackUri) {
-            // Finish speculative primes here too — don't wait only on playback_started.
+            // Finish speculative primes here too: don't wait only on playback_started.
             tryFinishPrime(trackUri);
           } else if (incomingUriRef.current === trackUri) {
             tryCutover(trackUri);
@@ -970,8 +982,9 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           return;
         }
 
-        // Paused path — fallback end detection for the owning slot only.
+        // Paused path: fallback end detection for the owning slot only.
         if (!enabledRef.current) {
+          sawPausedWhileDisabledRef.current = true;
           clearEndTimersFor(`${slot}:${trackUri}`);
           return;
         }
@@ -996,7 +1009,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           beginLoopCutover(trackUri);
           return;
         }
-        // Mid-sample pause while we still wanted audio — hardware media keys.
+        // Mid-sample pause while we still wanted audio: hardware media keys.
         if (state.seenHealthyProgress) {
           notifyExternalPause();
         }
@@ -1016,7 +1029,14 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       if (!controlled) setUncontrolledEnabled(next);
     }
 
-    enabledRef.current = enabled;
+    if (hidePauseLatchRef.current) {
+      // Parent sticky-pause caught up: latch can release.
+      if (!enabled) hidePauseLatchRef.current = false;
+      enabledRef.current = false;
+    } else {
+      enabledRef.current = enabled;
+    }
+    if (enabled) sawPausedWhileDisabledRef.current = false;
     activeUriRef.current = uri;
 
     useImperativeHandle(ref, () => ({
@@ -1030,7 +1050,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         const entry = poolRef.current.get(target);
         if (!entry?.ready) return;
 
-        // Spotify has no mute — play until audible, then pause at the hook.
+        // Spotify has no mute: play until audible, then pause at the hook.
         armingLeadRef.current = true;
         primingUriRef.current = target;
         entry.host.className = HOST_WARM;
@@ -1083,7 +1103,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           }
         }
 
-        // Arm still buffering — promote to live play (don't pause on audible).
+        // Arm still buffering: promote to live play (don't pause on audible).
         if (
           target &&
           armingLeadRef.current &&
@@ -1097,7 +1117,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             playingSlotRef.current = "act";
             incomingUriRef.current = null;
             entry.host.className = HOST_LIVE;
-            // play() already in flight from arm — nudge in case it stalled.
+            // play() already in flight from arm: nudge in case it stalled.
             entry.controller.play();
             pauseOthersExceptUri(target);
             ensureTwinUri(target);
@@ -1480,7 +1500,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         aheadUriRef.current = null;
         committedUriRef.current = uri;
 
-        // Gate arm / parked hot prime must survive soundOn=false — runSync(false)
+        // Gate arm / parked hot prime must survive soundOn=false: runSync(false)
         // would pause the buffer we're about to resume() on Continue.
         if (armingLeadRef.current) {
           setVisibleUri(null);
@@ -1563,6 +1583,54 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       if (hotPrimedUriRef.current && !enabledRef.current) return;
       runSync(committedUriRef.current, enabledRef.current);
     }, [poolTick]);
+
+    /**
+     * Sync-pause on tab/app hide. Background Chrome throttles React, so waiting
+     * for enabled=false via sticky pause leaves Spotify audio running (D-031).
+     */
+    const pauseForDocumentHide = useEffectEvent(() => {
+      hidePauseLatchRef.current = true;
+      enabledRef.current = false;
+      sawPausedWhileDisabledRef.current = false;
+      if (playingUriRef.current) needsResumeRef.current = true;
+
+      clearSwitchTimer();
+      clearEnforceTimers();
+      clearCutoverTimer();
+      clearPrimeFinishTimer();
+      clearLoopCutoverTimer();
+      clearAllEndTimers();
+      incomingUriRef.current = null;
+      incomingLoopSlotRef.current = null;
+      aheadUriRef.current = null;
+      primingUriRef.current = null;
+      hotPrimedUriRef.current = null;
+      armingLeadRef.current = false;
+      pendingGesturePlayRef.current = false;
+
+      for (const entry of poolRef.current.values()) {
+        entry.controller.pause();
+        entry.host.className = HOST_IDLE;
+      }
+      const twin = loopTwinRef.current;
+      if (twin) {
+        twin.controller.pause();
+        twin.host.className = HOST_IDLE;
+      }
+      loopTwinHotRef.current = false;
+      actSlotHotRef.current = false;
+
+      notifyExternalPause();
+    });
+
+    useEffect(() => {
+      function onVis() {
+        if (!document.hidden) return;
+        pauseForDocumentHide();
+      }
+      document.addEventListener("visibilitychange", onVis);
+      return () => document.removeEventListener("visibilitychange", onVis);
+    }, [pauseForDocumentHide]);
 
     function turnOn() {
       pendingGesturePlayRef.current = true;
@@ -1813,7 +1881,7 @@ function syncPlayback(
     }
   }
 
-  // Same URI already owning audio — preserve the active A/B slot.
+  // Same URI already owning audio: preserve the active A/B slot.
   if (playingUriRef.current === activeUri) {
     clearCutoverTimer();
     incomingUriRef.current = null;
@@ -1826,7 +1894,7 @@ function syncPlayback(
     if (incomingLoopSlotRef.current) {
       keep.push({ uri: activeUri, slot: incomingLoopSlotRef.current });
     }
-    // Keep the loop twin warm/hot-primed — enforce sweeps must not kill it.
+    // Keep the loop twin warm/hot-primed: enforce sweeps must not kill it.
     if (
       loopTwinRef.current?.uri === activeUri &&
       !keep.some((k) => k.slot === "loop")
@@ -1868,7 +1936,7 @@ function syncPlayback(
     if (abandoned) abandoned.host.className = HOST_IDLE;
   }
 
-  // First start — claim act slot.
+  // First start: claim act slot.
   if (!playingUriRef.current) {
     clearCutoverTimer();
     incomingUriRef.current = null;

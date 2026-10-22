@@ -13,12 +13,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { gateSecondaryTone } from "@/components/scrapped/gateChrome";
+import { gatePrimaryTone } from "@/components/scrapped/gateChrome";
 import { Button } from "@/components/ui/button";
 
 type Props = {
   className?: string;
-  /** Gate uses outline Button; deck chrome keeps the close icon. */
+  /** Gate uses primary fill Button; deck chrome keeps the close icon. */
   appearance?: "icon" | "text";
 };
 
@@ -46,16 +46,12 @@ export function SignOutConfirmButton({
         className={className}
         render={
           isText ? (
-            <Button
-              variant="outline"
-              size="lg"
-              className={gateSecondaryTone}
-            />
+            <Button size="lg" className={gatePrimaryTone} />
           ) : (
             <Button
               variant="default"
               size="icon"
-              className="size-8 rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
+              className="rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90"
             />
           )
         }

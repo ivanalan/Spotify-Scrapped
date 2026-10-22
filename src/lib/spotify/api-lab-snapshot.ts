@@ -89,7 +89,7 @@ const COOKIE_ITEM_CAP = 5;
  * Nulling `imageUrl` (the old approach) fit more easily but left every cover
  * blank in production. Drop Lab-only prose and extra rows instead.
  *
- * Keep headline `detail` (`"N of M"`) — the API deck reads it for ghosted
+ * Keep headline `detail` (`"N of M"`); the API deck reads it for ghosted
  * counts. Wiping it made production say “No all time favs got ghosted”
  * while `left-long-run` items (and art) still sealed.
  */
@@ -193,7 +193,7 @@ function writeFsSnapshot(stored: StoredApiLabSnapshot): void {
       : legacyFsPath();
     fs.writeFileSync(filePath, `${JSON.stringify(stored, null, 2)}\n`);
   } catch {
-    // Vercel / read-only FS — cookie path is the source of truth there.
+    // Vercel / read-only FS: cookie path is the source of truth there.
   }
 }
 
@@ -254,7 +254,7 @@ export async function clearApiLabSnapshotCookies(
 /**
  * Attach sealed snapshot cookies when they fit the header budget.
  * Oversized payloads clear Lab cookies and rely on the FS snapshot instead
- * (local only — Vercel has no durable FS for this path).
+ * (local only: Vercel has no durable FS for this path).
  * @returns whether cookies were written
  */
 export async function attachApiLabSnapshotCookies(
@@ -274,13 +274,13 @@ export async function attachApiLabSnapshotCookies(
 export async function readApiLabSnapshot(
   userId?: string,
 ): Promise<StoredApiLabSnapshot | null> {
-  // Prefer disk locally — avoids 431 from fat cookie jars after Lab grew.
+  // Prefer disk locally: avoids 431 from fat cookie jars after Lab grew.
   const fromFs = readFsSnapshot(userId);
   if (fromFs) {
     if (userId && fromFs.userId && fromFs.userId !== userId) {
       /* fall through */
     } else if (isHollowLikedSnapshot(fromFs)) {
-      /* fall through — force a Reload so one-like slides aren't blank */
+      /* fall through: force a Reload so one-like slides aren't blank */
     } else {
       return fromFs;
     }

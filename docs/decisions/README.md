@@ -2,19 +2,19 @@
 
 What we chose, why, what it displaced, and at what cost.
 
-**One fact, one place** — the locked choice lives in a `D-NNN` file; other docs link here instead of restating.
+**One fact, one place**: the locked choice lives in a `D-NNN` file; other docs link here instead of restating.
 
 ## How to add a decision
 
 1. Next ID = last `D-NNN` + 1 (zero-pad to three digits).
 2. Create `D-NNN-short-kebab-title.md` using the template below.
-3. Link it from `SCARS.md` / `SOUL.md` / code comments only when needed — don’t duplicate the full text.
+3. Link it from `SCARS.md` / `SOUL.md` / code comments only when needed; don’t duplicate the full text.
 4. **Ship the decision file in the same commit as the change** that locks it.
 
 ## Template
 
 ```markdown
-# D-NNN — Title
+# D-NNN: Title
 
 - **Date:** YYYY-MM-DD
 - **Status:** Locked | Superseded by D-MMM
@@ -46,3 +46,4 @@ What we give up, or what agents must remember forever.
 | [D-004](D-004-sign-in-sign-out-copy.md) | Sign in / sign out copy (not log / connect) | Locked |
 | [D-005](D-005-handwritten-api-story-copy.md) | Handwritten API story copy (voice + closer beats) | Locked |
 | [D-006](D-006-api-story-headline-style.md) | API story headline style (≤6 words, favs, open compounds) | Locked |
+| [D-031](D-031-pause-on-tab-hide.md) | Pause story on tab / app hide; stay paused on return | Locked |

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ghost hem ideas: SVG path explorations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #1a1624;
+        --card: #2a2433;
+        --ink: #f5f0ff;
+        --muted: color-mix(in oklab, #f5f0ff 62%, transparent);
+        --ghost: #f5f0ff;
+        --eye: #2a2433;
+        --cream: #f5e6c8;
+        --accent: #c9a0f5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        max-width: 42rem;
+        margin: 0 0 1.5rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .howto {
+        background: color-mix(in oklab, var(--card) 80%, black);
+        border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
+        margin-bottom: 2rem;
+        font-size: 0.88rem;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+
+      .howto strong {
+        color: var(--ink);
+        font-weight: 560;
+      }
+
+      .howto pre {
+        margin: 0.75rem 0 0;
+        padding: 0.75rem 0.9rem;
+        background: #12101a;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 0.75rem;
+        color: #d4c8f0;
+        line-height: 1.45;
+      }
+
+      .tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem 1.25rem;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .tools label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.85rem;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 0.85rem 0.65rem 0.7rem;
+        text-align: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s ease, transform 0.15s ease;
+      }
+
+      .card:hover {
+        border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+        transform: translateY(-1px);
+      }
+
+      .card.selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .card.current {
+        outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent);
+        outline-offset: 2px;
+      }
+
+      .card svg {
+        width: 88px;
+        height: 88px;
+        display: block;
+        margin: 0 auto 0.45rem;
+      }
+
+      .card .id {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--accent);
+      }
+
+      .card .name {
+        font-size: 0.78rem;
+        color: var(--ink);
+        margin-top: 0.1rem;
+      }
+
+      .path-panel {
+        position: sticky;
+        bottom: 0;
+        margin-top: 1.5rem;
+        background: #12101a;
+        border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1.15rem 1.25rem;
+        box-shadow: 0 -8px 32px color-mix(in oklab, black 45%, transparent);
+      }
+
+      .path-panel .label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+      }
+
+      .path-panel code {
+        display: block;
+        font-size: 0.72rem;
+        line-height: 1.5;
+        word-break: break-all;
+        color: #d4c8f0;
+        margin-bottom: 0.65rem;
+      }
+
+      .path-panel button {
+        font-family: inherit;
+        font-size: 0.8rem;
+        font-weight: 560;
+        border: none;
+        border-radius: 8px;
+        padding: 0.45rem 0.9rem;
+        background: var(--accent);
+        color: #1a1624;
+        cursor: pointer;
+      }
+
+      .path-panel button:active {
+        opacity: 0.85;
+      }
+
+      .toast {
+        display: none;
+        margin-left: 0.65rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .toast.show {
+        display: inline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Ghost hem ideas · <em>SVG</em></h1>
+      <p class="lede">
+        In the app these are not PNGs; they’re inline SVG
+        <code>&lt;path d="…"&gt;</code> strings (see
+        <code>GhostBody</code> in
+        <code>PeripheralMotifs.tsx</code> and
+        <code>blobPath()</code> in
+        <code>ShareRecapCard.tsx</code>). Same crown + eyes; only the bottom hem
+        changes. Click a card to copy its path.
+      </p>
+
+      <div class="howto">
+        <strong>How it ships</strong>: a ~64×64 path, scaled with
+        <code>transform="scale(size/64)"</code>, wash fill
+        <code>#f5f0ff</code>, eye dots. Current hem is two quadratic bumps
+        (<code>Q20 54 32 48 Q44 54 52 48</code>); that’s the wave you want to
+        replace.
+        <pre>function blobPath() {
+  // Locked D-028: four tiny scallops (was two-bump wave)
+  return "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+}</pre>
+      </div>
+
+      <div class="tools">
+        <label
+          ><input type="radio" name="fill" value="wash" checked /> Wash
+          (app)</label
+        >
+        <label
+          ><input type="radio" name="fill" value="cream" /> Cream
+          (explore)</label
+        >
+        <label
+          ><input type="checkbox" id="stroke" /> Black outline</label
+        >
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="path-panel">
+        <div class="label" id="sel-label">Selected: current (wave)</div>
+        <code id="sel-path"></code>
+        <button type="button" id="copy">Copy path</button>
+        <span class="toast" id="toast">Copied</span>
+      </div>
+    </div>
+
+    <script>
+      /**
+       * Crown is shared: right side up → dome → left side down to hem start.
+       * Hem runs left (12,48) → right (52,48). Swap only that middle.
+       */
+      const CROWN = "C56 32 50 10 32 8 C14 6 8 30 12 48 Z";
+
+      const ideas = [
+        {
+          id: "00",
+          name: "Old two-bump",
+          hem: "M12 48 Q20 54 32 48 Q44 54 52 48 ",
+        },
+        {
+          id: "01",
+          name: "2 soft lobes",
+          hem: "M12 48 Q22 56 32 48 Q42 56 52 48 ",
+        },
+        {
+          id: "02",
+          name: "4 tiny scallops",
+          current: true,
+          hem: "M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 ",
+        },
+        {
+          id: "03",
+          name: "Deep U",
+          hem: "M12 48 Q32 62 52 48 ",
+        },
+        {
+          id: "04",
+          name: "Bunny feet",
+          hem: "M12 48 Q18 50 22 56 Q26 50 32 48 Q38 50 42 56 Q46 50 52 48 ",
+        },
+        {
+          id: "05",
+          name: "Flat cut",
+          hem: "M12 48 L52 48 ",
+        },
+        {
+          id: "06",
+          name: "Soft zigzag",
+          hem: "M12 48 L18 54 L24 48 L30 54 L36 48 L42 54 L52 48 ",
+        },
+        {
+          id: "07",
+          name: "Rounded spikes",
+          hem: "M12 48 Q16 48 18 56 Q20 48 26 48 Q30 48 32 56 Q34 48 40 48 Q44 48 46 56 Q48 48 52 48 ",
+        },
+        {
+          id: "08",
+          name: "Battlement",
+          hem: "M12 48 L12 54 L18 54 L18 48 L26 48 L26 54 L38 54 L38 48 L46 48 L46 54 L52 54 L52 48 ",
+        },
+        {
+          id: "09",
+          name: "Heart lobes",
+          hem: "M12 48 Q16 50 18 56 Q22 50 26 48 Q30 54 32 58 Q34 54 38 48 Q42 50 46 56 Q50 50 52 48 ",
+        },
+        {
+          id: "10",
+          name: "Teardrops",
+          hem: "M12 48 Q18 50 20 58 Q24 50 32 48 Q40 50 44 58 Q48 50 52 48 ",
+        },
+        {
+          id: "11",
+          name: "Cloud puffs",
+          hem: "M12 48 Q14 56 22 56 Q26 60 32 56 Q38 60 42 56 Q50 56 52 48 ",
+        },
+        {
+          id: "12",
+          name: "Ice-cream drip",
+          hem: "M12 48 Q16 50 18 58 Q22 50 28 48 Q32 60 36 48 Q42 50 46 58 Q50 50 52 48 ",
+        },
+        {
+          id: "13",
+          name: "Flower petals",
+          hem: "M12 48 Q16 56 22 52 Q26 60 32 52 Q38 60 42 52 Q48 56 52 48 ",
+        },
+        {
+          id: "14",
+          name: "Stubby feet",
+          hem: "M12 48 L16 48 L16 56 Q20 58 24 56 L24 48 L40 48 L40 56 Q44 58 48 56 L48 48 L52 48 ",
+        },
+        {
+          id: "15",
+          name: "Curly tail",
+          hem: "M12 48 L40 48 Q48 48 50 54 Q46 60 40 56 Q44 50 48 48 L52 48 ",
+        },
+        {
+          id: "16",
+          name: "Balloon knot",
+          hem: "M12 48 Q22 50 28 48 L30 54 L32 50 L34 54 L36 48 Q42 50 52 48 ",
+        },
+        {
+          id: "17",
+          name: "Pear tip",
+          path: "M12 42 C14 52 24 60 32 60 C40 60 50 52 52 42 C56 28 50 10 32 8 C14 6 8 28 12 42 Z",
+        },
+        {
+          id: "18",
+          name: "Full oval",
+          path: "M12 40 C8 52 18 58 32 58 C46 58 56 52 52 40 C56 26 50 10 32 8 C14 6 8 26 12 40 Z",
+        },
+        {
+          id: "19",
+          name: "Sheet corners",
+          path: "M10 44 L14 56 L22 48 L32 54 L42 48 L50 56 L54 44 C56 28 50 10 32 8 C14 6 8 28 10 44 Z",
+        },
+        {
+          id: "20",
+          name: "Ruffle hem",
+          hem: "M12 48 Q15 54 18 48 Q21 54 24 48 Q27 54 30 48 Q33 54 36 48 Q39 54 42 48 Q45 54 48 48 Q50 52 52 48 ",
+        },
+        {
+          id: "21",
+          name: "Asymmetric",
+          hem: "M12 48 Q18 58 28 48 Q36 52 44 50 Q48 56 52 48 ",
+        },
+        {
+          id: "22",
+          name: "Shallow dips",
+          hem: "M12 48 Q22 50 32 48 Q42 50 52 48 ",
+        },
+        {
+          id: "23",
+          name: "Single flame",
+          hem: "M12 48 Q20 50 28 48 Q32 62 36 48 Q44 50 52 48 ",
+        },
+      ];
+
+      function buildPath(idea) {
+        if (idea.path) return idea.path;
+        return idea.hem + CROWN;
+      }
+
+      const grid = document.getElementById("grid");
+      let selected = ideas.find((i) => i.current) || ideas[0];
+      let fill = "wash";
+      let stroke = false;
+
+      function ghostFill() {
+        return fill === "cream" ? "var(--cream)" : "var(--ghost)";
+      }
+
+      function renderCard(idea) {
+        const d = buildPath(idea);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className =
+          "card" +
+          (idea.current ? " current" : "") +
+          (idea === selected ? " selected" : "");
+        card.innerHTML = `
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="${d}" fill="${ghostFill()}" ${
+          stroke
+            ? 'stroke="#1c1c1c" stroke-width="2.2" stroke-linejoin="round"'
+            : ""
+        } />
+            <circle cx="24" cy="26" r="3.2" fill="var(--eye)" />
+            <circle cx="40" cy="26" r="3.2" fill="var(--eye)" />
+          </svg>
+          <div class="id">${idea.id}</div>
+          <div class="name">${idea.name}</div>
+        `;
+        card.addEventListener("click", () => {
+          selected = idea;
+          updatePanel();
+          [...grid.children].forEach((c, i) => {
+            c.classList.toggle("selected", ideas[i] === selected);
+          });
+        });
+        return card;
+      }
+
+      function paint() {
+        grid.innerHTML = "";
+        ideas.forEach((idea) => grid.appendChild(renderCard(idea)));
+        updatePanel();
+      }
+
+      function updatePanel() {
+        document.getElementById("sel-label").textContent =
+          `Selected; ${selected.id} ${selected.name}`;
+        document.getElementById("sel-path").textContent = buildPath(selected);
+      }
+
+      document.querySelectorAll('input[name="fill"]').forEach((el) => {
+        el.addEventListener("change", (e) => {
+          fill = e.target.value;
+          paint();
+        });
+      });
+      document.getElementById("stroke").addEventListener("change", (e) => {
+        stroke = e.target.checked;
+        paint();
+      });
+
+      document.getElementById("copy").addEventListener("click", async () => {
+        const path = buildPath(selected);
+        await navigator.clipboard.writeText(path);
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1200);
+      });
+
+      paint();
+    </script>
+  </body>
+</html>

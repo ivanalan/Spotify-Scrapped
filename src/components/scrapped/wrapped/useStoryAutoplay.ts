@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-/** Default scene motion length — long enough for two text phases. Does not auto-advance. */
+/** Default scene motion length: long enough for two text phases. Does not auto-advance. */
 export const STORY_SCENE_MS = 6000;
 
 /** Stable fallback so the effect deps array never gains/loses a slot. */
@@ -62,7 +62,7 @@ function resolveBeatSchedule(
 
 /**
  * Drives in-scene progress + mid-scene beat index.
- * Progress fills 0→1 over the scene duration and stops — the user advances.
+ * Progress fills 0→1 over the scene duration and stops: the user advances.
  */
 export function useStoryAutoplay({
   active,
@@ -79,7 +79,7 @@ export function useStoryAutoplay({
   const [beatIndex, setBeatIndex] = useState(0);
   // Track scene identity so we can reset beatIndex during render (before
   // paint). A post-paint useEffect left one frame of the *previous* scene’s
-  // beat on the incoming slide — e.g. “Top ghosted song” flashing first.
+  // beat on the incoming slide: e.g. “Top ghosted song” flashing first.
   const [sceneEpoch, setSceneEpoch] = useState({ active, visitKey });
   if (active !== sceneEpoch.active || visitKey !== sceneEpoch.visitKey) {
     setSceneEpoch({ active, visitKey });

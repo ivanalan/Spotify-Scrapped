@@ -22,7 +22,7 @@ export const ARTIST_ACT_SLIDES = [5, 6] as const;
 /**
  * Fallback beats-per-scene (narrative blocks). Live deck expands each
  * title / subtitle / aside into its own line-beat via reading-time schedules
- * in `ApiScrappedDeck` — prefer those when wiring autoplay.
+ * in `ApiScrappedDeck`: prefer those when wiring autoplay.
  */
 export const API_SCRAPPED_BEAT_COUNTS = [
   2, 2, 3, 2, 3, 2, 2, 2, 1, 1,
@@ -63,7 +63,7 @@ function trackCreditsArtist(
   return sub.split(",").some((part) => part.trim() === name);
 }
 
-/** Song credited to a sabbatical artist — prefers their own trackId. */
+/** Song credited to a sabbatical artist: prefers their own trackId. */
 export function artistActTrackUri(
   report: ScrappedApiReport,
   artistItem: ApiMetricItem | undefined,
@@ -230,17 +230,17 @@ export function getApiSlideSoundtrackUris(
   }
 
   // --- Content pins (must match on-screen entities) ---------------------
-  // 2 — top ghosted song (e.g. Dapper)
+  // 2: top ghosted song (e.g. Dapper)
   out[2] = take(ghostedIds[0]);
-  // 3 — second ghosted song
+  // 3: second ghosted song
   out[3] = take(ghostedIds[1]);
-  // 5 — top left-on-read artist sample
+  // 5: top left-on-read artist sample
   out[5] = take(artist0Id);
-  // 6 — second left-on-read artist sample
+  // 6: second left-on-read artist sample
   out[6] = take(artist1Id);
-  // 4 — top one-like sample
+  // 4: top one-like sample
   out[4] = take(oneLikeIds[0]);
-  // 7 — top reunion song
+  // 7: top reunion song
   out[7] = take(reunionIds[0]);
 
   // Soft fallbacks for content slots that had no primary sample.
@@ -256,11 +256,11 @@ export function getApiSlideSoundtrackUris(
   if (!out[7]) out[7] = takeFirst([...reunionIds, ...likedYearIds]);
 
   // --- Ambient slides (never steal reserved hero tracks) ----------------
-  // 0 — user's top song right now (4-week #1)
+  // 0: user's top song right now (4-week #1)
   out[0] = takeFirst([shortTopId, ...likedYearIds, ...fallenIds, ...ghostedIds]);
-  // 1 — a different song liked this year
+  // 1: a different song liked this year
   out[1] = takeFirst([...likedYearIds, ...fallenIds, ...ghostedIds]);
-  // 8 — soft close / leftover left-on-read
+  // 8: soft close / leftover left-on-read
   out[8] = takeFirst([
     ...ghostedIds,
     ...fallenIds,
@@ -268,7 +268,7 @@ export function getApiSlideSoundtrackUris(
     ...reunionIds,
     shortTopId,
   ]);
-  // 9 — share / leftover
+  // 9: share / leftover
   out[9] = takeFirst([
     ...ghostedIds,
     ...fallenIds,

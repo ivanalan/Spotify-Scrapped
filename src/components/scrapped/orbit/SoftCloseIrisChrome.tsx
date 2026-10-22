@@ -6,7 +6,7 @@ type Props = {
 };
 
 /**
- * 8B soft-close iris — mono teal stepped rings, shrink 72% → 10% then hold.
+ * 8B soft-close iris: mono teal stepped rings, shrink 72% → 10% then hold.
  * Replaces funky pill bookends (D-016).
  */
 export function SoftCloseIrisChrome({

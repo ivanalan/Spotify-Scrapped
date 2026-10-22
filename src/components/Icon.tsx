@@ -27,7 +27,7 @@ export function preloadIonIcon() {
 // Any import of this module (gate, deck, etc.) starts the fetch before paint.
 preloadIonIcon();
 
-/** Official Ionicons web component — no custom SVG re-stroke. */
+/** Official Ionicons web component: no custom SVG re-stroke. */
 export function Icon({ icon, className, style, title }: IconProps) {
   useEffect(() => {
     preloadIonIcon();

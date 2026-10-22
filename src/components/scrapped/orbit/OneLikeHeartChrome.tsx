@@ -12,7 +12,7 @@ type Props = {
   replayKey?: number;
 };
 
-/** Ionicons heart path (512 viewBox) — outline + fill layers share it. */
+/** Ionicons heart path (512 viewBox): outline + fill layers share it. */
 const HEART_PATH =
   "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
 
@@ -23,7 +23,7 @@ const HEART_PATH =
 const HEART_SPARK_AT_SEC = 3.1;
 
 /**
- * Polar burst — Motion (x/y/opacity only). CSS keyframes + delay + `both`
+ * Polar burst: Motion (x/y/opacity only). CSS keyframes + delay + `both`
  * were hitching at the start/end; Motion runs on the compositor without
  * fill-mode/delay fights.
  */
@@ -42,7 +42,7 @@ const SPARKS = Array.from({ length: 12 }, (_, i) => {
 });
 
 /**
- * 4A one-like heart — stroke-draw outline → fill → pop → polar sparks.
+ * 4A one-like heart: stroke-draw outline → fill → pop → polar sparks.
  *
  * - Outline drawn via pathLength + stroke-dashoffset (no scale-in grow)
  * - Dual SVG paths; spring pop on HTML wrapper when fill lands
@@ -103,7 +103,7 @@ export function OneLikeHeartChrome({
             />
           ))}
         </div>
-        {/* Scale lives here — not on <svg> (Chromium rasterizes transformed SVG). */}
+        {/* Scale lives here: not on <svg> (Chromium rasterizes transformed SVG). */}
         <div className="mm-heart-pop">
           <svg
             className="mm-heart-glyph"

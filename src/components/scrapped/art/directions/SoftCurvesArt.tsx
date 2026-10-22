@@ -32,7 +32,7 @@ const CURVES = [
   },
 ] as const;
 
-/** Soft Surfaces album language — thick organic strokes on saturated flats. */
+/** Soft Surfaces album language: thick organic strokes on saturated flats. */
 export function SoftCurvesArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

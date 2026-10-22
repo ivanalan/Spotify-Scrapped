@@ -1,4 +1,4 @@
-# D-021 — Ghosted grass: rise-from-soil cascade
+# D-021: Ghosted grass: rise-from-soil cascade
 
 **Status:** Locked  
 **Date:** 2026-10-20  
@@ -17,7 +17,7 @@ Entity ridge grass **grows by rising from underground**, not by `scaleY`:
 
 ## Why
 
-`scaleY` on SVG `<g>` via Motion always reads as expanding from the **horizontal mid-line** — `transform-origin`, `transformBox: fill-box`, and translate→scale→translate wrappers all failed. Rising into a ground clip makes tips emerge from the soil line; cascade sells depth.
+`scaleY` on SVG `<g>` via Motion always reads as expanding from the **horizontal mid-line**: `transform-origin`, `transformBox: fill-box`, and translate→scale→translate wrappers all failed. Rising into a ground clip makes tips emerge from the soil line; cascade sells depth.
 
 ## Locked timing (production)
 
@@ -36,7 +36,7 @@ Grow duration ≈ 0.85s, ease `[0.22, 1, 0.36, 1]`. Local band `H = 140`.
 
 ## Cost
 
-Clip + rise needs rise distances kept in sync with path tip heights if the ridge paths change. No stretch “blade elongation” — growth is emergence, not squash.
+Clip + rise needs rise distances kept in sync with path tip heights if the ridge paths change. No stretch “blade elongation”; growth is emergence, not squash.
 
 ## Source of truth
 

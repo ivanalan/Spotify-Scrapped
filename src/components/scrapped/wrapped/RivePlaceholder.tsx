@@ -9,7 +9,7 @@ type Props = {
   className?: string;
 };
 
-/** Hard-edged slot for a future Rive composition — no soft atmosphere. */
+/** Hard-edged slot for a future Rive composition: no soft atmosphere. */
 export function RivePlaceholder({ label, src, inputs, className }: Props) {
   void src;
   void inputs;

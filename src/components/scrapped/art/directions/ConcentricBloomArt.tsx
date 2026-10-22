@@ -23,7 +23,7 @@ function petalPath(cx: number, cy: number, r: number, angle: number) {
   return `M ${cx} ${cy} Q ${cx + Math.cos(left) * mid} ${cy + Math.sin(left) * mid} ${tipX} ${tipY} Q ${cx + Math.cos(right) * mid} ${cy + Math.sin(right) * mid} ${cx} ${cy}`;
 }
 
-/** Radial petal / fan — Rome / Hong Kong city posters. */
+/** Radial petal / fan: Rome / Hong Kong city posters. */
 export function ConcentricBloomArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

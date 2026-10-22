@@ -33,7 +33,7 @@ export function isOverview(surface: ArtSurface) {
   return surface === "overview";
 }
 
-/** Paper plate inset — quieter surfaces leave more room for copy. */
+/** Paper plate inset: quieter surfaces leave more room for copy. */
 export function contentInset(surface: ArtSurface) {
   if (surface === "overview") return "12%";
   if (surface === "story") return "9%";

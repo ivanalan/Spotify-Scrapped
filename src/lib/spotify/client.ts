@@ -214,7 +214,7 @@ function throwRateLimited(path: string): never {
 
 /**
  * Low-level Spotify Web API helper. Path is relative to `/v1`, e.g. `/me`.
- * Server-only — do not import from client components.
+ * Server-only: do not import from client components.
  *
  * On 429: cache hits still return; otherwise fail immediately and cool down
  * until Retry-After (Spotify: rolling 30s window, limit is app-wide).
@@ -374,7 +374,7 @@ export async function getTracks(
         out[i + j] = res.tracks[j] ?? null;
       }
     } catch {
-      // Batch endpoint is restricted on some apps — fall back concurrently.
+      // Batch endpoint is restricted on some apps: fall back concurrently.
       const fetched = await mapPool(chunk, 6, async (id) => {
         if (!id) return null;
         try {

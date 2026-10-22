@@ -44,7 +44,7 @@ const PANES = [
   },
 ] as const;
 
-/** Soft editorial translucent planes — University / Theology boards. */
+/** Soft editorial translucent planes: University / Theology boards. */
 export function GlassSlabsArt({ surface }: DirectionArtProps) {
   const reduce = useReducedMotion();
   const overview = isOverview(surface);

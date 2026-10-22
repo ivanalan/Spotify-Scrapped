@@ -27,7 +27,7 @@ import {
 
 /**
  * Ensure sabbatical artists (#1 and #2) have playable trackIds distinct from
- * the #1 left-long song — otherwise artist-act slides keep the same URI.
+ * the #1 left-long song: otherwise artist-act slides keep the same URI.
  */
 async function ensureArtistActSoundtrack(
   report: ScrappedApiReport,
@@ -148,7 +148,7 @@ async function reportFromSnapshot(
       await writeApiLabSnapshot(stored);
     }
 
-    // Omit `stored` from the page result — Lab UI only needs `report`.
+    // Omit `stored` from the page result; Lab UI only needs `report`.
     return { kind: "ready", report, ...cooldownFields() };
   } catch {
     return null;
@@ -210,7 +210,7 @@ export async function fetchAndStoreScrappedApiLab(
       });
 
     // Liked Songs is required for one-like / liked-this-year slides. Do not
-    // absorb failures into an empty library — that shipped as "no liked songs"
+    // absorb failures into an empty library: that shipped as "no liked songs"
     // on Vercel when the paginated fetch timed out or rate-limited.
     const likedPage = await getSavedTracksDetailed();
     const liked = likedPage.tracks;

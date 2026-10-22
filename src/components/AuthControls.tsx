@@ -12,7 +12,7 @@ export async function AuthControls() {
     return (
       <a
         href="/api/spotify/login"
-        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-1.5")}
+        className={cn(buttonVariants({ variant: "ghost", size: "default" }), "gap-1.5")}
       >
         <Icon icon={musicalNotesOutline} className="size-3.5" />
         Sign in to Spotify
@@ -25,7 +25,7 @@ export async function AuthControls() {
       <span className="max-w-[10rem] truncate text-muted-foreground" title={label}>
         {label}
       </span>
-      <Button type="submit" size="sm" variant="ghost" className="gap-1.5">
+      <Button type="submit" size="default" variant="ghost" className="gap-1.5">
         <Icon icon={logOutOutline} className="size-3.5" />
         Sign out
       </Button>
