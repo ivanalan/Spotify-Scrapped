@@ -112,18 +112,35 @@ export function ScrappedAboutPage() {
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               Spotify and related marks are trademarks of Spotify AB. This site
-              uses the Spotify Web API under Spotify&rsquo;s developer terms; your
-              listening data stays yours.
+              uses the Spotify Web API under Spotify&rsquo;s developer terms.
             </p>
           </section>
 
-          <section className="mt-8 w-full border-t border-[var(--wrapped-ink)]/14 pt-8">
+          <section
+            id="privacy"
+            className="mt-8 w-full scroll-mt-10 border-t border-[var(--wrapped-ink)]/14 pt-8"
+          >
             <h2 className="text-title w-full text-[var(--wrapped-ink)]">
-              Do you store my password?
+              Privacy
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              No. Sign-in goes through Spotify OAuth. Access tokens stay
-              server-side.
+              We never see your Spotify password. Sign in goes through Spotify
+              OAuth. Access tokens stay in an encrypted cookie on our side for
+              about 30 days, or until you sign out.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              When you load Scrapped, we keep a sealed story snapshot in cookies
+              (tops, liked songs, cover art URLs) for about 30 days so the deck
+              can reopen without fetching again. Sign out clears those cookies.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              If you join the waitlist, we store that email so we can send a seat
+              invite. We only email waitlist addresses about access. To leave the
+              waitlist, reply to a Scrapped seat email or write the From address
+              on that invite from the address you joined with.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              We don&rsquo;t sell your data.
             </p>
           </section>
 

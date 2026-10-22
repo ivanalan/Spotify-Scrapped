@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spotify attribution · deck + share explore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #12101a;
+        --paper: #f5f5f5;
+        --muted: color-mix(in oklab, #f5f5f5 72%, transparent);
+        --orchid: #c9a0f5;
+        --teal: #0d7377;
+        --ember: #c45c26;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: #0a0910;
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        padding: 2rem 1.25rem 4rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .board-head {
+        margin-bottom: 1.75rem;
+        max-width: 36rem;
+      }
+
+      .board-head h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .board-head h1 em {
+        font-style: italic;
+        color: var(--orchid);
+      }
+
+      .board-head p {
+        margin: 0.55rem 0 0;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        align-items: start;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--orchid);
+      }
+
+      .note {
+        font-size: 0.8rem;
+        line-height: 1.45;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .phone {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        aspect-ratio: 9 / 19.5;
+        border-radius: 1.75rem;
+        overflow: hidden;
+        border: 1px solid color-mix(in oklab, #f5f5f5 14%, transparent);
+        box-shadow: 0 24px 60px color-mix(in oklab, #000 55%, transparent);
+        background: var(--ink);
+      }
+
+      .chrome {
+        position: absolute;
+        inset: 0 0 auto;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1rem 0.5rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+      }
+
+      .chrome .mark {
+        font-style: italic;
+      }
+
+      .chrome .credit {
+        font-size: 0.62rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: var(--muted);
+        text-decoration: none;
+        border-bottom: 1px solid color-mix(in oklab, #f5f5f5 22%, transparent);
+      }
+
+      .progress {
+        position: absolute;
+        top: 2.55rem;
+        left: 1rem;
+        right: 1rem;
+        z-index: 4;
+        display: flex;
+        gap: 3px;
+        height: 3px;
+      }
+
+      .progress span {
+        flex: 1;
+        border-radius: 99px;
+        background: color-mix(in oklab, #f5f5f5 18%, transparent);
+      }
+
+      .progress span.on {
+        background: color-mix(in oklab, #f5f5f5 88%, transparent);
+      }
+
+      /* —— A: entity slide —— */
+      .slide-entity {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            120% 80% at 10% 0%,
+            color-mix(in oklab, var(--ember) 55%, transparent),
+            transparent 55%
+          ),
+          var(--ink);
+        padding: 4.2rem 1.15rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .slide-entity h2 {
+        margin: 0;
+        font-size: 1.55rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .slide-entity .sub {
+        margin: 0.45rem 0 0;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+
+      .cover-wrap {
+        margin-top: 1.4rem;
+        width: min(72%, 200px);
+        aspect-ratio: 1;
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #2a2433;
+        flex-shrink: 0;
+      }
+
+      .cover-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .cover-hit {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        padding: 0.45rem;
+        background: linear-gradient(
+          to top,
+          color-mix(in oklab, #000 55%, transparent),
+          transparent 45%
+        );
+        text-decoration: none;
+        color: #f5f5f5;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        opacity: 0.92;
+      }
+
+      .cover-hit span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.28rem;
+        padding: 0.22rem 0.45rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, #000 45%, transparent);
+        backdrop-filter: blur(6px);
+      }
+
+      .cover-hit svg {
+        width: 0.7rem;
+        height: 0.7rem;
+        fill: currentColor;
+      }
+
+      .entity-foot {
+        margin-top: auto;
+        font-size: 0.68rem;
+        color: var(--muted);
+      }
+
+      .entity-foot a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: color-mix(in oklab, #f5f5f5 28%, transparent);
+      }
+
+      /* —— B: list slide —— */
+      .slide-list {
+        position: absolute;
+        inset: 0;
+        background: var(--ink);
+        padding: 4.2rem 1.15rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .slide-list h2 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .rows {
+        margin: 1.1rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+      }
+
+      .rows a {
+        display: grid;
+        grid-template-columns: 1.1rem 2.35rem 1fr;
+        gap: 0.55rem;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        padding: 0.15rem 0;
+        border-radius: 4px;
+      }
+
+      .rows a:hover .thumb {
+        outline: 1px solid color-mix(in oklab, #f5f5f5 35%, transparent);
+      }
+
+      .rows .n {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .thumb {
+        width: 2.35rem;
+        height: 2.35rem;
+        border-radius: 3px;
+        background: linear-gradient(135deg, #6b21a8, #0d7377);
+        outline: 1px solid transparent;
+      }
+
+      .thumb.t2 {
+        background: linear-gradient(135deg, #c45c26, #2a2433);
+      }
+
+      .thumb.t3 {
+        background: linear-gradient(135deg, #0d7377, #c9a0f5);
+      }
+
+      .rows .meta {
+        min-width: 0;
+      }
+
+      .rows .title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .rows .sub {
+        font-size: 0.68rem;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .list-credit {
+        margin-top: auto;
+        font-size: 0.62rem;
+        color: var(--muted);
+      }
+
+      .list-credit a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: color-mix(in oklab, #f5f5f5 28%, transparent);
+      }
+
+      /* —— C/D: share finale —— */
+      .slide-share {
+        position: absolute;
+        inset: 0;
+        background: var(--ink);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 3.6rem 0.85rem 1rem;
+      }
+
+      .share-island {
+        position: relative;
+        width: min(100%, 210px);
+        aspect-ratio: 9 / 16;
+        background: var(--teal);
+        color: #f5f5f5;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      }
+
+      .share-island .hero {
+        height: 49%;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+
+      .share-island .moon {
+        position: absolute;
+        top: -28px;
+        right: -22px;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 35%,
+          #fff 0%,
+          #f4ebff 28%,
+          #c9a0f5 62%,
+          #6b21a8 100%
+        );
+      }
+
+      .share-island .cover {
+        width: 59%;
+        aspect-ratio: 1;
+        background: linear-gradient(145deg, #2a2433, #6b21a8 70%);
+        position: relative;
+        z-index: 1;
+      }
+
+      .share-island .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.55rem;
+        padding: 0.45rem 0.55rem 0;
+        font-size: 0.48rem;
+        line-height: 1.25;
+      }
+
+      .share-island .cols strong {
+        display: block;
+        font-size: 0.52rem;
+        margin-bottom: 0.25rem;
+        opacity: 0.85;
+      }
+
+      .share-island .brand {
+        position: absolute;
+        right: 9%;
+        bottom: 4%;
+        font-size: 0.52rem;
+        letter-spacing: -0.015em;
+        opacity: 0.92;
+      }
+
+      .share-island .spot-on-card {
+        position: absolute;
+        left: 9%;
+        bottom: 4%;
+        font-size: 0.48rem;
+        letter-spacing: -0.01em;
+        opacity: 0.72;
+      }
+
+      .share-stage-credit {
+        margin-top: 0.55rem;
+        font-size: 0.62rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .share-stage-credit a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: color-mix(in oklab, #f5f5f5 28%, transparent);
+      }
+
+      .share-actions {
+        margin-top: 0.7rem;
+        display: flex;
+        gap: 0.45rem;
+        width: min(100%, 210px);
+      }
+
+      .share-actions button {
+        flex: 1;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: default;
+      }
+
+      .share-actions .primary {
+        background: #f5f5f5;
+        color: var(--ink);
+      }
+
+      .share-actions .ghost {
+        background: transparent;
+        color: #f5f5f5;
+        border: 1px solid color-mix(in oklab, #f5f5f5 22%, transparent);
+      }
+
+      .capture-badge {
+        position: absolute;
+        top: 3.15rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        font-size: 0.55rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.4rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--orchid) 35%, transparent);
+        color: #f5f5f5;
+        pointer-events: none;
+      }
+
+      .dash {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        max-width: 40rem;
+      }
+
+      .dash h2 {
+        margin: 0 0 0.6rem;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .dash ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.55;
+      }
+
+      .dash li + li {
+        margin-top: 0.35rem;
+      }
+
+      code {
+        font-size: 0.8em;
+        color: var(--orchid);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <header class="board-head">
+        <h1>Spotify attribution on <em>Scrapped</em></h1>
+        <p>
+          Explore only. How “Content from Spotify” and link-backs could sit on
+          entity, list, and share finale without co-branding the wordmark.
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- A -->
+        <article class="card">
+          <div class="label">A · Entity cover hit</div>
+          <p class="note">
+            Shipped: cover is the hit target → open.spotify. No Open chip. No
+            chrome credit beside Scrapped.
+          </p>
+          <div class="phone" aria-label="Entity slide mock">
+            <div class="chrome">
+              <span class="mark">Scrapped</span>
+              <span></span>
+            </div>
+            <div class="progress">
+              <span class="on"></span><span></span><span></span><span></span>
+            </div>
+            <div class="slide-entity">
+              <h2>Your #1 ghosted song</h2>
+              <p class="sub">Liked hard. Barely in rotation.</p>
+              <a class="cover-wrap" href="#" aria-label="Open track on Spotify">
+                <img src="assets/hero-cover.png" alt="" />
+              </a>
+              <p class="entity-foot">Night Drive · Soft Static</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- B -->
+        <article class="card">
+          <div class="label">B · List rows link out</div>
+          <p class="note">
+            Shipped: whole row → Spotify. Sublines stay artist/meta. Caption
+            under the list: Content from Spotify.
+          </p>
+          <div class="phone" aria-label="List slide mock">
+            <div class="chrome">
+              <span class="mark">Scrapped</span>
+              <span></span>
+            </div>
+            <div class="progress">
+              <span class="on"></span><span class="on"></span><span></span
+              ><span></span>
+            </div>
+            <div class="slide-list">
+              <h2>Ghosted songs</h2>
+              <ul class="rows">
+                <li>
+                  <a href="#">
+                    <span class="n">1</span>
+                    <span class="thumb" aria-hidden="true"></span>
+                    <span class="meta">
+                      <span class="title">Night Drive</span>
+                      <span class="sub">Soft Static</span>
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <span class="n">2</span>
+                    <span class="thumb t2" aria-hidden="true"></span>
+                    <span class="meta">
+                      <span class="title">Soft Static</span>
+                      <span class="sub">Harbor Lights</span>
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <span class="n">3</span>
+                    <span class="thumb t3" aria-hidden="true"></span>
+                    <span class="meta">
+                      <span class="title">Left on Read</span>
+                      <span class="sub">Quiet Rematch</span>
+                    </span>
+                  </a>
+                </li>
+              </ul>
+              <p class="list-credit">Content from Spotify</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- C -->
+        <article class="card">
+          <div class="label">C · Share · credit outside capture</div>
+          <p class="note">
+            Preferred: credit lives on the ink stage under the 9:16 island. PNG
+            export stays Scrapped-only (<code>myscrapped.com</code>).
+          </p>
+          <div class="phone" aria-label="Share finale outside credit">
+            <div class="chrome">
+              <span class="mark">Scrapped</span>
+              <span></span>
+            </div>
+            <span class="capture-badge">PNG = island only</span>
+            <div class="slide-share">
+              <div class="share-island" aria-hidden="true">
+                <div class="hero">
+                  <div class="moon"></div>
+                  <div class="cover"></div>
+                </div>
+                <div class="cols">
+                  <div>
+                    <strong>Left on read</strong>
+                    Artist one<br />Artist two<br />Artist three
+                  </div>
+                  <div>
+                    <strong>Ghosted songs</strong>
+                    Track one<br />Track two<br />Track three
+                  </div>
+                </div>
+                <span class="brand">myscrapped.com</span>
+              </div>
+              <p class="share-stage-credit">
+                <a href="#">Content from Spotify</a>
+              </p>
+              <div class="share-actions">
+                <button type="button" class="primary">Share</button>
+                <button type="button" class="ghost">Replay</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- D -->
+        <article class="card">
+          <div class="label">D · Share · credit on the PNG</div>
+          <p class="note">
+            Heavier compliance, busier card. Tiny left caption opposite
+            <code>myscrapped.com</code>. Only if outside credit is not enough.
+          </p>
+          <div class="phone" aria-label="Share finale on-card credit">
+            <div class="chrome">
+              <span class="mark">Scrapped</span>
+              <span></span>
+            </div>
+            <span class="capture-badge">Inside PNG</span>
+            <div class="slide-share">
+              <div class="share-island" aria-hidden="true">
+                <div class="hero">
+                  <div class="moon"></div>
+                  <div class="cover"></div>
+                </div>
+                <div class="cols">
+                  <div>
+                    <strong>Left on read</strong>
+                    Artist one<br />Artist two<br />Artist three
+                  </div>
+                  <div>
+                    <strong>Ghosted songs</strong>
+                    Track one<br />Track two<br />Track three
+                  </div>
+                </div>
+                <span class="spot-on-card">Content from Spotify</span>
+                <span class="brand">myscrapped.com</span>
+              </div>
+              <div class="share-actions" style="margin-top: 1.15rem">
+                <button type="button" class="primary">Share</button>
+                <button type="button" class="ghost">Replay</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <section class="dash">
+        <h2>Read of the board</h2>
+        <ul>
+          <li>
+            <strong>Shipped:</strong> A (cover → Spotify, no chip/chrome credit) +
+            B (row links + list caption) + C (stage credit outside capture).
+          </li>
+          <li>
+            <strong>B:</strong> row link-out is enough for lists; “Open on
+            Spotify” as row subline may be too loud. Try artist name as subline
+            and keep the row as the link.
+          </li>
+          <li>
+            <strong>D:</strong> only if you want the exported image itself to
+            carry attribution. Keep type smaller than <code>myscrapped.com</code>.
+          </li>
+          <li>
+            Avoid Spotify green fills and logo-as-Scrapped-chrome. Credit is
+            content provenance, not co-branding.
+          </li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>

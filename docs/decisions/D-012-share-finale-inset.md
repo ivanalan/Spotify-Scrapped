@@ -30,7 +30,7 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 | Card thesis | Hero + Left on read / Ghosted songs |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
 | Replay | `goTo(0)`: same as keyboard `R` |
-| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 0, maxWidth 320, card↔actions 32, hero 49%/59%, type 0.78rem, …); art kit [D-033](D-033-share-finale-b2-plain-teal.md) |
+| Density | `SHARE_FINALE_DENSITY` (gutter 36, radius 0, maxWidth 320, card↔actions 32, hero 49%/55%, type 0.65rem, …); art kit [D-033](D-033-share-finale-b2-plain-teal.md) |
 | Tap zones | Bottom cleared on finale so CTAs receive presses |
 | Visual kit | [D-033](D-033-share-finale-b2-plain-teal.md) (prior [D-021](D-021-share-finale-teal-orchid-lilac-moon.md) / [D-014](D-014-share-finale-kit-j8.md)) |
 | Form ref | `docs/mocks/wrapped-ref/named/25-share-finale.png` |

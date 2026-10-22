@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   gateFieldTone,
@@ -15,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const HELPER_DEFAULT =
-  "Enter the email you use for Spotify to join the waitlist.";
+  "Join the waitlistwith your Spotify email. You'll only be emailed about a seat.";
 const HELPER_SUCCESS =
   "You’re signed up for the waitlist! You’ll get an email with a link when it’s ready.";
 const HELPER_EMPTY = "Enter an email to join the waitlist";
@@ -164,15 +165,26 @@ export function GateWaitlistForm({ className }: { className?: string }) {
               : "Join waitlist"}
         </Button>
       </div>
-      <div className="mt-2.5 w-full space-y-1">
+      <div className="mt-2.5 w-full">
         <p
           className="text-caption w-full text-[var(--wrapped-muted)]"
           aria-live="polite"
         >
           {helper}
+          {helper === HELPER_DEFAULT ? (
+            <>
+              {" "}
+              <Link
+                href="/about#privacy"
+                className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+              >
+                Privacy
+              </Link>
+            </>
+          ) : null}
         </p>
         {phase !== "success" ? (
-          <p className="text-caption w-full text-[var(--wrapped-muted)]">
+          <p className="text-caption mt-8 w-full text-[var(--wrapped-muted)]">
             Already have access?{" "}
             <a
               href="/api/spotify/login"
