@@ -1293,73 +1293,76 @@ export function ApiScrappedDeck({
             }}
           >
             {/*
-              9:16 island (D-012 / D-033): shell sizes to the slot; inner capture
-              node is a fixed design canvas (maxWidthPx × designHeightPx) scaled
-              uniformly so type and spacing match every viewport. Export captures
-              the unscaled design node → ~1080×1920.
+              9:16 island (D-012 / D-033): size container is shell-only so cqb is
+              leftover after credit + actions. Inner capture node stays the fixed
+              design canvas (maxWidthPx × designHeightPx) scaled uniformly.
+              Export captures the unscaled design node → ~1080×1920.
             */}
-            <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center [container-type:size]">
-              <div
-                className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)] [container-type:size]"
-                style={{
-                  aspectRatio: D.aspectRatio,
-                  width: `min(100cqi, calc(100cqb * 9 / 16), ${shareTune.maxWidthPx}px)`,
-                  height: "auto",
-                  borderRadius: "var(--share-card-radius, 0px)",
-                }}
-              >
-                {/*
-                  Scaler fits the fixed design canvas into the shell.
-                  Capture ref stays on the unscaled poster so export is
-                  always designWidth → exportWidthPx (~1080).
-                */}
+            <div className="flex min-h-0 w-full flex-1 flex-col">
+              <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center [container-type:size]">
                 <div
-                  className="absolute top-0 left-0 origin-top-left"
+                  className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)] [container-type:size]"
                   style={{
-                    width: D.maxWidthPx,
-                    height: D.designHeightPx,
-                    transform: `scale(calc(100cqw / ${D.maxWidthPx}))`,
+                    aspectRatio: D.aspectRatio,
+                    // Height-first: never exceed leftover slot (credit is outside).
+                    height: `min(100cqb, calc(100cqi * 16 / 9), calc(${shareTune.maxWidthPx}px * 16 / 9))`,
+                    width: "auto",
+                    borderRadius: "var(--share-card-radius, 0px)",
                   }}
                 >
+                  {/*
+                    Scaler fits the fixed design canvas into the shell.
+                    Capture ref stays on the unscaled poster so export is
+                    always designWidth → exportWidthPx (~1080).
+                  */}
                   <div
-                    ref={shareCardRef}
-                    className="h-full w-full"
+                    className="absolute top-0 left-0 origin-top-left"
                     style={{
                       width: D.maxWidthPx,
                       height: D.designHeightPx,
+                      transform: `scale(calc(100cqw / ${D.maxWidthPx}))`,
                     }}
                   >
-                    <ShareRecapCard
-                      year={report.year}
-                      variant="minimal"
-                      active={active === FINALE_INDEX}
-                      leftLabel="Left on read"
-                      rightLabel="Ghosted songs"
-                      likedCount={likedCount}
-                      likedThisYearCount={likedThisYearCount}
-                      moonTune={shareTune.moon}
-                      ghostTune={shareTune.ghosts}
-                      brandTune={shareBrandTune}
-                      heroImageUrl={
-                        topArtist?.imageUrl ?? topSong?.imageUrl ?? null
-                      }
-                      heroAlt={topArtist?.label ?? topSong?.label ?? ""}
-                      skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
-                        (item) => ({
-                          id: item.id,
-                          title: item.label,
-                          artist: item.detail ?? "—",
-                        }),
-                      )}
-                      stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
-                        (item) => ({
-                          id: item.id,
-                          title: item.label,
-                          artist: item.sublabel ?? "—",
-                        }),
-                      )}
+                    <div
+                      ref={shareCardRef}
                       className="h-full w-full"
-                    />
+                      style={{
+                        width: D.maxWidthPx,
+                        height: D.designHeightPx,
+                      }}
+                    >
+                      <ShareRecapCard
+                        year={report.year}
+                        variant="minimal"
+                        active={active === FINALE_INDEX}
+                        leftLabel="Left on read"
+                        rightLabel="Ghosted songs"
+                        likedCount={likedCount}
+                        likedThisYearCount={likedThisYearCount}
+                        moonTune={shareTune.moon}
+                        ghostTune={shareTune.ghosts}
+                        brandTune={shareBrandTune}
+                        heroImageUrl={
+                          topArtist?.imageUrl ?? topSong?.imageUrl ?? null
+                        }
+                        heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+                        skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
+                          (item) => ({
+                            id: item.id,
+                            title: item.label,
+                            artist: item.detail ?? "—",
+                          }),
+                        )}
+                        stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
+                          (item) => ({
+                            id: item.id,
+                            title: item.label,
+                            artist: item.sublabel ?? "—",
+                          }),
+                        )}
+                        className="h-full w-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

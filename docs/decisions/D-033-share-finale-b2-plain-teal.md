@@ -15,7 +15,7 @@ Promote the B2 share-finale explore recipe (on-story tune lock):
 | Card field | Plain `#1A7A6E` (no nest gradient; no orchid wash) |
 | Corners | Sharp (`radiusPx: 0`) |
 | Design canvas | Locked **300 × 533** (`maxWidthPx` × `designHeightPx`, 9:16). Stage shell sizes to the slot; CSS `scale(shellW/300)` fits the poster. Export captures the unscaled canvas → ~1080×1920 |
-| On-screen size | Shell width = min(slot, leftover×9/16, `maxWidthPx`); Share column matches shell max |
+| On-screen size | Height-first shell = min(leftover height, slot×16/9, `maxWidthPx`×16/9); size container is shell-only (credit outside); Share column matches shell max |
 | Hero | Band 46% · cover 54% |
 | Year | None (no stacked digits on the card) |
 | Moon | Lilac-rim sphere · **TR** hero inset (−44, −52) · 164px · op 1 |
