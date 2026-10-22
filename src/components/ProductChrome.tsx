@@ -9,7 +9,10 @@ import { cn } from "@/lib/utils";
  */
 function isFullBleedScrapped(pathname: string): boolean {
   return (
-    pathname === "/" || pathname === "/about" || pathname === "/example"
+    pathname === "/" ||
+    pathname === "/about" ||
+    pathname === "/example" ||
+    pathname === "/ready"
   );
 }
 

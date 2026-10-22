@@ -47,91 +47,97 @@ export const SLIDE_SWATCH: CardSwatch[] = [
   "ink", // 6 left-on-read list; chat frame (D-016)
   "mango", // 7 plot twist / reunion; film letterbox (D-016)
   "teal", // 8 soft close; mono teal iris (D-016)
-  "ink", // 9 share; ink stage + teal nest / orchid wash (D-012 / D-021)
+  "ink", // 9 share; ink stage + plain teal card (D-012 / D-033)
 ];
 
 /**
- * Share finale inset density: locked from exploration (D-012).
- * Visual kit: D-021 (teal nest · orchid corners · lilac-rim moon).
+ * Share finale inset density: B2 explore lock (D-012 IA · D-033 art).
  * Card is always 9:16 (Wrapped share ritual): on screen and in the export PNG.
  */
 export const SHARE_FINALE_DENSITY = {
   gutterPx: 36,
-  radiusPx: 4,
+  /** Sharp corners: Wrapped-form share island, no radius. */
+  radiusPx: 0,
   cardActionsGapPx: 32,
   bodyTopPx: 28,
   bodyBottomPx: 16,
   /** Portrait share island: Stories / Reels friendly (Wrapped 25-share-finale). */
   aspectRatio: "9 / 16",
+  /**
+   * On-screen max width for the 9:16 island (and Share column).
+   * Caps desktop growth so rem/px density stays phone-tuned; export still
+   * scales the capture up to `exportWidthPx`.
+   */
+  maxWidthPx: 320,
   /** Target PNG width; height follows on-screen 9:16 via capture scale. */
   exportWidthPx: 1080,
   exportHeightPx: 1920,
-  /** Hero band + art sized so the square never overflows into MyScrapped.com. */
-  heroBandPct: 46,
-  heroSizePct: 48,
-  listColGapPx: 18,
-  listRowGapRem: 0.85,
-  listPadXPx: 19,
-  listPadYPx: 16,
-  typeRem: 0.62,
+  heroBandPct: 49,
+  heroSizePct: 59,
+  listColGapPx: 14,
+  listRowGapRem: 0.42,
+  listPadXPx: 14,
+  listPadYPx: 12,
+  typeRem: 0.78,
+  /** Metric number / label on the share card body. */
+  metricNumberRem: 1.3,
+  metricLabelRem: 0.72,
   actionsGapPx: 12,
 } as const;
 
 /**
- * Share finale visual kit: D-021 · C6 teal + B1 orchid corners + M4 lilac-rim moon.
- * Stage: ink + intro disks/star. Card: teal nest + orchid corner wash +
- * white→lilac moon + framing ghosts. Disks/star reuse INTRO_* tokens.
+ * Share finale visual kit: D-033 · B2 plain teal · TR moon ·
+ * three hero ghosts (mixed z) · liked metrics · myscrapped.com BR.
+ * Stage: ink + intro disks/star. No orchid wash; gradients only on moon.
+ * No year digits on the card.
  */
 export const SHARE_FINALE_KIT = {
-  id: "c-teal-m-lilac-rim",
+  id: "b2-share-finale",
   /** Stage field swatch: drives slide chrome (dark theme). */
   stageSwatch: "ink" as const,
-  cardBg: TEAL_NEST_GRADIENT,
-  /** Light type on teal card. */
+  /** Plain teal field (gradients reserved for moon). */
+  cardBg: CARD_PALETTE.teal.bg,
   cardInk: "#f5f5f5",
   cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
   cardPanel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
-  /**
-   * B1 orchid corners wash over the teal nest (D-019 recipe · D-021).
-   * Stays inside the card island: no edge bleed (D-013).
-   */
-  orchidWash: {
-    opacity: 0.75,
-    /** spread = 1 → default radial sizes */
-    background: [
-      "radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, #6B21A8 55%, transparent) 0%, transparent 58%)",
-      "radial-gradient(100% 70% at 100% 100%, color-mix(in oklab, #3B0764 45%, transparent) 0%, transparent 55%)",
-    ].join(", "),
-  },
   ghostFill: "#f5f0ff",
   ghostEye: "#2a2433",
-  brandLine: "MyScrapped.com",
+  brandLine: "myscrapped.com",
+  brand: {
+    position: "br" as const,
+    sizeRem: 0.72,
+    letterSpacingEm: -0.015,
+  },
   /**
-   * BL moon sphere: center on the card’s bottom-left corner (quarter peeks in).
-   * sizePx = diameter. White → lilac → orchid rim (M4). Sphere only.
+   * TR moon in the hero band: inset from top-right (negative = outside edge).
+   * White → lilac → orchid rim. Sphere only.
    */
   moon: {
-    /** Center pinned to this card corner. */
-    anchor: "bl" as const,
-    sizePx: 260,
-    /** Radial stops: highlight → mid → rim (always a gradient). */
+    anchor: "tr" as const,
+    sizePx: 164,
+    insetXPx: -44,
+    insetYPx: -52,
     stops: [
       { offset: "0%", color: "#FFFFFF" },
       { offset: "28%", color: "#F4EBFF" },
       { offset: "62%", color: "#C9A0F5" },
       { offset: "100%", color: "#6B21A8" },
     ],
-    opacity: 0.88,
+    opacity: 1,
   },
-  ghosts: {
-    tl: { xPct: 6, yPct: 6, sizePx: 46 },
-    br: { xPct: 76, yPct: 36, sizePx: 56 },
+  /**
+   * Hero-band ghosts. `z: below` under cover; `z: above` over cover.
+   * Positions are % of the hero band.
+   */
+  ghosts: [
+    { xPct: 14, yPct: 4, sizePx: 46, rotDeg: -14, opacity: 1, z: "below" as const },
+    { xPct: 73, yPct: 24, sizePx: 38, rotDeg: 8, opacity: 1, z: "above" as const },
+    { xPct: 59, yPct: 74, sizePx: 48, rotDeg: -3, opacity: 1, z: "above" as const },
+  ],
+  ghostMotion: {
     bobPx: 10,
-    /** Multiplier on rotate amp (1 = default). */
     wiggle: 1,
     durationSec: 4.3,
-    opacity: 0.85,
-    /** Delay between TL and BR float cycles. */
     phaseSec: 1.2,
   },
 } as const;

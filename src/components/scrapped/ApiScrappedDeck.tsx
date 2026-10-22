@@ -25,6 +25,7 @@ import {
 } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
+import { SHARE_FINALE_FOOTER_DEFAULT } from "@/components/scrapped/ShareFinaleLayoutTune";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
@@ -757,8 +758,10 @@ export function ApiScrappedDeck({
         "--share-list-row-gap": `${D.listRowGapRem}rem`,
         "--share-list-pad-x": `${D.listPadXPx}px`,
         "--share-list-pad-y": `${D.listPadYPx}px`,
-        "--share-list-label-gap": "1.25rem",
+        "--share-list-label-gap": "0.55rem",
         "--share-type-size": `${D.typeRem}rem`,
+        "--share-metric-number": `${D.metricNumberRem}rem`,
+        "--share-metric-label": `${D.metricLabelRem}rem`,
         "--share-card-radius": `${D.radiusPx}px`,
         paddingTop: `calc(3.5rem + ${D.bodyTopPx}px)`,
         paddingBottom: `${D.bodyBottomPx}px`,
@@ -1230,12 +1233,17 @@ export function ApiScrappedDeck({
             {orbitChrome(9)}
           </div>
           <div
-            className="relative z-10 mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"
-            style={{ gap: `${D.cardActionsGapPx}px` }}
+            className="relative z-10 mx-auto flex min-h-0 w-full flex-1 flex-col"
+            style={{
+              gap: `${D.cardActionsGapPx}px`,
+              // Match Share / Replay column to the capped 9:16 island (D-012).
+              maxWidth: `${D.maxWidthPx}px`,
+            }}
           >
             {/*
-              9:16 island (D-012): width = min(slot width, slot height × 9/16)
-              so the capture node stays true portrait (Stories / Wrapped form).
+              9:16 island (D-012): width = min(slot, leftover×9/16, maxWidthPx)
+              so the capture node stays true portrait at phone density.
+              Export scales the capture up to exportWidthPx (~1080).
             */}
             <div className="flex min-h-0 w-full flex-1 items-center justify-center [container-type:size]">
               <div
@@ -1243,9 +1251,9 @@ export function ApiScrappedDeck({
                 className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
                 style={{
                   aspectRatio: D.aspectRatio,
-                  width: "min(100cqi, calc(100cqb * 9 / 16))",
+                  width: `min(100cqi, calc(100cqb * 9 / 16), ${D.maxWidthPx}px)`,
                   height: "auto",
-                  borderRadius: "var(--share-card-radius, 4px)",
+                  borderRadius: "var(--share-card-radius, 0px)",
                 }}
               >
                 <ShareRecapCard
@@ -1254,6 +1262,9 @@ export function ApiScrappedDeck({
                   active={active === FINALE_INDEX}
                   leftLabel="Left on read"
                   rightLabel="Ghosted songs"
+                  likedCount={likedCount}
+                  likedThisYearCount={likedThisYearCount}
+                  footerLayout={SHARE_FINALE_FOOTER_DEFAULT}
                   heroImageUrl={topArtist?.imageUrl ?? topSong?.imageUrl ?? null}
                   heroAlt={topArtist?.label ?? topSong?.label ?? ""}
                   skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(

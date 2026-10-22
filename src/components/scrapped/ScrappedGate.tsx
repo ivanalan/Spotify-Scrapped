@@ -10,6 +10,7 @@ import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait
 import {
   gatePrimaryTone,
   gateSecondaryChromeClass,
+  gateTertiaryChromeClass,
 } from "@/components/scrapped/gateChrome";
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
@@ -28,6 +29,11 @@ type Props = {
    * Computed server-side from `?spotify_error=`.
    */
   seatsFull?: boolean;
+  /**
+   * Invite landing (`/ready`): off-waitlist copy + primary Sign in (D-032).
+   * No waitlist form; soft 24h window note.
+   */
+  offWaitlist?: boolean;
   mode: "auth" | "fetch" | "error" | "ready" | "loading";
   displayName?: string | null;
   retryAfterSeconds?: number;
@@ -59,6 +65,7 @@ export function ScrappedGate({
   message,
   authError,
   seatsFull = false,
+  offWaitlist = false,
   mode,
   displayName,
   retryAfterSeconds,
@@ -71,7 +78,8 @@ export function ScrappedGate({
 }: Props) {
   const connected = mode !== "auth";
   const name = displayName?.trim() || null;
-  const showSeatsFull = mode === "auth" && seatsFull;
+  const showSeatsFull = mode === "auth" && seatsFull && !offWaitlist;
+  const showOffWaitlist = mode === "auth" && offWaitlist;
 
   return (
     <div
@@ -113,7 +121,30 @@ export function ScrappedGate({
             Scrapped
           </h1>
 
-          {showSeatsFull ? (
+          {showOffWaitlist ? (
+            <div className="mt-6 w-full">
+              <p className="text-body w-full text-[var(--wrapped-muted)]">
+                You&rsquo;re off the waitlist. Sign in with Spotify to load
+                your Scrapped. Access is open for about 24 hours.
+
+              </p>
+              <a
+                href="/api/spotify/login"
+                className={cn(gateCtaClass, "mt-8 inline-flex justify-center")}
+                aria-label="Sign in to Spotify"
+              >
+                Sign in
+              </a>
+              <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
+                <Link
+                  href="/about#why-waitlist"
+                  className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+                >
+                  Why a waitlist?
+                </Link>
+              </p>
+            </div>
+          ) : showSeatsFull ? (
             <div className="mt-6 w-full">
               <p className="text-body w-full text-[var(--wrapped-muted)]">
                 Seats are full for now. We can only register a small set of

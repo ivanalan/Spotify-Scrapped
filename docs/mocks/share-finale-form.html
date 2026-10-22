@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Share finale B2 · type · metrics · brand</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --stage: #0a0a0a;
+        --muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --accent: #c9a0f5;
+
+        /* Locked kit (user recipe) */
+        --card-bg: #1a7a6e;
+        --card-ink: #f5f5f5;
+        --card-muted: color-mix(in oklab, #f5f5f5 90%, transparent);
+
+        --type-rem: 0.78;
+        --row-gap-rem: 0.28;
+        --num-gap-rem: 0.28;
+        --label-gap-rem: 0.55;
+        --hero-pct: 49;
+        --hero-art-pct: 59;
+        --metric-rem: 1.35;
+        --brand-rem: 0.72;
+        --pad-x: 14;
+        --pad-y: 12;
+        --col-gap: 14;
+
+        --moon-size: 164;
+        --moon-op: 1;
+        --moon-x: -44;
+        --moon-y: -52;
+
+        /* Live year type knobs */
+        --year-size: 2.4;
+        --year-op: 1;
+        --year-x: 6;
+        --year-y: 50;
+        --year-tracking: -0.04;
+        --year-leading: 0.9;
+        --year-weight: 800;
+        --year-font: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+        /* Live metric type */
+        --metric-val-rem: 1.35;
+        --metric-lab-rem: 0.72;
+        --liked-total: 1001;
+        --liked-year: 62;
+
+        /* Brand URL */
+        --brand-size: 0.72;
+        --brand-tracking: -0.015;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 1.75rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        max-width: 48rem;
+        margin: 0 0 1.15rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        align-items: start;
+      }
+
+      @media (max-width: 640px) {
+        .compare {
+          grid-template-columns: 1fr;
+          max-width: 300px;
+        }
+      }
+
+      .col-label {
+        font-size: 0.76rem;
+        font-weight: 600;
+        margin: 0 0 0.45rem;
+      }
+
+      .col-label span {
+        display: block;
+        font-weight: 400;
+        color: var(--muted);
+        font-size: 0.68rem;
+        margin-top: 0.15rem;
+        line-height: 1.35;
+      }
+
+      .stage-frame {
+        background: #0a0a0a;
+        padding: 1rem 0.75rem 1.15rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.7rem;
+      }
+
+      .stage-frame.sticky {
+        position: sticky;
+        top: 1rem;
+      }
+
+      .ref-card {
+        width: min(100%, 280px);
+        aspect-ratio: 9 / 16;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      }
+
+      .ref-switch {
+        display: flex;
+        gap: 0.35rem;
+        width: min(100%, 280px);
+      }
+
+      .ref-switch button {
+        flex: 1;
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--muted);
+        font: 600 0.68rem Poppins, sans-serif;
+        padding: 0.35rem 0.4rem;
+        cursor: pointer;
+      }
+
+      .ref-switch button[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--paper);
+      }
+
+      .card {
+        position: relative;
+        width: min(100%, 280px);
+        aspect-ratio: 9 / 16;
+        overflow: hidden;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        color: var(--card-ink);
+        background: var(--card-bg);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      }
+
+      .hero {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 calc(var(--hero-pct) * 1%);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      .hero-frame {
+        position: relative;
+        z-index: 2;
+        width: calc(var(--hero-art-pct) * 1%);
+        aspect-ratio: 1;
+        max-height: 88%;
+        overflow: hidden;
+        background: color-mix(in oklab, var(--card-ink) 12%, transparent);
+      }
+
+      .hero-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .layer-back {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .layer-front {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      .moon {
+        position: absolute;
+        right: calc(var(--moon-x) * 1px);
+        top: calc(var(--moon-y) * 1px);
+        width: calc(var(--moon-size) * 1px);
+        height: calc(var(--moon-size) * 1px);
+        border-radius: 50%;
+        opacity: var(--moon-op);
+        background: radial-gradient(
+          circle at 34% 30%,
+          #ffffff 0%,
+          #f4ebff 28%,
+          #c9a0f5 62%,
+          #6b21a8 100%
+        );
+      }
+
+      .year {
+        position: absolute;
+        left: calc(var(--year-x) * 1%);
+        top: calc(var(--year-y) * 1%);
+        transform: translateY(-50%);
+        font-family: var(--year-font);
+        font-size: calc(var(--year-size) * 1rem);
+        font-weight: var(--year-weight);
+        font-style: var(--year-style, normal);
+        letter-spacing: calc(var(--year-tracking) * 1em);
+        line-height: var(--year-leading);
+        color: var(--card-ink);
+        opacity: var(--year-op);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .year.inline {
+        flex-direction: row;
+        transform: translateY(-50%);
+      }
+
+      .year.spine {
+        flex-direction: row;
+        transform: translateY(-50%) rotate(-90deg);
+        transform-origin: left center;
+        white-space: nowrap;
+      }
+
+      .ghost {
+        position: absolute;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
+        transform-origin: 50% 50%;
+      }
+
+      .ghost svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .body {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0 calc(var(--pad-x) * 1px) calc(var(--pad-y) * 1px);
+      }
+
+      .lists {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--col-gap) * 1px);
+        flex: 1;
+        min-height: 0;
+        align-content: start;
+        padding-top: 2px;
+      }
+
+      .col h4 {
+        margin: 0 0 calc(var(--label-gap-rem) * 1rem);
+        font-size: calc(var(--type-rem) * 1rem);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .col ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--row-gap-rem) * 1rem);
+      }
+
+      .col li {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        column-gap: calc(var(--num-gap-rem) * 1rem);
+        align-items: baseline;
+        font-size: calc(var(--type-rem) * 1rem);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        min-width: 0;
+      }
+
+      .col li .n {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .col li .t {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--col-gap) * 1px);
+        padding-top: 0.5rem;
+        margin-top: auto;
+      }
+
+      .metric .val {
+        font-size: calc(var(--metric-val-rem) * 1rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .metric .lab {
+        margin-top: 0.12rem;
+        font-size: calc(var(--metric-lab-rem) * 1rem);
+        font-weight: 500;
+        line-height: 1.2;
+        color: var(--card-muted);
+      }
+
+      .foot {
+        display: flex;
+        align-items: flex-end;
+        padding-top: 0.5rem;
+        min-height: 1.4rem;
+      }
+
+      .foot .url {
+        font-size: calc(var(--brand-size) * 1rem);
+        font-weight: 700;
+        letter-spacing: calc(var(--brand-tracking) * 1em);
+        line-height: 1.15;
+      }
+
+      .foot.pos-br {
+        justify-content: flex-end;
+      }
+
+      .foot.pos-bl {
+        justify-content: flex-start;
+      }
+
+      .foot.pos-bc {
+        justify-content: center;
+      }
+
+      .foot.pos-spread {
+        justify-content: space-between;
+      }
+
+      .foot.pos-spread .url {
+        margin-left: auto;
+      }
+
+      .cta {
+        width: min(100%, 280px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .cta .share {
+        height: 40px;
+        border: 0;
+        border-radius: 999px;
+        background: #f5f5f5;
+        color: #1c1c1c;
+        font: 700 0.85rem Poppins, sans-serif;
+      }
+
+      .cta .replay {
+        height: 36px;
+        border: 0;
+        background: transparent;
+        color: color-mix(in oklab, #f5f5f5 88%, transparent);
+        font: 600 0.75rem Poppins, sans-serif;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .panel {
+        background: color-mix(in oklab, #1c1c1c 55%, #2a2433);
+        border: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        padding: 0.85rem 0.95rem 0.95rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.55rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      .panel h3 .hint {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 0.68rem;
+        opacity: 0.85;
+      }
+
+      .locked {
+        font-size: 0.7rem;
+        color: var(--muted);
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      .locked code {
+        color: var(--accent);
+        font-size: 0.85em;
+      }
+
+      .seg {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .seg button {
+        appearance: none;
+        border: 2px solid transparent;
+        cursor: pointer;
+        font: 600 0.68rem Poppins, sans-serif;
+        color: var(--muted);
+        background: #1a1624;
+        padding: 0.3rem 0.5rem;
+      }
+
+      .seg button[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--paper);
+      }
+
+      .knobs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem 0.75rem;
+      }
+
+      .knob {
+        min-width: 0;
+      }
+
+      .knob.span2 {
+        grid-column: 1 / -1;
+      }
+
+      .knob label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.66rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 0.1rem;
+      }
+
+      .knob label output {
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .knob input[type="range"] {
+        width: 100%;
+        accent-color: #c9a0f5;
+      }
+
+      .recipe {
+        margin: 0;
+        font-size: 0.7rem;
+        color: var(--muted);
+        line-height: 1.5;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .note {
+        margin-top: 1.25rem;
+        font-size: 0.76rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .note code {
+        color: var(--accent);
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>B2 locked · <em>type</em> · metrics · brand</h1>
+      <p class="lede">
+        Kit frozen from your recipe (field, cover, moon, ghosts). Controls are
+        now year type, liked metrics, and
+        <code>myscrapped.com</code> placement. Italic Scrapped mark removed from
+        the footer.
+      </p>
+
+      <div class="layout">
+        <div class="compare">
+          <div>
+            <p class="col-label">
+              Wrapped reference
+              <span>Official share finale · switch 2023 / 2024</span>
+            </p>
+            <div class="stage-frame">
+              <div class="ref-switch" role="group" aria-label="Wrapped year">
+                <button type="button" id="ref-2023" aria-pressed="true">2023</button>
+                <button type="button" id="ref-2024" aria-pressed="false">2024</button>
+              </div>
+              <img
+                id="ref-img"
+                class="ref-card"
+                src="wrapped-ref/named/25-share-finale.png"
+                alt="Spotify Wrapped share finale reference"
+              />
+              <div class="cta" aria-hidden="true">
+                <button class="share" type="button">Share</button>
+                <button class="replay" type="button">Replay from beginning</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p class="col-label">
+              Scrapped B2 (locked art)
+              <span>Teal · stack year · moon TR · mixed ghost z</span>
+            </p>
+            <div class="stage-frame sticky">
+              <article class="card" id="card" aria-label="B2 share card">
+                <header class="hero">
+                  <div class="layer-back" id="layer-back">
+                    <div class="year" id="year" aria-label="2026">
+                      <span>2</span><span>0</span><span>2</span><span>6</span>
+                    </div>
+                    <div class="moon"></div>
+                  </div>
+                  <div class="hero-frame">
+                    <img
+                      src="assets/hero-cover.png"
+                      alt="Album cover"
+                      width="300"
+                      height="300"
+                    />
+                  </div>
+                  <div class="layer-front" id="layer-front"></div>
+                </header>
+                <div class="body">
+                  <div class="lists">
+                    <div class="col">
+                      <h4>Left on read</h4>
+                      <ol>
+                        <li><span class="n">1</span><span class="t">Kendrick Lamar</span></li>
+                        <li><span class="n">2</span><span class="t">Mamalarky</span></li>
+                        <li><span class="n">3</span><span class="t">LE SSERAFIM</span></li>
+                        <li><span class="n">4</span><span class="t">keshi</span></li>
+                        <li><span class="n">5</span><span class="t">Kevin Abstract</span></li>
+                      </ol>
+                    </div>
+                    <div class="col">
+                      <h4>Ghosted songs</h4>
+                      <ol>
+                        <li><span class="n">1</span><span class="t">Dapper</span></li>
+                        <li><span class="n">2</span><span class="t">Calling After Me</span></li>
+                        <li><span class="n">3</span><span class="t">My Baby</span></li>
+                        <li><span class="n">4</span><span class="t">Cariño</span></li>
+                        <li><span class="n">5</span><span class="t">I'd Like To Walk</span></li>
+                      </ol>
+                    </div>
+                  </div>
+                  <div class="metrics">
+                    <div class="metric">
+                      <div class="val" id="liked-total">1,001</div>
+                      <div class="lab">Liked songs</div>
+                    </div>
+                    <div class="metric">
+                      <div class="val" id="liked-year">62</div>
+                      <div class="lab">Liked this year</div>
+                    </div>
+                  </div>
+                  <footer class="foot pos-br" id="foot">
+                    <span class="url">myscrapped.com</span>
+                  </footer>
+                </div>
+              </article>
+              <div class="cta" aria-hidden="true">
+                <button class="share" type="button">Share</button>
+                <button class="replay" type="button">Replay from beginning</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="panel">
+            <h3>Locked kit <span class="hint">frozen</span></h3>
+            <p class="locked">
+              Field <code>#1A7A6E</code> · cover 59% / hero 49% · moon TR 164px
+              (−44, −52) · ghosts 1 below + 2/3 above. Art knobs discarded.
+            </p>
+          </div>
+
+          <div class="panel">
+            <h3>Year type · 2026</h3>
+            <div class="seg" id="year-layout" role="group" aria-label="Year layout">
+              <button type="button" data-layout="stack" aria-pressed="true">Stacked</button>
+              <button type="button" data-layout="inline" aria-pressed="false">Inline</button>
+              <button type="button" data-layout="spine" aria-pressed="false">Spine</button>
+            </div>
+            <div class="seg" id="year-font" role="group" aria-label="Year font" style="margin-top: 0.45rem">
+              <button type="button" data-font="poppins" aria-pressed="true">Poppins</button>
+              <button type="button" data-font="space" aria-pressed="false">Space Grotesk</button>
+              <button type="button" data-font="mono" aria-pressed="false">IBM Plex Mono</button>
+            </div>
+            <div class="seg" id="year-style" role="group" aria-label="Year style" style="margin-top: 0.45rem">
+              <button type="button" data-style="normal" aria-pressed="true">Roman</button>
+              <button type="button" data-style="italic" aria-pressed="false">Italic</button>
+            </div>
+            <div class="knobs" style="margin-top: 0.55rem">
+              <div class="knob">
+                <label>Size <output id="o-year-size">2.40</output></label>
+                <input type="range" id="year-size" min="1" max="3.2" step="0.05" value="2.4" />
+              </div>
+              <div class="knob">
+                <label>Weight <output id="o-year-weight">800</output></label>
+                <input type="range" id="year-weight" min="500" max="800" step="100" value="800" />
+              </div>
+              <div class="knob">
+                <label>X <output id="o-year-x">6%</output></label>
+                <input type="range" id="year-x" min="0" max="40" step="1" value="6" />
+              </div>
+              <div class="knob">
+                <label>Y <output id="o-year-y">50%</output></label>
+                <input type="range" id="year-y" min="10" max="90" step="1" value="50" />
+              </div>
+              <div class="knob">
+                <label>Letter spacing <output id="o-year-track">-0.04em</output></label>
+                <input type="range" id="year-track" min="-0.12" max="0.2" step="0.01" value="-0.04" />
+              </div>
+              <div class="knob">
+                <label>Line height <output id="o-year-lead">0.90</output></label>
+                <input type="range" id="year-lead" min="0.7" max="1.3" step="0.02" value="0.9" />
+              </div>
+              <div class="knob span2">
+                <label>Opacity <output id="o-year-op">1.00</output></label>
+                <input type="range" id="year-op" min="0.2" max="1" step="0.02" value="1" />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Liked metrics</h3>
+            <div class="knobs">
+              <div class="knob span2">
+                <label>Liked songs <output id="o-liked-total">1,001</output></label>
+                <input type="range" id="liked-total-sl" min="0" max="5000" step="1" value="1001" />
+              </div>
+              <div class="knob span2">
+                <label>Liked this year <output id="o-liked-year">62</output></label>
+                <input type="range" id="liked-year-sl" min="0" max="500" step="1" value="62" />
+              </div>
+              <div class="knob">
+                <label>Number size <output id="o-metric-val">1.35rem</output></label>
+                <input type="range" id="metric-val" min="0.9" max="2" step="0.05" value="1.35" />
+              </div>
+              <div class="knob">
+                <label>Label size <output id="o-metric-lab">0.72rem</output></label>
+                <input type="range" id="metric-lab" min="0.5" max="1" step="0.02" value="0.72" />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>myscrapped.com</h3>
+            <div class="seg" id="brand-pos" role="group" aria-label="Brand position">
+              <button type="button" data-pos="br" aria-pressed="true">Bottom right</button>
+              <button type="button" data-pos="bl" aria-pressed="false">Bottom left</button>
+              <button type="button" data-pos="bc" aria-pressed="false">Bottom center</button>
+            </div>
+            <div class="knobs" style="margin-top: 0.55rem">
+              <div class="knob">
+                <label>Size <output id="o-brand-size">0.72rem</output></label>
+                <input type="range" id="brand-size" min="0.5" max="1.2" step="0.02" value="0.72" />
+              </div>
+              <div class="knob">
+                <label>Letter spacing <output id="o-brand-track">-0.015em</output></label>
+                <input type="range" id="brand-track" min="-0.06" max="0.16" step="0.005" value="-0.015" />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Recipe <span class="hint">live</span></h3>
+            <pre class="recipe" id="recipe"></pre>
+          </div>
+        </div>
+      </div>
+
+      <p class="note">
+        Locked art from your prior recipe. Open
+        <code>docs/mocks/share-finale-form.html</code>.
+      </p>
+    </div>
+
+    <script>
+      const GHOST_SVG = `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M12 48 Q17 54 22 48 Q27 54 32 48 Q37 54 42 48 Q47 54 52 48 C56 32 50 10 32 8 C14 6 8 30 12 48 Z"
+            fill="#f5f0ff" stroke="#1c1c1c" stroke-width="1.6" stroke-linejoin="round"/>
+          <ellipse cx="17" cy="34" rx="4" ry="2.2" fill="#e8a0b8" opacity="0.7"/>
+          <ellipse cx="47" cy="34" rx="4" ry="2.2" fill="#e8a0b8" opacity="0.7"/>
+          <circle cx="24" cy="26" r="3.2" fill="#2a2433"/>
+          <circle cx="40" cy="26" r="3.2" fill="#2a2433"/>
+        </svg>`;
+
+      /** Frozen from user recipe */
+      const LOCKED_GHOSTS = [
+        { x: 14, y: 4, size: 46, rot: -14, op: 1, z: "below" },
+        { x: 73, y: 24, size: 38, rot: 8, op: 1, z: "above" },
+        { x: 59, y: 74, size: 48, rot: -3, op: 1, z: "above" },
+      ];
+
+      const FONTS = {
+        poppins: '"Poppins", ui-sans-serif, system-ui, sans-serif',
+        space: '"Space Grotesk", ui-sans-serif, system-ui, sans-serif',
+        mono: '"IBM Plex Mono", ui-monospace, monospace',
+      };
+
+      const root = document.documentElement;
+      const yearEl = document.getElementById("year");
+      const footEl = document.getElementById("foot");
+      const recipeEl = document.getElementById("recipe");
+      const layerBack = document.getElementById("layer-back");
+      const layerFront = document.getElementById("layer-front");
+
+      let state = {
+        yearLayout: "stack",
+        yearFont: "poppins",
+        yearStyle: "normal",
+        yearSize: 2.4,
+        yearWeight: 800,
+        yearX: 6,
+        yearY: 50,
+        yearTrack: -0.04,
+        yearLead: 0.9,
+        yearOp: 1,
+        likedTotal: 1001,
+        likedYear: 62,
+        metricVal: 1.35,
+        metricLab: 0.72,
+        brandPos: "br",
+        brandSize: 0.72,
+        brandTrack: -0.015,
+      };
+
+      function fmtNum(n) {
+        return Number(n).toLocaleString("en-US");
+      }
+
+      function placeGhosts() {
+        for (const n of [...layerBack.querySelectorAll(".ghost")]) n.remove();
+        layerFront.innerHTML = "";
+        LOCKED_GHOSTS.forEach((g) => {
+          const el = document.createElement("div");
+          el.className = "ghost";
+          el.style.left = g.x + "%";
+          el.style.top = g.y + "%";
+          el.style.width = g.size + "px";
+          el.style.height = g.size + "px";
+          el.style.opacity = String(g.op);
+          el.style.transform = `rotate(${g.rot}deg)`;
+          el.innerHTML = GHOST_SVG;
+          (g.z === "below" ? layerBack : layerFront).appendChild(el);
+        });
+      }
+
+      function applyYear() {
+        yearEl.className = "year " + state.yearLayout;
+        if (state.yearLayout === "stack") {
+          yearEl.innerHTML = "<span>2</span><span>0</span><span>2</span><span>6</span>";
+        } else {
+          yearEl.textContent = "2026";
+        }
+        root.style.setProperty("--year-font", FONTS[state.yearFont]);
+        root.style.setProperty("--year-style", state.yearStyle);
+        root.style.setProperty("--year-size", String(state.yearSize));
+        root.style.setProperty("--year-weight", String(state.yearWeight));
+        root.style.setProperty("--year-x", String(state.yearX));
+        root.style.setProperty("--year-y", String(state.yearY));
+        root.style.setProperty("--year-tracking", String(state.yearTrack));
+        root.style.setProperty("--year-leading", String(state.yearLead));
+        root.style.setProperty("--year-op", String(state.yearOp));
+
+        document.getElementById("o-year-size").textContent = state.yearSize.toFixed(2);
+        document.getElementById("o-year-weight").textContent = String(state.yearWeight);
+        document.getElementById("o-year-x").textContent = state.yearX + "%";
+        document.getElementById("o-year-y").textContent = state.yearY + "%";
+        document.getElementById("o-year-track").textContent =
+          state.yearTrack.toFixed(2) + "em";
+        document.getElementById("o-year-lead").textContent = state.yearLead.toFixed(2);
+        document.getElementById("o-year-op").textContent = state.yearOp.toFixed(2);
+
+        setSeg("year-layout", "layout", state.yearLayout);
+        setSeg("year-font", "font", state.yearFont);
+        setSeg("year-style", "style", state.yearStyle);
+      }
+
+      function applyMetrics() {
+        document.getElementById("liked-total").textContent = fmtNum(state.likedTotal);
+        document.getElementById("liked-year").textContent = fmtNum(state.likedYear);
+        root.style.setProperty("--metric-val-rem", String(state.metricVal));
+        root.style.setProperty("--metric-lab-rem", String(state.metricLab));
+        document.getElementById("o-liked-total").textContent = fmtNum(state.likedTotal);
+        document.getElementById("o-liked-year").textContent = fmtNum(state.likedYear);
+        document.getElementById("o-metric-val").textContent =
+          state.metricVal.toFixed(2) + "rem";
+        document.getElementById("o-metric-lab").textContent =
+          state.metricLab.toFixed(2) + "rem";
+      }
+
+      function applyBrand() {
+        footEl.className = "foot pos-" + state.brandPos;
+        root.style.setProperty("--brand-size", String(state.brandSize));
+        root.style.setProperty("--brand-tracking", String(state.brandTrack));
+        document.getElementById("o-brand-size").textContent =
+          state.brandSize.toFixed(2) + "rem";
+        document.getElementById("o-brand-track").textContent =
+          state.brandTrack.toFixed(3) + "em";
+        setSeg("brand-pos", "pos", state.brandPos);
+      }
+
+      function setSeg(id, key, value) {
+        for (const b of document.querySelectorAll("#" + id + " button")) {
+          b.setAttribute(
+            "aria-pressed",
+            b.dataset[key] === value ? "true" : "false",
+          );
+        }
+      }
+
+      function writeRecipe() {
+        recipeEl.textContent = JSON.stringify(
+          {
+            kit: "b2-share-finale",
+            locked: {
+              field: "#1A7A6E",
+              cover: { artPct: 59, heroPct: 49 },
+              moon: { anchor: "tr", size: 164, op: 1, x: -44, y: -52 },
+              ghosts: LOCKED_GHOSTS,
+            },
+            year: {
+              layout: state.yearLayout,
+              font: state.yearFont,
+              style: state.yearStyle,
+              sizeScale: state.yearSize,
+              weight: state.yearWeight,
+              xPct: state.yearX,
+              yPct: state.yearY,
+              letterSpacingEm: state.yearTrack,
+              lineHeight: state.yearLead,
+              opacity: state.yearOp,
+            },
+            metrics: {
+              likedSongs: state.likedTotal,
+              likedThisYear: state.likedYear,
+              numberRem: state.metricVal,
+              labelRem: state.metricLab,
+            },
+            brand: {
+              text: "myscrapped.com",
+              position: state.brandPos,
+              sizeRem: state.brandSize,
+              letterSpacingEm: state.brandTrack,
+              scrappedMark: false,
+            },
+          },
+          null,
+          2,
+        );
+      }
+
+      function bindSeg(id, key, prop) {
+        for (const b of document.querySelectorAll("#" + id + " button")) {
+          b.addEventListener("click", () => {
+            state[prop] = b.dataset[key];
+            applyYear();
+            applyBrand();
+            writeRecipe();
+          });
+        }
+      }
+
+      bindSeg("year-layout", "layout", "yearLayout");
+      bindSeg("year-font", "font", "yearFont");
+      bindSeg("year-style", "style", "yearStyle");
+      bindSeg("brand-pos", "pos", "brandPos");
+
+      const ranges = [
+        ["year-size", "yearSize", applyYear],
+        ["year-weight", "yearWeight", applyYear],
+        ["year-x", "yearX", applyYear],
+        ["year-y", "yearY", applyYear],
+        ["year-track", "yearTrack", applyYear],
+        ["year-lead", "yearLead", applyYear],
+        ["year-op", "yearOp", applyYear],
+        ["liked-total-sl", "likedTotal", applyMetrics],
+        ["liked-year-sl", "likedYear", applyMetrics],
+        ["metric-val", "metricVal", applyMetrics],
+        ["metric-lab", "metricLab", applyMetrics],
+        ["brand-size", "brandSize", applyBrand],
+        ["brand-track", "brandTrack", applyBrand],
+      ];
+
+      for (const [id, prop, apply] of ranges) {
+        document.getElementById(id).addEventListener("input", (e) => {
+          state[prop] = Number(e.target.value);
+          apply();
+          writeRecipe();
+        });
+      }
+
+      const refImg = document.getElementById("ref-img");
+      document.getElementById("ref-2023").onclick = () => {
+        refImg.src = "wrapped-ref/named/25-share-finale.png";
+        document.getElementById("ref-2023").setAttribute("aria-pressed", "true");
+        document.getElementById("ref-2024").setAttribute("aria-pressed", "false");
+      };
+      document.getElementById("ref-2024").onclick = () => {
+        refImg.src = "wrapped-ref-2024/named/25-share-finale.png";
+        document.getElementById("ref-2023").setAttribute("aria-pressed", "false");
+        document.getElementById("ref-2024").setAttribute("aria-pressed", "true");
+      };
+
+      placeGhosts();
+      applyYear();
+      applyMetrics();
+      applyBrand();
+      writeRecipe();
+    </script>
+  </body>
+</html>

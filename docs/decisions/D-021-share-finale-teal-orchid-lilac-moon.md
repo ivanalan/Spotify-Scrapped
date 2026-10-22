@@ -1,8 +1,8 @@
 # D-021: Share finale: teal nest · orchid corners · lilac-rim moon
 
-**Status:** Locked (production)  
+**Status:** Superseded by [D-033](D-033-share-finale-b2-plain-teal.md)  
 **Date:** 2026-10-20  
-**Surfaces:** `/scrapped` API deck scene 9: visual art only. IA + density remain [D-012](D-012-share-finale-inset.md). Composition rules remain [D-013](D-013-share-finale-deck-rhyme-explore.md). Spine: [D-020](D-020-share-finale-orchid-corners-white-moon.md).
+**Surfaces:** `/scrapped` API deck scene 9: visual art only (historical). IA + density remain [D-012](D-012-share-finale-inset.md). Composition rules remain [D-013](D-013-share-finale-deck-rhyme-explore.md). Spine: [D-020](D-020-share-finale-orchid-corners-white-moon.md).
 
 ## Decision
 
