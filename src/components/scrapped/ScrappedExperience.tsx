@@ -23,11 +23,9 @@ import type { ScrappedApiReport } from "@/lib/scrapped-api";
 type Props = {
   report: ScrappedApiReport;
   /**
-   * `walkthrough`: frozen fixture, no artist-top-track API, deck back chrome (D-024).
+   * `walkthrough`: frozen fixture, no artist-top-track API, origin back chrome (D-024, D-040).
    */
   chromeMode?: "session" | "walkthrough";
-  /** Walkthrough toolbar back target. */
-  backHref?: string;
 };
 
 type Phase = "gate" | "loading" | "story";
@@ -55,7 +53,6 @@ async function fetchArtistTrackUri(need: {
 export function ScrappedExperience({
   report,
   chromeMode = "session",
-  backHref = "/about",
 }: Props) {
   const isWalkthrough = chromeMode === "walkthrough";
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
@@ -221,7 +218,6 @@ export function ScrappedExperience({
             held={!started}
             pauseApiRef={pauseApiRef}
             chromeMode={chromeMode}
-            backHref={backHref}
           />
         </div>
       ) : null}

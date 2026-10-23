@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import {
+  gateCaptionLinkChromeClass,
   gateFieldTone,
   gatePrimaryTone,
-  gateTertiaryChromeClass,
 } from "@/components/scrapped/gateChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const HELPER_DEFAULT =
-  "Join the waitlist with your Spotify email. You'll only be emailed about a seat.";
+  "Join with your Spotify email. Seat emails only.";
 const HELPER_SUCCESS =
   "You’re signed up for the waitlist! You’ll get an email with a link when it’s ready.";
 const HELPER_EMPTY = "Enter an email to join the waitlist";
@@ -167,7 +167,7 @@ export function GateWaitlistForm({ className }: { className?: string }) {
       </div>
       <div className="mt-2.5 w-full">
         <p
-          className="text-caption w-full text-[var(--wrapped-muted)]"
+          className="w-full text-xs text-[var(--wrapped-muted)]"
           aria-live="polite"
         >
           {helper}
@@ -176,7 +176,10 @@ export function GateWaitlistForm({ className }: { className?: string }) {
               {" "}
               <Link
                 href="/about#privacy"
-                className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+                className={cn(
+                  gateCaptionLinkChromeClass,
+                  "inline text-xs no-underline hover:no-underline",
+                )}
               >
                 Privacy
               </Link>

@@ -226,3 +226,19 @@ Format:
 - **Proof:** Live 1-like list showed identical “1 like” titles over real artist sublines (Indigo, Mind Shrine, …); disk snapshot still had `1 like · Empty Chair · 622d…`.
 - **Avoid:** Skip a leading `1 like` detail stub; song is the next segment. Never persist a migrate that leaves `label === "1 like"`. If a cookie already lost the song into `Artist · Nd ago`, Reload Lab data.
 - **Related:** `ensureApiReportSummary` / `migrateOneSaveArtistItems` in `scrapped-api.ts`
+
+## Plot twist film perforations look missing on long / wide screens
+
+- **Not:** Letterbox height, sprocket inset, or the mango field cutting holes off.
+- **Cause:** `FilmLetterboxChrome` rendered a fixed 32 sprockets (~1.2k px at 12px + 25px gap). The row used `min-width: 200%` for scroll travel, so on wide viewports the flex track stretched empty past the last hole.
+- **Proof:** “Plot twist.” on ultrawide: dense punches on the left of each bar, then a long unpunched black band.
+- **Avoid:** Size perf count from strip width (cover ≥ 200% at the D-016 pitch). Do not ship a phone-tuned fixed hole count for full-bleed film bars.
+- **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), `FilmLetterboxChrome.tsx`
+
+## Back from example / About always goes to the wrong place
+
+- **Not:** Browser history broken, or missing `router.back` support in Next.
+- **Cause:** About Back was hardcoded to `/`; example walkthrough Back was hardcoded to `/about` (`backHref`). Ingress from the gate, `/ready`, or seats-full was ignored.
+- **Proof:** Home → View example → Back landed on About; `/ready` → Why a waitlist? → Back landed on home.
+- **Avoid:** Chrome labeled Back uses origin back ([D-040](docs/decisions/D-040-origin-back.md)); cold entry falls back to `/`. Do not wire fixed parent hrefs for Back.
+- **Related:** `OriginBackButton`, `src/lib/origin-back.ts`

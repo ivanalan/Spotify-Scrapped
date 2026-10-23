@@ -16,6 +16,7 @@ export const metadata: Metadata = {
  * Anonymous example walkthrough (D-024).
  * Serves a Guest-redacted ScrappedApiReport: no Spotify Web API per visitor.
  * `ensureApiReportSummary` migrates older one-save row shapes (label=artist).
+ * Toolbar Back is origin back (D-040).
  */
 export default function ExampleWalkthroughPage() {
   const report = ensureApiReportSummary(
@@ -23,10 +24,6 @@ export default function ExampleWalkthroughPage() {
   );
 
   return (
-    <ScrappedExperience
-      report={report}
-      chromeMode="walkthrough"
-      backHref="/about"
-    />
+    <ScrappedExperience report={report} chromeMode="walkthrough" />
   );
 }
