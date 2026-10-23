@@ -1,21 +1,17 @@
 import Link from "next/link";
-import { gateTertiaryChromeClass } from "@/components/scrapped/gateChrome";
+import {
+  gateLinkChromeClass,
+  gateSecondaryChromeClass,
+} from "@/components/scrapped/gateChrome";
+import { OriginBackButton } from "@/components/scrapped/OriginBackButton";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-/** Tertiary: no fill; underline fades in on hover (D-023). */
-const backClass = cn(gateTertiaryChromeClass, "-ml-3 px-3");
-
-const walkLinkClass = cn(
-  buttonVariants({ variant: "outline", size: "lg" }),
-  "mt-4 border-[var(--wrapped-ink)]/22 !bg-[var(--wrapped-ink)]/6 !text-[var(--wrapped-ink)] no-underline hover:!bg-[var(--wrapped-ink)]/12 hover:!text-[var(--wrapped-ink)]",
-);
 
 /**
  * About / FAQ: Layout A long-scroll editorial (D-022).
  * Same Orbit ink field as the gate; art is blurred + frosted so body copy stays primary.
  * Example walkthrough ingress under “What is this?” → `/example` (D-024).
+ * ← Back: secondary chrome (D-023); returns to prior in-app screen (D-040); cold entry → `/`.
  */
 export function ScrappedAboutPage() {
   return (
@@ -46,9 +42,12 @@ export function ScrappedAboutPage() {
       <div className="relative z-10 col-start-1 row-start-1 flex w-full justify-center px-10">
         <div className="flex w-full max-w-sm flex-col items-stretch py-10 text-left">
           <div className="mb-6 flex w-full shrink-0 justify-start">
-            <Link href="/" className={backClass}>
+            <OriginBackButton
+              className={gateSecondaryChromeClass}
+              aria-label="Back"
+            >
               ← Back
-            </Link>
+            </OriginBackButton>
           </div>
 
           <h1 className="text-display w-full italic text-[var(--wrapped-ink)]">
@@ -67,11 +66,8 @@ export function ScrappedAboutPage() {
               A short story deck built from your Spotify listening data: liked
               songs, 4-week and 6-month tops, and multi-year favorites.
             </p>
-            <Link className={walkLinkClass} href="/example">
+            <Link className={cn(gateLinkChromeClass, "mt-4")} href="/example">
               View an example
-              <span aria-hidden className="text-[var(--wrapped-muted)]">
-                →
-              </span>
             </Link>
           </section>
 
@@ -94,7 +90,7 @@ export function ScrappedAboutPage() {
               Already have access?{" "}
               <a
                 href="/api/spotify/login"
-                className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+                className={cn(gateLinkChromeClass, "inline")}
                 aria-label="Sign in to Spotify"
               >
                 Sign in

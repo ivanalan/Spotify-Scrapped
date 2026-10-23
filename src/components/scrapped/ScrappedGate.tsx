@@ -8,9 +8,10 @@ import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton
 import { SpotifyLabFetchForm } from "@/components/scrapped/SpotifyLabFetchForm";
 import { SpotifyRateLimitWait } from "@/components/scrapped/SpotifyRateLimitWait";
 import {
+  gateCaptionLinkChromeClass,
+  gateLinkChromeClass,
   gatePrimaryTone,
   gateSecondaryChromeClass,
-  gateTertiaryChromeClass,
 } from "@/components/scrapped/gateChrome";
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
@@ -57,9 +58,6 @@ const gateCtaClass = cn(
   gatePrimaryTone,
   "mt-8 w-full",
 );
-
-const gateAltLinkClass =
-  "font-semibold text-[var(--wrapped-ink)] underline underline-offset-4";
 
 export function ScrappedGate({
   message,
@@ -113,7 +111,7 @@ export function ScrappedGate({
           {connected ? <SignOutConfirmButton appearance="text" /> : null}
         </div>
 
-        <div className="flex w-full flex-1 flex-col justify-center">
+        <div className="flex w-full flex-1 flex-col justify-center pb-16 pt-4">
           <p className="text-display w-full text-[var(--wrapped-ink)]">
             {SCRAPPED_API_YEAR}
           </p>
@@ -138,7 +136,7 @@ export function ScrappedGate({
               <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
                 <Link
                   href="/about#why-waitlist"
-                  className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+                  className={cn(gateCaptionLinkChromeClass, "inline")}
                 >
                   Why a waitlist?
                 </Link>
@@ -155,11 +153,17 @@ export function ScrappedGate({
                 <GateWaitlistForm />
               </div>
               <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
-                <Link href="/example" className={gateAltLinkClass}>
+                <Link
+                  href="/example"
+                  className={cn(gateCaptionLinkChromeClass, "inline")}
+                >
                   View an example
                 </Link>
                 <span aria-hidden> · </span>
-                <Link href="/about#why-waitlist" className={gateAltLinkClass}>
+                <Link
+                  href="/about#why-waitlist"
+                  className={cn(gateCaptionLinkChromeClass, "inline")}
+                >
                   Why a waitlist?
                 </Link>
               </p>
@@ -168,11 +172,17 @@ export function ScrappedGate({
             <>
               <p className="text-body mt-4 w-full text-[var(--wrapped-ink)]">
                 Scrapped is your <span className="italic">anti-wrapped</span>.
-                Songs you ghosted and artists you left on read.
+                Songs you ghosted and artists you left on read.{" "}
+                <Link
+                  href="/example"
+                  className={cn(gateLinkChromeClass, "inline")}
+                >
+                  View example
+                </Link>
               </p>
 
               {mode === "auth" ? (
-                <div className="mt-12 w-full space-y-3">
+                <div className="mt-10 w-full space-y-3">
                   {authError ? (
                     <p className="text-caption w-full text-[var(--wrapped-muted)]">
                       {authError}
@@ -269,11 +279,11 @@ export function ScrappedGate({
         </div>
 
         {mode === "auth" && !offWaitlist ? (
-          <p className="text-caption mt-4 mb-6 w-full shrink-0 text-center text-[var(--wrapped-muted)]">
+          <p className="text-caption mt-4 mb-6 w-full shrink-0 text-center text-[var(--wrapped-ink)]">
             Already have access?{" "}
             <a
               href="/api/spotify/login"
-              className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+              className={cn(gateCaptionLinkChromeClass, "inline")}
               aria-label="Sign in to Spotify"
             >
               Sign in

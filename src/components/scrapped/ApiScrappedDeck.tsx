@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useReducedMotion } from "motion/react";
 import {
   useCallback,
@@ -10,6 +9,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
@@ -24,6 +24,7 @@ import {
   volumeMuteOutline,
 } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
+import { OriginBackButton } from "@/components/scrapped/OriginBackButton";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
 import {
   ShareFinaleLayoutTune,
@@ -92,12 +93,10 @@ type Props = {
    */
   pauseApiRef?: MutableRefObject<ApiScrappedPauseApi | null>;
   /**
-   * `walkthrough`: back (left) to About; no sign-out X (D-024).
+   * `walkthrough`: origin back (left); no sign-out X (D-024, D-040).
    * Default `session` keeps pause / volume / sign-out.
    */
   chromeMode?: "session" | "walkthrough";
-  /** Used when `chromeMode="walkthrough"`. */
-  backHref?: string;
 };
 
 export type ApiScrappedPauseApi = {
@@ -111,6 +110,16 @@ const SLIDE_COUNT = API_SCRAPPED_SLIDE_COUNT;
 const FINALE_INDEX = SLIDE_COUNT - 1;
 /** Hold open-slide copy + progress so the soundtrack can catch up after Continue. */
 const INTRO_COPY_DELAY_SEC = 0.35;
+
+/** On-story layout panel: `/scrapped?tune=share` (keeps production Share clean). */
+function getShareTuneEnabled() {
+  return new URLSearchParams(window.location.search).get("tune") === "share";
+}
+function subscribeShareTuneEnabled() {
+  // Query flag is fixed for the page life; no live subscription needed.
+  return () => {};
+}
+
 /**
  * Cancel speculative next-act prime after this hold (audio only: no story pause).
  * Short taps clear the timer on pointerup and keep the hot buffer for cutTo.
@@ -135,7 +144,6 @@ export function ApiScrappedDeck({
   onSoundtrackUriChange,
   onSoundtrackPrimeTo,
   chromeMode = "session",
-  backHref = "/about",
   onSoundtrackCancelPrime,
   onSoundtrackCutTo,
   held = false,
@@ -157,23 +165,32 @@ export function ApiScrappedDeck({
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
   const [shareExportBusy, setShareExportBusy] = useState(false);
-  const [sharePrecaptureReady, setSharePrecaptureReady] = useState(false);
-  const [shareTuneEnabled, setShareTuneEnabled] = useState(false);
   const [shareTune, setShareTune] = useState<ShareFinaleTuneState>(
     shareFinaleTuneDefaults,
   );
+  const shareTuneEnabled = useSyncExternalStore(
+    subscribeShareTuneEnabled,
+    getShareTuneEnabled,
+    () => false,
+  );
   const reduceMotion = useReducedMotion();
 
-  // On-story layout panel: `/scrapped?tune=share` (keeps production Share clean).
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setShareTuneEnabled(params.get("tune") === "share");
-  }, []);
   // Open-slide gate: derive from session key vs async unlock (no sync setState in effects).
   const introSessionKey = held || active !== 0 ? null : String(visitKey);
   const [introUnlockedFor, setIntroUnlockedFor] = useState<string | null>(null);
   const introGate =
     introSessionKey != null && introUnlockedFor !== introSessionKey;
+  // Share PNG ready: same session-key pattern (async capture; no sync reset in effects).
+  const sharePrecaptureSessionKey =
+    active === FINALE_INDEX && !held
+      ? `${visitKey}:${report.year}:${JSON.stringify(shareTune)}`
+      : null;
+  const [sharePrecaptureReadyFor, setSharePrecaptureReadyFor] = useState<
+    string | null
+  >(null);
+  const sharePrecaptureReady =
+    sharePrecaptureSessionKey != null &&
+    sharePrecaptureReadyFor === sharePrecaptureSessionKey;
   /** Sticky pause button / space: drives chrome icon and soundtrack. */
   const userPaused = pausedSticky;
   const paused = userPaused || held || introGate;
@@ -716,13 +733,12 @@ export function ApiScrappedDeck({
   // Warm the share PNG while the finale is idle so Share can call
   // navigator.share synchronously enough for iOS WebKit's user-gesture gate.
   useEffect(() => {
-    if (active !== FINALE_INDEX || held) {
+    if (sharePrecaptureSessionKey == null) {
       sharePrecaptureRef.current = null;
-      setSharePrecaptureReady(false);
       return;
     }
     let cancelled = false;
-    setSharePrecaptureReady(false);
+    const key = sharePrecaptureSessionKey;
     const timer = window.setTimeout(() => {
       const node = shareCardRef.current;
       if (!node) return;
@@ -730,7 +746,7 @@ export function ApiScrappedDeck({
         .then((blob) => {
           if (cancelled) return;
           sharePrecaptureRef.current = blob;
-          setSharePrecaptureReady(true);
+          setSharePrecaptureReadyFor(key);
         })
         .catch(() => {
           // Leave unready: tap still tries on-demand capture (desktop OK).
@@ -740,7 +756,7 @@ export function ApiScrappedDeck({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [active, held, visitKey, report.year, shareTune]);
+  }, [sharePrecaptureSessionKey]);
 
   const onShareFinale = useCallback(async () => {
     const node = shareCardRef.current;
@@ -816,18 +832,17 @@ export function ApiScrappedDeck({
         </div>
 
         <div className="pointer-events-none mt-3 flex items-center justify-between">
-          <div className="pointer-events-auto flex items-center gap-1.5">
+          <div className="pointer-events-auto flex items-center gap-3">
             {chromeMode === "walkthrough" ? (
-              <Link
-                href={backHref}
-                aria-label="Back to About"
+              <OriginBackButton
+                aria-label="Back"
                 className={cn(
                   buttonVariants({ variant: "default", size: "icon" }),
                   "rounded-full bg-[var(--wrapped-ink)] text-[var(--wrapped-canvas)] hover:bg-[var(--wrapped-ink)] hover:opacity-90",
                 )}
               >
                 <Icon icon={arrowBackOutline} className="size-4" />
-              </Link>
+              </OriginBackButton>
             ) : null}
             <p className="font-sans text-sm font-semibold italic tracking-tight text-[var(--wrapped-ink)]">
               Scrapped

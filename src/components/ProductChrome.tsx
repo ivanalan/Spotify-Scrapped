@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { trackOriginBackPath } from "@/lib/origin-back";
 import { cn } from "@/lib/utils";
 
 /**
@@ -25,6 +27,10 @@ export function ProductNavShell({ children }: { children: React.ReactNode }) {
 export function ProductMain({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const fullBleed = isFullBleedScrapped(pathname);
+
+  useEffect(() => {
+    trackOriginBackPath(pathname);
+  }, [pathname]);
 
   return (
     <main

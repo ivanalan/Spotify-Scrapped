@@ -79,8 +79,9 @@ See **[docs/DATA.md](docs/DATA.md)** and **[docs/WRAPPED.md](docs/WRAPPED.md)** 
 - Left on read 5→6: ink + B1 orchid-corner wash · tuned pin/frame; [D-019](docs/decisions/D-019-left-on-read-orchid-corners.md).
 - Gate About (top-left) + `/about` Layout A; gate intro disks kit D6 (dim + down/outboard + top scrim); [D-022](docs/decisions/D-022-about-page-gate-d6.md). Privacy is `/about#privacy` (not a separate route); waitlist helper links there; [D-036](docs/decisions/D-036-about-privacy-waitlist-consent.md).
 - No in-deck Spotify attribution or song navigation (covers/rows display-only; no “Content from Spotify”); PNG stays Scrapped-first; [D-038](docs/decisions/D-038-no-deck-spotify-attribution.md) (supersedes [D-037](docs/decisions/D-037-spotify-content-attribution.md)).
-- Gate chrome triad: primary fill · secondary outline glass · tertiary underline (no bg); [D-023](docs/decisions/D-023-gate-button-triad.md).
+- Gate chrome: primary fill · secondary outline glass (gate About · About ← Back) · tertiary reserved · body link (ink · text-body) · caption link (muted · text-caption, brighter hover); [D-023](docs/decisions/D-023-gate-button-triad.md), [D-039](docs/decisions/D-039-gate-tertiary-vs-link.md).
 - Example walkthrough: frozen Guest `ScrappedApiReport` at `/example`; About “What is this?” CTA; back chrome, no sign-out X; [D-024](docs/decisions/D-024-example-walkthrough-snapshot.md).
+- Origin back: chrome labeled Back returns to the prior in-tab path; cold entry falls back to `/` (About + example); [D-040](docs/decisions/D-040-origin-back.md).
 - Not-allowlisted OAuth: seats-full mid band (About only; no Sign out) + waitlist + footer Sign in + example / why links; [D-025](docs/decisions/D-025-not-allowlisted-seats-full-gate.md), [D-027](docs/decisions/D-027-sign-in-under-waitlist.md).
 - Unsigned gate: no top-right **Sign in**: path is gate footer link; [D-027](docs/decisions/D-027-sign-in-under-waitlist.md).
 - Blob ghost hem: **four tiny scallops** (not two-bump wave); [D-028](docs/decisions/D-028-ghost-four-scallop-hem.md).

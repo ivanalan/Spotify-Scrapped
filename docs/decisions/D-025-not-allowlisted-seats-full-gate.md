@@ -26,7 +26,7 @@ Dev Mode rejects Spotify accounts that aren’t on the Dashboard allowlist after
 
 ## Cost
 
-Auth gate branches on error code. Visitors who land with a stale non-code query string only get the seats-full UI when the payload still looks like an allowlist failure. Leaving About (`← Back` → `/`) drops the query param, so they return to the normal auth gate.
+Auth gate branches on error code. Visitors who land with a stale non-code query string only get the seats-full UI when the payload still looks like an allowlist failure. About **← Back** is origin back ([D-040](D-040-origin-back.md)): seats-full → About → Back restores seats-full (query intact). Cold open of About still falls back to `/`.
 
 ## Key files
 
