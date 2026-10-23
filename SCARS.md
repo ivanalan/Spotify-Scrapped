@@ -192,8 +192,16 @@ Format:
 - **Not:** Export PNG density, list ellipsis, or moon z-order over the brand.
 - **Cause (stack):** (1) `SpotifyContentCredit` lived inside the `[container-type:size]` slot, so `100cqb` ignored the credit’s height. (2) After moving credit out, height-first shell + nested `scale(100cqw / 300)` on the shell container mis-resolved `cqw` on iOS: the 300×533 canvas stayed near full size inside a narrower shell, and `overflow-hidden` chopped the **right and bottom** (Ghosted column, Liked this year, brand).
 - **Proof:** iPhone 13 Pro Safari showed Share / Replay and “Content from Spotify,” but the teal card’s right edge and `myscrapped.com` were cut. Saved PNG (unscaled 300×533 capture) looked complete.
-- **Avoid:** Size container is shell-only; credit is a sibling under the island. Compute `--share-shell-w` once on that slot (`min(100cqi, 100cqb×9/16, maxWidth)`) and reuse it for shell width **and** `scale(var(--share-shell-w) / 300)`. Do not nest `container-type` on the shell for scale, and do not put stage chrome inside the cqb box.
+- **Avoid:** Size container is shell-only; credit is a sibling under the island. Compute `--share-shell-w` once on the shell (`min(100cqi, 100cqb×9/16, maxWidth)`) and reuse it for shell width **and** `scale(var(--share-shell-w) / 300px)`. Do not nest `container-type` on the shell for scale, and do not put stage chrome inside the cqb box.
 - **Related:** [D-012](docs/decisions/D-012-share-finale-inset.md), `ApiScrappedDeck` scene 9
+
+## Share PNG exports cropped (~576×1024) after preview scale fit
+
+- **Not:** Wrong design density, hero art missing, or Share sheet compressing the file.
+- **Cause:** Stage shell applies `transform: scale(shellW/300)` for on-screen fit. `modern-screenshot` sized the capture from `getBoundingClientRect()` (scaled ~160×284) while `scaleForExportWidth` still used layout 300 → canvas ~576×1024 with the right side of the 300-wide card clipped.
+- **Proof:** Preview looked full; Saved Image was 576×1024 with Ghosted / Liked this year / brand cut on the right. Earlier exports were ~1080×1920 when shell scale was ~1.
+- **Avoid:** Pass explicit `width` / `height` (`maxWidthPx` × `designHeightPx`) and `scale = exportWidthPx / maxWidthPx` into `domToBlob`; set clone `transform: none`. Never derive export box from the scaled bounding rect.
+- **Related:** [D-012](docs/decisions/D-012-share-finale-inset.md), `src/lib/share-card-export.ts`
 
 ## Non-allowlisted Spotify sign-in refreshes with a JSON parse error
 

@@ -28,7 +28,7 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 | Card aspect | **9:16** always; `--share-shell-w` = min(slot, leftover×9/16, `maxWidthPx` **300**); shell width uses that var; no flex-stretch to non-portrait |
 | Preview fit | Size container is **shell-only**. Spotify credit sits outside that container (sibling under the island, still on stage / outside capture). Same `--share-shell-w` drives `scale(var(--share-shell-w) / 300)` so iOS cannot mis-scale a nested `cqw` and clip the right/bottom |
 | Design canvas | Locked **300 × 533** poster; shell scales it uniformly via `--share-shell-w`. Type/spacing identical on every viewport; [D-033](D-033-share-finale-b2-plain-teal.md) |
-| Export PNG | Capture the **unscaled** design node; scale so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16 |
+| Export PNG | Capture the **unscaled** design node with explicit `width`/`height` = 300×533 (ignore stage `transform` bounding box); raster scale = `exportWidthPx / maxWidthPx` → ~1080×1920, still 9:16 |
 | Card thesis | Hero + Left on read / Ghosted songs + liked metrics under lists + centered brand |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
 | Replay | `goTo(0)`: same as keyboard `R` |

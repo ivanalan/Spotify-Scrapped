@@ -39,17 +39,19 @@ async function waitForImages(node: HTMLElement): Promise<void> {
 
 /**
  * Scale so the shared PNG is ~`exportWidthPx` wide (still 9:16).
- * Capture node is the fixed design canvas (`maxWidthPx` × `designHeightPx`);
- * stage CSS scale is on a parent wrapper and does not affect this math.
+ * Always use the locked design width: parent stage `transform: scale(...)`
+ * shrinks getBoundingClientRect / visual size on short phones, which would
+ * otherwise bake a cropped ~576×1024 PNG.
  */
-function scaleForExportWidth(node: HTMLElement): number {
-  const w = node.offsetWidth || D.maxWidthPx;
-  return Math.max(1, D.exportWidthPx / w);
+function scaleForExportWidth(): number {
+  return Math.max(1, D.exportWidthPx / D.maxWidthPx);
 }
 
 /**
  * Capture the inset share card as a PNG blob (no share sheet).
  * Node is the locked design canvas (9:16 at phone density); output ~1080×1920.
+ * Pass explicit width/height so modern-screenshot does not use the scaled
+ * on-screen bounding box from the stage shell.
  */
 export async function captureShareCardBlob(
   node: HTMLElement,
@@ -58,9 +60,17 @@ export async function captureShareCardBlob(
   await waitForImages(node);
 
   const blob = await domToBlob(node, {
-    scale: scale ?? scaleForExportWidth(node),
+    width: D.maxWidthPx,
+    height: D.designHeightPx,
+    scale: scale ?? scaleForExportWidth(),
     type: "image/png",
     backgroundColor: null,
+    // Neutralize ancestor stage scale on the clone root.
+    style: {
+      transform: "none",
+      width: `${D.maxWidthPx}px`,
+      height: `${D.designHeightPx}px`,
+    },
     fetch: {
       requestInit: { cache: "no-cache" },
     },
