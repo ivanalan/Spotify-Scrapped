@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Heart cascade: g08 smooth grow → fade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --muted: color-mix(in oklab, #f5f5f5 58%, transparent);
+        --pink: #ff4d8d;
+        --rose: #c9185b;
+        --gold: #ffe66d;
+        --teal-ice: #5eead4;
+        --orchid: #c9a0f5;
+        --card: #12181c;
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+        --ease-drift: cubic-bezier(0.22, 0.8, 0.28, 1);
+        --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        --loop: 6.4s;
+        --birth: 40;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: #0c0a12;
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--orchid);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        max-width: 48rem;
+        margin: 0 0 0.75rem;
+      }
+
+      .lede strong {
+        color: color-mix(in oklab, #f5f5f5 88%, transparent);
+        font-weight: 560;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem 1.25rem;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1.25rem;
+        border-radius: 14px;
+        background: color-mix(in oklab, #f5f5f5 5%, transparent);
+        border: 1px solid color-mix(in oklab, #f5f5f5 8%, transparent);
+      }
+
+      .controls label {
+        font-size: 0.8rem;
+        font-weight: 560;
+      }
+
+      .controls .birth-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .controls input[type="range"] {
+        flex: 1;
+        accent-color: var(--orchid);
+        min-width: 140px;
+      }
+
+      .controls .val {
+        font-size: 0.78rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--orchid);
+        min-width: 4.5rem;
+      }
+
+      .controls .hint {
+        font-size: 0.72rem;
+        color: var(--muted);
+        width: 100%;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0 0 1.25rem;
+      }
+
+      .chip {
+        font-size: 0.72rem;
+        font-weight: 560;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--orchid) 22%, transparent);
+        color: var(--orchid);
+      }
+
+      .chip.lock {
+        background: var(--orchid);
+        color: #1a1624;
+      }
+
+      .chip.teal {
+        background: color-mix(in oklab, var(--teal-ice) 18%, transparent);
+        color: var(--teal-ice);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .card {
+        position: relative;
+        background: var(--card);
+        border-radius: 16px;
+        border: 1px solid color-mix(in oklab, #f5f5f5 8%, transparent);
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.2s var(--ease-out), box-shadow 0.2s;
+      }
+
+      .card:hover {
+        border-color: color-mix(in oklab, var(--orchid) 45%, transparent);
+      }
+
+      .card.active {
+        border-color: var(--orchid);
+        box-shadow: 0 0 0 1px var(--orchid);
+      }
+
+      .card.keep {
+        border-color: color-mix(in oklab, var(--orchid) 50%, transparent);
+      }
+
+      .stage {
+        position: relative;
+        height: 240px;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(
+            120% 90% at 50% 0%,
+            color-mix(in oklab, var(--teal-ice) 35%, transparent),
+            transparent 55%
+          ),
+          linear-gradient(165deg, #0f4c5c 0%, #1a7a6e 42%, #0a2e36 100%);
+        overflow: hidden;
+      }
+
+      .beat-bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 3px;
+        background: color-mix(in oklab, #000 25%, transparent);
+        z-index: 4;
+      }
+
+      .beat-bar::before {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--teal-ice), var(--pink));
+        animation: beat-scrub var(--loop) linear infinite;
+      }
+
+      .beat-marks {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 4px;
+        height: 12px;
+        z-index: 4;
+        pointer-events: none;
+        font-size: 0.55rem;
+        color: color-mix(in oklab, #f5f5f5 50%, transparent);
+      }
+
+      .beat-marks span {
+        position: absolute;
+        transform: translateX(-50%);
+      }
+
+      .beat-marks span::before {
+        content: "";
+        display: block;
+        width: 1px;
+        height: 7px;
+        margin: 0 auto 1px;
+        background: color-mix(in oklab, #f5f5f5 30%, transparent);
+      }
+
+      .beat-marks .m-a {
+        left: 15%;
+      }
+
+      .beat-marks .m-c {
+        left: calc(var(--birth) * 1%);
+      }
+
+      .beat-marks .m-peak {
+        left: 48%;
+      }
+
+      .hero {
+        position: relative;
+        width: 170px;
+        height: 150px;
+        display: grid;
+        place-items: center;
+        margin-top: -0.5rem;
+      }
+
+      .heart-wrap {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        display: grid;
+        place-items: center;
+        z-index: 2;
+        transform-origin: 50% 55%;
+        animation: stamp var(--loop) var(--ease-soft) infinite;
+      }
+
+      .heart-svg {
+        width: 88px;
+        height: 88px;
+        overflow: visible;
+        display: block;
+        color: var(--pink);
+      }
+
+      .outline {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 22;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: outline-draw var(--loop) linear infinite;
+      }
+
+      .fill {
+        fill: currentColor;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: 50% 55%;
+        animation: fill-grow var(--loop) var(--ease-soft) infinite;
+      }
+
+      .cascade {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .bloom {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 88px;
+        height: 88px;
+        margin: -44px 0 0 -44px;
+        color: var(--pink);
+        opacity: 0;
+        transform-origin: 50% 55%;
+        --peak: 1.7;
+        --op: 0.4;
+        animation-duration: var(--loop);
+        animation-iteration-count: infinite;
+        animation-fill-mode: none;
+        animation-timing-function: var(--ease-smooth);
+      }
+
+      .bloom svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        display: block;
+      }
+
+      .bloom path {
+        fill: currentColor;
+        stroke: none;
+      }
+
+      .bloom.rose {
+        color: var(--rose);
+      }
+
+      .bloom.gold {
+        color: var(--gold);
+      }
+
+      .copy {
+        position: absolute;
+        left: 0.9rem;
+        right: 0.9rem;
+        bottom: 0.75rem;
+        z-index: 3;
+        pointer-events: none;
+        min-height: 2.8rem;
+      }
+
+      .line {
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.25;
+        color: #f5f5f5;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      .line.sub {
+        margin-top: 0.15rem;
+        font-weight: 450;
+        font-size: 0.68rem;
+        color: color-mix(in oklab, #f5f5f5 82%, transparent);
+      }
+
+      .line-a {
+        animation: word-a var(--loop) var(--ease-out) infinite;
+      }
+
+      .line-b {
+        animation: word-b var(--loop) var(--ease-out) infinite;
+      }
+
+      .line-b.sub {
+        animation-name: word-b-sub;
+      }
+
+      .meta-row {
+        padding: 0.85rem 1rem 1rem;
+      }
+
+      .tag {
+        font-size: 0.68rem;
+        font-weight: 650;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--orchid);
+        margin: 0 0 0.25rem;
+      }
+
+      .name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 0.3rem;
+      }
+
+      .why {
+        margin: 0;
+        font-size: 0.78rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .legend {
+        margin-top: 2rem;
+        padding: 1rem 1.1rem;
+        border-radius: 14px;
+        background: color-mix(in oklab, #f5f5f5 5%, transparent);
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: var(--muted);
+        max-width: 48rem;
+      }
+
+      .legend strong {
+        color: color-mix(in oklab, #f5f5f5 85%, transparent);
+        font-weight: 560;
+      }
+
+      @keyframes beat-scrub {
+        to {
+          width: 100%;
+        }
+      }
+
+      @keyframes outline-draw {
+        0% {
+          stroke-dashoffset: 1;
+          opacity: 1;
+        }
+        30%,
+        36% {
+          stroke-dashoffset: 0;
+          opacity: 1;
+        }
+        48%,
+        88% {
+          stroke-dashoffset: 0;
+          opacity: 0;
+        }
+        100% {
+          stroke-dashoffset: 1;
+          opacity: 1;
+        }
+      }
+
+      @keyframes stamp {
+        0%,
+        36% {
+          transform: scale(1) translateY(0);
+        }
+        40% {
+          transform: scale(0.9) translateY(3px);
+        }
+        48% {
+          transform: scale(1.12) translateY(-2px);
+        }
+        58% {
+          transform: scale(0.98) translateY(0);
+        }
+        68%,
+        88% {
+          transform: scale(1) translateY(0);
+        }
+        100% {
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      @keyframes fill-grow {
+        0%,
+        40% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+        48% {
+          opacity: 1;
+          transform: scale(1.04);
+        }
+        56%,
+        88% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+      }
+
+      @keyframes word-a {
+        0%,
+        4% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        10%,
+        36% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        44%,
+        100% {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+      }
+
+      @keyframes word-b {
+        0%,
+        46% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        52%,
+        86% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        92%,
+        100% {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+      }
+
+      @keyframes word-b-sub {
+        0%,
+        50% {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        56%,
+        86% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        92%,
+        100% {
+          opacity: 0;
+          transform: translateY(-3px);
+        }
+      }
+
+      .g08 .bloom,
+      .s01 .bloom,
+      .s02 .bloom,
+      .s05 .bloom {
+        animation-timing-function: var(--ease-smooth);
+      }
+
+      .s03 .bloom,
+      .s04 .bloom {
+        animation-timing-function: var(--ease-soft);
+      }
+
+      .s06 .bloom,
+      .s07 .bloom {
+        animation-timing-function: var(--ease-drift);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+        .outline {
+          stroke-dashoffset: 0;
+        }
+        .fill,
+        .line {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+    <style id="dyn"></style>
+  </head>
+  <body>
+    <div class="board">
+      <h1><em>Scrapped</em> cascade: g08 smooth</h1>
+      <p class="lede">
+        Kept <strong>g08</strong> (3 layers). Fix: max scale is reached
+        <strong>before</strong> the fade, then scale holds flat while opacity
+        drops. No second grow during the fade.
+      </p>
+
+      <div class="controls">
+        <div class="birth-row">
+          <label for="birth">Cascade birth</label>
+          <input id="birth" type="range" min="30" max="48" step="1" value="40" />
+          <span class="val" id="birthVal">40% · 2.6s</span>
+        </div>
+        <p class="hint">
+          Loop 6.4s. Stamp peak 48%. Grow finishes, then fade. Scale never
+          increases after max.
+        </p>
+      </div>
+
+      <div class="meta">
+        <span class="chip lock">kept · g08</span>
+        <span class="chip teal">smooth grow → fade</span>
+        <span class="chip">click to mark a fav</span>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <p class="legend">
+        <strong>Bug:</strong> old “fade at arrival” kept scaling from 0.96→1.0
+        while opacity fell, which read as a second grow. New kits lock scale at
+        <code>--peak</code> for the entire fade.
+      </p>
+    </div>
+
+    <script>
+      const HEART =
+        "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
+
+      const LOOP_S = 6.4;
+      const P3 = [1.25, 1.55, 1.9];
+
+      /**
+       * g08 lineage: 3 layers, inner→outer die.
+       * growEnd: when scale hits --peak (full opacity).
+       * fadeEnds: when opacity hits 0 (scale already locked).
+       */
+      const KITS = [
+        {
+          id: "g08",
+          tag: "g08 · kept",
+          name: "Smooth grow → fade",
+          why: "3 layers. Scale lands at max, then opacity only. Inner→outer.",
+          keep: true,
+          peaks: P3,
+          stagger: 0.12,
+          op: 0.4,
+          growSpan: 0.32,
+          fadeEnds: [60, 74, 88],
+        },
+        {
+          id: "s01",
+          tag: "s01 · smooth",
+          name: "Faster grow",
+          why: "Shorter grow into max, same clean opacity fade after.",
+          peaks: P3,
+          stagger: 0.12,
+          op: 0.4,
+          growSpan: 0.22,
+          fadeEnds: [60, 74, 88],
+        },
+        {
+          id: "s02",
+          tag: "s02 · smooth",
+          name: "Slower grow",
+          why: "Longer ease into max before fade. More Lottie-smooth.",
+          peaks: P3,
+          stagger: 0.12,
+          op: 0.4,
+          growSpan: 0.42,
+          fadeEnds: [64, 76, 88],
+        },
+        {
+          id: "s03",
+          tag: "s03 · smooth",
+          name: "Tight die ladder",
+          why: "Layers clear closer together after the shared max.",
+          peaks: P3,
+          stagger: 0.1,
+          op: 0.4,
+          growSpan: 0.32,
+          fadeEnds: [70, 76, 82],
+        },
+        {
+          id: "s04",
+          tag: "s04 · smooth",
+          name: "Wide die ladder",
+          why: "Inner gone earlier; outer hangs under the reveal.",
+          peaks: P3,
+          stagger: 0.12,
+          op: 0.4,
+          growSpan: 0.32,
+          fadeEnds: [54, 70, 90],
+        },
+        {
+          id: "s05",
+          tag: "s05 · smooth",
+          name: "Quick dissolve",
+          why: "Hit max, fade fast. Still no scale change during fade.",
+          peaks: P3,
+          stagger: 0.1,
+          op: 0.42,
+          growSpan: 0.28,
+          fadeEnds: [52, 58, 66],
+        },
+        {
+          id: "s06",
+          tag: "s06 · smooth",
+          name: "Soft linger",
+          why: "Gentle grow, long opacity dissolve at max size.",
+          peaks: P3,
+          stagger: 0.14,
+          op: 0.36,
+          growSpan: 0.38,
+          fadeEnds: [68, 80, 92],
+        },
+        {
+          id: "s07",
+          tag: "s07 · smooth",
+          name: "Clear before stamp peak",
+          why: "All three faded by ~stamp peak. Grow fully done first.",
+          peaks: P3,
+          stagger: 0.1,
+          op: 0.4,
+          growSpan: 0.26,
+          fadeEnds: [48, 54, 60],
+        },
+      ];
+
+      const dyn = document.getElementById("dyn");
+      const birthInput = document.getElementById("birth");
+      const birthVal = document.getElementById("birthVal");
+
+      function blooms(peaks, op) {
+        const tones = ["", "rose", "gold"];
+        return peaks.map((peak, i) => ({
+          peak,
+          tone: tones[i % tones.length],
+          op,
+        }));
+      }
+
+      function pct(n) {
+        return `${Math.max(0, Math.min(100, n))}%`;
+      }
+
+      function keyframesForLayer(kit, layer, birth) {
+        const i = layer - 1;
+        const staggerPct = (i * kit.stagger * 100) / LOOP_S;
+        const b = birth + staggerPct;
+        const fadeEnd = kit.fadeEnds[i];
+        const span = fadeEnd - b;
+        /* Scale reaches max at growEnd, BEFORE any opacity drop. */
+        const growEnd = b + span * kit.growSpan;
+        const fadeStart = growEnd; /* opacity begins only once scale is locked */
+        const name = `${kit.id}-L${layer}`;
+
+        return `
+@keyframes ${name} {
+  0%, ${pct(b - 0.4)} {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  ${pct(b + 1)} {
+    opacity: var(--op);
+    transform: scale(1.0);
+  }
+  /* Max scale reached; full opacity. From here scale NEVER increases. */
+  ${pct(growEnd)} {
+    opacity: var(--op);
+    transform: scale(var(--peak));
+  }
+  /* Flat scale through the entire fade */
+  ${pct(fadeStart + 0.01)} {
+    opacity: var(--op);
+    transform: scale(var(--peak));
+  }
+  ${pct(fadeEnd)}, 100% {
+    opacity: 0;
+    transform: scale(var(--peak));
+  }
+}`;
+      }
+
+      function rebuildDyn(birth) {
+        document.documentElement.style.setProperty("--birth", String(birth));
+        birthVal.textContent = `${birth}% · ${((birth / 100) * LOOP_S).toFixed(1)}s`;
+
+        let css = "";
+        for (const kit of KITS) {
+          kit.fadeEnds.forEach((_, i) => {
+            const layer = i + 1;
+            css += keyframesForLayer(kit, layer, birth);
+            css += `
+.${kit.id} .bloom:nth-child(${layer}) {
+  animation-name: ${kit.id}-L${layer};
+}
+`;
+          });
+        }
+        dyn.textContent = css;
+
+        document
+          .querySelectorAll(".bloom, .heart-wrap, .outline, .fill, .line")
+          .forEach((el) => {
+            el.style.animation = "none";
+          });
+        void document.body.offsetWidth;
+        document
+          .querySelectorAll(".bloom, .heart-wrap, .outline, .fill, .line")
+          .forEach((el) => {
+            el.style.animation = "";
+          });
+      }
+
+      function heartSvg() {
+        return `
+          <svg class="heart-svg" viewBox="0 0 512 512" aria-hidden="true">
+            <path class="outline" d="${HEART}" pathLength="1" />
+            <path class="fill" d="${HEART}" />
+          </svg>`;
+      }
+
+      function bloomsHtml(list) {
+        return `<div class="cascade">${list
+          .map(
+            (b) => `
+          <div class="bloom ${b.tone}" style="--peak:${b.peak};--op:${b.op}">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="${HEART}" /></svg>
+          </div>`
+          )
+          .join("")}</div>`;
+      }
+
+      const grid = document.getElementById("grid");
+      grid.innerHTML = KITS.map((k) => {
+        const list = blooms(k.peaks, k.op);
+        return `
+        <article class="card ${k.id}${k.keep ? " keep" : ""}" data-id="${k.id}" tabindex="0" role="button">
+          <div class="stage">
+            <div class="beat-bar" aria-hidden="true"></div>
+            <div class="beat-marks" aria-hidden="true">
+              <span class="m-a">setup</span>
+              <span class="m-c">cascade</span>
+              <span class="m-peak">peak</span>
+            </div>
+            <div class="hero">
+              ${bloomsHtml(list)}
+              <div class="heart-wrap">${heartSvg()}</div>
+            </div>
+            <div class="copy">
+              <div class="line line-a">You’ve heard of 1 hit wonders.</div>
+              <div class="line line-b">Meet your 1 like artists</div>
+              <div class="line line-b sub">You liked a single track and never looked back.</div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <p class="tag">${k.tag}</p>
+            <p class="name">${k.name}</p>
+            <p class="why">${k.why}</p>
+          </div>
+        </article>`;
+      }).join("");
+
+      grid.addEventListener("click", (e) => {
+        const card = e.target.closest(".card");
+        if (!card) return;
+        grid
+          .querySelectorAll(".card")
+          .forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+      });
+
+      birthInput.addEventListener("input", () => {
+        rebuildDyn(Number(birthInput.value));
+      });
+
+      rebuildDyn(Number(birthInput.value));
+    </script>
+  </body>
+</html>
