@@ -120,15 +120,23 @@ export function ScrappedAboutPage() {
               Privacy
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              We never see your Spotify password. Sign in is Spotify OAuth. An
-              encrypted session cookie and a sealed story snapshot (tops, liked
-              songs, cover URLs) stay on our side for about 30 days, or until you
-              sign out.
+              Sign in is Spotify OAuth, so we never see your password. Session and
+              story cookies (tops, liked songs, cover URLs) stay encrypted on our
+              side for about 30 days, or until you sign out.
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              Waitlist emails are stored only for seat invites. To leave, reply
-              to a Scrapped seat email or write the From address from the address
-              you joined with. We don&rsquo;t sell your data.
+              After you load Scrapped, we also keep a private story link on our
+              servers (~1 year) so you can reopen it after your seat ends. Anyone
+              with the link can view it. We email that link once to your Spotify
+              account address.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              Waitlist emails are for seat invites only. To leave, reply to a
+              Scrapped seat email or write the From address from the address you
+              joined with.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              We don&rsquo;t sell your data.
             </p>
           </section>
 
