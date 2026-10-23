@@ -10,7 +10,7 @@ Auth CTAs mixed **Log in**, **Log out**, **Connect Spotify**, **Disconnect**, an
 ## Decision
 
 1. User-facing auth copy uses **sign in** and **sign out** only (sentence case as UI labels: `Sign in`, `Sign out`, `Signed in to Spotify as {name}`).
-2. Gate placement: unsigned **Sign in** is the waitlist helper link (“Already have access? Sign in”); not top-right chrome ([D-027](D-027-sign-in-under-waitlist.md)). Prefer `aria-label="Sign in to Spotify"` when the Spotify noun is not in the visible label. Top-right **Sign out** (when signed in) is primary fill; About (top-left) stays outline secondary; [D-022](D-022-about-page-gate-d6.md), [D-023](D-023-gate-button-triad.md).
+2. Gate placement: unsigned **Sign in** is the gate footer link (“Already have access? Sign in”); not top-right chrome ([D-027](D-027-sign-in-under-waitlist.md)). Prefer `aria-label="Sign in to Spotify"` when the Spotify noun is not in the visible label. Top-right **Sign out** (when signed in) is primary fill; About (top-left) stays outline secondary; [D-022](D-022-about-page-gate-d6.md), [D-023](D-023-gate-button-triad.md).
 3. Do not use **log in / log out**, **connect / disconnect**, or mixed pairs for the same actions.
 4. API route paths (`/api/spotify/login`, `/api/spotify/logout`) may keep technical names; they are not product copy.
 

@@ -12,7 +12,7 @@ The gate collects waitlist emails and the app seals session + story cookies, but
 
 1. **Placement:** Privacy lives on `/about#privacy` (Layout A section). No dedicated `/privacy` route until a platform or counsel asks for a standalone URL.
 2. **About copy:** Replace the password-only FAQ with a Privacy section: OAuth (no password), ~30d encrypted session cookie, ~30d sealed story snapshot cookies (cleared on sign out), waitlist email storage and seat-only email use, how to leave the waitlist, no sale of data. Soften the trademark blurb (drop “listening data stays yours”).
-3. **Gate waitlist:** Default helper is one caption line: “Join with your Spotify email. Seat emails only.” + tertiary **Privacy** → `/about#privacy` (same chrome as Sign in). Error / success helpers replace that line; **Already have access?** stays below.
+3. **Gate waitlist:** Default helper is one caption line: “Join with your Spotify email. Seat emails only.” + tertiary **Privacy** → `/about#privacy` (same chrome as Sign in). Error / success helpers replace that line. **Already have access? Sign in** lives in the gate footer ([D-027](D-027-sign-in-under-waitlist.md)).
 
 ## Displaced
 

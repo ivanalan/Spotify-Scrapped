@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const HELPER_DEFAULT =
-  "Join the waitlistwith your Spotify email. You'll only be emailed about a seat.";
+  "Join the waitlist with your Spotify email. You'll only be emailed about a seat.";
 const HELPER_SUCCESS =
   "You’re signed up for the waitlist! You’ll get an email with a link when it’s ready.";
 const HELPER_EMPTY = "Enter an email to join the waitlist";
@@ -167,7 +167,7 @@ export function GateWaitlistForm({ className }: { className?: string }) {
       </div>
       <div className="mt-2.5 w-full">
         <p
-          className="text-caption w-full text-[var(--wrapped-muted)]"
+          className="text-caption w-full text-[0.875rem] text-[var(--wrapped-muted)]"
           aria-live="polite"
         >
           {helper}
@@ -183,18 +183,6 @@ export function GateWaitlistForm({ className }: { className?: string }) {
             </>
           ) : null}
         </p>
-        {phase !== "success" ? (
-          <p className="text-caption mt-8 w-full text-[var(--wrapped-muted)]">
-            Already have access?{" "}
-            <a
-              href="/api/spotify/login"
-              className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
-              aria-label="Sign in to Spotify"
-            >
-              Sign in
-            </a>
-          </p>
-        ) : null}
       </div>
     </form>
   );

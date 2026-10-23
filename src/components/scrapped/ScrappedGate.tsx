@@ -268,9 +268,18 @@ export function ScrappedGate({
           )}
         </div>
 
-        <p className="text-caption mt-10 w-full shrink-0 text-center text-[var(--wrapped-muted)]">
-          Created by Alan Matias
-        </p>
+        {mode === "auth" && !offWaitlist ? (
+          <p className="text-caption mt-4 mb-6 w-full shrink-0 text-center text-[var(--wrapped-muted)]">
+            Already have access?{" "}
+            <a
+              href="/api/spotify/login"
+              className={cn(gateTertiaryChromeClass, "inline h-auto p-0")}
+              aria-label="Sign in to Spotify"
+            >
+              Sign in
+            </a>
+          </p>
+        ) : null}
       </div>
     </div>
   );

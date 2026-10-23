@@ -11,7 +11,7 @@ Gate chrome settled on a clear primary/secondary pair (solid mid CTAs · outline
 
 1. **Primary**: Solid ink fill (`--wrapped-ink` light on ink field = white-ish), canvas text; hover **color-mix ~22% toward canvas** (noticeably darker, not opacity fade). Gate **Join waitlist** / **Continue** / signed-in **Sign out** (not top-right Sign in: [D-027](D-027-sign-in-under-waitlist.md)).
 2. **Secondary**: Outline + light glass (`ink/10` + `backdrop-blur-md`); hover strengthens border / wash. Gate **About** ([D-022](D-022-about-page-gate-d6.md)).
-3. **Tertiary**: No fill. Underline is **always on**; rest uses transparent decoration, hover fades decoration to ink (shadcn `link` + `gateTertiaryTone` via shared `gateTertiaryChromeClass`: no muted wash). About **← Back**. Unsigned **Sign in** under the waitlist helper (and About’s “Already have access?”) uses the same tertiary chrome; inline caption adds `h-auto p-0` so the line doesn’t inflate to button height.
+3. **Tertiary**: No fill. Underline is **always on**; rest uses transparent decoration, hover fades decoration to ink (shadcn `link` + `gateTertiaryTone` via shared `gateTertiaryChromeClass`: no muted wash). About **← Back**. Unsigned **Sign in** in the gate footer (and About’s “Already have access?”) uses the same tertiary chrome; inline caption adds `h-auto p-0` so the line doesn’t inflate to button height.
 4. Hover ease: shared `transition-[background-color,border-color,color,opacity,text-decoration-color]` · `duration-300` · `--ease-out` (`gateChromeTransition`).
 5. Still **shadcn** `Button` / `buttonVariants` + product tone via `className` ([D-003](D-003-shadcn-standard-controls.md)). Shared tones live in `gateChrome.ts`.
 

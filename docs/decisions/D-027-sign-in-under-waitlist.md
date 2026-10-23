@@ -5,12 +5,12 @@
 
 ## Why
 
-Auth gate mid band is waitlist-first. A solid top-right **Sign in** competed with **Join waitlist** and duplicated the path already offered under the form helper (“Already have access? Sign in”). One Sign in affordance is enough.
+Auth gate mid band is waitlist-first. A solid top-right **Sign in** competed with **Join waitlist** and duplicated the path already offered in the footer (“Already have access? Sign in”). One Sign in affordance is enough.
 
 ## Decision
 
 1. Unsigned auth gate: top chrome is **About** only (left). No top-right **Sign in**.
-2. Sign in lives under the waitlist form as a secondary text link: “Already have access? **Sign in**” → `/api/spotify/login` ([D-004](D-004-sign-in-sign-out-copy.md) verbs; `aria-label="Sign in to Spotify"`).
+2. Sign in lives in the gate footer as a secondary text link: “Already have access? **Sign in**” → `/api/spotify/login` ([D-004](D-004-sign-in-sign-out-copy.md) verbs; `aria-label="Sign in to Spotify"`). Hidden on `/ready` (off-waitlist already has a primary Sign in) and when signed in.
 3. Signed-in modes keep top-right **Sign out** as primary fill (light `--wrapped-ink` on the ink field). Waitlist Join / Continue share that primary tone ([D-023](D-023-gate-button-triad.md)).
 4. Seats-full (`not_allowlisted`) uses the same chrome; About only; retry via the waitlist helper link ([D-025](D-025-not-allowlisted-seats-full-gate.md)).
 
