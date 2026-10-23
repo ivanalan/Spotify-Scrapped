@@ -74,5 +74,5 @@ Portable install guide: [docs/agent-framework/README.md](docs/agent-framework/RE
 - Seat invite + `/ready`: [D-032](docs/decisions/D-032-seat-invite-ready-resend.md); local script + template `seat-invite`: [D-035](docs/decisions/D-035-local-invite-script-resend-template.md)
 - Simple 404 (orchid wash · logo top · Go home): [D-034](docs/decisions/D-034-simple-404-orchid-wash.md)
 - About Privacy (`/about#privacy`) + gate waitlist consent line: [D-036](docs/decisions/D-036-about-privacy-waitlist-consent.md)
-- Personal story snapshot `/s/[token]` + `story-link` email (Neon); off unless `STORY_SNAPSHOT_ENABLED=1`: [D-041](docs/decisions/D-041-personal-story-snapshot-token.md)
+- Personal story snapshot `/s/[token]` + `story-link` email (Neon): [D-041](docs/decisions/D-041-personal-story-snapshot-token.md)
 - No in-deck Spotify attribution / song navigation: [D-038](docs/decisions/D-038-no-deck-spotify-attribution.md) (supersedes [D-037](docs/decisions/D-037-spotify-content-attribution.md))

@@ -12,16 +12,6 @@ import { sendStoryLinkEmail } from "@/lib/story-snapshot/email";
 /** Default keep window for post-seat replay links. */
 const DEFAULT_TTL_MS = 365 * 24 * 60 * 60 * 1000;
 
-/**
- * Kill switch for Neon persist + one-shot story-link email (D-041).
- * Plumbing stays; off until `STORY_SNAPSHOT_ENABLED=1` (or true/yes).
- * Replay reads (`/s/[token]`) stay available for any row already stored.
- */
-export function isStorySnapshotPersistEnabled(): boolean {
-  const v = process.env.STORY_SNAPSHOT_ENABLED?.trim().toLowerCase();
-  return v === "1" || v === "true" || v === "yes";
-}
-
 function databaseUrl(): string | null {
   const url =
     process.env.DATABASE_URL?.trim() ||
@@ -99,9 +89,8 @@ export type UpsertStorySnapshotResult = {
 };
 
 /**
- * Persist a deck-slim report for post-seat replay. Soft-noops when persist is
- * disabled, or Neon is unset (local without DATABASE_URL). Reuses the existing
- * token on upsert.
+ * Persist a deck-slim report for post-seat replay. Soft-noops when Neon is
+ * unset (local without DATABASE_URL). Reuses the existing token on upsert.
  */
 export async function upsertStorySnapshot(input: {
   spotifyUserId: string;
@@ -109,7 +98,6 @@ export async function upsertStorySnapshot(input: {
   report: ScrappedApiReport;
   email?: string | null;
 }): Promise<UpsertStorySnapshotResult | null> {
-  if (!isStorySnapshotPersistEnabled()) return null;
   if (!input.spotifyUserId) return null;
   try {
     if (!(await ensureTable())) return null;
@@ -165,8 +153,8 @@ export async function upsertStorySnapshot(input: {
 }
 
 /**
- * Send the private story URL once per user+year. No-ops if persist is
- * disabled, already stamped, or email/Resend is unavailable.
+ * Send the private story URL once per user+year. No-ops if already stamped
+ * or if email/Resend is unavailable.
  */
 export async function maybeSendStoryLinkEmailOnce(input: {
   spotifyUserId: string;
@@ -174,7 +162,6 @@ export async function maybeSendStoryLinkEmailOnce(input: {
   email: string;
   storyUrl: string;
 }): Promise<void> {
-  if (!isStorySnapshotPersistEnabled()) return;
   const to = input.email.trim().toLowerCase();
   if (!to || !input.spotifyUserId) return;
 
