@@ -172,13 +172,18 @@ export function ScrappedGate({
             <>
               <p className="text-body mt-4 w-full text-[var(--wrapped-ink)]">
                 Scrapped is your <span className="italic">anti-wrapped</span>.
-                Songs you ghosted and artists you left on read.{" "}
-                <Link
-                  href="/example"
-                  className={cn(gateLinkChromeClass, "inline")}
-                >
-                  View example
-                </Link>
+                Songs you ghosted and artists you left on read.
+                {!connected ? (
+                  <>
+                    {" "}
+                    <Link
+                      href="/example"
+                      className={cn(gateLinkChromeClass, "inline")}
+                    >
+                      View example
+                    </Link>
+                  </>
+                ) : null}
               </p>
 
               {mode === "auth" ? (
