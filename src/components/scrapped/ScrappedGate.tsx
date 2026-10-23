@@ -133,7 +133,7 @@ export function ScrappedGate({
               >
                 Sign in
               </a>
-              <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
+              <p className="text-caption mt-5 w-full text-center text-[var(--wrapped-muted)]">
                 <Link
                   href="/about#why-waitlist"
                   className={cn(gateCaptionLinkChromeClass, "inline")}
