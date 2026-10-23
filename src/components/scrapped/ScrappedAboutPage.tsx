@@ -120,34 +120,15 @@ export function ScrappedAboutPage() {
               Privacy
             </h2>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              We never see your Spotify password. Sign in goes through Spotify
-              OAuth. Access tokens stay in an encrypted cookie on our side for
-              about 30 days, or until you sign out.
+              We never see your Spotify password. Sign in is Spotify OAuth. An
+              encrypted session cookie and a sealed story snapshot (tops, liked
+              songs, cover URLs) stay on our side for about 30 days, or until you
+              sign out.
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              When you load Scrapped, we keep a sealed story snapshot in cookies
-              (tops, liked songs, cover art URLs) for about 30 days so the deck
-              can reopen without fetching again. Sign out clears those cookies.
-            </p>
-            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              We also save a private story link on our servers (song and artist
-              names, cover URLs) so you can reopen your Scrapped after your live
-              seat ends. Anyone with that link can view the story. Links expire
-              after about a year. Copy yours from the share screen at the end of
-              the deck.
-            </p>
-            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              Once per story year, we email that private link to the Spotify
-              account address you signed in with.
-            </p>
-            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              If you join the waitlist, we store that email so we can send a seat
-              invite. We only email waitlist addresses about access. To leave the
-              waitlist, reply to a Scrapped seat email or write the From address
-              on that invite from the address you joined with.
-            </p>
-            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
-              We don&rsquo;t sell your data.
+              Waitlist emails are stored only for seat invites. To leave, reply
+              to a Scrapped seat email or write the From address from the address
+              you joined with. We don&rsquo;t sell your data.
             </p>
           </section>
 
