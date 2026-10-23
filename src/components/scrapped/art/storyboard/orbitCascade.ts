@@ -166,7 +166,7 @@ export const SLIDE_SPECS: SlideSpec[] = [
     ink: card(4).ink,
     ...accents(4),
     hero: "4A heart on teal nest (ice→mid→deep · share C0)",
-    motion: "Heart grow-in / lub-dub → perimeter rising hearts on list",
+    motion: "Outline draw → stamp fill → s03 cascade bloom → perimeter rising hearts on list",
     composition: "TEAL_NEST_GRADIENT field; mid clear for copy + list (D-015 / D-016)",
     why: "Nest rhymes share card; soft-close stays flat teal.",
     iterations: [

@@ -17,11 +17,11 @@
   --mm-ink: #0a0810;
 }
 
-/* ── 4A · One-like heart (Spotify-pop + polar sparks) ── */
+/* ── 4A · One-like heart (stamp + s03 cascade) ── */
 /*
- * Grammar: slow stroke-draw → then like (fill + short smooth pop + sparks).
- * Pop is a separate ~1.25s settle (no long-timeline undershoot stutter).
- * No underglow / ring. Hero + frame stay mounted (D-016).
+ * Grammar: linear stroke-draw → soft stamp fill → s03 cascade
+ * (3 filled hearts: grow to max → hold scale → opacity fade, inner→outer).
+ * No underglow / polar sparks. Hero + frame stay mounted (D-016).
  */
 .mm-heart-scene {
   position: absolute;
@@ -31,14 +31,19 @@
   --mm-heart-ease: cubic-bezier(0.33, 1, 0.68, 1);
   /* Linear draw: constant stroke speed (no mid-path rush) */
   --mm-heart-draw-ease: linear;
-  /* Smooth settle: no aggressive overshoot ease (that stuttered at the peak) */
-  --mm-heart-pop-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  /* 1) Linear draw  2) 1s hold  3) like (fill+pop) */
+  /* Soft stamp settle */
+  --mm-heart-pop-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  /* 1) Linear draw  2) hold  3) like (fill+stamp) + cascade */
   --mm-heart-draw-dur: 1.9s;
   --mm-heart-like-at: 2.9s;
   --mm-heart-like-dur: 1.25s;
-  --mm-heart-spark-at: 3.1s;
-  --mm-heart-pop-scale: 1.28;
+  /* s03: birth with stamp peak (~48% of like-dur), not during the hold */
+  --mm-heart-cascade-at: 3.05s;
+  --mm-heart-cascade-stagger: 0.1s;
+  --mm-heart-cascade-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --mm-heart-cascade-op: 0.4;
+  --mm-heart-pop-dip: 0.9;
+  --mm-heart-pop-peak: 1.12;
 }
 
 .mm-heart-hero {
@@ -89,38 +94,55 @@
 .mm-heart-fill {
   fill: currentColor;
   opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 55%;
 }
 
 /*
- * Sparks: layout/color only. Motion drives x/y/opacity in OneLikeHeartChrome
- * (CSS keyframe + delay + fill-mode:both was hitching at burst start/end).
+ * s03 cascade: filled hearts behind the glyph.
+ * Same loop clock per layer (duration = life); grow locks before fade.
  */
-.mm-heart-sparks {
+.mm-heart-cascade {
   position: absolute;
   left: 50%;
-  top: 48%;
+  top: 50%;
   width: 0;
   height: 0;
   pointer-events: none;
   z-index: 0;
 }
 
-.mm-heart-spark {
+.mm-heart-bloom {
   position: absolute;
   left: 0;
   top: 0;
+  width: 128px;
+  height: 128px;
+  margin: -64px 0 0 -64px;
+  color: var(--mm-pink);
+  opacity: 0;
+  transform-origin: 50% 55%;
+  --mm-bloom-peak: 1.25;
+}
+
+.mm-heart-bloom svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
   display: block;
-  border-radius: 50%;
-  background: var(--mm-pink);
-  /* transform/opacity owned by Motion */
 }
 
-.mm-heart-spark--gold {
-  background: var(--mm-gold);
+.mm-heart-bloom path {
+  fill: currentColor;
+  stroke: none;
 }
 
-.mm-heart-spark--rose {
-  background: var(--mm-rose);
+.mm-heart-bloom--rose {
+  color: var(--mm-rose);
+}
+
+.mm-heart-bloom--gold {
+  color: var(--mm-gold);
 }
 
 /* Idle / freeze: full outline drawn, no fill */
@@ -133,7 +155,7 @@
   opacity: 0;
 }
 
-/* Setup enter: slow draw, then like (fill + short smooth pop + sparks) */
+/* Setup enter: slow draw, then like (grow fill + soft stamp) + s03 cascade */
 .mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-outline {
   animation:
     mm-heart-draw var(--mm-heart-draw-dur) var(--mm-heart-draw-ease) both,
@@ -147,8 +169,31 @@
 }
 
 .mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-pop {
-  animation: mm-heart-pop var(--mm-heart-like-dur) var(--mm-heart-like-at)
+  animation: mm-heart-stamp var(--mm-heart-like-dur) var(--mm-heart-like-at)
     var(--mm-heart-pop-ease) both;
+}
+
+/*
+ * s03 tight die ladder (mock fadeEnds 70/76/82 on 6.4s, birth 2.56 + stagger).
+ * Layer life = fadeEnd − birth; growSpan 32% then opacity-only fade at max.
+ */
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-bloom--1 {
+  animation: mm-heart-bloom 1.92s var(--mm-heart-cascade-ease) both;
+  animation-delay: var(--mm-heart-cascade-at);
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-bloom--2 {
+  animation: mm-heart-bloom 2.2s var(--mm-heart-cascade-ease) both;
+  animation-delay: calc(
+    var(--mm-heart-cascade-at) + var(--mm-heart-cascade-stagger)
+  );
+}
+
+.mm-heart-scene[data-mode="hero"][data-animate="1"] .mm-heart-bloom--3 {
+  animation: mm-heart-bloom 2.49s var(--mm-heart-cascade-ease) both;
+  animation-delay: calc(
+    var(--mm-heart-cascade-at) + var(--mm-heart-cascade-stagger) * 2
+  );
 }
 
 /*
@@ -158,11 +203,17 @@
  */
 .mm-heart-scene[data-mode="frame"] .mm-heart-fill {
   opacity: 1;
+  transform: scale(1);
 }
 
 .mm-heart-scene[data-mode="frame"] .mm-heart-outline {
   opacity: 0;
   stroke-dashoffset: 0;
+}
+
+.mm-heart-scene[data-mode="frame"] .mm-heart-cascade {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .mm-heart-scene[data-mode="frame"][data-animate="1"] .mm-heart-hero {
@@ -197,28 +248,62 @@
   }
 }
 
-/* Full-size opacity fill: never scale(tiny) (that was the mid disc). */
+/* Grow fill across the stamp: never a tiny mid disc. */
 @keyframes mm-heart-fill {
-  from {
+  0% {
     opacity: 0;
+    transform: scale(0.55);
   }
-  to {
+  55% {
     opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Soft stamp: dip → peak → settle (locked press feel). */
+@keyframes mm-heart-stamp {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  18% {
+    transform: scale(var(--mm-heart-pop-dip)) translateY(3px);
+  }
+  48% {
+    transform: scale(var(--mm-heart-pop-peak)) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
   }
 }
 
 /*
- * Short like-pop after draw. Two-stop scale (peak → settle) + soft ease: * the old 1→peak→0.94→1 on a long timeline stuttered at the crest.
+ * s03 bloom life (percent of each layer's own duration):
+ * grow to max by 32%, then opacity fades at locked max scale.
  */
-@keyframes mm-heart-pop {
+@keyframes mm-heart-bloom {
   0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  8% {
+    opacity: var(--mm-heart-cascade-op);
     transform: scale(1);
   }
-  42% {
-    transform: scale(var(--mm-heart-pop-scale));
+  32% {
+    opacity: var(--mm-heart-cascade-op);
+    transform: scale(var(--mm-bloom-peak));
+  }
+  33% {
+    opacity: var(--mm-heart-cascade-op);
+    transform: scale(var(--mm-bloom-peak));
   }
   100% {
-    transform: scale(1);
+    opacity: 0;
+    transform: scale(var(--mm-bloom-peak));
   }
 }
 
@@ -794,7 +879,7 @@
   .mm-heart-hero .mm-heart-outline,
   .mm-heart-hero .mm-heart-fill,
   .mm-heart-hero .mm-heart-pop,
-  .mm-heart-hero .mm-heart-spark,
+  .mm-heart-hero .mm-heart-bloom,
   .mm-heart-frame .mm-heart-floater,
   .mm-chat .mm-chat-bubble,
   .mm-chat-typing,
@@ -813,9 +898,13 @@
   }
   .mm-heart-scene[data-mode="hero"] .mm-heart-fill {
     opacity: 1;
+    transform: none;
   }
   .mm-heart-scene[data-mode="hero"] .mm-heart-pop {
     transform: none;
+  }
+  .mm-heart-scene[data-mode="hero"] .mm-heart-cascade {
+    opacity: 0;
   }
   .mm-heart-scene[data-mode="frame"] .mm-heart-hero {
     opacity: 0;

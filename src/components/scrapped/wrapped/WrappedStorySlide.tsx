@@ -496,7 +496,7 @@ export function WrappedStorySlide({
         // mid-fade (same class of leak as section-level align). List BeatBody
         // is absolute pinTop, so nest padding does not affect it.
         field === "one-like-nest"
-          ? "pt-[min(40vh,20rem)] pb-24"
+          ? "pt-[min(34vh,17rem)] pb-24"
           : "py-24",
         className,
       )}

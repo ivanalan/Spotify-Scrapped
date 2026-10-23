@@ -51,7 +51,7 @@ Format:
 ## 1 like artist text flies up a ton when fading into the list
 
 - **Not:** `STORY_MOTION.exitY` (-8px) itself, or the heart’s exit drift.
-- **Cause:** Clearing copy under the 4A heart used section padding `pt-[min(40vh,20rem)]` only while `!isListBeat`. On Meet → list, `current` flips to the list beat immediately, so the section snapped to `py-24` while `AnimatePresence` was still exiting Meet copy: flex `justify-center` recentered that outgoing text high in the viewport on top of the small exit rise.
+- **Cause:** Clearing copy under the 4A heart used section nest top padding only while `!isListBeat`. On Meet → list, `current` flips to the list beat immediately, so the section snapped to `py-24` while `AnimatePresence` was still exiting Meet copy: flex `justify-center` recentered that outgoing text high in the viewport on top of the small exit rise.
 - **Proof:** “Meet your 1 like artists” shot upward then faded; shared exit should only nudge ~8px. Started when nest padding was gated on `!isListBeat`.
 - **Avoid:** Keep nest top padding for the whole `one-like-nest` field. Do not flip section padding from the incoming beat. List BeatBody is absolute `pinTop`, so nest padding does not layout the list.
 - **Related:** scar above (section-level beat chrome mid-exit), `WrappedStorySlide.tsx`
@@ -176,7 +176,7 @@ Format:
 - **Not:** Story autoplay advancing before the setup beat finishes, or copy motion stealing the handoff.
 - **Cause:** (1) `OneLikeHeartChrome` hard-swapped `mode` hero→frame (unmount hero / mount floaters). Floater CSS used **negative** `animation-delay`s. (2) Scene 4 used `beatPhase >= 2` (copied from 2-line setups): with a 3-block spine that is the Meet 1-like *subtitle*, so the hero fade began while “Meet your 1 like artists” was still on screen. (3) An extra `LIST_HANDOFF_HOLD_MS` then postponed the fade past the copy exit it was meant to match.
 - **Proof:** Heart left during “Meet your 1 like artists” reading; advancing Meet → list looked cut / misaligned with shared copy exit.
-- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Flip `frame` only when the list narrative starts (`beatPhase >= 3` on scene 4). Start the CSS hero fade with that flip (same moment Meet copy exits): no second hold. List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise. Enter uses outline→fill opacity + polar sparks: never a tiny scaled fill or underglow disc (reads as a mid spinner).
+- **Avoid:** Keep hero + frame mounted under one `mm-heart-scene`. Flip `frame` only when the list narrative starts (`beatPhase >= 3` on scene 4). Start the CSS hero fade with that flip (same moment Meet copy exits): no second hold. List floaters use positive stagger delays and a slow opacity hold at the bottom of the rise. Enter uses outline → grow fill + soft stamp → s03 cascade (grow to max, then opacity fade at locked scale): never a tiny scaled fill, underglow disc, or scale that keeps rising during the cascade fade.
 - **Related:** [D-016](docs/decisions/D-016-middeck-metaphor-promote.md), `OneLikeHeartChrome.tsx`, `middeck-metaphors.css`
 
 ## MyScrapped.com clipped by the share moon
