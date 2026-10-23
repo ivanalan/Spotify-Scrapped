@@ -1,7 +1,7 @@
 # D-041: Personal story snapshot (`/s/[token]`) after seat revoke
 
 - **Date:** 2026-10-23
-- **Status:** Locked
+- **Status:** Locked (persist + email **paused** until `STORY_SNAPSHOT_ENABLED=1`)
 - **Closes future phase from:** [D-032](D-032-seat-invite-ready-resend.md)
 
 ## Why
@@ -15,7 +15,8 @@ Spotify Dev Mode seats are scarce. After Dashboard allowlist removal, OAuth cann
 3. **Replay route:** [`/s/[token]`](../../src/app/s/[token]/page.tsx) loads by unguessable token; mounts `ScrappedExperience` with `chromeMode="walkthrough"` (no OAuth, no Sign out). `robots: noindex`. Capability URL = access.
 4. **Surface:** Delivery is the one-shot email + capability URL at `/s/[token]`. No in-deck **Copy story link** control on the share finale (Share / Replay only).
 5. **One-shot email:** After a ready upsert, if the Spotify account email is known and `story_link_emailed_at` is null, send Resend template `story-link` with `STORY_URL`, then stamp. Never re-sends for that user+year. Soft-fail without `RESEND_*` or template. Link origin is `STORY_PUBLIC_URL` or else `AUTH_URL` (so local OAuth loopback does not leak into mailed URLs).
-6. **Out of scope here:** Video capture; Plus multi-user hosting; magic links that grant live Web API seats; in-deck copy of the story URL.
+6. **Kill switch:** Neon upsert + story-link email no-op unless `STORY_SNAPSHOT_ENABLED` is `1` / `true` / `yes` (`isStorySnapshotPersistEnabled` in [`db.ts`](../../src/lib/story-snapshot/db.ts)). Plumbing stays. `/s/[token]` reads remain for any row already stored. About Privacy omits durable-link claims while paused.
+7. **Out of scope here:** Video capture; Plus multi-user hosting; magic links that grant live Web API seats; in-deck copy of the story URL.
 
 ## Displaced
 
@@ -24,7 +25,7 @@ Spotify Dev Mode seats are scarce. After Dashboard allowlist removal, OAuth cann
 
 ## Cost
 
-Neon stores taste metadata (titles, artists, cover URLs) keyed by Spotify user id. Secret links can be forwarded; disclose in About Privacy. Cover CDN URLs may stale over the TTL.
+Neon stores taste metadata (titles, artists, cover URLs) keyed by Spotify user id when enabled. Secret links can be forwarded; disclose in About Privacy when persist is on. Cover CDN URLs may stale over the TTL. Default-off means no new keepsakes until the flag is flipped.
 
 ## Key files
 

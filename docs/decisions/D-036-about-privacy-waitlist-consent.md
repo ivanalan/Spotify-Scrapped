@@ -11,7 +11,7 @@ The gate collects waitlist emails and the app seals session + story cookies, but
 ## Decision
 
 1. **Placement:** Privacy lives on `/about#privacy` (Layout A section). No dedicated `/privacy` route until a platform or counsel asks for a standalone URL.
-2. **About copy:** Privacy section on `/about#privacy`: OAuth (no password), ~30d encrypted session cookie, ~30d sealed story snapshot cookies (cleared on sign out), durable private story link on Neon after Load ([D-041](D-041-personal-story-snapshot-token.md); ~1y TTL; capability URL), waitlist email storage and seat-only email use, how to leave the waitlist, no sale of data. Soften the trademark blurb (drop “listening data stays yours”).
+2. **About copy:** Privacy section on `/about#privacy`: OAuth (no password), ~30d encrypted session cookie, ~30d sealed story snapshot cookies (cleared on sign out), waitlist email storage and seat-only email use, how to leave the waitlist, no sale of data. Soften the trademark blurb (drop “listening data stays yours”). Durable Neon story-link claims return only when [D-041](D-041-personal-story-snapshot-token.md) persist is enabled (`STORY_SNAPSHOT_ENABLED`).
 3. **Gate waitlist:** Default helper is one caption line: “Join with your Spotify email. Seat emails only.” + link **Privacy** → `/about#privacy` (same link chrome as Sign in; [D-039](D-039-gate-tertiary-vs-link.md)). Error / success helpers replace that line. **Already have access? Sign in** lives in the gate footer ([D-027](D-027-sign-in-under-waitlist.md)).
 
 ## Displaced
