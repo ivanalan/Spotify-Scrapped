@@ -7,6 +7,7 @@ import { deflateSync, inflateSync } from "node:zlib";
 import { CompactEncrypt, compactDecrypt } from "jose";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
+import { slimReportForCookie } from "@/lib/scrapped-api-slim";
 import type { ScrappedApiReport } from "@/lib/scrapped-api";
 
 const FS_DIR = path.join(process.cwd(), "data", "processed");
@@ -86,49 +87,16 @@ const COOKIE_ITEM_CAP = 5;
  * Shrink the snapshot for sealed cookies without dropping album art.
  *
  * On Vercel the FS write is a no-op, so cookies are the only persistence.
- * Nulling `imageUrl` (the old approach) fit more easily but left every cover
- * blank in production. Drop Lab-only prose and extra rows instead.
- *
+ * Drop Lab-only prose and extra rows via `slimReportForCookie`.
  * Keep headline `detail` (`"N of M"`); the API deck reads it for ghosted
- * counts. Wiping it made production say “No all time favs got ghosted”
- * while `left-long-run` items (and art) still sealed.
+ * counts.
  */
 function slimForCookie(stored: StoredApiLabSnapshot): StoredApiLabSnapshot {
-  const report: ScrappedApiReport = {
-    year: stored.report.year,
-    fetchedAt: stored.report.fetchedAt,
-    profileName: stored.report.profileName,
-    headlines: stored.report.headlines.map((h) => ({
-      id: h.id,
-      percent: h.percent,
-      label: h.label,
-      detail: h.detail,
-    })),
-    summary: stored.report.summary,
-    cards: stored.report.cards.map((card) => ({
-      id: card.id,
-      title: card.title,
-      calculated: "",
-      means: "",
-      bar: "",
-      source: "",
-      headline: card.headline,
-      items: card.items.slice(0, COOKIE_ITEM_CAP).map((item) => ({
-        id: item.id,
-        trackId: item.trackId,
-        label: item.label,
-        sublabel: item.sublabel,
-        detail: item.detail,
-        value: item.value,
-        imageUrl: item.imageUrl,
-      })),
-    })),
-  };
   return {
     fetchedAt: stored.fetchedAt,
     userId: stored.userId,
     schemaVersion: stored.schemaVersion ?? API_LAB_SNAPSHOT_VERSION,
-    report,
+    report: slimReportForCookie(stored.report, COOKIE_ITEM_CAP),
     // Plus joins can use a short sample; full URI list is disk-only locally.
     likedUris: stored.likedUris.slice(0, 40),
   };

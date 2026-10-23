@@ -130,6 +130,17 @@ export function ScrappedAboutPage() {
               can reopen without fetching again. Sign out clears those cookies.
             </p>
             <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              We also save a private story link on our servers (song and artist
+              names, cover URLs) so you can reopen your Scrapped after your live
+              seat ends. Anyone with that link can view the story. Links expire
+              after about a year. Copy yours from the share screen at the end of
+              the deck.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
+              Once per story year, we email that private link to the Spotify
+              account address you signed in with.
+            </p>
+            <p className="text-body mt-3 w-full text-[var(--wrapped-muted)]">
               If you join the waitlist, we store that email so we can send a seat
               invite. We only email waitlist addresses about access. To leave the
               waitlist, reply to a Scrapped seat email or write the From address

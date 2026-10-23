@@ -24,6 +24,7 @@ import {
   getTopArtists,
   getTopTracks,
 } from "./spotify/listening";
+import { upsertStorySnapshot } from "./story-snapshot/db";
 
 /**
  * Ensure sabbatical artists (#1 and #2) have playable trackIds distinct from
@@ -285,6 +286,15 @@ export async function fetchAndStoreScrappedApiLab(
 
     // Persist to disk so local refreshes aren't cookie-only.
     await writeApiLabSnapshot(stored);
+
+    // Durable post-seat replay (/s/[token]); soft-fails without Neon.
+    if (connection.userId) {
+      await upsertStorySnapshot({
+        spotifyUserId: connection.userId,
+        year,
+        report,
+      });
+    }
 
     return { kind: "ready", report, stored };
   } catch (err) {

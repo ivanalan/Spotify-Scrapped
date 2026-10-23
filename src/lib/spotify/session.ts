@@ -12,6 +12,8 @@ export type SpotifySession = {
   expiresAt: number; // unix seconds
   displayName?: string | null;
   userId?: string;
+  /** Spotify account email (`user-read-email`); used for one-shot story-link mail. */
+  email?: string | null;
 };
 
 const cookieOptions = {
@@ -57,6 +59,10 @@ export async function unsealSession(token: string): Promise<SpotifySession | nul
           ? (payload.displayName as string | null)
           : undefined,
       userId: typeof payload.userId === "string" ? payload.userId : undefined,
+      email:
+        typeof payload.email === "string" || payload.email === null
+          ? (payload.email as string | null)
+          : undefined,
     };
   } catch {
     return null;

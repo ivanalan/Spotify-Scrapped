@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
+  <title>Your Scrapped story link</title>
+  <!--
+    Resend: Templates → Create → alias `story-link` → publish.
+    Add variable STORY_URL (string). Subject: Your Scrapped story link
+    From: same as seat-invite (RESEND_FROM).
+    CTA href and fallback text use {{{STORY_URL}}}.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: light dark; }
+    .invite-copy { color: #1a1a1a !important; }
+    .invite-muted { color: #3d3d3d !important; }
+    .invite-caption { color: #6e6b7a !important; }
+    .invite-caption a { color: #3d3d3d !important; }
+    .invite-btn-td { background: #12101a !important; }
+    .invite-btn { color: #f5f5f5 !important; }
+    @media (prefers-color-scheme: dark) {
+      .invite-copy { color: #f5f5f5 !important; }
+      .invite-muted { color: #c8c6d0 !important; }
+      .invite-caption { color: #8a8796 !important; }
+      .invite-caption a { color: #c8c6d0 !important; }
+      .invite-btn-td { background: #f5f5f5 !important; }
+      .invite-btn { color: #12101a !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+    <tr>
+      <td align="left" style="padding:40px 24px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:420px;">
+          <tr>
+            <td class="invite-copy" style="font-family:Poppins,Helvetica,Arial,sans-serif;color:#1a1a1a;">
+              <p style="margin:0;font-size:28px;line-height:1.2;font-weight:700;">2026</p>
+              <p style="margin:4px 0 0;font-size:28px;line-height:1.2;font-weight:700;font-style:italic;">Scrapped</p>
+              <p class="invite-muted" style="margin:24px 0 0;font-size:16px;line-height:1.5;font-weight:400;color:#3d3d3d;">
+                Keep this private link. You can reopen your Scrapped story even after your live seat ends.
+              </p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:32px 0 0;">
+                <tr>
+                  <td class="invite-btn-td" style="border-radius:8px;background:#12101a;">
+                    <a class="invite-btn" href="{{{STORY_URL}}}" style="display:block;padding:14px 28px;font-family:Poppins,Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.25;color:#f5f5f5;text-decoration:none;text-align:center;">
+                      Open your story
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p class="invite-caption" style="margin:28px 0 0;font-size:13px;line-height:1.45;color:#6e6b7a;word-break:break-all;">
+                Or open <a href="{{{STORY_URL}}}" style="color:#3d3d3d;">{{{STORY_URL}}}</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

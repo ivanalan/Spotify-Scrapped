@@ -1403,7 +1403,7 @@ export function ApiScrappedDeck({
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-36 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "absolute top-0 bottom-44 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
             : "absolute inset-y-0 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />
@@ -1417,7 +1417,7 @@ export function ApiScrappedDeck({
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-36 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "absolute top-0 bottom-44 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
             : "absolute inset-y-0 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />

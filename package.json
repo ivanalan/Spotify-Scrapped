@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "NODE_OPTIONS='--max-http-header-size=65536' next start --hostname 127.0.0.1 --port 3000",
     "lint": "eslint",
-    "test": "tsx --test src/lib/api-scrapped-soundtrack.test.ts src/lib/scrapped-api-ghosted.test.ts",
+    "test": "tsx --test src/lib/api-scrapped-soundtrack.test.ts src/lib/scrapped-api-ghosted.test.ts src/lib/scrapped-api-slim.test.ts",
     "ingest": "tsx scripts/ingest.ts",
     "invite": "tsx --env-file=.env.local scripts/invite.ts"
   },

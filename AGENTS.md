@@ -90,6 +90,7 @@ See **[docs/DATA.md](docs/DATA.md)** and **[docs/WRAPPED.md](docs/WRAPPED.md)** 
 - No dash punctuation in writing (`—`, `--`, spaced `-` as clause breaks). Use sentences, semicolons, or colons ([D-030](docs/decisions/D-030-no-dash-punctuation.md)).
 - Tab / app hide sticky-pauses the API story; stay paused on return ([D-031](docs/decisions/D-031-pause-on-tab-hide.md)).
 - Seat invite: local `npm run invite -- <email>…` (1–5) via Resend template `seat-invite`; CTA `/ready` (off-waitlist Sign in, ~24h copy). Spotify allowlist rotation stays manual ([D-035](docs/decisions/D-035-local-invite-script-resend-template.md), [D-032](docs/decisions/D-032-seat-invite-ready-resend.md)).
+- Personal story snapshot: ready deck upserts deck-slim report to Neon; one-shot Resend `story-link` email; replay at `/s/[token]` (no finale copy control) ([D-041](docs/decisions/D-041-personal-story-snapshot-token.md)).
 - Global 404 is simple ink + orchid wash, logo top, centered mid, one Go home ([D-034](docs/decisions/D-034-simple-404-orchid-wash.md)).
 
 ## Layout
