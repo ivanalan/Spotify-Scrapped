@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type MouseEvent as ReactMouseEvent,
   type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
 } from "react";
@@ -33,7 +32,6 @@ import {
   type ShareFinaleTuneState,
 } from "@/components/scrapped/ShareFinaleLayoutTune";
 import { SignOutConfirmButton } from "@/components/scrapped/SignOutConfirmButton";
-import { SpotifyContentCredit } from "@/components/scrapped/SpotifyContentCredit";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
 import { WrappedEntityList } from "@/components/scrapped/wrapped/WrappedEntityList";
 import { WrappedStorySlide } from "@/components/scrapped/wrapped/WrappedStorySlide";
@@ -43,11 +41,6 @@ import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
 } from "@/lib/api-scrapped-soundtrack";
-import {
-  spotifyArtistUrl,
-  spotifyOpenLinkFromPoint,
-  spotifyTrackUrl,
-} from "@/lib/spotify/open-url";
 import { cn } from "@/lib/utils";
 import {
   SHARE_FINALE_DENSITY as D,
@@ -609,22 +602,13 @@ export function ApiScrappedDeck({
   );
 
   const onZoneClick = useCallback(
-    (dir: -1 | 1, e?: ReactMouseEvent<HTMLButtonElement>) => {
+    (dir: -1 | 1) => {
       clearPrimeHoldTimer();
-      // Zones paint above covers/rows; open Spotify when the tap is over a link.
-      if (e) {
-        const spotifyLink = spotifyOpenLinkFromPoint(e.clientX, e.clientY);
-        if (spotifyLink) {
-          cancelSoundtrackPrime();
-          window.open(spotifyLink.href, "_blank", "noopener,noreferrer");
-          return;
-        }
-      }
       const next = activeRef.current + dir;
       if (next < 0 || next > FINALE_INDEX) return;
       goTo(next);
     },
-    [goTo, clearPrimeHoldTimer, cancelSoundtrackPrime],
+    [goTo, clearPrimeHoldTimer],
   );
 
   const onZonePointerUp = useCallback(() => {
@@ -983,14 +967,7 @@ export function ApiScrappedDeck({
                 ? "A multi year fav that fell out of the recent rotation."
                 : "Wow. You actually still talk to your old favs.",
               lead: topSong ? (
-                <a
-                  href={spotifyTrackUrl(topSong.trackId ?? topSong.id)}
-                  data-spotify-open=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open ${topSong.label} on Spotify`}
-                  className="relative mx-auto block size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--wrapped-ink)]"
-                >
+                <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topSong.imageUrl ? (
                     <Image
                       src={topSong.imageUrl}
@@ -1002,7 +979,7 @@ export function ApiScrappedDeck({
                       priority
                     />
                   ) : null}
-                </a>
+                </div>
               ) : undefined,
               align: "center",
               display: "hero",
@@ -1040,10 +1017,8 @@ export function ApiScrappedDeck({
                     label: item.label,
                     sublabel: item.sublabel,
                     imageUrl: item.imageUrl,
-                    href: spotifyTrackUrl(item.trackId ?? item.id),
                   }))}
                   active={!held && active === 3}
-                  showSpotifyCredit
                 />
               ),
             },
@@ -1090,12 +1065,8 @@ export function ApiScrappedDeck({
                       </span>
                     ),
                     imageUrl: item.imageUrl,
-                    href: item.trackId
-                      ? spotifyTrackUrl(item.trackId)
-                      : spotifyArtistUrl(item.id),
                   }))}
                   active={!held && active === 4}
-                  showSpotifyCredit
                   empty="No 1 like artists in this sample. Loyal, or just indecisive?"
                 />
               ),
@@ -1120,14 +1091,7 @@ export function ApiScrappedDeck({
                 ? "Highest multi year fav missing from latest activity."
                 : "Your loyalty program is weirdly intact.",
               lead: topArtist ? (
-                <a
-                  href={spotifyArtistUrl(topArtist.id)}
-                  data-spotify-open=""
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open ${topArtist.label} on Spotify`}
-                  className="relative mx-auto block size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--wrapped-ink)]"
-                >
+                <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topArtist.imageUrl ? (
                     <Image
                       src={topArtist.imageUrl}
@@ -1138,7 +1102,7 @@ export function ApiScrappedDeck({
                       priority
                     />
                   ) : null}
-                </a>
+                </div>
               ) : undefined,
               align: "center",
               display: "hero",
@@ -1177,10 +1141,8 @@ export function ApiScrappedDeck({
                     label: item.label,
                     sublabel: item.detail,
                     imageUrl: item.imageUrl,
-                    href: spotifyArtistUrl(item.id),
                   }))}
                   active={!held && active === 6}
-                  showSpotifyCredit
                   empty="Empty sabbatical list. Touch grass? Or don’t."
                 />
               ),
@@ -1214,10 +1176,8 @@ export function ApiScrappedDeck({
                             label: item.label,
                             sublabel: item.sublabel,
                             imageUrl: item.imageUrl,
-                            href: spotifyTrackUrl(item.trackId ?? item.id),
                           }))}
                         active={!held && active === 7}
-                        showSpotifyCredit
                       />
                     ),
                   },
@@ -1371,7 +1331,6 @@ export function ApiScrappedDeck({
                   </div>
                 </div>
               </div>
-              <SpotifyContentCredit className="mt-2 w-full shrink-0 text-center" />
             </div>
 
             <div
@@ -1425,7 +1384,7 @@ export function ApiScrappedDeck({
         aria-label="Previous slide"
         onPointerDown={(e) => onZonePointerDown(-1, e)}
         onPointerUp={onZonePointerUp}
-        onClick={(e) => onZoneClick(-1, e)}
+        onClick={() => onZoneClick(-1)}
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
@@ -1439,7 +1398,7 @@ export function ApiScrappedDeck({
         aria-label="Next slide"
         onPointerDown={(e) => onZonePointerDown(1, e)}
         onPointerUp={onZonePointerUp}
-        onClick={(e) => onZoneClick(1, e)}
+        onClick={() => onZoneClick(1)}
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX

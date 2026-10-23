@@ -1,11 +1,6 @@
 export { SPOTIFY_SCOPES } from "./scopes";
 export { spotifyRedirectUri } from "./redirect";
 export {
-  spotifyArtistUrl,
-  spotifyOpenLinkFromPoint,
-  spotifyTrackUrl,
-} from "./open-url";
-export {
   SpotifyApiError,
   getSpotifyAccessToken,
   getSpotifyCooldown,
