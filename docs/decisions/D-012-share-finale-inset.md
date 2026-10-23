@@ -25,9 +25,9 @@ Wrapped’s finale ritual is inset card + Share + Replay, not a full-bleed scree
 | Axis | Choice |
 |------|--------|
 | IA | Inset card + Share + Replay below |
-| Card aspect | **9:16** always; height-first shell = min(leftover height, slot×16/9, `maxWidthPx`×16/9); no flex-stretch to non-portrait |
-| Preview fit | Size container is **shell-only**. Spotify credit sits outside that container (sibling under the island, still on stage / outside capture). Shell sizes to leftover after chrome padding, credit, and Share / Replay so short phones do not clip `myscrapped.com` |
-| Design canvas | Locked **300 × 533** poster; shell scales it uniformly (`scale(shellW/300)`). Type/spacing identical on every viewport; [D-033](D-033-share-finale-b2-plain-teal.md) |
+| Card aspect | **9:16** always; `--share-shell-w` = min(slot, leftover×9/16, `maxWidthPx` **300**); shell width uses that var; no flex-stretch to non-portrait |
+| Preview fit | Size container is **shell-only**. Spotify credit sits outside that container (sibling under the island, still on stage / outside capture). Same `--share-shell-w` drives `scale(var(--share-shell-w) / 300)` so iOS cannot mis-scale a nested `cqw` and clip the right/bottom |
+| Design canvas | Locked **300 × 533** poster; shell scales it uniformly via `--share-shell-w`. Type/spacing identical on every viewport; [D-033](D-033-share-finale-b2-plain-teal.md) |
 | Export PNG | Capture the **unscaled** design node; scale so width ≈ **1080** (`exportWidthPx`) → ~1080×1920, still 9:16 |
 | Card thesis | Hero + Left on read / Ghosted songs + liked metrics under lists + centered brand |
 | Share | Capture **inset card only** → native OS share sheet with PNG file (`shareCardImage` / `navigator.share({ files })` **files-only**). Pre-capture while finale is idle so iOS keeps the tap gesture. User chooses Save/Download or another app. No auto-download when the sheet opens. |
@@ -44,7 +44,7 @@ Gold full-bleed share slide with edge-to-edge `ShareRecapCard` and no Share / Re
 
 ## Cost
 
-Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). iOS requires files-only ShareData + precapture before tap (see SCARS). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Wide / tall viewports leave more stage around a capped 9:16 shell (Share column matches); the poster inside stays 300×533 scaled down. Agents must not restore URL-only share, title/text+files ShareData, silent auto-download-as-primary, uncapped desktop growth, rem-reflowing islands without uniform scale, credit inside the shell size container (clips brand on short phones), or non-9:16 stretch cards without revisiting this decision.
+Desktop browsers that lack `canShare({ files })` fall back to a direct PNG download (no sheet). iOS requires files-only ShareData + precapture before tap (see SCARS). Ghost bob may freeze mid-frame in the PNG. No Instagram deep link. Plus finale unchanged. Wide / tall viewports leave more stage around a capped 9:16 shell (Share column matches); the poster inside stays 300×533 scaled down. Agents must not restore URL-only share, title/text+files ShareData, silent auto-download-as-primary, uncapped desktop growth, rem-reflowing islands without uniform scale, credit inside the shell size container, nested shell `cqw` scale (iOS right/bottom clip), or non-9:16 stretch cards without revisiting this decision.
 
 ## Source of truth
 

@@ -10,6 +10,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type MouseEvent as ReactMouseEvent,
   type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
@@ -1294,21 +1295,25 @@ export function ApiScrappedDeck({
           >
             {/*
               9:16 island (D-012 / D-033): size container is shell-only so cqb is
-              leftover after credit + actions. Inner capture node stays the fixed
-              design canvas (maxWidthPx × designHeightPx) scaled uniformly.
-              Export captures the unscaled design node → ~1080×1920.
+              leftover after credit + actions. --share-shell-w is computed once on
+              that slot and reused for shell width + canvas scale (nested cqw on
+              the shell mis-scales on iOS and clips the right/bottom). Export
+              still captures the unscaled 300×533 design node → ~1080×1920.
             */}
             <div className="flex min-h-0 w-full flex-1 flex-col">
               <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center [container-type:size]">
                 <div
-                  className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)] [container-type:size]"
-                  style={{
-                    aspectRatio: D.aspectRatio,
-                    // Height-first: never exceed leftover slot (credit is outside).
-                    height: `min(100cqb, calc(100cqi * 16 / 9), calc(${shareTune.maxWidthPx}px * 16 / 9))`,
-                    width: "auto",
-                    borderRadius: "var(--share-card-radius, 0px)",
-                  }}
+                  className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+                  style={
+                    {
+                      aspectRatio: D.aspectRatio,
+                      // Same expression for width + scale (slot is the only CQ).
+                      ["--share-shell-w"]: `min(100cqi, calc(100cqb * 9 / 16), ${shareTune.maxWidthPx}px)`,
+                      width: "var(--share-shell-w)",
+                      height: "auto",
+                      borderRadius: "var(--share-card-radius, 0px)",
+                    } as CSSProperties
+                  }
                 >
                   {/*
                     Scaler fits the fixed design canvas into the shell.
@@ -1320,7 +1325,7 @@ export function ApiScrappedDeck({
                     style={{
                       width: D.maxWidthPx,
                       height: D.designHeightPx,
-                      transform: `scale(calc(100cqw / ${D.maxWidthPx}))`,
+                      transform: `scale(calc(var(--share-shell-w) / ${D.maxWidthPx}px))`,
                     }}
                   >
                     <div

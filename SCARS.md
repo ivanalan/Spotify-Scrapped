@@ -190,9 +190,9 @@ Format:
 ## Share preview clips myscrapped.com on short phones
 
 - **Not:** Export PNG density, list ellipsis, or moon z-order over the brand.
-- **Cause:** Scene 9 put `SpotifyContentCredit` inside the `[container-type:size]` slot and sized the 9:16 shell with `100cqb` of that whole box. The shell claimed the full leftover height; the credit still needed ~24px underneath; section `overflow-hidden` chopped the teal card bottom.
-- **Proof:** iPhone 13 Pro Safari showed Share / Replay and “Content from Spotify,” but `myscrapped.com` was cut at the card edge. Saved PNG (unscaled 300×533 capture) looked complete.
-- **Avoid:** Size container is shell-only. Credit is a sibling under the island (still outside capture). Height-first shell: `min(100cqb, 100cqi×16/9, maxWidth×16/9)`. Do not put stage chrome inside the cqb box.
+- **Cause (stack):** (1) `SpotifyContentCredit` lived inside the `[container-type:size]` slot, so `100cqb` ignored the credit’s height. (2) After moving credit out, height-first shell + nested `scale(100cqw / 300)` on the shell container mis-resolved `cqw` on iOS: the 300×533 canvas stayed near full size inside a narrower shell, and `overflow-hidden` chopped the **right and bottom** (Ghosted column, Liked this year, brand).
+- **Proof:** iPhone 13 Pro Safari showed Share / Replay and “Content from Spotify,” but the teal card’s right edge and `myscrapped.com` were cut. Saved PNG (unscaled 300×533 capture) looked complete.
+- **Avoid:** Size container is shell-only; credit is a sibling under the island. Compute `--share-shell-w` once on that slot (`min(100cqi, 100cqb×9/16, maxWidth)`) and reuse it for shell width **and** `scale(var(--share-shell-w) / 300)`. Do not nest `container-type` on the shell for scale, and do not put stage chrome inside the cqb box.
 - **Related:** [D-012](docs/decisions/D-012-share-finale-inset.md), `ApiScrappedDeck` scene 9
 
 ## Non-allowlisted Spotify sign-in refreshes with a JSON parse error
