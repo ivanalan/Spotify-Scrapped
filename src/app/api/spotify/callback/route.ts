@@ -47,9 +47,11 @@ export async function GET(request: Request) {
       const me = (await meRes.json()) as {
         id?: string;
         display_name?: string | null;
+        email?: string | null;
       };
       session.userId = me.id;
       session.displayName = me.display_name ?? null;
+      session.email = me.email ?? null;
     } else if (meRes.status === 403) {
       // Dev Mode: authorize can succeed; API rejects non-allowlisted users.
       throw new SpotifyOAuthError("not_allowlisted");

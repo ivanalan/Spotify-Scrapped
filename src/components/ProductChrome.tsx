@@ -14,7 +14,8 @@ function isFullBleedScrapped(pathname: string): boolean {
     pathname === "/" ||
     pathname === "/about" ||
     pathname === "/example" ||
-    pathname === "/ready"
+    pathname === "/ready" ||
+    pathname.startsWith("/s/")
   );
 }
 

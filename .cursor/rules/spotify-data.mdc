@@ -5,6 +5,7 @@ alwaysApply: true
 
 # Spotify data rules
 
+- **Never read, open, diff, or edit `.env.local` (or other secret env files).** Use [`.env.example`](../../.env.example) as the proxy for env names and comments. Tell the human which keys to set; do not load real values. If a task seems to need `.env.local`, stop and ask them to paste a redacted snippet or confirm the key name only.
 - Agent memory (soul / scars / decisions): read [SOUL.md](SOUL.md) and [agent-memory.mdc](agent-memory.mdc). The file is the memory, not the conversation.
 - Read [docs/DATA.md](docs/DATA.md) and [AGENTS.md](AGENTS.md) before changing ingest or analytics.
 - Before changing Scrapped deck order, slide copy, or share-card framing, read [docs/WRAPPED.md](docs/WRAPPED.md); keep Wrapped’s beat spine; invert meaning, don’t scramble pacing. API story voice: conversational text-first (see mocks + API spine in WRAPPED.md). `/scrapped` slide copy lives in `ApiScrappedDeck.tsx`.

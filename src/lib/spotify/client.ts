@@ -68,6 +68,7 @@ export const getSpotifyConnection = cache(async (): Promise<{
   connected: boolean;
   displayName?: string | null;
   userId?: string;
+  email?: string | null;
 }> => {
   const session = await getFreshSession();
   if (!session) return { connected: false };
@@ -75,6 +76,7 @@ export const getSpotifyConnection = cache(async (): Promise<{
     connected: true,
     displayName: session.displayName,
     userId: session.userId,
+    email: session.email,
   };
 });
 
