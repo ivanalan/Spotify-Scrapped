@@ -166,7 +166,7 @@ export function ScrappedGate({
             </div>
           ) : (
             <>
-              <p className="text-body mt-6 w-full text-[var(--wrapped-ink)]">
+              <p className="text-body mt-4 w-full text-[var(--wrapped-ink)]">
                 Scrapped is your <span className="italic">anti-wrapped</span>.
                 Songs you ghosted and artists you left on read.
               </p>

@@ -167,7 +167,7 @@ export function GateWaitlistForm({ className }: { className?: string }) {
       </div>
       <div className="mt-2.5 w-full">
         <p
-          className="text-caption w-full text-[0.875rem] text-[var(--wrapped-muted)]"
+          className="text-caption w-full text-[var(--wrapped-muted)]"
           aria-live="polite"
         >
           {helper}
