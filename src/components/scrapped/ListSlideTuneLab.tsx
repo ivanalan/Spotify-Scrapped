@@ -38,7 +38,7 @@ const MOCK_ROWS = [
   },
 ];
 
-const HEADLINE = "The reunion setlist";
+const HEADLINE = "The all-star setlist";
 const SUBLINE =
   "Old multi-year favorites; or old likes; back in your 4-week tops after a gap.";
 
@@ -368,7 +368,7 @@ export function ListSlideTuneLab() {
           Scrapped · Slide 08 tune lab
         </p>
         <h1 className="max-w-[18ch] font-heading text-[clamp(2.5rem,7vw,3.75rem)] leading-[0.95] tracking-[-0.03em] text-foreground">
-          Reunion setlist
+          All-star setlist
         </h1>
         <p className="max-w-xl text-[1.05rem] leading-relaxed text-muted-foreground">
           Direct view of slide 08 (list beat). Sliders retune title, subtitle,

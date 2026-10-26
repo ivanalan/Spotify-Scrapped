@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Share · All time favs · G3 spine left tune</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --stage: #0a0a0a;
+        --muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --accent: #c9a0f5;
+
+        --card-bg: #f0b429;
+        --card-ink: #1c1c1c;
+        --card-muted: color-mix(in oklab, #1c1c1c 72%, transparent);
+        --film-bg: #0a0a0a;
+        --film-hole: #f0b429;
+
+        --w: 300;
+        --h: 533;
+        --hero-pct: 46;
+        --hero-art-pct: 58;
+        --pad-x: 16;
+        --list-row-gap: 0.51;
+        --list-label-gap: 0.55;
+        --type-rem: 0.71;
+        --metric-num: 1.3;
+        --metric-lab: 0.72;
+        --metrics-gap: 29;
+        --art-list-gap: 2;
+        --brand-pad: 12;
+        --col-gap: 14;
+
+        --lb-h: 64;
+        --sprocket-w: 16;
+        --sprocket-h: 16;
+        --sprocket-gap: 15;
+        --sprocket-pad-x: 12;
+        --list-width: 64;
+        --film-dur-top: 36s;
+        --film-dur-bot: 42s;
+
+        /* Spine brand */
+        --spine-size: 0.72;
+        --spine-track: -0.015;
+        --spine-x: -31;
+        --spine-y: 50;
+        --spine-rot: -90;
+        --spine-op: 1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 1.75rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        max-width: 46rem;
+        margin: 0 0 1.1rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .lock {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #1a1624;
+        background: var(--accent);
+        padding: 0.22rem 0.65rem;
+        margin: 0 0 1.25rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stage-frame {
+        background: #0a0a0a;
+        padding: 1rem 0.75rem 1.15rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.7rem;
+      }
+
+      .stage-frame.sticky {
+        position: sticky;
+        top: 1rem;
+      }
+
+      .card {
+        position: relative;
+        width: calc(var(--w) * 1px);
+        height: calc(var(--h) * 1px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        color: var(--card-ink);
+        background: var(--card-bg);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        flex-shrink: 0;
+      }
+
+      .film-strip {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: calc(var(--lb-h) * 1px);
+        background: var(--film-bg);
+        z-index: 2;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .film-strip.top {
+        top: 0;
+      }
+
+      .film-strip.bot {
+        bottom: 0;
+      }
+
+      .film-perfs {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        gap: calc(var(--sprocket-gap) * 1px);
+        padding: 0 calc(var(--sprocket-pad-x) * 1px);
+        min-width: 200%;
+        height: 100%;
+        animation: film-scroll var(--film-dur-top) linear infinite;
+      }
+
+      .film-strip.bot .film-perfs {
+        animation-duration: var(--film-dur-bot);
+        animation-direction: reverse;
+      }
+
+      .film-perfs i {
+        flex: 0 0 calc(var(--sprocket-w) * 1px);
+        width: calc(var(--sprocket-w) * 1px);
+        height: calc(var(--sprocket-h) * 1px);
+        border-radius: 2px;
+        background: var(--film-hole);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+      }
+
+      @keyframes film-scroll {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .film-perfs {
+          animation: none;
+        }
+      }
+
+      .hero {
+        position: relative;
+        z-index: 3;
+        flex: 0 0 calc(var(--hero-pct) * 1%);
+        display: grid;
+        place-items: center;
+        overflow: visible;
+      }
+
+      .hero-frame {
+        position: relative;
+        z-index: 10;
+        width: calc(var(--hero-art-pct) * 1%);
+        aspect-ratio: 1;
+        max-height: 88%;
+        overflow: hidden;
+        background: color-mix(in oklab, var(--card-ink) 10%, transparent);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      }
+
+      .hero-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .body {
+        position: relative;
+        z-index: 4;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0 calc(var(--pad-x) * 1px)
+          calc(var(--lb-h) * 1px + var(--brand-pad) * 1px);
+      }
+
+      .lists {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: calc(var(--art-list-gap) * 1px);
+        min-height: 0;
+      }
+
+      .lists .col {
+        width: calc(var(--list-width) * 1%);
+        min-width: 0;
+      }
+
+      .col h4 {
+        margin: 0 0 calc(var(--list-label-gap) * 1rem);
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        color: var(--card-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .col ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--list-row-gap) * 1rem);
+      }
+
+      .col li {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        column-gap: 0.28rem;
+        align-items: baseline;
+        font-size: calc(var(--type-rem) * 1rem);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        min-width: 0;
+      }
+
+      .col li .n {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .col li .t {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--col-gap) * 1px);
+        margin-top: calc(var(--metrics-gap) * 1px);
+        width: 100%;
+      }
+
+      .metric .lab {
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        line-height: 1.2;
+        color: var(--card-muted);
+      }
+
+      .metric .val {
+        margin-top: 0.12rem;
+        font-size: calc(var(--metric-num) * 1rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .brand.spine-left {
+        position: absolute;
+        z-index: 6;
+        left: calc(var(--spine-x) * 1px);
+        top: calc(var(--spine-y) * 1%);
+        transform: translateY(-50%) rotate(calc(var(--spine-rot) * 1deg));
+        transform-origin: center center;
+        font-size: calc(var(--spine-size) * 1rem);
+        font-weight: 700;
+        letter-spacing: calc(var(--spine-track) * 1em);
+        line-height: 1.15;
+        white-space: nowrap;
+        color: var(--card-ink);
+        opacity: var(--spine-op);
+        pointer-events: none;
+      }
+
+      .cta {
+        width: min(100%, 300px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .cta .share {
+        height: 40px;
+        border: 0;
+        border-radius: 999px;
+        background: #f5f5f5;
+        color: #1c1c1c;
+        font: 700 0.85rem Poppins, sans-serif;
+      }
+
+      .cta .replay {
+        height: 40px;
+        border: 0;
+        background: transparent;
+        color: color-mix(in oklab, #f5f5f5 88%, transparent);
+        font: 600 0.75rem Poppins, sans-serif;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: calc(100dvh - 2rem);
+        overflow: auto;
+        padding-right: 0.25rem;
+      }
+
+      .panel {
+        background: color-mix(in oklab, #1c1c1c 55%, #2a2433);
+        border: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        padding: 0.85rem 0.95rem 0.95rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.55rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      .panel h3 .hint {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 0.68rem;
+        opacity: 0.85;
+      }
+
+      .knobs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem 0.75rem;
+      }
+
+      .knob {
+        min-width: 0;
+      }
+
+      .knob.span2 {
+        grid-column: 1 / -1;
+      }
+
+      .knob label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.66rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 0.1rem;
+      }
+
+      .knob label output {
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .knob input[type="range"] {
+        width: 100%;
+        accent-color: #c9a0f5;
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 0.45rem;
+        margin-top: 0.55rem;
+      }
+
+      .panel-actions button {
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--paper);
+        font: 600 0.7rem Poppins, sans-serif;
+        padding: 0.35rem 0.55rem;
+        cursor: pointer;
+      }
+
+      .recipe {
+        margin: 0;
+        font-size: 0.68rem;
+        color: var(--muted);
+        line-height: 1.5;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .locked {
+        margin: 0;
+        font-size: 0.72rem;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .locked code {
+        color: var(--accent);
+        font-size: 0.88em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Share · <em>G3</em> · spine left</h1>
+      <p class="lede">
+        Locked art: G3 cinema film · yellow field · cover on top · C2 narrow
+        list. Brand is <code>myscrapped.com</code> on the left spine. Use the
+        knobs for position and type size.
+      </p>
+      <div class="lock">Lock · G3 · spine left · live tune</div>
+
+      <div class="layout">
+        <div class="stage-frame sticky">
+          <article class="card" id="card" aria-label="All time favs share card">
+            <div class="film-strip top" aria-hidden="true">
+              <div class="film-perfs" id="perfs-top"></div>
+            </div>
+            <div class="film-strip bot" aria-hidden="true">
+              <div class="film-perfs" id="perfs-bot"></div>
+            </div>
+            <div class="brand spine-left" id="brand">myscrapped.com</div>
+            <header class="hero">
+              <div class="hero-frame">
+                <img
+                  src="assets/hero-cover.png"
+                  alt=""
+                  width="300"
+                  height="300"
+                />
+              </div>
+            </header>
+            <div class="body">
+              <div class="lists">
+                <div class="col">
+                  <h4>All time favs</h4>
+                  <ol>
+                    <li><span class="n">1</span><span class="t">Bags</span></li>
+                    <li>
+                      <span class="n">2</span
+                      ><span class="t">Are You Bored Yet?</span>
+                    </li>
+                    <li>
+                      <span class="n">3</span><span class="t">Soft Spot</span>
+                    </li>
+                    <li>
+                      <span class="n">4</span
+                      ><span class="t">Motion Sickness</span>
+                    </li>
+                    <li>
+                      <span class="n">5</span><span class="t">Kyoto</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="lab">Liked songs</div>
+                  <div class="val">1,001</div>
+                </div>
+                <div class="metric">
+                  <div class="lab">Liked this year</div>
+                  <div class="val">62</div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <div class="cta" aria-hidden="true">
+            <button class="share" type="button">Share</button>
+            <button class="replay" type="button">Replay from beginning</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="panel">
+            <h3>Locked <span class="hint">G3</span></h3>
+            <p class="locked">
+              Field <code>#F0B429</code> · film black 64px · cover 58% z10 · list
+              64% · slow sprockets · brand spine left.
+            </p>
+          </div>
+
+          <div class="panel">
+            <h3>Spine brand <span class="hint">myscrapped.com</span></h3>
+            <div class="knobs">
+              <div class="knob">
+                <label>Size <output id="o-spine-size">0.72rem</output></label>
+                <input
+                  type="range"
+                  id="spine-size"
+                  min="0.5"
+                  max="1.2"
+                  step="0.01"
+                  value="0.72"
+                />
+              </div>
+              <div class="knob">
+                <label>Tracking <output id="o-spine-track">-0.015em</output></label>
+                <input
+                  type="range"
+                  id="spine-track"
+                  min="-0.08"
+                  max="0.12"
+                  step="0.005"
+                  value="-0.015"
+                />
+              </div>
+              <div class="knob">
+                <label>X inset <output id="o-spine-x">-31px</output></label>
+                <input
+                  type="range"
+                  id="spine-x"
+                  min="-40"
+                  max="36"
+                  step="1"
+                  value="-31"
+                />
+              </div>
+              <div class="knob">
+                <label>Y <output id="o-spine-y">50%</output></label>
+                <input
+                  type="range"
+                  id="spine-y"
+                  min="18"
+                  max="82"
+                  step="1"
+                  value="50"
+                />
+              </div>
+              <div class="knob">
+                <label>Rotate <output id="o-spine-rot">-90°</output></label>
+                <input
+                  type="range"
+                  id="spine-rot"
+                  min="-120"
+                  max="-60"
+                  step="1"
+                  value="-90"
+                />
+              </div>
+              <div class="knob">
+                <label>Opacity <output id="o-spine-op">1.00</output></label>
+                <input
+                  type="range"
+                  id="spine-op"
+                  min="0.25"
+                  max="1"
+                  step="0.01"
+                  value="1"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>List type <span class="hint">All time favs</span></h3>
+            <div class="knobs">
+              <div class="knob">
+                <label>Row size <output id="o-type">0.71rem</output></label>
+                <input
+                  type="range"
+                  id="type"
+                  min="0.5"
+                  max="0.95"
+                  step="0.01"
+                  value="0.71"
+                />
+              </div>
+              <div class="knob">
+                <label>Label size <output id="o-metric-lab">0.72rem</output></label>
+                <input
+                  type="range"
+                  id="metric-lab"
+                  min="0.5"
+                  max="1"
+                  step="0.01"
+                  value="0.72"
+                />
+              </div>
+              <div class="knob">
+                <label>List width <output id="o-list-width">64%</output></label>
+                <input
+                  type="range"
+                  id="list-width"
+                  min="48"
+                  max="88"
+                  step="1"
+                  value="64"
+                />
+              </div>
+              <div class="knob">
+                <label>Row gap <output id="o-row-gap">0.51rem</output></label>
+                <input
+                  type="range"
+                  id="row-gap"
+                  min="0.2"
+                  max="0.9"
+                  step="0.01"
+                  value="0.51"
+                />
+              </div>
+              <div class="knob">
+                <label>Label gap <output id="o-label-gap">0.55rem</output></label>
+                <input
+                  type="range"
+                  id="label-gap"
+                  min="0.2"
+                  max="1"
+                  step="0.01"
+                  value="0.55"
+                />
+              </div>
+              <div class="knob">
+                <label>Art → list <output id="o-art-list-gap">2px</output></label>
+                <input
+                  type="range"
+                  id="art-list-gap"
+                  min="0"
+                  max="48"
+                  step="1"
+                  value="2"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Metrics <span class="hint">liked</span></h3>
+            <div class="knobs">
+              <div class="knob">
+                <label>Number <output id="o-metric-num">1.30rem</output></label>
+                <input
+                  type="range"
+                  id="metric-num"
+                  min="0.9"
+                  max="1.8"
+                  step="0.01"
+                  value="1.3"
+                />
+              </div>
+              <div class="knob">
+                <label>Gap after list <output id="o-metrics-gap">29px</output></label>
+                <input
+                  type="range"
+                  id="metrics-gap"
+                  min="8"
+                  max="48"
+                  step="1"
+                  value="29"
+                />
+              </div>
+              <div class="knob">
+                <label>Col gap <output id="o-col-gap">14px</output></label>
+                <input
+                  type="range"
+                  id="col-gap"
+                  min="6"
+                  max="28"
+                  step="1"
+                  value="14"
+                />
+              </div>
+              <div class="knob">
+                <label>Pad X <output id="o-pad-x">16px</output></label>
+                <input
+                  type="range"
+                  id="pad-x"
+                  min="8"
+                  max="28"
+                  step="1"
+                  value="16"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Hero / film <span class="hint">position</span></h3>
+            <div class="knobs">
+              <div class="knob">
+                <label>Hero band <output id="o-hero">46%</output></label>
+                <input
+                  type="range"
+                  id="hero"
+                  min="34"
+                  max="56"
+                  step="1"
+                  value="46"
+                />
+              </div>
+              <div class="knob">
+                <label>Cover size <output id="o-cover">58%</output></label>
+                <input
+                  type="range"
+                  id="cover"
+                  min="44"
+                  max="72"
+                  step="1"
+                  value="58"
+                />
+              </div>
+              <div class="knob">
+                <label>Rail height <output id="o-lb">64px</output></label>
+                <input
+                  type="range"
+                  id="lb"
+                  min="36"
+                  max="88"
+                  step="1"
+                  value="64"
+                />
+              </div>
+              <div class="knob">
+                <label>Sprocket <output id="o-sprocket">16px</output></label>
+                <input
+                  type="range"
+                  id="sprocket"
+                  min="10"
+                  max="22"
+                  step="1"
+                  value="16"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Recipe <span class="hint">copy</span></h3>
+            <pre class="recipe" id="recipe"></pre>
+            <div class="panel-actions">
+              <button type="button" id="reset">Reset defaults</button>
+              <button type="button" id="copy">Copy recipe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const root = document.documentElement;
+      const card = document.getElementById("card");
+
+      const DEFAULTS = {
+        "spine-size": 0.72,
+        "spine-track": -0.015,
+        "spine-x": -31,
+        "spine-y": 50,
+        "spine-rot": -90,
+        "spine-op": 1,
+        type: 0.71,
+        "metric-lab": 0.72,
+        "list-width": 64,
+        "row-gap": 0.51,
+        "label-gap": 0.55,
+        "art-list-gap": 2,
+        "metric-num": 1.3,
+        "metrics-gap": 29,
+        "col-gap": 14,
+        "pad-x": 16,
+        hero: 46,
+        cover: 58,
+        lb: 64,
+        sprocket: 16,
+      };
+
+      function fillPerfs() {
+        const html = "<i></i>".repeat(32);
+        document.getElementById("perfs-top").innerHTML = html;
+        document.getElementById("perfs-bot").innerHTML = html;
+      }
+
+      function num(id) {
+        return Number(document.getElementById(id).value);
+      }
+
+      function setOut(id, text) {
+        document.getElementById(id).textContent = text;
+      }
+
+      function apply() {
+        const spineSize = num("spine-size");
+        const spineTrack = num("spine-track");
+        const spineX = num("spine-x");
+        const spineY = num("spine-y");
+        const spineRot = num("spine-rot");
+        const spineOp = num("spine-op");
+        const type = num("type");
+        const metricLab = num("metric-lab");
+        const listWidth = num("list-width");
+        const rowGap = num("row-gap");
+        const labelGap = num("label-gap");
+        const artListGap = num("art-list-gap");
+        const metricNum = num("metric-num");
+        const metricsGap = num("metrics-gap");
+        const colGap = num("col-gap");
+        const padX = num("pad-x");
+        const hero = num("hero");
+        const cover = num("cover");
+        const lb = num("lb");
+        const sprocket = num("sprocket");
+
+        root.style.setProperty("--spine-size", String(spineSize));
+        root.style.setProperty("--spine-track", String(spineTrack));
+        root.style.setProperty("--spine-x", String(spineX));
+        root.style.setProperty("--spine-y", String(spineY));
+        root.style.setProperty("--spine-rot", String(spineRot));
+        root.style.setProperty("--spine-op", String(spineOp));
+        root.style.setProperty("--type-rem", String(type));
+        root.style.setProperty("--metric-lab", String(metricLab));
+        root.style.setProperty("--list-width", String(listWidth));
+        root.style.setProperty("--list-row-gap", String(rowGap));
+        root.style.setProperty("--list-label-gap", String(labelGap));
+        root.style.setProperty("--art-list-gap", String(artListGap));
+        root.style.setProperty("--metric-num", String(metricNum));
+        root.style.setProperty("--metrics-gap", String(metricsGap));
+        root.style.setProperty("--col-gap", String(colGap));
+        root.style.setProperty("--pad-x", String(padX));
+        root.style.setProperty("--hero-pct", String(hero));
+        root.style.setProperty("--hero-art-pct", String(cover));
+        root.style.setProperty("--lb-h", String(lb));
+        root.style.setProperty("--sprocket-w", String(sprocket));
+        root.style.setProperty("--sprocket-h", String(sprocket));
+
+        setOut("o-spine-size", `${spineSize.toFixed(2)}rem`);
+        setOut(
+          "o-spine-track",
+          `${spineTrack >= 0 ? "+" : ""}${spineTrack.toFixed(3)}em`,
+        );
+        setOut("o-spine-x", `${spineX}px`);
+        setOut("o-spine-y", `${spineY}%`);
+        setOut("o-spine-rot", `${spineRot}°`);
+        setOut("o-spine-op", spineOp.toFixed(2));
+        setOut("o-type", `${type.toFixed(2)}rem`);
+        setOut("o-metric-lab", `${metricLab.toFixed(2)}rem`);
+        setOut("o-list-width", `${listWidth}%`);
+        setOut("o-row-gap", `${rowGap.toFixed(2)}rem`);
+        setOut("o-label-gap", `${labelGap.toFixed(2)}rem`);
+        setOut("o-art-list-gap", `${artListGap}px`);
+        setOut("o-metric-num", `${metricNum.toFixed(2)}rem`);
+        setOut("o-metrics-gap", `${metricsGap}px`);
+        setOut("o-col-gap", `${colGap}px`);
+        setOut("o-pad-x", `${padX}px`);
+        setOut("o-hero", `${hero}%`);
+        setOut("o-cover", `${cover}%`);
+        setOut("o-lb", `${lb}px`);
+        setOut("o-sprocket", `${sprocket}px`);
+
+        document.getElementById("recipe").textContent = [
+          "kit: g3-spine-left",
+          `spine: size ${spineSize.toFixed(2)}rem · track ${spineTrack.toFixed(3)}em · x ${spineX}px · y ${spineY}% · rot ${spineRot}° · op ${spineOp.toFixed(2)}`,
+          `list: type ${type.toFixed(2)}rem · label ${metricLab.toFixed(2)}rem · width ${listWidth}% · row-gap ${rowGap.toFixed(2)} · label-gap ${labelGap.toFixed(2)} · art-list-gap ${artListGap}px`,
+          `metrics: num ${metricNum.toFixed(2)}rem · gap ${metricsGap}px · col ${colGap}px · pad-x ${padX}px`,
+          `hero: band ${hero}% · cover ${cover}% · rail ${lb}px · sprocket ${sprocket}px`,
+          "field: #F0B429 · film #0A0A0A · cover z10 · brand spine-left",
+        ].join("\n");
+      }
+
+      function reset() {
+        for (const [id, value] of Object.entries(DEFAULTS)) {
+          document.getElementById(id).value = String(value);
+        }
+        apply();
+      }
+
+      document.querySelectorAll(".knobs input[type=range]").forEach((input) => {
+        input.addEventListener("input", apply);
+      });
+
+      document.getElementById("reset").addEventListener("click", reset);
+      document.getElementById("copy").addEventListener("click", async () => {
+        const text = document.getElementById("recipe").textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          document.getElementById("copy").textContent = "Copied";
+          setTimeout(() => {
+            document.getElementById("copy").textContent = "Copy recipe";
+          }, 1200);
+        } catch {
+          document.getElementById("copy").textContent = "Copy failed";
+        }
+      });
+
+      fillPerfs();
+      apply();
+    </script>
+  </body>
+</html>

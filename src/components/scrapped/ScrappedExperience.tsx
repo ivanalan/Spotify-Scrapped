@@ -1,15 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ApiScrappedDeck,
-  type ApiScrappedPauseApi,
-} from "@/components/scrapped/ApiScrappedDeck";
-import {
-  collectSoundtrackUris,
-  DeckSoundtrack,
-  type DeckSoundtrackHandle,
-  type SoundtrackWarmState,
+import type { ApiScrappedPauseApi } from "@/components/scrapped/ApiScrappedDeck";
+import type {
+  DeckSoundtrackHandle,
+  SoundtrackWarmState,
 } from "@/components/scrapped/DeckSoundtrack";
 import { ScrappedGate } from "@/components/scrapped/ScrappedGate";
 import {
@@ -19,6 +15,23 @@ import {
   needsSecondArtistSoundtrackResolve,
 } from "@/lib/api-scrapped-soundtrack";
 import type { ScrappedApiReport } from "@/lib/scrapped-api";
+import { collectSoundtrackUris } from "@/lib/soundtrack-uris";
+
+const ApiScrappedDeck = dynamic(
+  () =>
+    import("@/components/scrapped/ApiScrappedDeck").then(
+      (m) => m.ApiScrappedDeck,
+    ),
+  { ssr: false, loading: () => null },
+);
+
+const DeckSoundtrack = dynamic(
+  () =>
+    import("@/components/scrapped/DeckSoundtrack").then(
+      (m) => m.DeckSoundtrack,
+    ),
+  { ssr: false, loading: () => null },
+);
 
 type Props = {
   report: ScrappedApiReport;
@@ -76,6 +89,24 @@ export function ScrappedExperience({
     leadReady: false,
     leadAudible: false,
   });
+  const [soundtrackModReady, setSoundtrackModReady] = useState(false);
+  const [deckModReady, setDeckModReady] = useState(false);
+  const modulesReady = soundtrackModReady && deckModReady;
+
+  // Prefetch heavy chunks so the gate stays interactive while they load.
+  // Soundtrack can mount (and warm) as soon as its chunk arrives.
+  useEffect(() => {
+    let cancelled = false;
+    void import("@/components/scrapped/DeckSoundtrack").then(() => {
+      if (!cancelled) setSoundtrackModReady(true);
+    });
+    void import("@/components/scrapped/ApiScrappedDeck").then(() => {
+      if (!cancelled) setDeckModReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const soundtrackOpts = useMemo(
     () => ({ artistSoundtrackUri, artistSoundtrackUri2 }),
@@ -177,7 +208,9 @@ export function ScrappedExperience({
   }
 
   const started = phase === "story";
-  const continueEnabled = warm.leadReady || soundtrackPreload.length === 0;
+  const leadWarm =
+    warm.leadReady || soundtrackPreload.length === 0;
+  const continueEnabled = modulesReady && leadWarm;
   // Mount the deck while Cueing/Continue so play() isn't fighting a remount.
   const deckMounted =
     isWalkthrough || continueEnabled || phase !== "gate";
@@ -193,6 +226,7 @@ export function ScrappedExperience({
             phase === "gate" ? handleContinuePointerDown : undefined
           }
           continueEnabled={continueEnabled}
+          modulesReady={modulesReady}
           warmReady={warm.ready}
           warmTotal={Math.max(warm.total, phase === "loading" ? warm.total : 1)}
         />
@@ -223,18 +257,20 @@ export function ScrappedExperience({
       ) : null}
 
       {/* Mounted on the gate so Continue can unlock a warm embed in-gesture. */}
-      <DeckSoundtrack
-        ref={soundtrackRef}
-        uri={soundtrackUri}
-        preloadUris={soundtrackPreload}
-        enabled={soundOn && (!started || !deckPaused)}
-        onEnabledChange={setSoundOn}
-        showToggle={false}
-        showPlayer={false}
-        onWarmChange={setWarm}
-        onExternalPause={() => pauseApiRef.current?.pauseStory()}
-        onExternalResume={() => pauseApiRef.current?.resumeStory()}
-      />
+      {soundtrackModReady ? (
+        <DeckSoundtrack
+          ref={soundtrackRef}
+          uri={soundtrackUri}
+          preloadUris={soundtrackPreload}
+          enabled={soundOn && (!started || !deckPaused)}
+          onEnabledChange={setSoundOn}
+          showToggle={false}
+          showPlayer={false}
+          onWarmChange={setWarm}
+          onExternalPause={() => pauseApiRef.current?.pauseStory()}
+          onExternalResume={() => pauseApiRef.current?.resumeStory()}
+        />
+      ) : null}
     </div>
   );
 }

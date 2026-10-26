@@ -62,6 +62,12 @@ export const SHARE_FINALE_DENSITY = {
   /** Sharp corners: Wrapped-form share island, no radius. */
   radiusPx: 0,
   cardActionsGapPx: 32,
+  /** Gap between share island and carousel dots (D-042). */
+  dotsGapAfterCardPx: 14,
+  /** Space between pagination dots. */
+  dotsGapPx: 8,
+  /** Visual dot diameter (hit target stays 40px). */
+  dotSizePx: 6,
   bodyTopPx: 28,
   bodyBottomPx: 16,
   /** Portrait share island: Stories / Reels friendly (Wrapped 25-share-finale). */
@@ -151,6 +157,59 @@ export const SHARE_FINALE_KIT = {
     wiggle: 1,
     durationSec: 4.3,
     phaseSec: 1.2,
+  },
+} as const;
+
+/**
+ * Share finale card 1: All time favs · G3 cinema film · spine brand (D-043).
+ * Same 300×533 canvas as D-033; yellow field; black letterbox; cover above film.
+ * Explore: `docs/mocks/share-all-time-favs.html`.
+ */
+export const SHARE_ALL_TIME_FAVS_KIT = {
+  id: "g3-spine-left",
+  cardBg: "#F0B429",
+  cardInk: "#1c1c1c",
+  cardMuted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
+  cardPanel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
+  brandLine: "myscrapped.com",
+  listLabel: "All time favs",
+  /** Match card 0 (D-033) cover size + centered hero band. */
+  heroBandPct: SHARE_FINALE_DENSITY.heroBandPct,
+  heroSizePct: SHARE_FINALE_DENSITY.heroSizePct,
+  listWidthPct: 64,
+  listPadXPx: 16,
+  /**
+   * Pull the list up into the empty yellow under the centered cover
+   * without moving the art (negative body margin).
+   */
+  listPullUpPx: 16,
+  listRowGapRem: 0.51,
+  listLabelGapRem: 0.55,
+  typeRem: 0.85,
+  metricNumberRem: 1.3,
+  metricLabelRem: 0.72,
+  metricsGapAfterListPx: 28,
+  listColGapPx: 14,
+  /** Body pad under metrics so content clears the bottom rail. */
+  bodyPadBottomExtraPx: 12,
+  film: {
+    bg: "#0A0A0A",
+    hole: "#F0B429",
+    railHeightPx: 64,
+    sprocketPx: 16,
+    sprocketGapPx: 15,
+    sprocketPadXPx: 12,
+    scrollTopSec: 36,
+    scrollBotSec: 42,
+    perfCount: 32,
+  },
+  spine: {
+    sizeRem: 0.72,
+    letterSpacingEm: -0.015,
+    insetXPx: -31,
+    yPct: 45,
+    rotateDeg: -90,
+    opacity: 1,
   },
 } as const;
 

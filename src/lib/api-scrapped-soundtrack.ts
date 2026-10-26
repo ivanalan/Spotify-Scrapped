@@ -5,7 +5,7 @@
  * Scene index (1-based user slides → 0-based):
  * 0 open (short-term #1) · 1 liked this year · 2 top ghosted song ·
  * 3 2nd ghosted song · 4 one-like · 5 top left-on-read artist ·
- * 6 2nd left-on-read artist · 7 reunion · 8 soft close · 9 share
+ * 6 2nd left-on-read artist · 7 all-star · 8 soft close · 9 share
  */
 
 import type {
@@ -240,7 +240,7 @@ export function getApiSlideSoundtrackUris(
   out[6] = take(artist1Id);
   // 4: top one-like sample
   out[4] = take(oneLikeIds[0]);
-  // 7: top reunion song
+  // 7: top all-star song
   out[7] = take(reunionIds[0]);
 
   // Soft fallbacks for content slots that had no primary sample.

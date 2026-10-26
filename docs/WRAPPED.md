@@ -113,9 +113,9 @@ Scene 3 (2 beats): “one ghost town” setup → Top ghosted songs list
 Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists list
 Scene 5 (2 beats): “Now the artists” → #1 left-on-read artist
 Scene 6 (2 beats): “Get the gang back together?” → Top left-on-read artists list
-Scene 7 (2 beats): “Plot twist.” + setup → reunion reveal (song or setlist)
+Scene 7 (2 beats): “Plot twist.” + setup → all-star reveal (song or setlist)
 Scene 8 (2 beats): “Thanks for staying.” → “Same time next year?”
-Scene 9: Share finale (holds; no auto-advance)
+Scene 9: Share finale (holds; no auto-advance; swipeable share cards + dots, D-042)
 ```
 
 API deck plays like Stories for *in-scene* motion: progress segments fill left→right over the scene duration, then stop; the user advances. Multi-beat scenes keep one canvas; each copy line is a beat timed for reading, then the stack exits before the next narrative block. Pause button / space pauses (sticky); hardware media play-pause (e.g. Mac F8) matches space once the soundtrack has been audible. Prev/next resets and replays the target scene.
@@ -171,7 +171,7 @@ Use these when writing or reordering slides.
 1. **Open with brand + thesis**: product name is the hero; one line of anti-Wrapped framing.  
 2. **Volume → singular → list** for songs, then the same for artists (Wrapped muscle memory).  
 3. **One job per slide**: if the blurb needs “and also…”, split or cut.  
-4. **Bridge before redemption**: liked-but-scrapped / second-chance come *after* the roast lists so the emotional arc is reject → complicate → forgive → share.  
+4. **Bridge before endurance**: liked-but-scrapped / all-star staples (`second-chance` card) come *after* the roast lists so the emotional arc is reject → complicate → still here → share.  
 5. **Counterweight before share**: “stayed for” / finishes prevent the finale from being only dunking.  
 6. **Share card = portable thesis**: year + a few leaders + tagline; match Wrapped’s “screenshot the last slide” habit (`ShareRecapCard`).  
 7. **Empty states that keep rhythm**: short honest line, same layout chrome; don’t delete the beat number mid-deck if we can help it.

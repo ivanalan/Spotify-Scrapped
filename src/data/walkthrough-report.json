@@ -263,19 +263,19 @@
     },
     {
       "id": "second-chance",
-      "title": "Second-chance returns",
-      "calculated": "Two groups, merged, then sorted by current 4-week rank. First: in both the multi-year and 4-week top 50, missing from the 6-month list. Second: a like older than 180 days and from before this year, that is back in the 4-week top 50. Another release of the same song counts.",
-      "means": "Something you used to play, or saved a long time ago, is in this month again after a gap.",
-      "bar": "Current 4-week rank. Higher rank, longer bar.",
-      "source": "Top tracks (all three windows) + Liked Songs",
+      "title": "All-star staples",
+      "calculated": "From your multi-year top 50, pick one tier (whole pool, not mixed). Prefer tracks also in both the 6-month and 4-week top 50s. If that set is empty, use multi-year tracks that appear only in the 4-week list (not 6-month). If that is empty too, use multi-year tracks that appear only in the 6-month list (not 4-week). Sorted by multi-year rank.",
+      "means": "All-time favs that never fully ghosted: still showing up in recent tops.",
+      "bar": "Multi-year rank. Higher all-time rank, longer bar.",
+      "source": "Top tracks (all three windows)",
       "items": [
         {
           "id": "2Lumsra3kuU61wXkEKzKaK",
           "trackId": "2Lumsra3kuU61wXkEKzKaK",
           "label": "Disco",
           "sublabel": "Surf Curse",
-          "detail": "4-week #29 · long, skipped 6 months",
-          "value": 22,
+          "detail": "multi-year #4 · still in 6mo + 4wk",
+          "value": 47,
           "imageUrl": "https://i.scdn.co/image/ab67616d00001e02a7060ab3ca5dc05fc9552e66"
         },
         {
@@ -283,8 +283,8 @@
           "trackId": "4t46soaqA758rbukTO5pp1",
           "label": "Mi Bello Angel",
           "sublabel": "Natanael Cano",
-          "detail": "4-week #32 · old like, back",
-          "value": 19,
+          "detail": "multi-year #8 · still in 6mo + 4wk",
+          "value": 43,
           "imageUrl": "https://i.scdn.co/image/ab67616d00001e02066c67e297dd388e5b25bc3a"
         },
         {
@@ -292,8 +292,8 @@
           "trackId": "0SC6bK22QGoX8EdgFM13Gv",
           "label": "Hereditary",
           "sublabel": "Isaiah Rashad",
-          "detail": "4-week #46 · long, skipped 6 months",
-          "value": 5,
+          "detail": "multi-year #12 · still in 6mo + 4wk",
+          "value": 39,
           "imageUrl": "https://i.scdn.co/image/ab67616d00001e02986cd6b330f7405b17a604f4"
         },
         {
@@ -301,8 +301,8 @@
           "trackId": "1L47iGkPc36XHDV1kOI9qP",
           "label": "Star-Crossed",
           "sublabel": "Grey Dugan",
-          "detail": "4-week #49 · long, skipped 6 months",
-          "value": 2,
+          "detail": "multi-year #18 · still in 6mo + 4wk",
+          "value": 33,
           "imageUrl": "https://i.scdn.co/image/ab67616d00001e02268e447e0ebd29cf03c3efc8"
         },
         {
@@ -310,8 +310,8 @@
           "trackId": "6R7jCmKhrnqeLl9fZyQ9Ej",
           "label": "Underworld",
           "sublabel": "Alice Phoebe Lou",
-          "detail": "4-week #undefined · old like, back",
-          "value": 1,
+          "detail": "multi-year #22 · still in 6mo + 4wk",
+          "value": 29,
           "imageUrl": "https://i.scdn.co/image/ab67616d00001e02e575c2844371f9b58dfdcadf"
         }
       ]

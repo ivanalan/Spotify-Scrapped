@@ -242,3 +242,11 @@ Format:
 - **Proof:** Home → View example → Back landed on About; `/ready` → Why a waitlist? → Back landed on home.
 - **Avoid:** Chrome labeled Back uses origin back ([D-040](docs/decisions/D-040-origin-back.md)); cold entry falls back to `/`. Do not wire fixed parent hrefs for Back.
 - **Related:** `OriginBackButton`, `src/lib/origin-back.ts`
+
+## After first sign-in the gate freezes; then animations; then Warming…
+
+- **Not:** Continue disabled alone, or `loading.tsx` failing to show during RSC.
+- **Cause:** `ScrappedExperience` statically imported `ApiScrappedDeck` + `DeckSoundtrack`, so the ready gate hydrated those modules on the main thread before orbit motion and iframe warm UI caught up. About / Sign out looked dead for seconds.
+- **Proof:** Post-Load ready gate: unresponsive chrome → Framer orbit started → “Warming the first track…” appeared.
+- **Avoid:** Dynamic-import the deck and soundtrack; keep the gate light; show Preparing… until chunks + lead warm. Do not statically pull those modules into the gate entry.
+- **Related:** `ScrappedExperience.tsx`, `ScrappedGate.tsx`

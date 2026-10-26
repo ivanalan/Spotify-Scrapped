@@ -26,6 +26,12 @@ import {
 import { Icon } from "@/components/Icon";
 import { OriginBackButton } from "@/components/scrapped/OriginBackButton";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
+import { ShareAllTimeFavsCard } from "@/components/scrapped/ShareAllTimeFavsCard";
+import {
+  SHARE_FINALE_CARD_COUNT,
+  ShareFinaleCardDots,
+  ShareFinaleCardPager,
+} from "@/components/scrapped/ShareFinaleCardPager";
 import {
   ShareFinaleLayoutTune,
   shareFinaleCssVars,
@@ -165,6 +171,8 @@ export function ApiScrappedDeck({
   const [visitKey, setVisitKey] = useState(0);
   const [pausedSticky, setPausedSticky] = useState(false);
   const [shareExportBusy, setShareExportBusy] = useState(false);
+  /** Active poster in the share-finale carousel (D-042). */
+  const [shareCardIndex, setShareCardIndex] = useState(0);
   const [shareTune, setShareTune] = useState<ShareFinaleTuneState>(
     shareFinaleTuneDefaults,
   );
@@ -183,7 +191,7 @@ export function ApiScrappedDeck({
   // Share PNG ready: same session-key pattern (async capture; no sync reset in effects).
   const sharePrecaptureSessionKey =
     active === FINALE_INDEX && !held
-      ? `${visitKey}:${report.year}:${JSON.stringify(shareTune)}`
+      ? `${visitKey}:${report.year}:${shareCardIndex}:${JSON.stringify(shareTune)}`
       : null;
   const [sharePrecaptureReadyFor, setSharePrecaptureReadyFor] = useState<
     string | null
@@ -382,24 +390,24 @@ export function ApiScrappedDeck({
       ? [
           {
             headline: "Plot twist.",
-            subline: "Not everyone stayed ghosted.",
+            subline: "Not everyone got ghosted.",
           },
           {
-            headline: "The reunion setlist",
-            subline: "A few old favs you were loyal to",
+            headline: "The all-star setlist",
+            subline: "All-time favs still in rotation",
             hasSupport: true,
           },
         ]
       : [
           {
             headline: "Plot twist.",
-            subline: "Not everyone stayed ghosted.",
+            subline: "Not everyone got ghosted.",
           },
           {
-            headline: reunionLabel ?? "No reunions on the calendar.",
+            headline: reunionLabel ?? "No all-stars on the board.",
             subline: hasReunionSong
-              ? "A few old favs you were loyal to"
-              : "The soft launch stayed soft. For now.",
+              ? "All-time favs still in rotation"
+              : "The long window went quiet. For now.",
             hasSupport: hasReunionSong,
           },
         ];
@@ -777,8 +785,14 @@ export function ApiScrappedDeck({
   }, [report.year]);
 
   const onReplayFromBeginning = useCallback(() => {
+    setShareCardIndex(0);
     goTo(0);
   }, [goTo]);
+
+  // Reset carousel when leaving the finale so Replay / re-entry start on card 0.
+  useEffect(() => {
+    if (active !== FINALE_INDEX) setShareCardIndex(0);
+  }, [active]);
 
   const shareFinaleStyle = useMemo(
     () => shareFinaleCssVars(shareTune),
@@ -884,9 +898,18 @@ export function ApiScrappedDeck({
         </div>
       </div>
 
+      {/*
+        Finale: raise the scroller above default Stories zones (z-36) so the
+        share card can receive swipe on the open right side; a dedicated prev
+        strip at z-38 still covers the left 30% for go-back (D-042).
+      */}
       <div
         ref={scrollerRef}
-        className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className={
+          active === FINALE_INDEX
+            ? "relative z-[37] flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            : "flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        }
       >
         {/* 0: year open → Hey + welcome (paired). Copy delayed for Continue audio. */}
         <WrappedStorySlide
@@ -1165,7 +1188,7 @@ export function ApiScrappedDeck({
           ]}
         />
 
-        {/* 7: plot twist + reunion (combined) */}
+        {/* 7: plot twist + all-star setlist (combined) */}
         <WrappedStorySlide
           {...sceneMotion(7)}
           tone={slideTone(7)}
@@ -1175,12 +1198,12 @@ export function ApiScrappedDeck({
               ? [
                   {
                     headline: "Plot twist.",
-                    subline: "Not everyone stayed ghosted.",
+                    subline: "Not everyone got ghosted.",
                     display: "hero",
                   },
                   {
-                    headline: "The reunion setlist",
-                    subline: "A few old favs you were loyal to",
+                    headline: "The all-star setlist",
+                    subline: "All-time favs still in rotation",
                     display: "sentence",
                     children: (
                       <WrappedEntityList
@@ -1200,15 +1223,15 @@ export function ApiScrappedDeck({
               : [
                   {
                     headline: "Plot twist.",
-                    subline: "Not everyone stayed ghosted.",
+                    subline: "Not everyone got ghosted.",
                     display: "hero",
                   },
                   {
                     headline:
-                      reunionSong?.label ?? "No reunions on the calendar.",
+                      reunionSong?.label ?? "No all-stars on the board.",
                     subline: reunionSong
-                      ? "A few old favs you were loyal to"
-                      : "The soft launch stayed soft. For now.",
+                      ? "All-time favs still in rotation"
+                      : "The long window went quiet. For now.",
                     display: "hero",
                     footer: reunionSong ? (
                       <span>
@@ -1263,23 +1286,28 @@ export function ApiScrappedDeck({
           <div
             className="relative z-10 mx-auto flex min-h-0 w-full flex-1 flex-col"
             style={{
-              gap: `${D.cardActionsGapPx}px`,
               // Match Share / Replay column to the capped 9:16 island (D-012).
               maxWidth: `${shareTune.maxWidthPx}px`,
             }}
           >
             {/*
               9:16 island (D-012 / D-033): size container is shell-only so cqb is
-              leftover after credit + actions. --share-shell-w is computed once on
+              leftover after dots + actions. --share-shell-w is computed once on
               that slot and reused for shell width + canvas scale (nested cqw on
               the shell mis-scales on iOS and clips the right/bottom). Export
               still captures the unscaled 300×533 design node → ~1080×1920.
+              Finale tap zones are pointer-events-none (D-042) so swipe lands
+              on the posters; this column does not need to out-stack them.
             */}
-            <div className="flex min-h-0 w-full flex-1 flex-col">
+            <div
+              className="relative flex min-h-0 w-full flex-1 flex-col"
+              style={{ gap: `${D.dotsGapAfterCardPx}px` }}
+            >
               <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center [container-type:size]">
-                <div
-                  className="relative overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-                  style={
+                <ShareFinaleCardPager
+                  index={shareCardIndex}
+                  onIndexChange={setShareCardIndex}
+                  shellStyle={
                     {
                       aspectRatio: D.aspectRatio,
                       // Same expression for width + scale (slot is the only CQ).
@@ -1295,62 +1323,120 @@ export function ApiScrappedDeck({
                     Capture ref stays on the unscaled poster so export is
                     always designWidth → exportWidthPx (~1080).
                   */}
-                  <div
-                    className="absolute top-0 left-0 origin-top-left"
-                    style={{
-                      width: D.maxWidthPx,
-                      height: D.designHeightPx,
-                      transform: `scale(calc(var(--share-shell-w) / ${D.maxWidthPx}px))`,
-                    }}
-                  >
+                  <div className="relative h-full w-full">
                     <div
-                      ref={shareCardRef}
-                      className="h-full w-full"
+                      className="absolute top-0 left-0 origin-top-left"
                       style={{
                         width: D.maxWidthPx,
                         height: D.designHeightPx,
+                        transform: `scale(calc(var(--share-shell-w) / ${D.maxWidthPx}px))`,
                       }}
                     >
-                      <ShareRecapCard
-                        year={report.year}
-                        variant="minimal"
-                        active={active === FINALE_INDEX}
-                        leftLabel="Left on read"
-                        rightLabel="Ghosted songs"
-                        likedCount={likedCount}
-                        likedThisYearCount={likedThisYearCount}
-                        moonTune={shareTune.moon}
-                        ghostTune={shareTune.ghosts}
-                        brandTune={shareBrandTune}
-                        heroImageUrl={
-                          topArtist?.imageUrl ?? topSong?.imageUrl ?? null
-                        }
-                        heroAlt={topArtist?.label ?? topSong?.label ?? ""}
-                        skipped={(leftLongArtists?.items ?? []).slice(0, 5).map(
-                          (item) => ({
-                            id: item.id,
-                            title: item.label,
-                            artist: item.detail ?? "—",
-                          }),
-                        )}
-                        stayed={(leftLongSongs?.items ?? []).slice(0, 5).map(
-                          (item) => ({
-                            id: item.id,
-                            title: item.label,
-                            artist: item.sublabel ?? "—",
-                          }),
-                        )}
+                      <div
+                        ref={shareCardIndex === 0 ? shareCardRef : undefined}
                         className="h-full w-full"
-                      />
+                        style={{
+                          width: D.maxWidthPx,
+                          height: D.designHeightPx,
+                        }}
+                      >
+                        <ShareRecapCard
+                          year={report.year}
+                          variant="minimal"
+                          active={
+                            active === FINALE_INDEX && shareCardIndex === 0
+                          }
+                          leftLabel="Left on read"
+                          rightLabel="Ghosted songs"
+                          likedCount={likedCount}
+                          likedThisYearCount={likedThisYearCount}
+                          moonTune={shareTune.moon}
+                          ghostTune={shareTune.ghosts}
+                          brandTune={shareBrandTune}
+                          heroImageUrl={
+                            topArtist?.imageUrl ?? topSong?.imageUrl ?? null
+                          }
+                          heroAlt={topArtist?.label ?? topSong?.label ?? ""}
+                          skipped={(leftLongArtists?.items ?? [])
+                            .slice(0, 5)
+                            .map((item) => ({
+                              id: item.id,
+                              title: item.label,
+                              artist: item.detail ?? "—",
+                            }))}
+                          stayed={(leftLongSongs?.items ?? [])
+                            .slice(0, 5)
+                            .map((item) => ({
+                              id: item.id,
+                              title: item.label,
+                              artist: item.sublabel ?? "—",
+                            }))}
+                          className="h-full w-full"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                  <div className="relative h-full w-full">
+                    <div
+                      className="absolute top-0 left-0 origin-top-left"
+                      style={{
+                        width: D.maxWidthPx,
+                        height: D.designHeightPx,
+                        transform: `scale(calc(var(--share-shell-w) / ${D.maxWidthPx}px))`,
+                      }}
+                    >
+                      <div
+                        ref={shareCardIndex === 1 ? shareCardRef : undefined}
+                        className="h-full w-full"
+                        style={{
+                          width: D.maxWidthPx,
+                          height: D.designHeightPx,
+                        }}
+                      >
+                        <ShareAllTimeFavsCard
+                          active={
+                            active === FINALE_INDEX && shareCardIndex === 1
+                          }
+                          likedCount={likedCount}
+                          likedThisYearCount={likedThisYearCount}
+                          heroImageUrl={
+                            reunionSong?.imageUrl ??
+                            topSong?.imageUrl ??
+                            topArtist?.imageUrl ??
+                            null
+                          }
+                          heroAlt={
+                            reunionSong?.label ??
+                            topSong?.label ??
+                            topArtist?.label ??
+                            ""
+                          }
+                          tracks={(secondChance?.items ?? [])
+                            .slice(0, 5)
+                            .map((item) => ({
+                              id: item.id,
+                              title: item.label,
+                            }))}
+                          className="h-full w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </ShareFinaleCardPager>
               </div>
+              <ShareFinaleCardDots
+                index={shareCardIndex}
+                count={SHARE_FINALE_CARD_COUNT}
+                onIndexChange={setShareCardIndex}
+              />
             </div>
 
             <div
-              className="relative z-40 flex shrink-0 flex-col"
-              style={{ gap: `${D.actionsGapPx}px` }}
+              className="relative flex shrink-0 flex-col"
+              style={{
+                marginTop: `${D.cardActionsGapPx - D.dotsGapAfterCardPx}px`,
+                gap: `${D.actionsGapPx}px`,
+              }}
             >
               <Button
                 type="button"
@@ -1391,7 +1477,9 @@ export function ApiScrappedDeck({
         Tap → prev/next (including over list rows). Pause is sticky button / space.
         Long press cancels speculative soundtrack prime only (no hold-pause).
         Chrome stays higher (z-40) so pause / mute / sign-out still win.
-        Finale: leave bottom clear so Share / Replay receive taps.
+        Finale (D-042): scroller is z-37 so the card can swipe; prev strip is
+        z-38 over the left 30% (bottom cleared for dots / Share / Replay); next
+        zone is off so the open side of the card keeps the swipe gesture.
       */}
       <button
         type="button"
@@ -1403,7 +1491,7 @@ export function ApiScrappedDeck({
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-44 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "absolute top-0 bottom-52 left-0 z-[38] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
             : "absolute inset-y-0 left-0 z-[36] w-[30%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />
@@ -1417,7 +1505,7 @@ export function ApiScrappedDeck({
         onPointerCancel={onZonePointerCancel}
         className={
           active === FINALE_INDEX
-            ? "absolute top-0 bottom-44 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
+            ? "pointer-events-none absolute inset-y-0 left-[30%] z-[36] w-[70%] select-none outline-none"
             : "absolute inset-y-0 left-[30%] z-[36] w-[70%] touch-manipulation select-none outline-none focus:outline-none focus-visible:outline-none"
         }
       />

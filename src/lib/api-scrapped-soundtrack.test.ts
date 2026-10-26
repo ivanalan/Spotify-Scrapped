@@ -268,7 +268,7 @@ describe("getApiSlideSoundtrackUri", () => {
     );
   });
 
-  it("switches at plot twist + reunion (scene 7) to the reunion track", () => {
+  it("switches at plot twist + all-star (scene 7) to the all-star track", () => {
     const report = reportFixture({
       artistTrackId: "kendrickTrack",
       reunionTrackId: "reunionSong",
