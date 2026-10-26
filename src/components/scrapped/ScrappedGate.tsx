@@ -48,6 +48,11 @@ type Props = {
   onContinuePointerDown?: () => void;
   /** When false, Continue waits until the lead soundtrack embed is primed. */
   continueEnabled?: boolean;
+  /**
+   * Story + soundtrack client chunks loaded. False while dynamic imports
+   * are still in flight (Preparing… before warm count).
+   */
+  modulesReady?: boolean;
   /** Soundtrack warm progress (ready gate + loading). */
   warmReady?: number;
   warmTotal?: number;
@@ -71,6 +76,7 @@ export function ScrappedGate({
   onContinue,
   onContinuePointerDown,
   continueEnabled = true,
+  modulesReady = true,
   warmReady = 0,
   warmTotal = 0,
 }: Props) {
@@ -226,7 +232,7 @@ export function ScrappedGate({
                           className="size-4 animate-spin rounded-full border-2 border-[var(--wrapped-canvas)] border-t-transparent"
                           aria-hidden
                         />
-                        Loading…
+                        {mode === "loading" ? "Loading…" : "Preparing…"}
                       </span>
                     )}
                   </button>
@@ -242,8 +248,10 @@ export function ScrappedGate({
                     >
                       {mode === "loading"
                         ? "Starting soundtrack…"
-                        : "Warming the first track…"}
-                      {warmTotal > 0 ? (
+                        : !modulesReady
+                          ? "Preparing your Scrapped…"
+                          : "Warming the first track…"}
+                      {modulesReady && warmTotal > 0 ? (
                         <span className="mt-1 block font-mono tabular-nums">
                           {warmReady} / {warmTotal}
                         </span>

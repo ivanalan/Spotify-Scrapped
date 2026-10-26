@@ -617,28 +617,46 @@ export function buildScrappedApiReport(
         longArtistIds.has(artist.id) && !mediumArtistIds.has(artist.id),
     );
 
-  const secondChance = new Map<
-    string,
-    { track: ApiTrack; via: "gap" | "like" }
-  >();
-  for (const track of snap.shortTracks) {
-    if (longIds.has(track.id) && !mediumIds.has(track.id)) {
-      secondChance.set(track.id, { track, via: "gap" });
+  const mediumRank = new Map(snap.mediumTracks.map((t, i) => [t.id, i + 1]));
+
+  type AllStarTier = "both" | "short" | "medium";
+  type AllStarRow = { track: ApiTrack; longRank: number; tier: AllStarTier };
+
+  const allStarBoth: AllStarRow[] = [];
+  const allStarShortOnly: AllStarRow[] = [];
+  const allStarMediumOnly: AllStarRow[] = [];
+  for (const [i, track] of snap.longTracks.entries()) {
+    const rank = i + 1;
+    const inShort = shortIds.has(track.id);
+    const inMedium = mediumIds.has(track.id);
+    if (inShort && inMedium) {
+      allStarBoth.push({ track, longRank: rank, tier: "both" });
+    } else if (inShort) {
+      allStarShortOnly.push({ track, longRank: rank, tier: "short" });
+    } else if (inMedium) {
+      allStarMediumOnly.push({ track, longRank: rank, tier: "medium" });
     }
   }
-  for (const saved of snap.liked) {
-    if (
-      inYear(saved.added_at, year) ||
-      !sameSong(saved.track, shortIndex) ||
-      daysSince(saved.added_at, now) <= 180
-    ) {
-      continue;
-    }
-    const existing = secondChance.get(saved.track.id);
-    if (!existing) {
-      secondChance.set(saved.track.id, { track: saved.track, via: "like" });
-    }
+
+  function sortAllStars(rows: AllStarRow[]): AllStarRow[] {
+    return [...rows].sort((a, b) => {
+      if (a.longRank !== b.longRank) return a.longRank - b.longRank;
+      const aRecent =
+        shortRank.get(a.track.id) ?? mediumRank.get(a.track.id) ?? 99;
+      const bRecent =
+        shortRank.get(b.track.id) ?? mediumRank.get(b.track.id) ?? 99;
+      if (aRecent !== bRecent) return aRecent - bRecent;
+      return a.track.name.localeCompare(b.track.name);
+    });
   }
+
+  const allStars =
+    allStarBoth.length > 0
+      ? sortAllStars(allStarBoth)
+      : allStarShortOnly.length > 0
+        ? sortAllStars(allStarShortOnly)
+        : sortAllStars(allStarMediumOnly);
+
   const headlines = [
     headline(
       "fell-month",
@@ -659,11 +677,6 @@ export function buildScrappedApiReport(
       "of your 6-month top artists cooled off in the last 4 weeks",
     ),
   ];
-
-  const returns = [...secondChance.values()].sort(
-    (a, b) =>
-      (shortRank.get(a.track.id) ?? 99) - (shortRank.get(b.track.id) ?? 99),
-  );
 
   const shortLikedCount = shortLikedTracks.length;
   const shortWhole = snap.shortTracks.length;
@@ -746,19 +759,21 @@ export function buildScrappedApiReport(
     },
     {
       id: "second-chance",
-      title: "Second-chance returns",
+      title: "All-star staples",
       calculated:
-        "Two groups, merged, then sorted by current 4-week rank. First: in both the multi-year and 4-week top 50, missing from the 6-month list. Second: a like older than 180 days and from before this year, that is back in the 4-week top 50. Another release of the same song counts.",
-      means: "Something you used to play, or saved a long time ago, is in this month again after a gap.",
-      bar: "Current 4-week rank. Higher rank, longer bar.",
-      source: "Top tracks (all three windows) + Liked Songs",
-      items: returns.slice(0, TOP_N).map(({ track, via }) =>
+        "From your multi-year top 50, pick one tier (whole pool, not mixed). Prefer tracks also in both the 6-month and 4-week top 50s. If that set is empty, use multi-year tracks that appear only in the 4-week list (not 6-month). If that is empty too, use multi-year tracks that appear only in the 6-month list (not 4-week). Sorted by multi-year rank.",
+      means: "All-time favs that never fully ghosted: still showing up in recent tops.",
+      bar: "Multi-year rank. Higher all-time rank, longer bar.",
+      source: "Top tracks (all three windows)",
+      items: allStars.slice(0, TOP_N).map(({ track, longRank: rank, tier }) =>
         trackItem(
           track,
-          via === "gap"
-            ? `4-week #${shortRank.get(track.id)} · long, skipped 6 months`
-            : `4-week #${shortRank.get(track.id)} · old like, back`,
-          51 - (shortRank.get(track.id) ?? 50),
+          tier === "both"
+            ? `multi-year #${rank} · still in 6mo + 4wk`
+            : tier === "short"
+              ? `multi-year #${rank} · back in 4 weeks`
+              : `multi-year #${rank} · still in 6 months`,
+          51 - rank,
         ),
       ),
     },
