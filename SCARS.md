@@ -126,6 +126,14 @@ Format:
 - **Proof:** Mobile showed the idle “Load data” button after sign-in / revisit in the same tab; desktop often “worked” because people tapped. Cleared only in `ScrappedExperience`.
 - **Avoid:** Do not latch auto-start in `sessionStorage` before navigation succeeds. Defer submit with a timeout and cancel it on effect cleanup so Strict Mode remounts get one real submit.
 
+## Load data stays idle while the first-sign-in fetch runs
+
+- **Not:** Auto-start failing, a dead submit handler, or the user needing to tap Load data.
+- **Cause:** `SpotifyLabFetchForm` showed **Loading…** only from `useFormStatus().pending`, but the form `action` is a URL (`/api/spotify/lab-refresh`). React’s form status tracks function actions; with a URI, `pending` stays false for the whole POST navigation.
+- **Proof:** Mobile recording after OAuth: idle **Load data** for ~7s, then skeleton, then **Preparing…** / **Continue**. Fetch succeeded; busy UI never painted.
+- **Avoid:** Optimistic busy from first paint when `autoStart` (and on `onSubmit` for manual Load). Do not rely on `useFormStatus` alone for URL form POSTs.
+- **Related:** `SpotifyLabFetchForm.tsx`
+
 ## Soft-close bottom pill stack missing on mobile, visible on web
 
 - **Not:** Missing bottom art in the double-stack markup, or a mobile-only CSS `display:none`.

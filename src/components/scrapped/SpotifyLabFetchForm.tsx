@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { refreshOutline } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
@@ -13,7 +13,10 @@ type Props = {
   label: string;
   /** `gate` = primary CTA on the Orbit landing; default is inline link for Lab. */
   tone?: "link" | "gate";
-  /** Kick off Load once on mount (gate fetch) so Start is a loading indicator. */
+  /**
+   * Kick off Load once on mount (gate fetch). First paint is already busy:
+   * URL `action` never flips `useFormStatus().pending`.
+   */
   autoStart?: boolean;
   className?: string;
 };
@@ -22,20 +25,24 @@ function SubmitButton({
   label,
   tone,
   className,
+  optimisticBusy,
 }: {
   label: string;
   tone: "link" | "gate";
   className?: string;
+  /** Local busy: URL form actions never set `useFormStatus().pending`. */
+  optimisticBusy: boolean;
 }) {
   const { pending } = useFormStatus();
+  const busy = pending || optimisticBusy;
 
   return (
     <Button
       type="submit"
       variant={tone === "gate" ? "default" : "link"}
       size={tone === "gate" ? "lg" : "default"}
-      disabled={pending}
-      aria-busy={pending}
+      disabled={busy}
+      aria-busy={busy}
       className={cn(
         tone === "gate"
           ? cn(
@@ -43,12 +50,12 @@ function SubmitButton({
               "w-full gap-2",
             )
           : "h-auto gap-1.5 p-0 text-foreground",
-        pending && tone === "gate" && "pointer-events-none opacity-80",
+        busy && tone === "gate" && "pointer-events-none opacity-80",
         className,
       )}
     >
       {tone === "gate" ? (
-        pending ? (
+        busy ? (
           <span
             className="size-4 animate-spin rounded-full border-2 border-[var(--wrapped-canvas)] border-t-transparent"
             aria-hidden
@@ -57,8 +64,8 @@ function SubmitButton({
           <Icon icon={refreshOutline} className="size-5" />
         )
       ) : null}
-      {pending ? "Loading…" : label}
-      {tone === "link" && !pending ? " →" : null}
+      {busy ? "Loading…" : label}
+      {tone === "link" && !busy ? " →" : null}
     </Button>
   );
 }
@@ -71,6 +78,8 @@ export function SpotifyLabFetchForm({
   className,
 }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
+  // SSR + first client paint: autoStart gates never flash idle "Load data".
+  const [optimisticBusy, setOptimisticBusy] = useState(autoStart);
 
   // Defer + cancel on cleanup so React Strict Mode remounts (and short-lived
   // mobile mounts) don't latch a "already started" flag and skip the real submit.
@@ -94,12 +103,18 @@ export function SpotifyLabFetchForm({
       ref={formRef}
       action="/api/spotify/lab-refresh"
       method="post"
+      onSubmit={() => setOptimisticBusy(true)}
       className={
         tone === "gate" ? "flex w-full flex-col items-stretch" : undefined
       }
     >
       <input type="hidden" name="next" value={next} />
-      <SubmitButton label={label} tone={tone} className={className} />
+      <SubmitButton
+        label={label}
+        tone={tone}
+        className={className}
+        optimisticBusy={optimisticBusy}
+      />
     </form>
   );
 }
