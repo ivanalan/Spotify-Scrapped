@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Share · 1 like artists · heart explore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --stage: #0a0a0a;
+        --muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --accent: #c9a0f5;
+
+        --pink: #ff4d8d;
+        --rose: #c9185b;
+        --gold: #ffe66d;
+        --orchid: #9b4de8;
+        --mango: #ff9f1c;
+        --teal: #1a7a6e;
+        --teal-ice: #5eead4;
+        --teal-deep: #0f4c5c;
+        --ink: #12101a;
+
+        --w: 300;
+        --h: 533;
+        --hero-pct: 46;
+        --hero-art-pct: 54;
+        --pad-x: 16;
+        --list-row-gap: 0.51;
+        --list-label-gap: 0.55;
+        --type-rem: 0.71;
+        --metric-num: 1.3;
+        --metric-lab: 0.72;
+        --metrics-gap: 29;
+        --brand-gap: 39;
+        --brand-pad: 16;
+        --col-gap: 14;
+        --list-width: 72;
+
+        --card-bg: #c9185b;
+        --card-ink: #f5f5f5;
+        --card-muted: color-mix(in oklab, #f5f5f5 90%, transparent);
+        --card-panel: color-mix(in oklab, #f5f5f5 14%, transparent);
+
+        --heart-ease: cubic-bezier(0.33, 1, 0.68, 1);
+        --heart-draw-ease: linear;
+        --heart-pop-ease: cubic-bezier(0.33, 1, 0.68, 1);
+        --heart-draw-dur: 1.9s;
+        --heart-like-at: 2.9s;
+        --heart-like-dur: 1.25s;
+        --heart-cascade-at: 3.05s;
+        --heart-cascade-stagger: 0.1s;
+        --heart-cascade-ease: cubic-bezier(0.4, 0, 0.2, 1);
+        --heart-cascade-op: 1;
+        --heart-pop-dip: 0.9;
+        --heart-pop-peak: 1.12;
+        --heart-hero-c: var(--pink);
+        --bloom-1: var(--pink);
+        --bloom-2: var(--rose);
+        --bloom-3: var(--gold);
+
+        --spine-size: 0.72;
+        --spine-track: -0.015;
+        --spine-x: -31;
+        --spine-y: 50;
+        --spine-rot: -90;
+        --spine-op: 1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 1.75rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        max-width: 48rem;
+        margin: 0 0 0.85rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .lock {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #1a1624;
+        background: var(--accent);
+        padding: 0.22rem 0.65rem;
+        margin: 0 0 1.25rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stage-frame {
+        background: #0a0a0a;
+        padding: 1rem 0.75rem 1.15rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.7rem;
+      }
+
+      .stage-frame.sticky {
+        position: sticky;
+        top: 1rem;
+      }
+
+      .card {
+        position: relative;
+        width: calc(var(--w) * 1px);
+        height: calc(var(--h) * 1px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        color: var(--card-ink);
+        background: var(--card-bg);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        flex-shrink: 0;
+      }
+
+      .card[data-field="nest"] {
+        background: linear-gradient(
+          165deg,
+          #5eead4 0%,
+          #1a7a6e 50%,
+          #0f4c5c 100%
+        );
+      }
+
+      .hero {
+        position: relative;
+        /* Above body so straddle / corner 1-hearts can peek over the list */
+        z-index: 5;
+        flex: 0 0 calc(var(--hero-pct) * 1%);
+        display: grid;
+        place-items: center;
+        overflow: visible;
+      }
+
+      .hero-frame {
+        position: relative;
+        z-index: 10;
+        width: calc(var(--hero-art-pct) * 1%);
+        aspect-ratio: 1;
+        max-height: 88%;
+        overflow: visible;
+        background: var(--card-panel);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      }
+
+      .hero-frame img {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .heart-badge {
+        position: absolute;
+        right: -10%;
+        bottom: -8%;
+        width: 42%;
+        aspect-ratio: 1;
+        z-index: 12;
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+      }
+
+      /* “1” heart: placed vs cover via data-one-z on .card */
+      .heart-metric {
+        position: absolute;
+        top: auto;
+        left: auto;
+        right: -10%;
+        bottom: -8%;
+        width: 42%;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+        opacity: 1;
+        transform: none;
+        z-index: 12;
+      }
+
+      .heart-badge.is-hidden,
+      .heart-metric.is-hidden {
+        display: none;
+      }
+
+      .heart-badge .pop,
+      .heart-metric .pop {
+        width: 100%;
+        height: 100%;
+      }
+
+      .heart-badge .glyph,
+      .heart-badge .bloom,
+      .heart-metric .glyph,
+      .heart-metric .bloom {
+        width: 100%;
+        height: 100%;
+      }
+
+      .heart-badge .bloom,
+      .heart-metric .bloom {
+        margin: -50% 0 0 -50%;
+      }
+
+      .heart-metric .one {
+        position: absolute;
+        z-index: 5;
+        font-size: 1.55rem;
+        font-weight: 800;
+        letter-spacing: -0.06em;
+        line-height: 1;
+        color: var(--card-ink);
+        transform: translateY(6%);
+        pointer-events: none;
+      }
+
+      /* Z / place recipes for the 1-heart */
+
+      .card[data-one-z="br-over"] .heart-metric {
+        right: -10%;
+        bottom: -8%;
+        width: 42%;
+        z-index: 12;
+      }
+
+      .card[data-one-z="br-under"] .heart-metric {
+        right: -6%;
+        bottom: -6%;
+        width: 44%;
+        z-index: 1;
+      }
+
+      .card[data-one-z="tl-over"] .heart-metric {
+        right: auto;
+        left: -12%;
+        top: -10%;
+        bottom: auto;
+        width: 40%;
+        z-index: 12;
+      }
+
+      .card[data-one-z="tl-under"] .heart-metric {
+        right: auto;
+        left: -10%;
+        top: -8%;
+        bottom: auto;
+        width: 42%;
+        z-index: 1;
+      }
+
+      .card[data-one-z="center-over"] .heart-metric {
+        right: 50%;
+        bottom: 50%;
+        width: 58%;
+        transform: translate(50%, 50%);
+        z-index: 12;
+      }
+
+      .card[data-one-z="center-over"] .heart-metric .one {
+        font-size: 2.1rem;
+      }
+
+      .card[data-one-z="center-under"] .heart-metric {
+        right: 50%;
+        bottom: 50%;
+        width: 78%;
+        transform: translate(50%, 50%);
+        z-index: 1;
+        opacity: 0.95;
+      }
+
+      .card[data-one-z="center-under"] .heart-metric .one {
+        font-size: 2.6rem;
+      }
+
+      .card[data-one-z="straddle"] .heart-metric {
+        right: 50%;
+        bottom: -22%;
+        width: 48%;
+        transform: translateX(50%);
+        z-index: 12;
+      }
+
+      .card[data-one-z="straddle-under"] .heart-metric {
+        right: 50%;
+        bottom: -18%;
+        width: 52%;
+        transform: translateX(50%);
+        z-index: 1;
+      }
+
+      .card[data-one-z="mid-left"] .heart-metric {
+        right: auto;
+        left: -18%;
+        top: 50%;
+        bottom: auto;
+        width: 46%;
+        transform: translateY(-50%);
+        z-index: 12;
+      }
+
+      .card[data-one-z="mid-left-under"] .heart-metric {
+        right: auto;
+        left: -14%;
+        top: 50%;
+        bottom: auto;
+        width: 48%;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+
+      /* TL / edge pin beside the locked cover */
+      .heart-hero {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: start start;
+        padding: 10% 0 0 6%;
+        pointer-events: none;
+        z-index: 4;
+      }
+
+      .heart-hero.is-hidden {
+        display: none;
+      }
+
+      .heart-hero .heart-stage {
+        width: 88px;
+        height: 88px;
+      }
+
+      .heart-hero.is-pin-lg .heart-stage {
+        width: 104px;
+        height: 104px;
+      }
+
+      .heart-stage {
+        position: relative;
+        width: 148px;
+        height: 148px;
+        display: grid;
+        place-items: center;
+      }
+
+      .cascade {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .bloom {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 128px;
+        height: 128px;
+        margin: -64px 0 0 -64px;
+        color: var(--bloom-1);
+        opacity: 0;
+        transform-origin: 50% 55%;
+        --bloom-peak: 1.25;
+      }
+
+      .bloom svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        display: block;
+      }
+
+      .bloom path {
+        fill: currentColor;
+        stroke: none;
+      }
+
+      .bloom--1 {
+        color: var(--bloom-1);
+        --bloom-peak: 1.25;
+        z-index: 3;
+      }
+
+      .bloom--2 {
+        color: var(--bloom-2);
+        --bloom-peak: 1.55;
+        z-index: 2;
+      }
+
+      .bloom--3 {
+        color: var(--bloom-3);
+        --bloom-peak: 1.9;
+        z-index: 1;
+      }
+
+      .pop {
+        position: relative;
+        z-index: 4;
+        width: 128px;
+        height: 128px;
+        display: grid;
+        place-items: center;
+        transform-origin: 50% 55%;
+        color: var(--heart-hero-c);
+      }
+
+      .heart-stage .pop,
+      .heart-stage .bloom {
+        width: 100%;
+        height: 100%;
+      }
+
+      .heart-stage .bloom {
+        margin: -50% 0 0 -50%;
+      }
+
+      .glyph {
+        width: 128px;
+        height: 128px;
+        overflow: visible;
+        display: block;
+      }
+
+      .outline {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 22;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        opacity: 1;
+      }
+
+      .fill {
+        fill: currentColor;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: 50% 55%;
+      }
+
+      /* Modes */
+      .card[data-heart="bloom"] .outline {
+        animation:
+          heart-draw var(--heart-draw-dur) var(--heart-draw-ease) both,
+          heart-outline-fade var(--heart-like-dur) var(--heart-like-at)
+            var(--heart-ease) both;
+      }
+
+      .card[data-heart="bloom"] .fill {
+        animation: heart-fill var(--heart-like-dur) var(--heart-like-at)
+          var(--heart-ease) both;
+      }
+
+      .card[data-heart="bloom"] .pop {
+        animation: heart-stamp var(--heart-like-dur) var(--heart-like-at)
+          var(--heart-pop-ease) both;
+      }
+
+      .card[data-heart="bloom"] .bloom--1 {
+        animation: heart-bloom 1.92s var(--heart-cascade-ease) both;
+        animation-delay: var(--heart-cascade-at);
+      }
+
+      .card[data-heart="bloom"] .bloom--2 {
+        animation: heart-bloom 2.2s var(--heart-cascade-ease) both;
+        animation-delay: calc(
+          var(--heart-cascade-at) + var(--heart-cascade-stagger)
+        );
+      }
+
+      .card[data-heart="bloom"] .bloom--3 {
+        animation: heart-bloom 2.49s var(--heart-cascade-ease) both;
+        animation-delay: calc(
+          var(--heart-cascade-at) + var(--heart-cascade-stagger) * 2
+        );
+      }
+
+      .card[data-heart="stamp"] .outline {
+        opacity: 0;
+        stroke-dashoffset: 0;
+      }
+
+      .card[data-heart="stamp"] .fill {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .card[data-heart="stamp"] .cascade {
+        display: none;
+      }
+
+      .card[data-heart="metric"] .outline {
+        opacity: 0;
+        stroke-dashoffset: 0;
+      }
+
+      .card[data-heart="metric"] .fill {
+        opacity: 1;
+      }
+
+      .card[data-heart="metric"] .cascade {
+        display: none;
+      }
+
+      .card[data-heart="badge"] .heart-badge .outline {
+        animation:
+          heart-draw 1.2s var(--heart-draw-ease) both,
+          heart-outline-fade 0.9s 1.6s var(--heart-ease) both;
+      }
+
+      .card[data-heart="badge"] .heart-badge .fill {
+        animation: heart-fill 0.9s 1.6s var(--heart-ease) both;
+      }
+
+      .card[data-heart="badge"] .heart-badge .pop {
+        animation: heart-stamp 0.9s 1.6s var(--heart-pop-ease) both;
+      }
+
+      .card[data-heart="badge"] .heart-badge .bloom--1 {
+        animation: heart-bloom 1.6s var(--heart-cascade-ease) both;
+        animation-delay: 1.75s;
+      }
+
+      .card[data-heart="badge"] .heart-badge .bloom--2 {
+        animation: heart-bloom 1.85s var(--heart-cascade-ease) both;
+        animation-delay: 1.85s;
+      }
+
+      .card[data-heart="badge"] .heart-badge .bloom--3 {
+        animation: heart-bloom 2.1s var(--heart-cascade-ease) both;
+        animation-delay: 1.95s;
+      }
+
+      /* Watermark giant heart behind list */
+      .watermark {
+        position: absolute;
+        left: 50%;
+        top: 52%;
+        width: 240px;
+        height: 240px;
+        margin: -120px 0 0 -120px;
+        color: var(--heart-hero-c);
+        opacity: 0.14;
+        z-index: 1;
+        pointer-events: none;
+        transform-origin: 50% 55%;
+      }
+
+      .watermark.is-hidden {
+        display: none;
+      }
+
+      .watermark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+      }
+
+      .watermark path {
+        fill: currentColor;
+      }
+
+      /*
+       * Tiny rising floaters.
+       * Rise must use card px (not %): % translate is relative to the floater
+       * box (~20px), so hearts barely moved and sat under hero/body.
+       */
+      .floaters {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 8;
+      }
+
+      .floaters.is-hidden {
+        display: none;
+      }
+
+      .floater {
+        position: absolute;
+        bottom: -6%;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        color: var(--pink);
+        will-change: transform, opacity;
+      }
+
+      .floater svg {
+        width: var(--fs, 26px);
+        height: var(--fs, 26px);
+        display: block;
+        overflow: visible;
+        filter: drop-shadow(
+          0 0 8px color-mix(in oklab, currentColor 40%, transparent)
+        );
+      }
+
+      .floater path {
+        fill: currentColor;
+      }
+
+      .floater:nth-child(1) {
+        left: 5%;
+        --fs: 28px;
+        --dx: -18px;
+      }
+      .floater:nth-child(2) {
+        left: 20%;
+        --fs: 22px;
+        --dx: -28px;
+        color: var(--gold);
+      }
+      .floater:nth-child(3) {
+        left: 46%;
+        --fs: 20px;
+        --dx: 0px;
+        color: var(--rose);
+      }
+      .floater:nth-child(4) {
+        left: 68%;
+        --fs: 26px;
+        --dx: 30px;
+        color: var(--pink);
+      }
+      .floater:nth-child(5) {
+        left: 84%;
+        --fs: 30px;
+        --dx: 22px;
+        color: var(--gold);
+      }
+      .floater:nth-child(6) {
+        left: 12%;
+        --fs: 16px;
+        --dx: -12px;
+        color: var(--pink);
+      }
+      .floater:nth-child(7) {
+        left: 36%;
+        --fs: 17px;
+        --dx: 8px;
+        color: var(--gold);
+      }
+      .floater:nth-child(8) {
+        left: 58%;
+        --fs: 15px;
+        --dx: 16px;
+        color: var(--rose);
+      }
+      .floater:nth-child(9) {
+        left: 78%;
+        --fs: 19px;
+        --dx: 10px;
+        color: var(--pink);
+      }
+      .floater:nth-child(10) {
+        left: 90%;
+        --fs: 14px;
+        --dx: 6px;
+        color: var(--gold);
+      }
+
+      .floater.is-extra {
+        display: none;
+      }
+
+      .card[data-float="on"] .floater,
+      .card[data-float="dense"] .floater {
+        animation: heart-rise 13s linear infinite;
+      }
+
+      .card[data-float="on"] .floater:nth-child(1),
+      .card[data-float="dense"] .floater:nth-child(1) {
+        animation-duration: 14s;
+        animation-delay: -8s;
+      }
+      .card[data-float="on"] .floater:nth-child(5),
+      .card[data-float="dense"] .floater:nth-child(5) {
+        animation-duration: 15.5s;
+        animation-delay: -11s;
+      }
+      .card[data-float="on"] .floater:nth-child(2),
+      .card[data-float="dense"] .floater:nth-child(2) {
+        animation-duration: 15s;
+        animation-delay: -4s;
+      }
+      .card[data-float="on"] .floater:nth-child(4),
+      .card[data-float="dense"] .floater:nth-child(4) {
+        animation-duration: 14.5s;
+        animation-delay: -9.5s;
+      }
+      .card[data-float="on"] .floater:nth-child(3),
+      .card[data-float="dense"] .floater:nth-child(3) {
+        animation-name: heart-rise-soft;
+        animation-duration: 13.5s;
+        animation-delay: -6s;
+      }
+
+      .card[data-float="dense"] .floater.is-extra {
+        display: grid;
+      }
+
+      .card[data-float="dense"] .floater:nth-child(6) {
+        animation-duration: 16s;
+        animation-delay: -10s;
+      }
+      .card[data-float="dense"] .floater:nth-child(7) {
+        animation-duration: 15.2s;
+        animation-delay: -3s;
+      }
+      .card[data-float="dense"] .floater:nth-child(8) {
+        animation-duration: 14.8s;
+        animation-delay: -13s;
+      }
+      .card[data-float="dense"] .floater:nth-child(9) {
+        animation-duration: 15.8s;
+        animation-delay: -7s;
+      }
+      .card[data-float="dense"] .floater:nth-child(10) {
+        animation-duration: 16.4s;
+        animation-delay: -1s;
+      }
+
+      .card[data-float="corners"] .floater {
+        animation: heart-rise 14s linear infinite;
+      }
+
+      .card[data-float="corners"] .floater:nth-child(n + 3):nth-child(-n + 10) {
+        display: none;
+      }
+
+      .card[data-float="corners"] .floater:nth-child(1) {
+        left: 5%;
+        animation-delay: -7s;
+      }
+
+      .card[data-float="corners"] .floater:nth-child(2) {
+        left: 86%;
+        animation-delay: -3s;
+        color: var(--gold);
+      }
+
+      .card[data-float="slow"] .floater {
+        animation: heart-rise 18s linear infinite;
+      }
+
+      .card[data-float="slow"] .floater:nth-child(1) {
+        animation-delay: -12s;
+      }
+      .card[data-float="slow"] .floater:nth-child(2) {
+        animation-delay: -8s;
+      }
+      .card[data-float="slow"] .floater:nth-child(3) {
+        animation-name: heart-rise-soft;
+        animation-delay: -5s;
+      }
+      .card[data-float="slow"] .floater:nth-child(4) {
+        animation-delay: -14s;
+      }
+      .card[data-float="slow"] .floater:nth-child(5) {
+        animation-delay: -2s;
+      }
+      .card[data-float="slow"] .floater.is-extra {
+        display: none;
+      }
+
+      @keyframes heart-draw {
+        from {
+          stroke-dashoffset: 1;
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes heart-outline-fade {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes heart-fill {
+        0% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+        55% {
+          opacity: 1;
+          transform: scale(1.04);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes heart-stamp {
+        0% {
+          transform: scale(1) translateY(0);
+        }
+        18% {
+          transform: scale(var(--heart-pop-dip)) translateY(3px);
+        }
+        48% {
+          transform: scale(var(--heart-pop-peak)) translateY(-2px);
+        }
+        100% {
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      @keyframes heart-bloom {
+        0% {
+          opacity: 0;
+          transform: scale(0.88);
+        }
+        8% {
+          opacity: var(--heart-cascade-op);
+          transform: scale(1);
+        }
+        32% {
+          opacity: var(--heart-cascade-op);
+          transform: scale(var(--bloom-peak));
+        }
+        33% {
+          opacity: var(--heart-cascade-op);
+          transform: scale(var(--bloom-peak));
+        }
+        100% {
+          opacity: 0;
+          transform: scale(var(--bloom-peak));
+        }
+      }
+
+      @keyframes heart-rise {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.78);
+        }
+        10% {
+          opacity: 0.95;
+          transform: translate(calc(var(--dx, 0) * 0.12), -48px) scale(0.88);
+        }
+        55% {
+          opacity: 0.8;
+          transform: translate(calc(var(--dx, 0) * 0.7), -280px) scale(0.95);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(calc(var(--dx, 0) * 1.35), -520px) scale(0.72);
+        }
+      }
+
+      @keyframes heart-rise-soft {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.7);
+        }
+        12% {
+          opacity: 0.7;
+          transform: translate(0, -52px) scale(0.82);
+        }
+        60% {
+          opacity: 0.5;
+          transform: translate(0, -290px) scale(0.9);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(0, -500px) scale(0.65);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card[data-heart="bloom"] .outline,
+        .card[data-heart="bloom"] .fill,
+        .card[data-heart="bloom"] .pop,
+        .card[data-heart="bloom"] .bloom,
+        .card[data-heart="badge"] .outline,
+        .card[data-heart="badge"] .fill,
+        .card[data-heart="badge"] .pop,
+        .card[data-heart="badge"] .bloom,
+        .floater {
+          animation: none !important;
+        }
+
+        .card[data-heart="bloom"] .outline,
+        .card[data-heart="badge"] .outline {
+          stroke-dashoffset: 0;
+          opacity: 0;
+        }
+
+        .card[data-heart="bloom"] .fill,
+        .card[data-heart="badge"] .fill {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .card[data-float="on"] .floater:nth-child(-n + 5),
+        .card[data-float="dense"] .floater:nth-child(-n + 5),
+        .card[data-float="slow"] .floater:nth-child(-n + 5),
+        .card[data-float="corners"] .floater:nth-child(-n + 2) {
+          opacity: 0.7;
+          transform: translateY(-160px);
+        }
+      }
+
+      .body {
+        position: relative;
+        z-index: 4;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0 calc(var(--pad-x) * 1px) calc(var(--brand-pad) * 1px);
+      }
+
+      .lists {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 0;
+        padding-top: 2px;
+      }
+
+      .lists .col {
+        width: calc(var(--list-width) * 1%);
+        min-width: 0;
+      }
+
+      .col h4 {
+        margin: 0 0 calc(var(--list-label-gap) * 1rem);
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        color: var(--card-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .col ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--list-row-gap) * 1rem);
+      }
+
+      .col li {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        column-gap: 0.28rem;
+        align-items: baseline;
+        font-size: calc(var(--type-rem) * 1rem);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        min-width: 0;
+      }
+
+      .col li .n {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .col li .stack {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.05rem;
+      }
+
+      .col li .t {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .col li .s {
+        font-size: 0.78em;
+        font-weight: 500;
+        color: var(--card-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .card[data-rows="artists"] .col li .s {
+        display: none;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--col-gap) * 1px);
+        margin-top: calc(var(--metrics-gap) * 1px);
+        width: 100%;
+      }
+
+      .metric .lab {
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        line-height: 1.2;
+        color: var(--card-muted);
+      }
+
+      .metric .val {
+        margin-top: 0.12rem;
+        font-size: calc(var(--metric-num) * 1rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .brand.center {
+        margin-top: calc(var(--brand-gap) * 1px);
+        text-align: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+
+      .brand.spine-left {
+        position: absolute;
+        z-index: 6;
+        left: calc(var(--spine-x) * 1px);
+        top: calc(var(--spine-y) * 1%);
+        transform: translateY(-50%) rotate(calc(var(--spine-rot) * 1deg));
+        transform-origin: center center;
+        font-size: calc(var(--spine-size) * 1rem);
+        font-weight: 700;
+        letter-spacing: calc(var(--spine-track) * 1em);
+        line-height: 1.15;
+        white-space: nowrap;
+        color: var(--card-ink);
+        opacity: var(--spine-op);
+        pointer-events: none;
+      }
+
+      .brand.spine-left.is-hidden,
+      .brand.center.is-hidden {
+        display: none;
+      }
+
+      .stage-actions {
+        display: flex;
+        gap: 0.45rem;
+        width: min(100%, 300px);
+      }
+
+      .stage-actions button {
+        flex: 1;
+        height: 40px;
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--paper);
+        font: 600 0.72rem Poppins, sans-serif;
+        cursor: pointer;
+      }
+
+      .stage-actions button.primary {
+        background: #f5f5f5;
+        color: #1c1c1c;
+        border-color: transparent;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: calc(100dvh - 2rem);
+        overflow: auto;
+        padding-right: 0.25rem;
+      }
+
+      .family h2 {
+        margin: 0 0 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .family + .family {
+        margin-top: 0.25rem;
+      }
+
+      .kit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+        gap: 0.55rem;
+      }
+
+      .kit {
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        background: color-mix(in oklab, #1c1c1c 55%, #2a2433);
+        color: var(--paper);
+        text-align: left;
+        padding: 0.65rem 0.7rem 0.7rem;
+        cursor: pointer;
+        min-height: 88px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .kit:hover {
+        border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+      }
+
+      .kit[aria-pressed="true"] {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .kit.is-fav {
+        outline: 1px dashed color-mix(in oklab, var(--accent) 55%, transparent);
+        outline-offset: 2px;
+      }
+
+      .kit .swatches {
+        display: flex;
+        gap: 3px;
+      }
+
+      .kit .swatches i {
+        width: 12px;
+        height: 12px;
+        display: block;
+        border-radius: 2px;
+      }
+
+      .kit .id {
+        font: 600 0.68rem ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: var(--accent);
+      }
+
+      .kit .label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      .kit .note {
+        font-size: 0.64rem;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+
+      .panel {
+        background: color-mix(in oklab, #1c1c1c 55%, #2a2433);
+        border: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        padding: 0.85rem 0.95rem 0.95rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .recipe {
+        margin: 0;
+        font-size: 0.68rem;
+        color: var(--muted);
+        line-height: 1.5;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 0.45rem;
+        margin-top: 0.65rem;
+      }
+
+      .panel-actions button {
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--paper);
+        font: 600 0.7rem Poppins, sans-serif;
+        padding: 0.35rem 0.55rem;
+        height: 40px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Share · <em>1 like artists</em> · heart explore</h1>
+      <p class="lede">
+        Third share poster ideas for the scene 4 beat. Hero cover is always
+        <code>assets/hero-cover.png</code>. Family <strong>E</strong> iterates
+        the “1” heart over/under the cover. Families B/C/D carry rising
+        floaters (fixed to use card px so they actually travel). Canvas
+        <code>300×533</code>. Pick, replay, copy recipe.
+      </p>
+      <div class="lock">Promoted · b1-float-cover · D-044</div>
+
+      <div class="layout">
+        <div class="stage-frame sticky">
+          <article
+            class="card"
+            id="card"
+            data-field="solid"
+            data-heart="metric"
+            data-float="off"
+            data-one-z="br-over"
+            data-rows="artists"
+            data-brand="center"
+            aria-label="1 like artists share card"
+          >
+            <div class="floaters" id="floaters" aria-hidden="true"></div>
+            <div class="watermark is-hidden" id="watermark" aria-hidden="true">
+              <svg viewBox="0 0 512 512">
+                <path d="" />
+              </svg>
+            </div>
+            <div class="brand spine-left is-hidden" id="brand-spine">
+              myscrapped.com
+            </div>
+            <header class="hero" id="hero">
+              <div class="heart-hero is-hidden" id="heart-hero">
+                <div class="heart-stage" id="heart-stage"></div>
+              </div>
+              <div class="hero-frame" id="hero-frame">
+                <img
+                  id="hero-img"
+                  alt=""
+                  width="160"
+                  height="160"
+                  src="assets/hero-cover.png"
+                />
+                <div class="heart-badge is-hidden" id="heart-badge"></div>
+                <div class="heart-metric is-hidden" id="heart-metric">
+                  <div class="heart-stage" id="metric-stage"></div>
+                  <span class="one">1</span>
+                </div>
+              </div>
+            </header>
+            <div class="body">
+              <div class="lists">
+                <div class="col">
+                  <h4>1 like artists</h4>
+                  <ol id="rows"></ol>
+                </div>
+              </div>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="lab">Liked songs</div>
+                  <div class="val">1,001</div>
+                </div>
+                <div class="metric">
+                  <div class="lab">Liked this year</div>
+                  <div class="val">62</div>
+                </div>
+              </div>
+              <div class="brand center" id="brand-center">myscrapped.com</div>
+            </div>
+          </article>
+          <div class="stage-actions">
+            <button type="button" class="primary" id="replay">Replay</button>
+            <button type="button" id="copy-stage">Copy recipe</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <section class="family" data-family="A">
+            <h2>A · Cover + bloom badge</h2>
+            <div class="kit-grid" id="kits-a"></div>
+          </section>
+          <section class="family" data-family="B">
+            <h2>B · Tiny hearts frame</h2>
+            <div class="kit-grid" id="kits-b"></div>
+          </section>
+          <section class="family" data-family="C">
+            <h2>C · Combination</h2>
+            <div class="kit-grid" id="kits-c"></div>
+          </section>
+          <section class="family" data-family="D">
+            <h2>D · Layout flips</h2>
+            <div class="kit-grid" id="kits-d"></div>
+          </section>
+          <section class="family" data-family="E">
+            <h2>E · “1” heart · z stack</h2>
+            <div class="kit-grid" id="kits-e"></div>
+          </section>
+
+          <div class="panel">
+            <h3>Recipe</h3>
+            <pre class="recipe" id="recipe"></pre>
+            <div class="panel-actions">
+              <button type="button" id="copy">Copy recipe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const HEART_PATH =
+        "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
+
+      const ROWS = [
+        { title: "Empty Chair", artist: "Julia Jacklin" },
+        { title: "Motion Sickness", artist: "Phoebe Bridgers" },
+        { title: "Kyoto", artist: "Sesame Street" },
+        { title: "Scott Street", artist: "boygenius" },
+        { title: "Francesca", artist: "Hozier" },
+      ];
+
+      const KITS = [
+        {
+          id: "a1-bloom-nest",
+          family: "A",
+          label: "Bloom badge · nest",
+          note: "Teal nest · cover · corner cascade badge",
+          field: "nest",
+          bg: null,
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "badge",
+          float: "off",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#5eead4", "#1a7a6e", "#ff4d8d"],
+        },
+        {
+          id: "a2-bloom-rose",
+          family: "A",
+          label: "Bloom badge · rose",
+          note: "Rose field · cover · pink→gold cascade badge",
+          field: "solid",
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "badge",
+          float: "off",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#ffe66d", "#ff9f1c"],
+          swatches: ["#c9185b", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "a3-bloom-ink",
+          family: "A",
+          label: "Bloom badge · ink",
+          note: "Ink night · cover · pink cascade badge",
+          field: "solid",
+          bg: "#12101a",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 88%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 12%, transparent)",
+          heart: "badge",
+          float: "off",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#12101a", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "b1-float-cover",
+          family: "B",
+          label: "Floaters + cover",
+          note: "Rose field · cover · 5 rising hearts",
+          field: "solid",
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "none",
+          float: "on",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#c9185b", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "b2-float-ink",
+          family: "B",
+          label: "Ink edge float",
+          note: "Ink field · cover · gold/pink edge floaters",
+          field: "solid",
+          bg: "#12101a",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 88%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 12%, transparent)",
+          heart: "none",
+          float: "on",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#12101a", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "b3-float-dense",
+          family: "B",
+          label: "Dense floaters",
+          note: "10 quieter hearts · cover stays hero",
+          field: "solid",
+          bg: "#9b4de8",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "none",
+          float: "dense",
+          watermark: false,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#9b4de8", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "c1-stamp-float",
+          family: "C",
+          label: "Stamp + slow float",
+          note: "Cover · settled TL stamp · slow floaters",
+          field: "solid",
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "stamp",
+          float: "slow",
+          watermark: false,
+          pin: true,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#c9185b", "#ff4d8d", "#1a7a6e"],
+        },
+        {
+          id: "c2-bloom-then-float",
+          family: "C",
+          label: "Bloom then float",
+          note: "Cover · TL cascade once · floaters keep rising",
+          field: "nest",
+          bg: null,
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "bloom",
+          float: "on",
+          watermark: false,
+          pin: true,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#5eead4", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "c3-watermark",
+          family: "C",
+          label: "Watermark heart",
+          note: "Cover · giant low-op heart · corner floaters",
+          field: "solid",
+          bg: "#12101a",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 88%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 12%, transparent)",
+          heart: "none",
+          float: "corners",
+          watermark: true,
+          pin: false,
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#12101a", "#ff4d8d", "#c9185b"],
+        },
+        {
+          id: "d1-spine-rose",
+          family: "D",
+          label: "Spine + TL pin",
+          note: "Rose · cover · left spine brand · stamp pin",
+          field: "solid",
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "stamp",
+          float: "off",
+          watermark: false,
+          pin: true,
+          rows: "songs",
+          brand: "spine",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#c9185b", "#ff4d8d", "#f0b429"],
+        },
+        {
+          id: "d3-dual-heart",
+          family: "D",
+          label: "Cover + badge + float",
+          note: "Share density · nest · bloom badge · floaters",
+          field: "nest",
+          bg: null,
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "badge",
+          float: "on",
+          watermark: false,
+          pin: false,
+          oneZ: "br-over",
+          rows: "songs",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#1a7a6e", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "e1-one-br-over",
+          family: "E",
+          label: "1 · BR over",
+          note: "Gold 1-heart above cover corner",
+          field: "solid",
+          bg: "#ff4d8d",
+          ink: "#1c1c1c",
+          muted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
+          panel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "br-over",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#c9185b", "#ff9f1c"],
+          swatches: ["#ff4d8d", "#ffe66d", "#1c1c1c"],
+        },
+        {
+          id: "e2-one-br-under",
+          family: "E",
+          label: "1 · BR under",
+          note: "Same corner · heart tucked behind cover",
+          field: "solid",
+          bg: "#ff4d8d",
+          ink: "#1c1c1c",
+          muted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
+          panel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "br-under",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#c9185b", "#ff9f1c"],
+          swatches: ["#ff4d8d", "#ffe66d", "#12101a"],
+        },
+        {
+          id: "e3-one-center-over",
+          family: "E",
+          label: "1 · center over",
+          note: "Large 1-heart stamped on cover face",
+          field: "solid",
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "center-over",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#ff4d8d", "#ff9f1c"],
+          swatches: ["#c9185b", "#ffe66d", "#f5f5f5"],
+        },
+        {
+          id: "e4-one-center-under",
+          family: "E",
+          label: "1 · center under",
+          note: "Giant heart behind cover · peeks at edges",
+          field: "solid",
+          bg: "#12101a",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 88%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 12%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "center-under",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#12101a", "#ff4d8d", "#ffe66d"],
+        },
+        {
+          id: "e5-one-tl-over",
+          family: "E",
+          label: "1 · TL over",
+          note: "Top-left over · floaters rising",
+          field: "solid",
+          bg: "#ff4d8d",
+          ink: "#1c1c1c",
+          muted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
+          panel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
+          heart: "metric",
+          float: "on",
+          watermark: false,
+          pin: false,
+          oneZ: "tl-over",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#c9185b", "#ff9f1c"],
+          swatches: ["#ff4d8d", "#ffe66d", "#ff4d8d"],
+        },
+        {
+          id: "e6-one-straddle",
+          family: "E",
+          label: "1 · straddle over",
+          note: "Hangs off cover bottom · above list",
+          field: "nest",
+          bg: null,
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "straddle",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#c9185b", "#ff9f1c"],
+          swatches: ["#1a7a6e", "#ffe66d", "#ff4d8d"],
+        },
+        {
+          id: "e7-one-straddle-under",
+          family: "E",
+          label: "1 · straddle under",
+          note: "Same hang · tucked under cover bottom",
+          field: "nest",
+          bg: null,
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "metric",
+          float: "off",
+          watermark: false,
+          pin: false,
+          oneZ: "straddle-under",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ff4d8d",
+          blooms: ["#ff4d8d", "#c9185b", "#ffe66d"],
+          swatches: ["#1a7a6e", "#ff4d8d", "#12101a"],
+        },
+        {
+          id: "e8-one-mid-left",
+          family: "E",
+          label: "1 · mid-left over",
+          note: "Side bite over cover · dense floaters",
+          field: "solid",
+          bg: "#9b4de8",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          heart: "metric",
+          float: "dense",
+          watermark: false,
+          pin: false,
+          oneZ: "mid-left",
+          rows: "artists",
+          brand: "center",
+          heroC: "#ffe66d",
+          blooms: ["#ffe66d", "#ff4d8d", "#ff9f1c"],
+          swatches: ["#9b4de8", "#ffe66d", "#ff4d8d"],
+        },
+      ];
+
+      const card = document.getElementById("card");
+      const recipeEl = document.getElementById("recipe");
+      const heartHero = document.getElementById("heart-hero");
+      const heartStage = document.getElementById("heart-stage");
+      const metricStage = document.getElementById("metric-stage");
+      const heartBadge = document.getElementById("heart-badge");
+      const heartMetric = document.getElementById("heart-metric");
+      const watermark = document.getElementById("watermark");
+      const floaters = document.getElementById("floaters");
+      const brandCenter = document.getElementById("brand-center");
+      const brandSpine = document.getElementById("brand-spine");
+      const rowsEl = document.getElementById("rows");
+
+      let activeId = KITS[0].id;
+      let replayKey = 0;
+
+      function heartSvg(extraClass) {
+        return `<svg class="${extraClass || "glyph"}" viewBox="0 0 512 512"><path class="outline" d="${HEART_PATH}" pathLength="1" /><path class="fill" d="${HEART_PATH}" /></svg>`;
+      }
+
+      function bloomLayers() {
+        return [1, 2, 3]
+          .map(
+            (i) =>
+              `<div class="bloom bloom--${i}"><svg viewBox="0 0 512 512"><path d="${HEART_PATH}" /></svg></div>`,
+          )
+          .join("");
+      }
+
+      function mountHeart(host) {
+        host.innerHTML = `<div class="cascade">${bloomLayers()}</div><div class="pop">${heartSvg()}</div>`;
+      }
+
+      function mountFloaters() {
+        floaters.innerHTML = Array.from({ length: 10 }, (_, i) => {
+          const extra = i >= 5 ? " is-extra" : "";
+          return `<div class="floater${extra}"><svg viewBox="0 0 512 512"><path d="${HEART_PATH}" /></svg></div>`;
+        }).join("");
+      }
+
+      function renderRows(mode) {
+        rowsEl.innerHTML = ROWS.map((row, i) => {
+          const primary = mode === "artists" ? row.artist : row.title;
+          const secondary = mode === "artists" ? "" : row.artist;
+          return `<li><span class="n">${i + 1}</span><span class="stack"><span class="t">${primary}</span><span class="s">${secondary}</span></span></li>`;
+        }).join("");
+      }
+
+      function recipeText(kit) {
+        return [
+          `kit: ${kit.id}`,
+          `family: ${kit.family}`,
+          `field: ${kit.field === "nest" ? "teal-nest" : kit.bg}`,
+          `ink: ${kit.ink}`,
+          `heart: ${kit.heart}`,
+          `float: ${kit.float}`,
+          `cover: assets/hero-cover.png`,
+          `oneZ: ${kit.oneZ || "br-over"}`,
+          `watermark: ${kit.watermark}`,
+          `pin: ${kit.pin}`,
+          `rows: ${kit.rows}`,
+          `brand: ${kit.brand}`,
+          `heroC: ${kit.heroC}`,
+          `blooms: ${kit.blooms.join(" · ")}`,
+          `canvas: 300×533`,
+          `label: 1 like artists`,
+        ].join("\n");
+      }
+
+      function applyKit(kit, { remount = true } = {}) {
+        activeId = kit.id;
+        card.dataset.field = kit.field;
+        card.dataset.heart = kit.heart;
+        card.dataset.float = kit.float;
+        card.dataset.rows = kit.rows;
+        card.dataset.brand = kit.brand;
+        card.dataset.oneZ = kit.oneZ || "br-over";
+
+        if (kit.field === "solid") {
+          card.style.background = kit.bg;
+        } else {
+          card.style.background = "";
+        }
+        card.style.color = kit.ink;
+        card.style.setProperty("--card-ink", kit.ink);
+        card.style.setProperty("--card-muted", kit.muted);
+        card.style.setProperty("--card-panel", kit.panel);
+        card.style.setProperty("--heart-hero-c", kit.heroC);
+        card.style.setProperty("--bloom-1", kit.blooms[0]);
+        card.style.setProperty("--bloom-2", kit.blooms[1]);
+        card.style.setProperty("--bloom-3", kit.blooms[2]);
+
+        // Cover is locked on every kit (share grammar).
+        const showPinHeart =
+          kit.pin && (kit.heart === "bloom" || kit.heart === "stamp");
+        const showMetric = kit.heart === "metric";
+        const showBadge = kit.heart === "badge";
+
+        heartHero.classList.toggle("is-hidden", !showPinHeart);
+        heartHero.classList.toggle("is-pin-lg", kit.heart === "bloom");
+        heartMetric.classList.toggle("is-hidden", !showMetric);
+        heartBadge.classList.toggle("is-hidden", !showBadge);
+        watermark.classList.toggle("is-hidden", !kit.watermark);
+        floaters.classList.toggle("is-hidden", kit.float === "off");
+        brandCenter.classList.toggle("is-hidden", kit.brand !== "center");
+        brandSpine.classList.toggle("is-hidden", kit.brand !== "spine");
+
+        if (kit.watermark) {
+          watermark.querySelector("path").setAttribute("d", HEART_PATH);
+          watermark.style.color = kit.heroC;
+        }
+
+        if (remount) {
+          replayKey += 1;
+          heartStage.innerHTML = "";
+          metricStage.innerHTML = "";
+          heartBadge.innerHTML = "";
+          if (showMetric) mountHeart(metricStage);
+          else if (showBadge) mountHeart(heartBadge);
+          else if (showPinHeart) mountHeart(heartStage);
+          mountFloaters();
+        }
+
+        renderRows(kit.rows);
+        recipeEl.textContent = recipeText(kit);
+
+        document.querySelectorAll(".kit").forEach((btn) => {
+          btn.setAttribute(
+            "aria-pressed",
+            String(btn.dataset.kitId === kit.id),
+          );
+        });
+      }
+
+      const FAV_KIT_ID = "b1-float-cover";
+
+      function kitButton(kit) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "kit" + (kit.id === FAV_KIT_ID ? " is-fav" : "");
+        btn.dataset.kitId = kit.id;
+        btn.setAttribute("aria-pressed", "false");
+        btn.innerHTML = `
+          <span class="swatches" aria-hidden="true">${kit.swatches
+            .map((c) => `<i style="background:${c}"></i>`)
+            .join("")}</span>
+          <span class="id">${kit.id}${kit.id === FAV_KIT_ID ? " · fav" : ""}</span>
+          <span class="label">${kit.label}</span>
+          <span class="note">${kit.note}</span>
+        `;
+        btn.addEventListener("click", () => applyKit(kit));
+        return btn;
+      }
+
+      function mountKits() {
+        const hosts = {
+          A: document.getElementById("kits-a"),
+          B: document.getElementById("kits-b"),
+          C: document.getElementById("kits-c"),
+          D: document.getElementById("kits-d"),
+          E: document.getElementById("kits-e"),
+        };
+        KITS.forEach((kit) => hosts[kit.family].appendChild(kitButton(kit)));
+      }
+
+      async function copyRecipe() {
+        const text = recipeEl.textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          ["copy", "copy-stage"].forEach((id) => {
+            const el = document.getElementById(id);
+            const prev = el.textContent;
+            el.textContent = "Copied";
+            setTimeout(() => {
+              el.textContent = prev;
+            }, 1100);
+          });
+        } catch {
+          /* ignore */
+        }
+      }
+
+      document.getElementById("replay").addEventListener("click", () => {
+        const kit = KITS.find((k) => k.id === activeId);
+        if (kit) applyKit(kit, { remount: true });
+      });
+      document.getElementById("copy").addEventListener("click", copyRecipe);
+      document
+        .getElementById("copy-stage")
+        .addEventListener("click", copyRecipe);
+
+      mountKits();
+      mountFloaters();
+      watermark.querySelector("path").setAttribute("d", HEART_PATH);
+      applyKit(KITS.find((k) => k.id === FAV_KIT_ID) || KITS[0]);
+    </script>
+  </body>
+</html>

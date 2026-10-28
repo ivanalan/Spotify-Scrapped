@@ -345,15 +345,21 @@
     );
 }
 
-/* Scene 4 one-like: teal nest C0 (TEAL_NEST_GRADIENT). Soft-close stays flat. */
+/* Scene 4 one-like: volume ocean (ONE_LIKE_OCEAN_GRADIENT / D-045). */
 .wrapped-story [data-scrapped-slide][data-scrapped-field="one-like-nest"] {
   background-color: var(--wrapped-canvas);
   background-image: linear-gradient(
     165deg,
-    #5eead4 0%,
-    #1a7a6e 50%,
-    #0f4c5c 100%
+    #a5f3fc 0%,
+    #0284c7 48%,
+    #075985 100%
   );
+}
+
+/* Scene 8 soft close: flat ocean deep (ONE_LIKE_HEART.oceanDeep). Light ink via teal tone. */
+.wrapped-story [data-scrapped-slide][data-scrapped-field="soft-close-ocean"] {
+  background-color: #075985;
+  background-image: none;
 }
 
 .wrapped-story[data-wrapped-tone="mango"],

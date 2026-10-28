@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scrapped · striped tent · story layouts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Striped tent kit */
+        --sky-hi: #ffe08a;
+        --sky: #ffb020;
+        --sky-lo: #f07800;
+        --water-ice: #9ed0ff;
+        --water-mid: #2f6fdb;
+        --water-deep: #003a8c;
+        --ghosted: #0c0c14;
+        --ghosted-wash: #0047ab;
+        --scarlet: #e10600;
+        --scarlet-deep: #a10000;
+        --cobalt: #0047ab;
+        --cobalt-bright: #2f6fdb;
+        --white: #fffdf5;
+        --ink-light: #f7f4ef;
+        --ink-dark: #141018;
+
+        --stage: #0a0a10;
+        --paper: #f7f4ef;
+        --muted: color-mix(in oklab, #f7f4ef 55%, transparent);
+        --panel: color-mix(in oklab, #f7f4ef 7%, transparent);
+        --line: color-mix(in oklab, #f7f4ef 12%, transparent);
+        --accent: var(--sky);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+        min-height: 100dvh;
+      }
+
+      @media (max-width: 960px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .rail {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        max-height: 100dvh;
+        overflow: auto;
+        padding: 1.25rem 1.1rem 2rem;
+        border-right: 1px solid var(--line);
+        background: color-mix(in oklab, #0a0a10 90%, #1a1020);
+      }
+
+      @media (max-width: 960px) {
+        .rail {
+          position: relative;
+          max-height: none;
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+
+      h1 {
+        margin: 0 0 0.35rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        margin: 0 0 1rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+
+      .lede strong {
+        color: color-mix(in oklab, #f7f4ef 88%, transparent);
+        font-weight: 560;
+      }
+
+      .lock {
+        margin: 0 0 1rem;
+        padding: 0.7rem 0.75rem;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        font-size: 0.74rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .lock h2 {
+        margin: 0 0 0.35rem;
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--sky);
+      }
+
+      .lock ul {
+        margin: 0;
+        padding-left: 1.05rem;
+      }
+
+      .lock li + li {
+        margin-top: 0.25rem;
+      }
+
+      .section-label {
+        margin: 1rem 0 0.45rem;
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .spine {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 3px;
+        height: 14px;
+        margin-bottom: 0.75rem;
+      }
+
+      .spine span {
+        border-radius: 2px;
+      }
+
+      .token-list {
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .token-row {
+        display: grid;
+        grid-template-columns: 18px 1fr auto;
+        gap: 0.45rem;
+        align-items: center;
+        font-size: 0.72rem;
+      }
+
+      .token-row i {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1px solid color-mix(in oklab, #fff 16%, transparent);
+      }
+
+      .token-row .hex {
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .jump {
+        display: grid;
+        gap: 0.3rem;
+        margin-top: 0.75rem;
+      }
+
+      .jump a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.74rem;
+        padding: 0.35rem 0.45rem;
+        border-radius: 6px;
+        border: 1px solid transparent;
+      }
+
+      .jump a:hover {
+        color: var(--paper);
+        border-color: var(--line);
+        background: var(--panel);
+      }
+
+      .main {
+        padding: 1.25rem 1.15rem 3.5rem;
+      }
+
+      .main > header {
+        margin-bottom: 1.25rem;
+      }
+
+      .main > header h2 {
+        margin: 0 0 0.3rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+
+      .main > header p {
+        margin: 0;
+        max-width: 44rem;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .stories {
+        display: grid;
+        gap: 2rem;
+      }
+
+      .story {
+        display: grid;
+        grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+        gap: 1.25rem;
+        align-items: start;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      @media (max-width: 820px) {
+        .story {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .story-notes h3 {
+        margin: 0 0 0.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+
+      .story-notes .beat {
+        margin: 0 0 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--sky);
+      }
+
+      .story-notes dl {
+        margin: 0;
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      .story-notes dt {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.15rem;
+      }
+
+      .story-notes dd {
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.45;
+        color: color-mix(in oklab, #f7f4ef 82%, transparent);
+      }
+
+      .swatch-inline {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        vertical-align: -1px;
+        margin-right: 0.25rem;
+        border: 1px solid color-mix(in oklab, #fff 20%, transparent);
+      }
+
+      /* ——— Phone ——— */
+      .phone {
+        position: relative;
+        width: min(100%, 300px);
+        aspect-ratio: 9 / 16;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        overflow: hidden;
+        margin-inline: auto;
+        box-shadow: 0 22px 48px color-mix(in oklab, #000 42%, transparent);
+        color: var(--s-ink, var(--ink-light));
+      }
+
+      .phone-field {
+        position: absolute;
+        inset: 0;
+        background: var(--s-field);
+      }
+
+      .phone-wash {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: var(--s-wash-op, 0);
+        background:
+          radial-gradient(
+            120% 80% at 0% 0%,
+            color-mix(in oklab, var(--s-wash) 55%, transparent) 0%,
+            transparent 68%
+          ),
+          radial-gradient(
+            105% 75% at 100% 100%,
+            color-mix(in oklab, var(--s-wash-2, var(--s-wash)) 40%, transparent)
+              0%,
+            transparent 65%
+          );
+      }
+
+      .chrome {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        z-index: 20;
+        display: grid;
+        gap: 8px;
+      }
+
+      .progress {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 3px;
+        height: 2.5px;
+      }
+
+      .progress i {
+        background: color-mix(in oklab, var(--s-ink) 22%, transparent);
+        border-radius: 1px;
+      }
+
+      .progress i.on {
+        background: var(--s-ink);
+      }
+
+      .chrome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .wordmark {
+        font-size: 0.68rem;
+        font-weight: 600;
+        font-style: italic;
+        letter-spacing: -0.01em;
+        opacity: 0.9;
+      }
+
+      .chrome-icons {
+        display: flex;
+        gap: 8px;
+        opacity: 0.75;
+      }
+
+      .chrome-icons span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1.5px solid currentColor;
+      }
+
+      .body {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        padding: 18% 11% 12%;
+        pointer-events: none;
+      }
+
+      .body.bottom {
+        justify-content: flex-end;
+      }
+
+      .body.center {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-top: 20%;
+      }
+
+      .body.list {
+        justify-content: center;
+        padding-bottom: 16%;
+      }
+
+      .headline {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.1;
+        color: var(--s-ink);
+      }
+
+      .headline.sm {
+        font-size: 1.05rem;
+      }
+
+      .headline em {
+        font-style: italic;
+      }
+
+      .subline {
+        margin: 0.45rem 0 0;
+        font-size: 0.78rem;
+        line-height: 1.4;
+        color: var(--s-muted);
+        max-width: 24ch;
+      }
+
+      .body.center .subline {
+        max-width: 28ch;
+      }
+
+      .cover {
+        width: 44%;
+        aspect-ratio: 1;
+        border-radius: 4px;
+        background: linear-gradient(
+          145deg,
+          color-mix(in oklab, var(--sky-hi) 70%, #fff) 0%,
+          color-mix(in oklab, var(--scarlet) 55%, #333) 100%
+        );
+        margin: 0 auto 0.7rem;
+        box-shadow: 0 12px 28px color-mix(in oklab, #000 30%, transparent);
+        position: relative;
+        z-index: 2;
+      }
+
+      .entity-name {
+        margin: 0;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--s-ink);
+      }
+
+      .entity-meta {
+        margin: 0.2rem 0 0;
+        font-size: 0.68rem;
+        color: var(--s-muted);
+      }
+
+      .list {
+        display: grid;
+        gap: 0.48rem;
+        margin-top: 0.7rem;
+        width: 100%;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 16px 26px minmax(0, 1fr);
+        gap: 0.45rem;
+        align-items: center;
+      }
+
+      .row .n {
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: var(--s-muted);
+      }
+
+      .row .thumb {
+        width: 26px;
+        height: 26px;
+        border-radius: 3px;
+        background: color-mix(in oklab, var(--s-ink) 14%, transparent);
+      }
+
+      .row .lab strong {
+        display: block;
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: var(--s-ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .row .lab span {
+        display: block;
+        font-size: 0.52rem;
+        color: var(--s-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .motif {
+        position: absolute;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      /* Intro disks TL */
+      .intro-disks {
+        top: -18%;
+        left: -28%;
+        width: 78%;
+        aspect-ratio: 1;
+      }
+
+      .intro-disks i {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        transform: rotate(45deg) scale(var(--r));
+        background: radial-gradient(
+          circle at 30% 30%,
+          color-mix(in oklab, var(--sky-hi) 35%, transparent),
+          color-mix(in oklab, var(--cobalt) 55%, transparent) 55%,
+          color-mix(in oklab, var(--ghosted) 80%, transparent)
+        );
+        opacity: calc(0.95 - var(--i) * 0.1);
+      }
+
+      .intro-star {
+        right: -8%;
+        bottom: -4%;
+        width: 28%;
+        aspect-ratio: 1;
+        background: conic-gradient(
+          from 20deg,
+          var(--sky-hi),
+          var(--sky-lo),
+          var(--scarlet),
+          var(--sky-hi)
+        );
+        clip-path: polygon(
+          50% 0%,
+          61% 35%,
+          98% 35%,
+          68% 57%,
+          79% 91%,
+          50% 70%,
+          21% 91%,
+          32% 57%,
+          2% 35%,
+          39% 35%
+        );
+        opacity: 0.9;
+      }
+
+      /* Volume ocean */
+      .ocean {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 34%;
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          color-mix(in oklab, var(--water-ice) 45%, transparent) 22%,
+          var(--water-mid) 62%,
+          var(--water-deep) 100%
+        );
+        clip-path: ellipse(130% 100% at 50% 100%);
+        z-index: 4;
+      }
+
+      .fish {
+        position: absolute;
+        width: 7px;
+        height: 4px;
+        border-radius: 50%;
+        background: color-mix(in oklab, var(--ink-dark) 55%, var(--water-ice));
+        opacity: 0.7;
+        z-index: 5;
+      }
+
+      /* Ghosted grass */
+      .grass {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 22%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        padding: 0 4%;
+        z-index: 4;
+      }
+
+      .grass i {
+        width: 7px;
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--cobalt) 70%, #1a3a20),
+          #0a1a10
+        );
+        border-radius: 3px 3px 0 0;
+        height: var(--h);
+        opacity: 0.85;
+        transform-origin: bottom center;
+      }
+
+      .haunt {
+        top: 14%;
+        left: 7%;
+        width: 34px;
+        height: 42px;
+        background: color-mix(in oklab, var(--ink-light) 88%, transparent);
+        border-radius: 16px 16px 10px 10px;
+        opacity: 0.55;
+        z-index: 5;
+      }
+
+      .haunt::before,
+      .haunt::after {
+        content: "";
+        position: absolute;
+        top: 38%;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--ghosted);
+      }
+
+      .haunt::before {
+        left: 28%;
+      }
+
+      .haunt::after {
+        right: 28%;
+      }
+
+      .stars span {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--sky-hi);
+        opacity: 0.7;
+        z-index: 2;
+      }
+
+      /* Ghosted list moon + ghosts */
+      .moon {
+        top: -12%;
+        right: -14%;
+        width: 42%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 32%,
+          #fff 0%,
+          var(--sky-hi) 28%,
+          var(--scarlet) 62%,
+          var(--cobalt) 100%
+        );
+        z-index: 4;
+      }
+
+      .ghost {
+        width: 26px;
+        height: 32px;
+        background: color-mix(in oklab, var(--ink-light) 90%, transparent);
+        border-radius: 14px 14px 8px 8px;
+        opacity: 0.72;
+        z-index: 5;
+      }
+
+      .ghost::before,
+      .ghost::after {
+        content: "";
+        position: absolute;
+        top: 36%;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--ghosted);
+      }
+
+      .ghost::before {
+        left: 28%;
+      }
+
+      .ghost::after {
+        right: 28%;
+      }
+
+      .scrim {
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 18%;
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--ghosted) 72%, transparent),
+          transparent
+        );
+        z-index: 15;
+      }
+
+      /* One-like hearts */
+      .heart-hero {
+        top: 16%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 72px;
+        height: 66px;
+        z-index: 4;
+      }
+
+      .heart-hero svg {
+        width: 100%;
+        height: 100%;
+        fill: var(--scarlet);
+        filter: drop-shadow(0 0 18px color-mix(in oklab, var(--scarlet) 45%, transparent));
+      }
+
+      .floater {
+        width: 18px;
+        height: 16px;
+        z-index: 4;
+      }
+
+      .floater svg {
+        width: 100%;
+        height: 100%;
+        fill: var(--c, var(--sky-hi));
+        opacity: 0.85;
+      }
+
+      /* Left-on-read typing + bubbles */
+      .typing {
+        top: 14%;
+        left: 8%;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 9px 12px;
+        border-radius: 16px;
+        background: radial-gradient(
+          100% 145% at 25% 30%,
+          var(--water-ice) 0%,
+          var(--water-mid) 42%,
+          var(--water-deep) 78%,
+          #0a0810 100%
+        );
+        box-shadow: 0 8px 18px color-mix(in oklab, #000 35%, transparent);
+        z-index: 6;
+      }
+
+      .typing span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #f5f0ff;
+        opacity: 0.9;
+      }
+
+      .typing span:nth-child(2) {
+        opacity: 0.7;
+      }
+
+      .typing span:nth-child(3) {
+        opacity: 0.5;
+      }
+
+      .chat-col {
+        top: 16%;
+        left: 3%;
+        display: grid;
+        gap: 10px;
+        z-index: 4;
+      }
+
+      .chat-mirror {
+        top: 22%;
+        right: 3%;
+        display: grid;
+        gap: 12px;
+        z-index: 4;
+      }
+
+      .bubble {
+        width: 42px;
+        height: 28px;
+        border-radius: 14px;
+        background: radial-gradient(
+          100% 145% at 25% 30%,
+          var(--water-ice) 0%,
+          var(--water-mid) 42%,
+          var(--water-deep) 78%,
+          #0a0810 100%
+        );
+        opacity: 0.72;
+      }
+
+      .bubble.lg {
+        width: 52px;
+        height: 34px;
+      }
+
+      .bubble.sm {
+        width: 34px;
+        height: 22px;
+        opacity: 0.55;
+      }
+
+      /* Film letterbox */
+      .film {
+        left: 0;
+        right: 0;
+        height: 11%;
+        background: #0a0a0a;
+        z-index: 16;
+        overflow: hidden;
+      }
+
+      .film.top {
+        top: 0;
+      }
+
+      .film.bot {
+        bottom: 0;
+      }
+
+      .film .perfs {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 10px;
+        min-width: 200%;
+      }
+
+      .film .perfs i {
+        width: 11px;
+        height: 11px;
+        border-radius: 2px;
+        background: var(--sky);
+        flex-shrink: 0;
+      }
+
+      /* Soft close iris */
+      .iris {
+        top: 18%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 46%;
+        aspect-ratio: 1;
+        z-index: 4;
+      }
+
+      .iris-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        transform: scale(var(--s));
+        background: var(--c);
+        opacity: 0.9;
+        clip-path: path(
+          "M128,224 C128,224 48,160 48,104 C48,72 72,48 104,48 C120,48 136,56 144,72 C152,56 168,48 184,48 C216,48 240,72 240,104 C240,160 160,224 128,224 Z"
+        );
+        /* fallback circle if path unsupported: keep circle */
+      }
+
+      .iris-cluster {
+        position: absolute;
+        inset: 8%;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 50% 50%, var(--scarlet) 0 14%, transparent 15%),
+          radial-gradient(
+            circle at 50% 50%,
+            var(--sky-hi) 0 28%,
+            var(--cobalt-bright) 29% 46%,
+            var(--water-deep) 47% 68%,
+            var(--scarlet-deep) 69% 100%
+          );
+        box-shadow: 0 0 40px color-mix(in oklab, var(--scarlet) 35%, transparent);
+      }
+
+      /* Share finale */
+      .share-stage-disks {
+        top: -20%;
+        left: -30%;
+        width: 70%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          color-mix(in oklab, var(--cobalt) 40%, transparent),
+          transparent 70%
+        );
+        z-index: 1;
+      }
+
+      .share-card {
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        top: 14%;
+        bottom: 26%;
+        background: var(--cobalt);
+        color: var(--white);
+        z-index: 8;
+        display: flex;
+        flex-direction: column;
+        padding: 14px 12px 12px;
+        box-shadow: 0 16px 36px color-mix(in oklab, #000 45%, transparent);
+      }
+
+      .share-card .cover {
+        width: 46%;
+        margin-bottom: 0.55rem;
+      }
+
+      .share-card .list {
+        margin-top: 0.35rem;
+        gap: 0.35rem;
+      }
+
+      .share-card .row .lab strong,
+      .share-card .row .n {
+        color: var(--white);
+      }
+
+      .share-card .row .lab span {
+        color: color-mix(in oklab, var(--white) 75%, transparent);
+      }
+
+      .share-card .row .thumb {
+        background: color-mix(in oklab, var(--white) 18%, transparent);
+      }
+
+      .share-brand {
+        margin-top: auto;
+        text-align: center;
+        font-size: 0.58rem;
+        opacity: 0.85;
+        padding-top: 0.5rem;
+      }
+
+      .share-actions {
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: 8%;
+        z-index: 12;
+        display: grid;
+        gap: 8px;
+      }
+
+      .share-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 2px;
+      }
+
+      .share-dots i {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: color-mix(in oklab, var(--ink-light) 35%, transparent);
+      }
+
+      .share-dots i.on {
+        background: var(--ink-light);
+      }
+
+      .share-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .share-btns span {
+        height: 32px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-size: 0.62rem;
+        font-weight: 600;
+      }
+
+      .share-btns .primary {
+        background: var(--ink-light);
+        color: var(--ghosted);
+      }
+
+      .share-btns .secondary {
+        border: 1px solid color-mix(in oklab, var(--ink-light) 35%, transparent);
+        color: var(--ink-light);
+      }
+
+      .heart-path {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="heart-path" aria-hidden="true">
+      <defs>
+        <path
+          id="heart"
+          d="M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z"
+        />
+      </defs>
+    </svg>
+
+    <div class="shell">
+      <aside class="rail">
+        <h1><em>Striped tent</em></h1>
+        <p class="lede">
+          Locked kit. This board is about
+          <strong>realistic story layouts</strong> (settled / list-reveal beat),
+          not more palettes. No production code yet.
+        </p>
+
+        <div class="lock">
+          <h2>Color locks</h2>
+          <ul>
+            <li>1 Volume: orange sky + blue water</li>
+            <li>7 All-star setlist: same sky (no water)</li>
+            <li>2–3 Ghosted: dark field</li>
+            <li>5–6 Left on read: same scarlet field</li>
+          </ul>
+        </div>
+
+        <div class="section-label">Deck spine</div>
+        <div class="spine" aria-hidden="true">
+          <span style="background: var(--ghosted)"></span>
+          <span style="background: var(--sky)"></span>
+          <span style="background: var(--ghosted)"></span>
+          <span style="background: var(--ghosted)"></span>
+          <span style="background: var(--cobalt-bright)"></span>
+          <span style="background: var(--scarlet)"></span>
+          <span style="background: var(--scarlet)"></span>
+          <span style="background: var(--sky)"></span>
+          <span style="background: var(--scarlet-deep)"></span>
+        </div>
+
+        <div class="section-label">Tokens</div>
+        <div class="token-list" id="tokens"></div>
+
+        <div class="section-label">Jump</div>
+        <nav class="jump">
+          <a href="#s0">0 Intro</a>
+          <a href="#s1">1 Volume</a>
+          <a href="#s2">2 Most ghosted</a>
+          <a href="#s3">3 Ghosted songs</a>
+          <a href="#s4">4 1 like artists</a>
+          <a href="#s5">5 Left on read</a>
+          <a href="#s6">6 Gang back together</a>
+          <a href="#s7">7 Plot twist</a>
+          <a href="#s8">8 Soft close</a>
+          <a href="#s9">9 Share</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header>
+          <h2>Story layouts · phone density</h2>
+          <p>
+            Each frame shows the main content beat (list or entity reveal), with
+            art framing edges the way production chrome does. Type mid-band stays
+            clear.
+          </p>
+        </header>
+
+        <div class="stories">
+          <!-- 0 INTRO -->
+          <article class="story" id="s0">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--ghosted);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--ghosted-wash);
+                --s-wash-2: var(--water-deep);
+                --s-wash-op: 0.45;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif intro-disks" aria-hidden="true">
+                <i style="--r: 1; --i: 0"></i>
+                <i style="--r: 0.82; --i: 1"></i>
+                <i style="--r: 0.64; --i: 2"></i>
+                <i style="--r: 0.48; --i: 3"></i>
+                <i style="--r: 0.34; --i: 4"></i>
+                <i style="--r: 0.22; --i: 5"></i>
+              </div>
+              <div class="motif intro-star"></div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body center">
+                <h3 class="headline">2026 <em>Scrapped</em></h3>
+                <p class="subline">This is for the ones you ghosted.</p>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 0 · open</p>
+              <h3>Intro</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--ghosted)"></span>
+                  Dark ink with cobalt corner wash (intro-dusk recipe, striped-tent
+                  tokens).
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  TL concentric oval ladder; BR pointed star. Mid band clear for
+                  centered hero type.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  Year + italic Scrapped → Hey {name} + welcome. Two beats, same
+                  canvas.
+                </dd>
+                <dt>Chrome</dt>
+                <dd>9 progress segments; italic wordmark; light ink on dark.</dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 1 VOLUME -->
+          <article class="story" id="s1">
+            <div
+              class="phone"
+              style="
+                --s-field: linear-gradient(
+                  165deg,
+                  var(--sky-hi) 0%,
+                  var(--sky) 42%,
+                  var(--sky-lo) 100%
+                );
+                --s-ink: var(--ink-dark);
+                --s-muted: color-mix(in oklab, #141018 86%, transparent);
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="motif ocean"></div>
+              <span class="fish" style="left: 18%; bottom: 18%"></span>
+              <span class="fish" style="left: 32%; bottom: 12%"></span>
+              <span class="fish" style="left: 48%; bottom: 22%"></span>
+              <span class="fish" style="left: 61%; bottom: 14%"></span>
+              <span class="fish" style="left: 74%; bottom: 20%"></span>
+              <span class="fish" style="left: 27%; bottom: 8%"></span>
+              <span class="fish" style="left: 55%; bottom: 7%"></span>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body bottom">
+                <h3 class="headline">1,284 songs in your Liked list</h3>
+                <p class="subline">That's not a pond. That's an ocean.</p>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 1 · volume · LOCK</p>
+              <h3>Liked list volume</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--sky)"></span>
+                  Orange / yellow sky gradient. Light theme (dark ink).
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  Bottom ocean wave: ice → mid → deep blue. Fish school = liked
+                  this year (1:1, cap 15). Tide rises on the “joined” beat.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  Big number hero at bottom; subline under. Second beat swaps to
+                  “N new songs joined this year.”
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 2 GHOSTED ENTITY -->
+          <article class="story" id="s2">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--ghosted);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--ghosted-wash);
+                --s-wash-op: 0.55;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif stars" aria-hidden="true">
+                <span style="top: 22%; left: 18%"></span>
+                <span style="top: 28%; left: 72%"></span>
+                <span style="top: 36%; left: 58%"></span>
+                <span style="top: 19%; left: 44%"></span>
+              </div>
+              <div class="motif haunt"></div>
+              <div class="motif grass">
+                <i style="--h: 42%"></i><i style="--h: 68%"></i
+                ><i style="--h: 55%"></i><i style="--h: 78%"></i
+                ><i style="--h: 48%"></i><i style="--h: 70%"></i
+                ><i style="--h: 58%"></i><i style="--h: 80%"></i
+                ><i style="--h: 45%"></i><i style="--h: 62%"></i
+                ><i style="--h: 74%"></i><i style="--h: 50%"></i>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i><i></i
+                  ><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body center">
+                <div class="cover"></div>
+                <h3 class="headline sm">Most ghosted song</h3>
+                <p class="entity-name">Motion Sickness</p>
+                <p class="entity-meta">Phoebe Bridgers</p>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 2 · entity · LOCK dark</p>
+              <h3>Most ghosted song</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--ghosted)"></span>
+                  Dark night. Cobalt wash. No moon on this beat.
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  Bottom grass rise-from-soil; cover-TL haunt ghost (slow fade);
+                  sparse S9 stars grow-in. Mid band = cover + title.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  Setup ratio → “One of them stings the most” → cover reveal +
+                  track / artist.
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 3 GHOSTED LIST -->
+          <article class="story" id="s3">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--ghosted);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--ghosted-wash);
+                --s-wash-op: 0.55;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif scrim"></div>
+              <div class="motif moon"></div>
+              <div class="motif ghost" style="top: 18%; left: 8%"></div>
+              <div class="motif ghost" style="top: 26%; left: 78%; width: 22px; height: 28px"></div>
+              <div class="motif ghost" style="top: 48%; left: 4%; width: 24px; height: 30px; opacity: 0.5"></div>
+              <div class="motif ghost" style="top: 58%; right: 6%; width: 28px; height: 34px"></div>
+              <div class="motif ghost" style="top: 72%; left: 14%; width: 20px; height: 26px; opacity: 0.45"></div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body list">
+                <h3 class="headline sm">Your ghosted songs</h3>
+                <p class="subline">Multi year favs missing from your recent tops.</p>
+                <div class="list">
+                  <div class="row">
+                    <span class="n">1</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Motion Sickness</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">2</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Kyoto</strong><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">3</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Scott Street</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">4</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Savior Complex</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">5</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Chinese Satellite</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 3 · list · LOCK dark · pairs with 2</p>
+              <h3>Ghosted songs list</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>Same dark as scene 2 (pair rhyme).</dd>
+                <dt>Art</dt>
+                <dd>
+                  TR-corner moon (no halo). Five edge ghosts (slow fade → float).
+                  Top C8 scrim so chrome stays readable. No mid-band hero over
+                  rows.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  Setup “one ghost town” → numbered 5-row cascade list.
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 4 ONE LIKE -->
+          <article class="story" id="s4">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--cobalt-bright);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="motif floater" style="top: 14%; left: 6%; --c: var(--sky-hi)">
+                <svg viewBox="0 0 512 512"><use href="#heart" /></svg>
+              </div>
+              <div class="motif floater" style="top: 22%; left: 22%; --c: var(--scarlet); width: 14px; height: 12px">
+                <svg viewBox="0 0 512 512"><use href="#heart" /></svg>
+              </div>
+              <div class="motif floater" style="top: 18%; right: 10%; --c: var(--sky)">
+                <svg viewBox="0 0 512 512"><use href="#heart" /></svg>
+              </div>
+              <div class="motif floater" style="top: 70%; left: 8%; --c: var(--scarlet-deep); width: 16px; height: 14px">
+                <svg viewBox="0 0 512 512"><use href="#heart" /></svg>
+              </div>
+              <div class="motif floater" style="top: 66%; right: 8%; --c: var(--sky-hi); width: 20px; height: 18px">
+                <svg viewBox="0 0 512 512"><use href="#heart" /></svg>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i></i><i></i><i></i
+                  ><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body list">
+                <h3 class="headline sm">1 like artists</h3>
+                <p class="subline">Artists with only 1 song saved.</p>
+                <div class="list">
+                  <div class="row">
+                    <span class="n">1</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Bloom</strong><span>Troye Sivan · 42d ago</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">2</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Supalonely</strong><span>BENEE · 110d ago</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">3</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Electric Feel</strong><span>MGMT · 200d ago</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">4</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Midnight City</strong><span>M83 · 301d ago</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">5</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Do I Wanna Know?</strong
+                      ><span>Arctic Monkeys · 340d ago</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 4 · list frame</p>
+              <h3>1 like artists</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span
+                    class="swatch-inline"
+                    style="background: var(--cobalt-bright)"
+                  ></span>
+                  Cobalt bright (striped free act). Production today uses ocean
+                  nest; here the tent blue owns the card.
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  List beat: perimeter rising hearts only (frame, not mid hero).
+                  Setup beats use a centered heart bloom before the list lands.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  “1 hit wonders” → “Meet your 1 like artists” → numbered list
+                  with song · artist · days-ago.
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 5 LEFT ON READ -->
+          <article class="story" id="s5">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--scarlet);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--scarlet-deep);
+                --s-wash-op: 0.45;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif typing">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i><i></i
+                  ><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body center">
+                <div class="cover"></div>
+                <h3 class="headline sm">Top artist left on read</h3>
+                <p class="entity-name">The 1975</p>
+                <p class="entity-meta">Still in all time tops</p>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 5 · entity · pairs with 6</p>
+              <h3>Artists you left on read</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--scarlet)"></span>
+                  Scarlet canvas + deep scarlet wash.
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  TL typing pin (ocean-bloom fill on the bubble). Mid clear for
+                  cover. Pin is the one→many accent into scene 6.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  Setup line → centered cover + “Top artist left on read.”
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 6 GANG -->
+          <article class="story" id="s6">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--scarlet);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--scarlet-deep);
+                --s-wash-op: 0.45;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif chat-col">
+                <div class="bubble lg"></div>
+                <div class="bubble"></div>
+                <div class="bubble sm"></div>
+                <div class="bubble"></div>
+              </div>
+              <div class="motif chat-mirror">
+                <div class="bubble"></div>
+                <div class="bubble lg"></div>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body list">
+                <h3 class="headline sm">Top artists you left on read</h3>
+                <p class="subline">
+                  Highest multi year favs missing from latest activity.
+                </p>
+                <div class="list">
+                  <div class="row">
+                    <span class="n">1</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>The 1975</strong><span>All time fav</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">2</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>HAIM</strong><span>All time fav</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">3</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Clairo</strong><span>All time fav</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">4</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>SZA</strong><span>All time fav</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">5</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Frank Ocean</strong><span>All time fav</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 6 · list · same scarlet as 5</p>
+              <h3>Get the gang back together</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>Same scarlet as scene 5 (locked pair).</dd>
+                <dt>Art</dt>
+                <dd>
+                  Edge chat chorus: left column + right mirror bubbles (ocean
+                  bloom). Frames the list; never covers mid-band rows.
+                </dd>
+                <dt>Copy</dt>
+                <dd>
+                  “Get the gang back together?” → numbered left-on-read artists.
+                </dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 7 PLOT TWIST -->
+          <article class="story" id="s7">
+            <div
+              class="phone"
+              style="
+                --s-field: linear-gradient(
+                  165deg,
+                  var(--sky-hi) 0%,
+                  var(--sky) 42%,
+                  var(--sky-lo) 100%
+                );
+                --s-ink: var(--ink-dark);
+                --s-muted: color-mix(in oklab, #141018 86%, transparent);
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="motif film top">
+                <div class="perfs">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+              </div>
+              <div class="motif film bot">
+                <div class="perfs">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark" style="color: #f7f4ef">Scrapped</span>
+                  <div class="chrome-icons" style="color: #f7f4ef">
+                    <span></span><span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="body list" style="padding-top: 22%; padding-bottom: 18%">
+                <h3 class="headline sm">The all-star setlist</h3>
+                <p class="subline">All-time favs still in rotation</p>
+                <div class="list">
+                  <div class="row">
+                    <span class="n">1</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Pink + White</strong><span>Frank Ocean</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">2</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Nights</strong><span>Frank Ocean</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">3</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Self Control</strong><span>Frank Ocean</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">4</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Ivy</strong><span>Frank Ocean</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">5</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>White Ferrari</strong><span>Frank Ocean</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 7 · reunion · LOCK sky reuse</p>
+              <h3>All-star setlist</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--sky)"></span>
+                  Same orange / yellow sky as volume. No water.
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  7L film letterbox: black bars + sky-colored sprockets. Bars
+                  present on setup; retract as list enters. Chrome forced light
+                  on the black bars during setup.
+                </dd>
+                <dt>Copy</dt>
+                <dd>“Plot twist.” → all-star setlist (or single reunion song).</dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 8 SOFT CLOSE -->
+          <article class="story" id="s8">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--scarlet-deep);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="motif iris">
+                <div class="iris-cluster"></div>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+              <div class="body center" style="padding-top: 48%">
+                <h3 class="headline">See you next Scrapped.</h3>
+                <p class="subline">Hopefully fewer favs get ghosted.</p>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 8 · soft close</p>
+              <h3>Thanks for staying</h3>
+              <dl>
+                <dt>Field</dt>
+                <dd>
+                  <span
+                    class="swatch-inline"
+                    style="background: var(--scarlet-deep)"
+                  ></span>
+                  Deep scarlet (striped close). Production today uses ocean deep;
+                  tent version keeps the red family.
+                </dd>
+                <dt>Art</dt>
+                <dd>
+                  Compact heart iris / plug cluster in the upper mid. Copy sits
+                  below so the iris can breathe.
+                </dd>
+                <dt>Copy</dt>
+                <dd>“Thanks for staying.” → “See you next Scrapped.”</dd>
+              </dl>
+            </div>
+          </article>
+
+          <!-- 9 SHARE -->
+          <article class="story" id="s9">
+            <div
+              class="phone"
+              style="
+                --s-field: var(--ghosted);
+                --s-ink: var(--ink-light);
+                --s-muted: color-mix(in oklab, #f7f4ef 88%, transparent);
+                --s-wash: var(--ghosted-wash);
+                --s-wash-op: 0.4;
+              "
+            >
+              <div class="phone-field"></div>
+              <div class="phone-wash"></div>
+              <div class="motif share-stage-disks"></div>
+              <div class="motif intro-star" style="width: 22%; bottom: 28%; right: -6%; opacity: 0.55"></div>
+              <div class="share-card">
+                <div class="cover"></div>
+                <div class="list">
+                  <div class="row">
+                    <span class="n">1</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Motion Sickness</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">2</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Kyoto</strong><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="n">3</span><span class="thumb"></span
+                    ><span class="lab"
+                      ><strong>Scott Street</strong
+                      ><span>Phoebe Bridgers</span></span
+                    >
+                  </div>
+                </div>
+                <div class="share-brand">myscrapped.com</div>
+              </div>
+              <div class="share-actions">
+                <div class="share-dots">
+                  <i class="on"></i><i></i><i></i>
+                </div>
+                <div class="share-btns">
+                  <span class="primary">Share</span>
+                  <span class="secondary">Replay</span>
+                </div>
+              </div>
+              <div class="chrome">
+                <div class="progress">
+                  <i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i
+                  ><i class="on"></i><i class="on"></i><i class="on"></i>
+                </div>
+                <div class="chrome-row">
+                  <span class="wordmark">Scrapped</span>
+                  <div class="chrome-icons"><span></span><span></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="story-notes">
+              <p class="beat">Scene 9 · share finale</p>
+              <h3>Share</h3>
+              <dl>
+                <dt>Stage</dt>
+                <dd>
+                  <span class="swatch-inline" style="background: var(--ghosted)"></span>
+                  Dark ink + intro disks / star behind the card.
+                </dd>
+                <dt>Card</dt>
+                <dd>
+                  Inset 9:16 poster.
+                  <span
+                    class="swatch-inline"
+                    style="background: var(--cobalt)"
+                  ></span>
+                  Cobalt card (striped). Cover + short list + centered brand.
+                  Pager dots + Share / Replay under the card.
+                </dd>
+                <dt>IA</dt>
+                <dd>
+                  Multi-card pager in production (ghosted / all-time favs / 1
+                  like). This frame shows card 0 density.
+                </dd>
+              </dl>
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const TOKENS = {
+        skyHi: "#FFE08A",
+        sky: "#FFB020",
+        skyLo: "#F07800",
+        waterIce: "#9ED0FF",
+        waterMid: "#2F6FDB",
+        waterDeep: "#003A8C",
+        ghosted: "#0C0C14",
+        ghostedWash: "#0047AB",
+        scarlet: "#E10600",
+        scarletDeep: "#A10000",
+        cobalt: "#0047AB",
+        cobaltBright: "#2F6FDB",
+        white: "#FFFDF5",
+      };
+
+      document.getElementById("tokens").innerHTML = Object.entries(TOKENS)
+        .map(
+          ([name, hex]) => `
+          <div class="token-row">
+            <i style="background:${hex}"></i>
+            <span>${name}</span>
+            <span class="hex">${hex}</span>
+          </div>`
+        )
+        .join("");
+    </script>
+  </body>
+</html>

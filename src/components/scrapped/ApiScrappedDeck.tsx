@@ -27,6 +27,7 @@ import { Icon } from "@/components/Icon";
 import { OriginBackButton } from "@/components/scrapped/OriginBackButton";
 import { ShareRecapCard } from "@/components/scrapped/ShareRecapCard";
 import { ShareAllTimeFavsCard } from "@/components/scrapped/ShareAllTimeFavsCard";
+import { ShareOneLikeArtistsCard } from "@/components/scrapped/ShareOneLikeArtistsCard";
 import {
   SHARE_FINALE_CARD_COUNT,
   ShareFinaleCardDots,
@@ -519,7 +520,10 @@ export function ApiScrappedDeck({
       reunionBeats,
       [
         { headline: "Thanks for staying." },
-        { headline: "Same time next year?" },
+        {
+          headline: "See you next Scrapped.",
+          subline: "Hopefully fewer favs get ghosted.",
+        },
       ],
       [{ headline: "Share" }],
     ];
@@ -1246,10 +1250,11 @@ export function ApiScrappedDeck({
           }
         />
 
-        {/* 8: soft close before share (two beats) */}
+        {/* 8: soft close before share (two beats); ocean + heart iris (D-047) */}
         <WrappedStorySlide
           {...sceneMotion(8)}
           tone={slideTone(8)}
+          field="soft-close-ocean"
           chrome={orbitChrome(8)}
           beats={[
             {
@@ -1258,14 +1263,15 @@ export function ApiScrappedDeck({
               display: "hero",
             },
             {
-              headline: "Same time next year?",
+              headline: "See you next Scrapped.",
+              subline: "Hopefully fewer favs get ghosted.",
               align: "center",
               display: "hero",
             },
           ]}
         />
 
-        {/* 9: share finale: ink stage + intro chrome + teal card (D-012 / D-033) */}
+        {/* 9: share finale: ink stage + intro chrome + rose card 0 (D-012 / D-051) */}
         <section
           data-scrapped-slide
           data-wrapped-tone={slideTone(9)}
@@ -1397,8 +1403,6 @@ export function ApiScrappedDeck({
                           active={
                             active === FINALE_INDEX && shareCardIndex === 1
                           }
-                          likedCount={likedCount}
-                          likedThisYearCount={likedThisYearCount}
                           heroImageUrl={
                             reunionSong?.imageUrl ??
                             topSong?.imageUrl ??
@@ -1416,6 +1420,50 @@ export function ApiScrappedDeck({
                             .map((item) => ({
                               id: item.id,
                               title: item.label,
+                            }))}
+                          className="h-full w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative h-full w-full">
+                    <div
+                      className="absolute top-0 left-0 origin-top-left"
+                      style={{
+                        width: D.maxWidthPx,
+                        height: D.designHeightPx,
+                        transform: `scale(calc(var(--share-shell-w) / ${D.maxWidthPx}px))`,
+                      }}
+                    >
+                      <div
+                        ref={shareCardIndex === 2 ? shareCardRef : undefined}
+                        className="h-full w-full"
+                        style={{
+                          width: D.maxWidthPx,
+                          height: D.designHeightPx,
+                        }}
+                      >
+                        <ShareOneLikeArtistsCard
+                          active={
+                            active === FINALE_INDEX && shareCardIndex === 2
+                          }
+                          likedCount={likedCount}
+                          likedThisYearCount={likedThisYearCount}
+                          heroImageUrl={
+                            oneSaveArtists?.items[0]?.imageUrl ??
+                            topSong?.imageUrl ??
+                            null
+                          }
+                          heroAlt={
+                            oneSaveArtists?.items[0]?.sublabel ??
+                            oneSaveArtists?.items[0]?.label ??
+                            ""
+                          }
+                          artists={(oneSaveArtists?.items ?? [])
+                            .slice(0, 5)
+                            .map((item) => ({
+                              id: item.id,
+                              title: item.sublabel ?? item.label,
                             }))}
                           className="h-full w-full"
                         />

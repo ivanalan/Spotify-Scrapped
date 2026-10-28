@@ -8,7 +8,7 @@
 
 Match Wrapped’s share-finale **carousel form** (`25-share-finale`):
 
-1. **Two share posters** in a horizontal pager (card 0 = `ShareRecapCard` minimal / D-033; card 1 = All time favs / [D-043](D-043-share-all-time-favs-g3-spine.md)).
+1. **Three share posters** in a horizontal pager (card 0 = `ShareRecapCard` minimal / D-033; card 1 = All time favs / [D-043](D-043-share-all-time-favs-g3-spine.md); card 2 = `"1 like" artists` / [D-044](D-044-share-one-like-artists-b1.md)).
 2. **Pagination dots** under the island (above Share / Replay), active brighter.
 3. **Swipe / drag** on the island switches cards; dots are also tappable (40px targets).
 4. **Pointer swipe + transform** only (no nested `overflow-x` scroll, no motion `drag`+`animate` on the same axis), so the deck’s snap-x scroller does not steal the gesture. Release always snaps to a whole card (window `pointerup` / lost capture); `user-select: none` + `preventDefault` on pointerdown so web drag does not highlight copy.
@@ -23,8 +23,9 @@ Wrapped’s closing ritual is a swipeable stack of shareable cards with dots, no
 
 | Axis | Choice |
 |------|--------|
-| Count | 2 (`SHARE_FINALE_CARD_COUNT`); grow only with a new decision |
-| Card 1 | All time favs G3 spine ([D-043](D-043-share-all-time-favs-g3-spine.md)); placeholder removed |
+| Count | 3 (`SHARE_FINALE_CARD_COUNT`); grow only with a new decision |
+| Card 1 | All time favs G3 centered brand ([D-043](D-043-share-all-time-favs-g3-spine.md)) |
+| Card 2 | `"1 like" artists` b1 float cover ([D-044](D-044-share-one-like-artists-b1.md)) |
 | Motion | Spring snap after drag; reduced-motion = instant |
 | Dots | Under island; `SHARE_FINALE_DENSITY` `dotsGapAfterCardPx` / `dotSizePx` / `dotsGapPx` |
 | Form ref | `docs/mocks/wrapped-ref-2023/25-share-finale.png` |

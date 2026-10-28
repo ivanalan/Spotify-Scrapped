@@ -1,6 +1,10 @@
 /**
  * Orbit Cascade card palette: production source of truth for `/scrapped`.
  * Research storyboard re-exports from here. See D-007.
+ *
+ * Parked alternate: striped tent kit lives in
+ * `docs/mocks/story-color-presets.html` + [D-050](../../docs/decisions/D-050-striped-tent-deck-colors.md)
+ * (not wired).
  */
 
 export const CARD_PALETTE = {
@@ -19,12 +23,29 @@ export const EMBER_FIELD_GRADIENT =
   "linear-gradient(165deg, #FFC878 0%, #FF7A3A 45%, #E85018 100%)";
 
 /**
- * Teal nest: ice → canvas → deep (165deg).
- * Share finale card + scene 4 one-like field (C0). Soft-close stays flat teal.
- * Keep in sync with `data-scrapped-field="one-like-nest"` in globals.css.
+ * Scene 4 one-like field: volume ocean crest → deep (combo A / D-045).
+ * Soft-close stays flat teal. Keep in sync with
+ * `data-scrapped-field="one-like-nest"` in globals.css.
  */
-export const TEAL_NEST_GRADIENT =
-  "linear-gradient(165deg, #5EEAD4 0%, #1A7A6E 50%, #0F4C5C 100%)";
+export const ONE_LIKE_OCEAN_GRADIENT =
+  "linear-gradient(165deg, #A5F3FC 0%, #0284C7 48%, #075985 100%)";
+
+/** @deprecated Alias for storyboard; prefer ONE_LIKE_OCEAN_GRADIENT. */
+export const TEAL_NEST_GRADIENT = ONE_LIKE_OCEAN_GRADIENT;
+
+/**
+ * Scene 4 heart + list floaters (combo A): intro circle / disk stops.
+ * Hero rose; blooms hot → lilac → orchid. Share card 0 moon + card 2 floaters rhyme these.
+ */
+export const ONE_LIKE_HEART = {
+  hero: "#C9185B",
+  blooms: ["#E070FF", "#C9A0F5", "#9B4DE8"] as const,
+  /** 5 perimeter floaters: bloom ladder + hero, then repeat hot. */
+  floaters: ["#E070FF", "#C9A0F5", "#9B4DE8", "#C9185B", "#E070FF"] as const,
+  oceanDeep: "#075985",
+  oceanMid: "#0284C7",
+  oceanIce: "#A5F3FC",
+} as const;
 
 export type CardSwatch = keyof typeof CARD_PALETTE;
 /**
@@ -42,12 +63,12 @@ export const SLIDE_SWATCH: CardSwatch[] = [
   "ember", // 1 volume (ocean)
   "ink", // 2 most ghosted song; night rhyme w/ list (D-017)
   "ink", // 3 ghosted songs list; sky/grass/ghosts (D-010)
-  "teal", // 4 list
-  "ink", // 5 left-on-read entity; chat bloom (D-016)
-  "ink", // 6 left-on-read list; chat frame (D-016)
-  "mango", // 7 plot twist / reunion; film letterbox (D-016)
-  "teal", // 8 soft close; mono teal iris (D-016)
-  "ink", // 9 share; ink stage + plain teal card (D-012 / D-033)
+  "teal", // 4 one-like; ocean field override (D-045); chrome stays dark
+  "rose", // 5 left-on-read entity; rose field + ocean bloom (D-049)
+  "rose", // 6 left-on-read list; rose field + ocean bloom (D-049)
+  "ember", // 7 plot twist / reunion; same flame field as volume (D-046); film (D-016)
+  "teal", // 8 soft close; ocean deep field + heart iris (D-047); chrome dark
+  "ink", // 9 share; ink stage + rose card 0 (D-051)
 ];
 
 /**
@@ -104,21 +125,22 @@ export const SHARE_FINALE_DENSITY = {
 } as const;
 
 /**
- * Share finale visual kit: D-033 · B2 plain teal · TR moon ·
+ * Share finale visual kit: D-051 · left-on-read rose · ocean moon ·
  * three hero ghosts (mixed z) · liked metrics · myscrapped.com centered.
- * Stage: ink + intro disks/star. No orchid wash; gradients only on moon.
- * No year digits on the card.
+ * Stage: ink + intro disks/star. Plain rose card; ocean ice→deep moon.
+ * Field rhymes scenes 5→6 ([D-049]); moon rhymes volume / one-like water.
+ * No year digits on the card. Density still D-033 / D-012.
  */
 export const SHARE_FINALE_KIT = {
   id: "b2-share-finale",
   /** Stage field swatch: drives slide chrome (dark theme). */
   stageSwatch: "ink" as const,
-  /** Plain teal field (gradients reserved for moon). */
-  cardBg: CARD_PALETTE.teal.bg,
+  /** Plain rose (left-on-read field); gradients reserved for moon. */
+  cardBg: CARD_PALETTE.rose.bg,
   cardInk: "#f5f5f5",
   cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
   cardPanel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
-  ghostFill: "#f5f0ff",
+  ghostFill: "#FBEAFF",
   ghostEye: "#2a2433",
   brandLine: "myscrapped.com",
   brand: {
@@ -128,7 +150,7 @@ export const SHARE_FINALE_KIT = {
   },
   /**
    * TR moon in the hero band: inset from top-right (negative = outside edge).
-   * White → lilac → orchid rim. Sphere only.
+   * Ocean ice → mid → deep (volume / one-like water). Sphere only.
    */
   moon: {
     anchor: "tr" as const,
@@ -137,9 +159,9 @@ export const SHARE_FINALE_KIT = {
     insetYPx: -52,
     stops: [
       { offset: "0%", color: "#FFFFFF" },
-      { offset: "28%", color: "#F4EBFF" },
-      { offset: "62%", color: "#C9A0F5" },
-      { offset: "100%", color: "#6B21A8" },
+      { offset: "22%", color: ONE_LIKE_HEART.oceanIce },
+      { offset: "55%", color: ONE_LIKE_HEART.oceanMid },
+      { offset: "100%", color: ONE_LIKE_HEART.oceanDeep },
     ],
     opacity: 1,
   },
@@ -161,12 +183,12 @@ export const SHARE_FINALE_KIT = {
 } as const;
 
 /**
- * Share finale card 1: All time favs · G3 cinema film · spine brand (D-043).
+ * Share finale card 1: All time favs · G3 cinema film · centered brand (D-043).
  * Same 300×533 canvas as D-033; yellow field; black letterbox; cover above film.
  * Explore: `docs/mocks/share-all-time-favs.html`.
  */
 export const SHARE_ALL_TIME_FAVS_KIT = {
-  id: "g3-spine-left",
+  id: "g3-center-brand",
   cardBg: "#F0B429",
   cardInk: "#1c1c1c",
   cardMuted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
@@ -185,13 +207,19 @@ export const SHARE_ALL_TIME_FAVS_KIT = {
   listPullUpPx: 16,
   listRowGapRem: 0.51,
   listLabelGapRem: 0.55,
+  listLabelRem: 0.72,
   typeRem: 0.85,
-  metricNumberRem: 1.3,
-  metricLabelRem: 0.72,
-  metricsGapAfterListPx: 28,
+  /** Liked metrics removed; brand sits in that slot under the list. */
+  showMetrics: false,
+  brandGapAfterListPx: 55,
   listColGapPx: 14,
-  /** Body pad under metrics so content clears the bottom rail. */
+  /** Body pad under brand so content clears the bottom rail. */
   bodyPadBottomExtraPx: 12,
+  brand: {
+    position: "center" as const,
+    sizeRem: SHARE_FINALE_KIT.brand.sizeRem,
+    letterSpacingEm: SHARE_FINALE_KIT.brand.letterSpacingEm,
+  },
   film: {
     bg: "#0A0A0A",
     hole: "#F0B429",
@@ -203,13 +231,54 @@ export const SHARE_ALL_TIME_FAVS_KIT = {
     scrollBotSec: 42,
     perfCount: 32,
   },
-  spine: {
-    sizeRem: 0.72,
-    letterSpacingEm: -0.015,
-    insetXPx: -31,
-    yPct: 45,
-    rotateDeg: -90,
-    opacity: 1,
+} as const;
+
+/**
+ * Share finale card 2: `"1 like" artists` · ocean nest + rising hearts (D-048).
+ * Same 300×533 canvas; liked metrics hidden; centered brand under list.
+ * Field + floaters rhyme scene 4 (D-045). IA / density stay D-044.
+ */
+export const SHARE_ONE_LIKE_ARTISTS_KIT = {
+  id: "b1-float-cover",
+  /** Scene 4 ocean nest (crest → deep); light ink on blue. */
+  cardBg: ONE_LIKE_OCEAN_GRADIENT,
+  cardInk: "#f5f5f5",
+  cardMuted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+  cardPanel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+  brandLine: "myscrapped.com",
+  /** Quoted product label + artists (D-006 “1 like”). */
+  listLabel: '"1 like" artists',
+  heroBandPct: SHARE_FINALE_DENSITY.heroBandPct,
+  heroSizePct: SHARE_FINALE_DENSITY.heroSizePct,
+  listWidthPct: 62,
+  listPadXPx: SHARE_FINALE_DENSITY.listPadXPx,
+  listPullUpPx: 16,
+  listRowGapRem: 0.9,
+  listLabelGapRem: 1,
+  listLabelRem: 0.85,
+  typeRem: 0.85,
+  showMetrics: false,
+  metricNumberRem: SHARE_FINALE_DENSITY.metricNumberRem,
+  metricLabelRem: SHARE_FINALE_DENSITY.metricLabelRem,
+  metricsGapAfterListPx: 48,
+  /** Brand sits under the list when metrics are hidden. */
+  brandGapAfterListPx: 55,
+  brandPadBottomPx: SHARE_FINALE_DENSITY.brandPadBottomPx,
+  listColGapPx: SHARE_FINALE_DENSITY.listColGapPx,
+  brand: {
+    position: "center" as const,
+    sizeRem: SHARE_FINALE_KIT.brand.sizeRem,
+    letterSpacingEm: SHARE_FINALE_KIT.brand.letterSpacingEm,
+  },
+  floaters: {
+    count: 5,
+    /** Same ladder as scene 4 list floaters (ONE_LIKE_HEART / D-045). */
+    colors: ONE_LIKE_HEART.floaters,
+    sizesPx: [28, 22, 20, 26, 30] as const,
+    leftPct: [5, 20, 46, 68, 84] as const,
+    dxPx: [-18, -28, 0, 30, 22] as const,
+    durationSec: [14, 15, 13.5, 14.5, 15.5] as const,
+    delaySec: [-8, -4, -6, -9.5, -11] as const,
   },
 } as const;
 
@@ -357,7 +426,8 @@ export const SLIDE_ACCENTS: Record<
   /** Ghosted night (entity) + list: purple → ember (D-010 / D-017). */
   2: { accent: "#5C1A7A", accent2: "#F05A3D" },
   3: { accent: "#5C1A7A", accent2: "#F05A3D" },
-  4: { accent: "#ffe66d", accent2: "#ff6b9d" },
+  /** One-like: circle hot + orchid (D-045 combo A). */
+  4: { accent: "#E070FF", accent2: "#9B4DE8" },
   5: { accent: "#C9A0F5", accent2: "#6B21A8" },
   6: { accent: "#ff4d8d", accent2: "#ffe66d" },
   7: { accent: "#1B2A6B", accent2: "#ffe66d" },

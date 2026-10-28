@@ -1,6 +1,6 @@
 # D-033: Share finale B2: plain teal · TR moon · mixed ghosts
 
-**Status:** Locked (production)  
+**Status:** Locked (density / IA); card **field** superseded by [D-045](D-045-one-like-ocean-circle-heart.md) (ocean deep + circle moon)  
 **Date:** 2026-10-22  
 **Surfaces:** `/scrapped` API deck scene 9: visual art + card body (metrics / brand). IA remains [D-012](D-012-share-finale-inset.md). Composition rules remain [D-013](D-013-share-finale-deck-rhyme-explore.md).
 

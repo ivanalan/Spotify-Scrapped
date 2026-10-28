@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Share · one-column list · type + metrics tune</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --stage: #0a0a0a;
+        --muted: color-mix(in oklab, #f5f5f5 62%, transparent);
+        --accent: #c9a0f5;
+
+        /* Locked canvas (D-012 / D-033) */
+        --w: 300;
+        --h: 533;
+        --hero-pct: 46;
+        --hero-art-pct: 54;
+        --pad-x: 16;
+        --list-width: 62;
+        --list-pull: 16;
+        --list-row-gap: 0.9;
+        --list-label-gap: 1;
+        --type-rem: 0.85;
+        --metric-lab: 0.85;
+        --metric-num: 1.3;
+        --metrics-gap: 48;
+        --brand-gap: 55;
+        --brand-pad: 16;
+        --col-gap: 14;
+        --brand-size: 0.72;
+        --brand-track: -0.015;
+
+        --card-bg: #c9185b;
+        --card-ink: #f5f5f5;
+        --card-muted: color-mix(in oklab, #f5f5f5 90%, transparent);
+        --card-panel: color-mix(in oklab, #f5f5f5 14%, transparent);
+
+        --pink: #ff4d8d;
+        --rose: #c9185b;
+        --gold: #ffe66d;
+        --film-bg: #0a0a0a;
+        --film-hole: #f0b429;
+        --lb-h: 64;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 1.75rem 1.25rem 4rem;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        max-width: 48rem;
+        margin: 0 0 0.85rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .lock {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #1a1624;
+        background: var(--accent);
+        padding: 0.22rem 0.65rem;
+        margin: 0 0 1.25rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stage-frame {
+        background: #0a0a0a;
+        padding: 1rem 0.75rem 1.15rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.7rem;
+      }
+
+      .stage-frame.sticky {
+        position: sticky;
+        top: 1rem;
+      }
+
+      .card {
+        position: relative;
+        width: calc(var(--w) * 1px);
+        height: calc(var(--h) * 1px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        color: var(--card-ink);
+        background: var(--card-bg);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        flex-shrink: 0;
+      }
+
+      /* G3 film (card 1 only) */
+      .film-strip {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: calc(var(--lb-h) * 1px);
+        background: var(--film-bg);
+        z-index: 2;
+        overflow: hidden;
+        pointer-events: none;
+        display: none;
+      }
+
+      .card[data-skin="g3"] .film-strip {
+        display: block;
+      }
+
+      .film-strip.top {
+        top: 0;
+      }
+
+      .film-strip.bot {
+        bottom: 0;
+      }
+
+      .film-perfs {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 0 12px;
+        min-width: 200%;
+        height: 100%;
+        animation: film-scroll 36s linear infinite;
+      }
+
+      .film-strip.bot .film-perfs {
+        animation-duration: 42s;
+        animation-direction: reverse;
+      }
+
+      .film-perfs i {
+        flex: 0 0 16px;
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        background: var(--film-hole);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+      }
+
+      @keyframes film-scroll {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* b1 floaters (card 2 only) */
+      .floaters {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 8;
+        display: none;
+      }
+
+      .card[data-skin="b1"] .floaters {
+        display: block;
+      }
+
+      .floater {
+        position: absolute;
+        bottom: -6%;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        color: var(--pink);
+        animation: heart-rise 14s linear infinite;
+      }
+
+      .floater svg {
+        width: var(--fs, 26px);
+        height: var(--fs, 26px);
+        display: block;
+        overflow: visible;
+        filter: drop-shadow(
+          0 0 8px color-mix(in oklab, currentColor 40%, transparent)
+        );
+      }
+
+      .floater path {
+        fill: currentColor;
+      }
+
+      .floater:nth-child(1) {
+        left: 5%;
+        --fs: 28px;
+        --dx: -18px;
+        animation-duration: 14s;
+        animation-delay: -8s;
+      }
+      .floater:nth-child(2) {
+        left: 20%;
+        --fs: 22px;
+        --dx: -28px;
+        color: var(--gold);
+        animation-duration: 15s;
+        animation-delay: -4s;
+      }
+      .floater:nth-child(3) {
+        left: 46%;
+        --fs: 20px;
+        --dx: 0px;
+        color: var(--rose);
+        animation-name: heart-rise-soft;
+        animation-duration: 13.5s;
+        animation-delay: -6s;
+      }
+      .floater:nth-child(4) {
+        left: 68%;
+        --fs: 26px;
+        --dx: 30px;
+        animation-duration: 14.5s;
+        animation-delay: -9.5s;
+      }
+      .floater:nth-child(5) {
+        left: 84%;
+        --fs: 30px;
+        --dx: 22px;
+        color: var(--gold);
+        animation-duration: 15.5s;
+        animation-delay: -11s;
+      }
+
+      @keyframes heart-rise {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.78);
+        }
+        10% {
+          opacity: 0.95;
+          transform: translate(calc(var(--dx, 0) * 0.12), -48px) scale(0.88);
+        }
+        55% {
+          opacity: 0.8;
+          transform: translate(calc(var(--dx, 0) * 0.7), -280px) scale(0.95);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(calc(var(--dx, 0) * 1.35), -520px) scale(0.72);
+        }
+      }
+
+      @keyframes heart-rise-soft {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.7);
+        }
+        12% {
+          opacity: 0.7;
+          transform: translate(0, -52px) scale(0.82);
+        }
+        60% {
+          opacity: 0.5;
+          transform: translate(0, -290px) scale(0.9);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(0, -500px) scale(0.65);
+        }
+      }
+
+      .hero {
+        position: relative;
+        z-index: 5;
+        flex: 0 0 calc(var(--hero-pct) * 1%);
+        display: grid;
+        place-items: center;
+        overflow: visible;
+      }
+
+      .hero-frame {
+        position: relative;
+        z-index: 10;
+        width: calc(var(--hero-art-pct) * 1%);
+        aspect-ratio: 1;
+        max-height: 88%;
+        overflow: hidden;
+        background: var(--card-panel);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      }
+
+      .hero-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .body {
+        position: relative;
+        z-index: 4;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        margin-top: calc(var(--list-pull) * -1px);
+        padding: 0 calc(var(--pad-x) * 1px) calc(var(--brand-pad) * 1px);
+      }
+
+      .card[data-skin="g3"] .body {
+        padding-bottom: calc(var(--lb-h) * 1px + 12px);
+      }
+
+      .lists {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        flex-shrink: 0;
+      }
+
+      .lists .col {
+        width: calc(var(--list-width) * 1%);
+        min-width: 0;
+      }
+
+      .col h4 {
+        margin: 0 0 calc(var(--list-label-gap) * 1rem);
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        color: var(--card-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .col ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--list-row-gap) * 1rem);
+      }
+
+      .col li {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        column-gap: 0.28rem;
+        align-items: baseline;
+        font-size: calc(var(--type-rem) * 1rem);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        min-width: 0;
+        color: var(--card-ink);
+      }
+
+      .col li .n {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .col li .t {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(var(--col-gap) * 1px);
+        margin-top: calc(var(--metrics-gap) * 1px);
+        width: 100%;
+        flex-shrink: 0;
+      }
+
+      .card[data-metrics="off"] .metrics {
+        display: none;
+      }
+
+      .metric .lab {
+        font-size: calc(var(--metric-lab) * 1rem);
+        font-weight: 500;
+        line-height: 1.2;
+        color: var(--card-muted);
+      }
+
+      .metric .val {
+        margin-top: 0.12rem;
+        font-size: calc(var(--metric-num) * 1rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        font-variant-numeric: tabular-nums;
+        color: var(--card-ink);
+      }
+
+      .brand.center {
+        margin-top: calc(var(--brand-gap) * 1px);
+        text-align: center;
+        font-size: calc(var(--brand-size) * 1rem);
+        font-weight: 700;
+        letter-spacing: calc(var(--brand-track) * 1em);
+        line-height: 1.15;
+        white-space: nowrap;
+        color: var(--card-ink);
+        flex-shrink: 0;
+      }
+
+      /* When metrics hide, brand gap uses brand-gap (enough room under list) */
+      .card[data-metrics="off"] .brand.center {
+        margin-top: calc(var(--brand-gap) * 1px);
+      }
+
+      .cta {
+        width: min(100%, 300px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .cta .share {
+        height: 40px;
+        border: 0;
+        border-radius: 999px;
+        background: #f5f5f5;
+        color: #1c1c1c;
+        font: 700 0.85rem Poppins, sans-serif;
+      }
+
+      .cta .replay {
+        height: 40px;
+        border: 0;
+        background: transparent;
+        color: color-mix(in oklab, #f5f5f5 88%, transparent);
+        font: 600 0.75rem Poppins, sans-serif;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: calc(100dvh - 2rem);
+        overflow: auto;
+        padding-right: 0.25rem;
+      }
+
+      .panel {
+        background: color-mix(in oklab, #1c1c1c 55%, #2a2433);
+        border: 1px solid color-mix(in oklab, #f5f5f5 12%, transparent);
+        padding: 0.85rem 0.95rem 0.95rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      .panel h3 .hint {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 0.68rem;
+        opacity: 0.85;
+      }
+
+      .seg {
+        display: flex;
+        gap: 0.35rem;
+      }
+
+      .seg button {
+        flex: 1;
+        height: 40px;
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--muted);
+        font: 600 0.7rem Poppins, sans-serif;
+        cursor: pointer;
+      }
+
+      .seg button[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--paper);
+        background: color-mix(in oklab, #9b4de8 18%, #1a1624);
+      }
+
+      .knobs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem 0.75rem;
+      }
+
+      .knob {
+        min-width: 0;
+      }
+
+      .knob.span2 {
+        grid-column: 1 / -1;
+      }
+
+      .knob label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.66rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 0.1rem;
+      }
+
+      .knob label output {
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .knob input[type="range"] {
+        width: 100%;
+        accent-color: #c9a0f5;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        min-height: 40px;
+      }
+
+      .toggle-row span {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--paper);
+      }
+
+      .toggle-row button {
+        appearance: none;
+        height: 40px;
+        min-width: 5.5rem;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--muted);
+        font: 600 0.72rem Poppins, sans-serif;
+        cursor: pointer;
+      }
+
+      .toggle-row button[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--paper);
+        background: color-mix(in oklab, #9b4de8 18%, #1a1624);
+      }
+
+      .recipe {
+        margin: 0;
+        font-size: 0.68rem;
+        color: var(--muted);
+        line-height: 1.5;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 0.45rem;
+        margin-top: 0.55rem;
+      }
+
+      .panel-actions button {
+        appearance: none;
+        border: 1px solid color-mix(in oklab, #f5f5f5 18%, transparent);
+        background: #1a1624;
+        color: var(--paper);
+        font: 600 0.7rem Poppins, sans-serif;
+        padding: 0.35rem 0.55rem;
+        height: 40px;
+        cursor: pointer;
+      }
+
+      .locked {
+        margin: 0;
+        font-size: 0.72rem;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .locked code {
+        color: var(--accent);
+        font-size: 0.88em;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .floater,
+        .film-perfs {
+          animation: none !important;
+        }
+        .floater {
+          opacity: 0.7;
+          transform: translateY(-160px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <h1>Share · <em>one-column</em> · type + metrics</h1>
+      <p class="lede">
+        Layout-accurate tune for the single-column posters (card 1 G3 · card 2
+        b1). Canvas <code>300×533</code>, hero <code>46% / 54%</code>, list
+        width <code>64%</code>, centered column. Toggle liked metrics off;
+        slide list / label / metric / brand type.
+      </p>
+      <div class="lock">Tune · matches D-043 / D-044 outline</div>
+
+      <div class="layout">
+        <div class="stage-frame sticky">
+          <article
+            class="card"
+            id="card"
+            data-skin="b1"
+            data-metrics="off"
+            aria-label="One-column share card"
+          >
+            <div class="film-strip top" aria-hidden="true">
+              <div class="film-perfs" id="perfs-top"></div>
+            </div>
+            <div class="film-strip bot" aria-hidden="true">
+              <div class="film-perfs" id="perfs-bot"></div>
+            </div>
+            <div class="floaters" id="floaters" aria-hidden="true"></div>
+            <header class="hero">
+              <div class="hero-frame">
+                <img
+                  src="assets/hero-cover.png"
+                  alt=""
+                  width="300"
+                  height="300"
+                />
+              </div>
+            </header>
+            <div class="body">
+              <div class="lists">
+                <div class="col">
+                  <h4 id="list-label">"1 like" artists</h4>
+                  <ol id="rows"></ol>
+                </div>
+              </div>
+              <div class="metrics" id="metrics">
+                <div class="metric">
+                  <div class="lab">Liked songs</div>
+                  <div class="val">1,001</div>
+                </div>
+                <div class="metric">
+                  <div class="lab">Liked this year</div>
+                  <div class="val">62</div>
+                </div>
+              </div>
+              <div class="brand center" id="brand-center">myscrapped.com</div>
+            </div>
+          </article>
+          <div class="cta" aria-hidden="true">
+            <button class="share" type="button">Share</button>
+            <button class="replay" type="button">Replay from beginning</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="panel">
+            <h3>Skin <span class="hint">card 1 / 2</span></h3>
+            <div class="seg" role="group" aria-label="Card skin">
+              <button type="button" id="skin-b1" aria-pressed="true">
+                b1 · 1 like
+              </button>
+              <button type="button" id="skin-g3" aria-pressed="false">
+                G3 · favs
+              </button>
+            </div>
+            <p class="locked" style="margin-top: 0.65rem">
+              Outline stays identical. Both skins use centered
+              <code>myscrapped.com</code> under the list stack.
+            </p>
+          </div>
+
+          <div class="panel">
+            <h3>Liked metrics</h3>
+            <div class="toggle-row">
+              <span>Liked songs · Liked this year</span>
+              <button
+                type="button"
+                id="metrics-toggle"
+                aria-pressed="false"
+              >
+                Hidden
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Typography <span class="hint">list + chrome</span></h3>
+            <div class="knobs">
+              <div class="knob">
+                <label>List row <output id="o-type">0.85rem</output></label>
+                <input
+                  type="range"
+                  id="type"
+                  min="0.55"
+                  max="1.1"
+                  step="0.01"
+                  value="0.85"
+                />
+              </div>
+              <div class="knob">
+                <label>List label <output id="o-metric-lab">0.85rem</output></label>
+                <input
+                  type="range"
+                  id="metric-lab"
+                  min="0.5"
+                  max="1"
+                  step="0.01"
+                  value="0.85"
+                />
+              </div>
+              <div class="knob">
+                <label>Metric num <output id="o-metric-num">1.30rem</output></label>
+                <input
+                  type="range"
+                  id="metric-num"
+                  min="0.9"
+                  max="1.8"
+                  step="0.01"
+                  value="1.3"
+                />
+              </div>
+              <div class="knob">
+                <label>Brand size <output id="o-brand-size">0.72rem</output></label>
+                <input
+                  type="range"
+                  id="brand-size"
+                  min="0.5"
+                  max="1.1"
+                  step="0.01"
+                  value="0.72"
+                />
+              </div>
+              <div class="knob">
+                <label>Row gap <output id="o-row-gap">0.90rem</output></label>
+                <input
+                  type="range"
+                  id="row-gap"
+                  min="0.2"
+                  max="1.2"
+                  step="0.01"
+                  value="0.9"
+                />
+              </div>
+              <div class="knob">
+                <label>Label gap <output id="o-label-gap">1.00rem</output></label>
+                <input
+                  type="range"
+                  id="label-gap"
+                  min="0.2"
+                  max="1.2"
+                  step="0.01"
+                  value="1"
+                />
+              </div>
+              <div class="knob span2">
+                <label>List width <output id="o-list-width">62%</output></label>
+                <input
+                  type="range"
+                  id="list-width"
+                  min="48"
+                  max="88"
+                  step="1"
+                  value="62"
+                />
+              </div>
+              <div class="knob">
+                <label>Metrics→list <output id="o-metrics-gap">48px</output></label>
+                <input
+                  type="range"
+                  id="metrics-gap"
+                  min="8"
+                  max="56"
+                  step="1"
+                  value="48"
+                />
+              </div>
+              <div class="knob">
+                <label>Brand→list <output id="o-brand-gap">55px</output></label>
+                <input
+                  type="range"
+                  id="brand-gap"
+                  min="8"
+                  max="72"
+                  step="1"
+                  value="55"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Recipe</h3>
+            <pre class="recipe" id="recipe"></pre>
+            <div class="panel-actions">
+              <button type="button" id="reset">Reset defaults</button>
+              <button type="button" id="copy">Copy recipe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const HEART =
+        "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
+
+      const SKINS = {
+        b1: {
+          label: '"1 like" artists',
+          rows: [
+            "Julia Jacklin",
+            "Phoebe Bridgers",
+            "boygenius",
+            "Hozier",
+            "Japanese Breakfast",
+          ],
+          bg: "#c9185b",
+          ink: "#f5f5f5",
+          muted: "color-mix(in oklab, #f5f5f5 90%, transparent)",
+          panel: "color-mix(in oklab, #f5f5f5 14%, transparent)",
+          brand: "center",
+        },
+        g3: {
+          label: "All time favs",
+          rows: [
+            "Bags",
+            "Are You Bored Yet?",
+            "Soft Spot",
+            "Motion Sickness",
+            "Kyoto",
+          ],
+          bg: "#f0b429",
+          ink: "#1c1c1c",
+          muted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
+          panel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
+          brand: "center",
+        },
+      };
+
+      const DEFAULTS = {
+        type: 0.85,
+        metricLab: 0.85,
+        metricNum: 1.3,
+        brandSize: 0.72,
+        rowGap: 0.9,
+        labelGap: 1,
+        listWidth: 62,
+        metricsGap: 48,
+        brandGap: 55,
+        metricsOn: false,
+        skin: "b1",
+      };
+
+      const root = document.documentElement;
+      const card = document.getElementById("card");
+      const listLabel = document.getElementById("list-label");
+      const rowsEl = document.getElementById("rows");
+      const recipeEl = document.getElementById("recipe");
+      const metricsToggle = document.getElementById("metrics-toggle");
+      const skinB1 = document.getElementById("skin-b1");
+      const skinG3 = document.getElementById("skin-g3");
+
+      const knobs = {
+        type: document.getElementById("type"),
+        metricLab: document.getElementById("metric-lab"),
+        metricNum: document.getElementById("metric-num"),
+        brandSize: document.getElementById("brand-size"),
+        rowGap: document.getElementById("row-gap"),
+        labelGap: document.getElementById("label-gap"),
+        listWidth: document.getElementById("list-width"),
+        metricsGap: document.getElementById("metrics-gap"),
+        brandGap: document.getElementById("brand-gap"),
+      };
+
+      const outs = {
+        type: document.getElementById("o-type"),
+        metricLab: document.getElementById("o-metric-lab"),
+        metricNum: document.getElementById("o-metric-num"),
+        brandSize: document.getElementById("o-brand-size"),
+        rowGap: document.getElementById("o-row-gap"),
+        labelGap: document.getElementById("o-label-gap"),
+        listWidth: document.getElementById("o-list-width"),
+        metricsGap: document.getElementById("o-metrics-gap"),
+        brandGap: document.getElementById("o-brand-gap"),
+      };
+
+      let state = { ...DEFAULTS };
+
+      function mountFloaters() {
+        const host = document.getElementById("floaters");
+        host.innerHTML = Array.from({ length: 5 }, () => {
+          return `<div class="floater"><svg viewBox="0 0 512 512"><path d="${HEART}" /></svg></div>`;
+        }).join("");
+      }
+
+      function mountPerfs() {
+        ["perfs-top", "perfs-bot"].forEach((id) => {
+          const el = document.getElementById(id);
+          el.innerHTML = Array.from({ length: 32 }, () => "<i></i>").join("");
+        });
+      }
+
+      function renderRows(skin) {
+        const data = SKINS[skin];
+        listLabel.textContent = data.label;
+        rowsEl.innerHTML = data.rows
+          .map(
+            (t, i) =>
+              `<li><span class="n">${i + 1}</span><span class="t">${t}</span></li>`,
+          )
+          .join("");
+      }
+
+      function applySkin(skin) {
+        state.skin = skin;
+        const data = SKINS[skin];
+        card.dataset.skin = skin;
+        card.style.setProperty("--card-bg", data.bg);
+        card.style.background = data.bg;
+        card.style.color = data.ink;
+        card.style.setProperty("--card-ink", data.ink);
+        card.style.setProperty("--card-muted", data.muted);
+        card.style.setProperty("--card-panel", data.panel);
+        skinB1.setAttribute("aria-pressed", String(skin === "b1"));
+        skinG3.setAttribute("aria-pressed", String(skin === "g3"));
+        renderRows(skin);
+        syncRecipe();
+      }
+
+      function applyMetrics(on) {
+        state.metricsOn = on;
+        card.dataset.metrics = on ? "on" : "off";
+        metricsToggle.setAttribute("aria-pressed", String(on));
+        metricsToggle.textContent = on ? "Shown" : "Hidden";
+        syncRecipe();
+      }
+
+      function num(id) {
+        return Number(knobs[id].value);
+      }
+
+      function sync() {
+        state.type = num("type");
+        state.metricLab = num("metricLab");
+        state.metricNum = num("metricNum");
+        state.brandSize = num("brandSize");
+        state.rowGap = num("rowGap");
+        state.labelGap = num("labelGap");
+        state.listWidth = num("listWidth");
+        state.metricsGap = num("metricsGap");
+        state.brandGap = num("brandGap");
+
+        root.style.setProperty("--type-rem", String(state.type));
+        root.style.setProperty("--metric-lab", String(state.metricLab));
+        root.style.setProperty("--metric-num", String(state.metricNum));
+        root.style.setProperty("--brand-size", String(state.brandSize));
+        root.style.setProperty("--list-row-gap", String(state.rowGap));
+        root.style.setProperty("--list-label-gap", String(state.labelGap));
+        root.style.setProperty("--list-width", String(state.listWidth));
+        root.style.setProperty("--metrics-gap", String(state.metricsGap));
+        root.style.setProperty("--brand-gap", String(state.brandGap));
+
+        outs.type.textContent = `${state.type.toFixed(2)}rem`;
+        outs.metricLab.textContent = `${state.metricLab.toFixed(2)}rem`;
+        outs.metricNum.textContent = `${state.metricNum.toFixed(2)}rem`;
+        outs.brandSize.textContent = `${state.brandSize.toFixed(2)}rem`;
+        outs.rowGap.textContent = `${state.rowGap.toFixed(2)}rem`;
+        outs.labelGap.textContent = `${state.labelGap.toFixed(2)}rem`;
+        outs.listWidth.textContent = `${state.listWidth}%`;
+        outs.metricsGap.textContent = `${state.metricsGap}px`;
+        outs.brandGap.textContent = `${state.brandGap}px`;
+
+        syncRecipe();
+      }
+
+      function syncRecipe() {
+        recipeEl.textContent = [
+          `skin: ${state.skin} (${state.skin === "b1" ? "D-044 card 2" : "D-043 card 1"})`,
+          `canvas: 300×533`,
+          `hero: band 46% · cover 54%`,
+          `listWidth: ${state.listWidth}%`,
+          `typeRem: ${state.type.toFixed(2)}`,
+          `listLabelRem: ${state.metricLab.toFixed(2)}`,
+          `listRowGapRem: ${state.rowGap.toFixed(2)}`,
+          `listLabelGapRem: ${state.labelGap.toFixed(2)}`,
+          `metrics: ${state.metricsOn ? "shown" : "hidden"}`,
+          `metricNumberRem: ${state.metricNum.toFixed(2)}`,
+          `metricsGapAfterListPx: ${state.metricsGap}`,
+          `brand: center`,
+          `brandSizeRem: ${state.brandSize.toFixed(2)}`,
+          `brandGapAfterListPx: ${state.brandGap}`,
+          `listLabel: ${state.skin === "b1" ? '"1 like" artists' : "All time favs"}`,
+          `brandLine: myscrapped.com`,
+        ].join("\n");
+      }
+
+      function reset() {
+        Object.entries({
+          type: DEFAULTS.type,
+          metricLab: DEFAULTS.metricLab,
+          metricNum: DEFAULTS.metricNum,
+          brandSize: DEFAULTS.brandSize,
+          rowGap: DEFAULTS.rowGap,
+          labelGap: DEFAULTS.labelGap,
+          listWidth: DEFAULTS.listWidth,
+          metricsGap: DEFAULTS.metricsGap,
+          brandGap: DEFAULTS.brandGap,
+        }).forEach(([k, v]) => {
+          knobs[k].value = String(v);
+        });
+        applySkin(DEFAULTS.skin);
+        applyMetrics(DEFAULTS.metricsOn);
+        sync();
+      }
+
+      Object.values(knobs).forEach((el) => el.addEventListener("input", sync));
+      skinB1.addEventListener("click", () => applySkin("b1"));
+      skinG3.addEventListener("click", () => applySkin("g3"));
+      metricsToggle.addEventListener("click", () =>
+        applyMetrics(!state.metricsOn),
+      );
+      document.getElementById("reset").addEventListener("click", reset);
+      document.getElementById("copy").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(recipeEl.textContent);
+          const btn = document.getElementById("copy");
+          const prev = btn.textContent;
+          btn.textContent = "Copied";
+          setTimeout(() => {
+            btn.textContent = prev;
+          }, 1100);
+        } catch {
+          /* ignore */
+        }
+      });
+
+      mountFloaters();
+      mountPerfs();
+      applySkin(DEFAULTS.skin);
+      applyMetrics(DEFAULTS.metricsOn);
+      sync();
+    </script>
+  </body>
+</html>

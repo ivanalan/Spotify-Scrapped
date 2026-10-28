@@ -67,7 +67,7 @@ type Props = {
    * Optional field kit on the slide canvas (e.g. intro orchid corners).
    * Maps to `data-scrapped-field` for globals.css gradients.
    */
-  field?: "intro-dusk" | "one-like-nest";
+  field?: "intro-dusk" | "one-like-nest" | "soft-close-ocean";
   className?: string;
   /** Multi-beat scene (same canvas; text enters then exits). */
   beats?: WrappedStoryBeat[];
