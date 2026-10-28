@@ -1,9 +1,9 @@
 /**
- * Temporary investigation logging for soundtrack / pause bugs.
+ * Temporary investigation logging for soundtrack loop / cutover bugs.
  * Enable with `?debug=soundtrack` (or `&debug=soundtrack`).
  * Log only: never change control flow.
  *
- * On-device panel: `SoundtrackDebugPanel` subscribes to the ring buffer.
+ * On-device panel: `SoundtrackDebugPanel` (cases E/F: first + second loop).
  *
  * @see docs/slices/soundtrack-pause-bugs.md
  */
@@ -153,16 +153,20 @@ export function shortUri(uri: string | null | undefined): string | null {
   return m ? `track:${m[1]!.slice(0, 8)}…` : uri;
 }
 
-/** Events that usually matter for hypothesis mapping. */
+/** Events that usually matter for same-URI loop hypothesis mapping. */
 export function isSoundtrackDebugHighlight(event: string): boolean {
   return (
-    event === "cutoverFallback" ||
+    event === "beginLoopCutover" ||
+    event === "beginLoopCutover.skip" ||
+    event === "tryLoopCutover" ||
+    event === "fallbackLoopRestart" ||
+    event === "loop.schedule" ||
+    event === "loop.pausedAtEnd" ||
+    event === "playback.nearEnd" ||
+    event === "ensureTwinUri" ||
     event === "notifyExternalPause" ||
     event === "visibilitychange" ||
-    event === "cancelPrime" ||
-    event === "primeHoldCancel" ||
     event === "sticky" ||
-    event === "cutTo" ||
-    event === "primeTo"
+    event === "cutTo"
   );
 }

@@ -10,6 +10,7 @@
 | H-b2 / hot | `cutTo` hot uses `play()` via `takeActOwnershipNow`; audible priming → `path=priming-hot` immediate ownership |
 | H-a1 / H-c1 | `scheduleCutoverFallback` calls `play()` when next entry is already audible |
 | H-d1 | `cancelPrime` sets ~700ms reject latch; late `playback_started` / `playback_update` pause+seek |
+| H-a2 | Loop A/B always `seek+play` (no hot `resume`); `tryLoopCutover` reinforces `play()`; `LOOP_CUT_LEAD_MS` 1800; outer window endTimer only (no stall thrash); ignore dying-slot schedules while `incomingLoop` set |
 
 ## By design (not a code bug)
 
@@ -18,6 +19,8 @@
 ## Verify
 
 `/?debug=soundtrack`: tap-advance should log mostly `cutTo path=hot` (or `priming-hot`); hold ≥600ms should `primeHoldCancel` without sustained next-act bleed; no multi-second silence with `||` chrome on normal taps.
+
+Loop stay-put (cases E/F): `armLead` often at rem≈1–1.8s → `beginLoopCutover path=play` → `tryLoopCutover` → further `playback.nearEnd`. Outer window may `armEndTimer` only; no silence after the second flip.
 
 ## Out of scope (still)
 

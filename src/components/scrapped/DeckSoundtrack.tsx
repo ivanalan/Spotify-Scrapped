@@ -95,14 +95,14 @@ const LOOP_COOLDOWN_MS = 1200;
 /**
  * Start the idle A/B slot this many ms before the preview ends so cutover can
  * overlap the dying tail (Spotify has no mute: brief double-audio is OK).
+ * Wider than one sparse playback_update (~1s) so rem≈1.0–1.5s ticks still arm.
  */
-const LOOP_CUT_LEAD_MS = 1000;
+const LOOP_CUT_LEAD_MS = 1800;
 /**
  * Fallback when Spotify stops emitting playback_update at preview end and the
  * twin cutover never armed.
  */
 const END_LOOP_SCHEDULE_PAD_MS = 250;
-const END_STALL_LOOP_MS = 900;
 
 /** Which embed owns audio for the committed URI (act pool vs loop twin). */
 type PlaySlot = "act" | "loop";
@@ -374,7 +374,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     >(new Map());
     /** Fallback end timers keyed by slot+uri. */
     const endLoopTimersRef = useRef<Map<string, number>>(new Map());
-    const stallLoopTimersRef = useRef<Map<string, number>>(new Map());
+    /** Throttle `playback.nearEnd` logs (ms timestamp of last emit). */
+    const nearEndLogAtRef = useRef(0);
 
     function clearSwitchTimer() {
       if (switchTimerRef.current != null) {
@@ -415,20 +416,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         window.clearTimeout(endId);
         endLoopTimersRef.current.delete(key);
       }
-      const stallId = stallLoopTimersRef.current.get(key);
-      if (stallId != null) {
-        window.clearTimeout(stallId);
-        stallLoopTimersRef.current.delete(key);
-      }
     }
 
     function clearAllEndTimers() {
       for (const id of endLoopTimersRef.current.values()) window.clearTimeout(id);
       endLoopTimersRef.current.clear();
-      for (const id of stallLoopTimersRef.current.values()) {
-        window.clearTimeout(id);
-      }
-      stallLoopTimersRef.current.clear();
     }
 
     function resolveCutWaiters(trackUri: string) {
@@ -459,6 +451,36 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         loopStateRef.current.set(trackUri, state);
       }
       return state;
+    }
+
+    /** Shared snapshot fields for loop debug events. */
+    function loopSnap(trackUri: string) {
+      const state = loopStateFor(trackUri);
+      const twin = loopTwinRef.current;
+      const twinMatches = twin?.uri === trackUri;
+      return {
+        uri: shortUri(trackUri),
+        playSlot: playingSlotRef.current,
+        incomingLoop: incomingLoopSlotRef.current,
+        twinReady: twinMatches ? twin!.ready : false,
+        twinHot: loopTwinHotRef.current,
+        actHot: actSlotHotRef.current,
+        healthy: state.seenHealthyProgress,
+        lastPos: Math.round(state.lastPlayingPosition),
+        coolMs: Math.max(0, state.cooldownUntil - Date.now()),
+        enabled: enabledRef.current,
+      };
+    }
+
+    function canBeginLoopSkipReason(trackUri: string): string | null {
+      if (!enabledRef.current) return "disabled";
+      if (committedUriRef.current !== trackUri) return "notCommitted";
+      if (playingUriRef.current !== trackUri) return "notPlaying";
+      if (incomingLoopSlotRef.current != null) return "incomingLoop";
+      if (incomingUriRef.current != null) return "incomingAct";
+      if (!loopStateFor(trackUri).seenHealthyProgress) return "noHealthy";
+      if (Date.now() < loopStateFor(trackUri).cooldownUntil) return "cooldown";
+      return null;
     }
 
     /**
@@ -633,12 +655,19 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       loopTwinHotRef.current = false;
       twin.host.className = HOST_WARM;
       twin.controller.loadUri(trackUri, false, START_AT_SEC);
+      soundtrackDebug("ensureTwinUri", {
+        uri: shortUri(trackUri),
+        playSlot: playingSlotRef.current,
+      });
       // loadUri may not re-fire `ready`; don't block A/B loops forever.
       window.setTimeout(() => {
         if (loopTwinRef.current !== twin) return;
         if (twin.uri !== trackUri) return;
         if (twin.ready) return;
         twin.ready = true;
+        soundtrackDebug("ensureTwinUri.readyFallback", {
+          uri: shortUri(trackUri),
+        });
         setPoolTick((n) => n + 1);
       }, 2000);
     }
@@ -728,6 +757,19 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
       // Keep only the live slot; pause stray act embeds.
       pauseExceptSlots([{ uri: trackUri, slot }]);
+      // Reinforce after pauseExcept: hot resume() can no-op; play() matches
+      // takeActOwnershipNow (parked embeds are unreliable on resume alone).
+      if (live && enabledRef.current) {
+        suppressExternalPauseBriefly();
+        live.controller.play();
+      }
+      soundtrackDebug("tryLoopCutover", {
+        ...loopSnap(trackUri),
+        to: slot,
+        from: retiring,
+        liveAudible: live?.audible ?? false,
+        liveReady: live?.ready ?? false,
+      });
     }
 
     /**
@@ -795,67 +837,105 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }
 
     function canBeginLoop(trackUri: string) {
-      const state = loopStateFor(trackUri);
-      return (
-        enabledRef.current &&
-        committedUriRef.current === trackUri &&
-        playingUriRef.current === trackUri &&
-        incomingLoopSlotRef.current == null &&
-        incomingUriRef.current == null &&
-        state.seenHealthyProgress &&
-        Date.now() >= state.cooldownUntil
-      );
+      return canBeginLoopSkipReason(trackUri) == null;
     }
 
     /** Same-embed restart: only when the idle twin/act slot isn't usable. */
     function fallbackLoopRestart(trackUri: string, slot: PlaySlot) {
-      if (!canBeginLoop(trackUri)) return false;
+      const skip = canBeginLoopSkipReason(trackUri);
+      if (skip) {
+        soundtrackDebug("fallbackLoopRestart.skip", {
+          ...loopSnap(trackUri),
+          slot,
+          reason: skip,
+        });
+        return false;
+      }
       const entry = getSlotEntry(slot, trackUri);
-      if (!entry) return false;
+      if (!entry) {
+        soundtrackDebug("fallbackLoopRestart.skip", {
+          ...loopSnap(trackUri),
+          slot,
+          reason: "noEntry",
+        });
+        return false;
+      }
       const state = loopStateFor(trackUri);
       state.lastPlayingPosition = 0;
       state.cooldownUntil = Date.now() + LOOP_COOLDOWN_MS;
       entry.controller.restart();
       entry.controller.seek(START_AT_SEC);
       entry.controller.play();
+      soundtrackDebug("fallbackLoopRestart", {
+        ...loopSnap(trackUri),
+        slot,
+        ready: entry.ready,
+      });
       return true;
     }
 
     /** Start the idle A/B slot early; cut when it reports audible. */
     function beginLoopCutover(trackUri: string) {
-      if (!canBeginLoop(trackUri)) return false;
+      const skip = canBeginLoopSkipReason(trackUri);
+      if (skip) {
+        soundtrackDebug("beginLoopCutover.skip", {
+          ...loopSnap(trackUri),
+          reason: skip,
+        });
+        return false;
+      }
       const from = playingSlotRef.current;
       const to = otherSlot(from);
       const idle = getSlotEntry(to, trackUri);
       if (!idle?.ready) {
+        soundtrackDebug("beginLoopCutover", {
+          ...loopSnap(trackUri),
+          from,
+          to,
+          path: "fallback",
+          idleReady: idle?.ready ?? false,
+        });
         return fallbackLoopRestart(trackUri, from);
       }
 
       incomingLoopSlotRef.current = to;
       idle.host.className = HOST_LIVE;
-      const hot =
-        (to === "loop" && loopTwinHotRef.current) ||
-        (to === "act" && actSlotHotRef.current);
-      if (hot) {
-        if (to === "loop") loopTwinHotRef.current = false;
-        if (to === "act") actSlotHotRef.current = false;
-        idle.controller.resume();
-      } else {
-        idle.controller.seek(START_AT_SEC);
-        idle.controller.play();
-      }
+      // Always seek+play for A/B loops. Hot resume() often no-ops on a parked
+      // act/twin (same scar as takeActOwnershipNow); that reads as stutter then
+      // silence after the first successful loop→act flip.
+      if (to === "loop") loopTwinHotRef.current = false;
+      if (to === "act") actSlotHotRef.current = false;
+      idle.controller.seek(START_AT_SEC);
+      idle.controller.play();
 
       clearLoopCutoverTimer();
       clearAllEndTimers();
       loopCutoverTimerRef.current = window.setTimeout(() => {
         loopCutoverTimerRef.current = null;
-        if (incomingLoopSlotRef.current !== to) return;
+        if (incomingLoopSlotRef.current !== to) {
+          soundtrackDebug("tryLoopCutover.timerSkip", {
+            ...loopSnap(trackUri),
+            expected: to,
+          });
+          return;
+        }
+        soundtrackDebug("tryLoopCutover.timer", {
+          uri: shortUri(trackUri),
+          to,
+        });
         tryLoopCutover(trackUri, to);
       }, CUTOVER_FALLBACK_MS);
 
       const state = loopStateFor(trackUri);
       state.seenHealthyProgress = false;
       state.cooldownUntil = Date.now() + LOOP_COOLDOWN_MS;
+      soundtrackDebug("beginLoopCutover", {
+        ...loopSnap(trackUri),
+        from,
+        to,
+        path: "play",
+        fallbackMs: CUTOVER_FALLBACK_MS,
+      });
       return true;
     }
 
@@ -868,13 +948,24 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       if (duration <= 0) return;
       if (playingSlotRef.current !== slot) return;
       if (playingUriRef.current !== trackUri) return;
-      if (!canBeginLoop(trackUri) && incomingLoopSlotRef.current == null) return;
+      // Cutover already in flight: dying-slot updates must not re-arm timers.
+      if (incomingLoopSlotRef.current != null) return;
+      if (!canBeginLoop(trackUri)) return;
 
       const remaining = duration - position;
       const key = `${slot}:${trackUri}`;
 
       // Primary path: arm A/B cutover before the sample dies.
-      if (remaining <= LOOP_CUT_LEAD_MS && incomingLoopSlotRef.current == null) {
+      if (remaining <= LOOP_CUT_LEAD_MS) {
+        soundtrackDebug("loop.schedule", {
+          ...loopSnap(trackUri),
+          action: "armLead",
+          slot,
+          pos: Math.round(position),
+          dur: Math.round(duration),
+          rem: Math.round(remaining),
+          leadMs: LOOP_CUT_LEAD_MS,
+        });
         beginLoopCutover(trackUri);
         clearEndTimersFor(key);
         return;
@@ -885,7 +976,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return;
       }
 
-      // Fallback if cutover never armed (twin not ready / events stop).
+      // Outer near-end window: endTimer only (stall thrash removed; lead is wide
+      // enough that sparse updates hit armLead before rem→0).
       const endId = endLoopTimersRef.current.get(key);
       if (endId != null) window.clearTimeout(endId);
       const delay = Math.max(0, remaining + END_LOOP_SCHEDULE_PAD_MS);
@@ -893,27 +985,33 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         key,
         window.setTimeout(() => {
           endLoopTimersRef.current.delete(key);
-          if (incomingLoopSlotRef.current) return;
+          if (incomingLoopSlotRef.current) {
+            soundtrackDebug("loop.schedule", {
+              ...loopSnap(trackUri),
+              action: "endTimerSkip",
+              reason: "incomingLoop",
+            });
+            return;
+          }
+          soundtrackDebug("loop.schedule", {
+            ...loopSnap(trackUri),
+            action: "endTimerFire",
+            slot,
+            remWas: Math.round(remaining),
+          });
           beginLoopCutover(trackUri);
         }, delay),
       );
 
-      const stallId = stallLoopTimersRef.current.get(key);
-      if (stallId != null) window.clearTimeout(stallId);
-      stallLoopTimersRef.current.set(
-        key,
-        window.setTimeout(() => {
-          stallLoopTimersRef.current.delete(key);
-          const state = loopStateFor(trackUri);
-          if (
-            state.lastPlayingPosition >= duration - END_RESTART_MS ||
-            position >= duration - END_RESTART_MS
-          ) {
-            if (incomingLoopSlotRef.current) return;
-            beginLoopCutover(trackUri);
-          }
-        }, END_STALL_LOOP_MS),
-      );
+      soundtrackDebug("loop.schedule", {
+        ...loopSnap(trackUri),
+        action: "armEndTimer",
+        slot,
+        pos: Math.round(position),
+        dur: Math.round(duration),
+        rem: Math.round(remaining),
+        endDelay: Math.round(delay),
+      });
     }
 
     const notifyExternalPause = useEffectEvent(() => {
@@ -1074,6 +1172,23 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             playingSlotRef.current === slot &&
             playingUriRef.current === trackUri
           ) {
+            if (duration > 0) {
+              const remaining = duration - position;
+              if (
+                remaining <= END_RESTART_MS + 2500 &&
+                Date.now() - nearEndLogAtRef.current >= 1000
+              ) {
+                nearEndLogAtRef.current = Date.now();
+                soundtrackDebug("playback.nearEnd", {
+                  ...loopSnap(trackUri),
+                  slot,
+                  pos: Math.round(position),
+                  dur: Math.round(duration),
+                  rem: Math.round(remaining),
+                  buffering: !!isBuffering,
+                });
+              }
+            }
             scheduleLoopFromPlayback(trackUri, slot, position, duration);
           }
           return;
@@ -1103,6 +1218,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           state.lastPlayingPosition >= duration - END_RESTART_MS &&
           position <= END_RESTART_MS;
         if (pausedAtEnd || resetAfterEnd) {
+          soundtrackDebug("loop.pausedAtEnd", {
+            ...loopSnap(trackUri),
+            slot,
+            pos: Math.round(position),
+            dur: Math.round(duration),
+            kind: pausedAtEnd ? "pausedAtEnd" : "resetAfterEnd",
+          });
           beginLoopCutover(trackUri);
           return;
         }
