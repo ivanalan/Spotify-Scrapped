@@ -181,9 +181,9 @@ Format:
 ## Sample loops stutter then die after one or two plays
 
 - **Not:** Sticky pause, mute chrome, or the slide auto-advancing off the act.
-- **Cause:** (1) Stall end-detect used a 2.5s window, so `beginLoopCutover` started the idle slot ~1.8s early (overlap stutter). (2) Second cutover used hot `resume()` on the parked act; `resume()` often no-ops (same class as prime ownership), so `tryLoopCutover` logged success then silence with no further `playback.nearEnd`.
-- **Proof:** `?debug=soundtrack` stay-put (2026-10-28): act→loop `path=play` + nearEnd continues; loop→act `path=hot` then no nearEnd; phone recording silence with `||` chrome.
-- **Avoid:** Loop A/B always `seek+play` (never hot resume); reinforce `play()` in `tryLoopCutover`; `LOOP_CUT_LEAD_MS` wide enough for sparse updates (~1800); outer near-end uses endTimer only (no stall thrash); ignore dying-slot `scheduleLoopFromPlayback` while `incomingLoop` is set.
+- **Cause:** (1) Stall end-detect used a 2.5s window, so `beginLoopCutover` started the idle slot ~1.8s early (overlap stutter). (2) Second cutover used hot `resume()` on the parked act; `resume()` often no-ops (same class as prime ownership), so `tryLoopCutover` logged success then silence with no further `playback.nearEnd`. (3) **iOS:** Continue unlocks only the act iframe; A/B twin `play()` at preview end chirps/`tryLoopCutover` then silence (no further `playback.nearEnd`).
+- **Proof:** Desktop `?debug=soundtrack` stay-put (2026-10-28): act→loop `path=play` + nearEnd continues; loop→act `path=hot` then no nearEnd. iPhone: `armLead` → `beginLoopCutover path=play` → `tryLoopCutover liveAudible=true` → no nearEnd.
+- **Avoid:** Loop A/B always `seek+play` (never hot resume); reinforce `play()` in `tryLoopCutover`; `LOOP_CUT_LEAD_MS` ~1800; outer near-end endTimer only; on iOS prefer `restartLoopOnAct` (same gesture-unlocked embed); watchdog recovers silent twin → act. Ignore dying-slot schedules while `incomingLoop` is set.
 
 ## Desktop #1 artist slide looks like a mobile-cropped background
 

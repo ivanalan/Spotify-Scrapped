@@ -160,6 +160,8 @@ export function isSoundtrackDebugHighlight(event: string): boolean {
     event === "beginLoopCutover.skip" ||
     event === "tryLoopCutover" ||
     event === "fallbackLoopRestart" ||
+    event === "restartLoopOnAct" ||
+    event === "loop.watchdog" ||
     event === "loop.schedule" ||
     event === "loop.pausedAtEnd" ||
     event === "playback.nearEnd" ||

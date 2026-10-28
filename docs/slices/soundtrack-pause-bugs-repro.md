@@ -32,9 +32,11 @@ No Mac Web Inspector required. Console still gets `[scrapped:soundtrack]` lines.
 1. Clear the panel after the act is audible.
 2. Hands off until silence or until you hear the sample restart.
 
-**Healthy:** near end → `playback.nearEnd` → `loop.schedule action=armLead` (often at rem≈1–1.8s; outer window may `armEndTimer` first) → `beginLoopCutover path=play` → `tryLoopCutover` → audio continues; later `playback.nearEnd` again with rising `pos`.
+**Healthy (desktop):** near end → `armLead` → `beginLoopCutover path=play` → `tryLoopCutover` → further `playback.nearEnd`.
 
-**Bug (mobile class):** silence with `||`; look for `beginLoopCutover.skip`, `fallbackLoopRestart.skip`, `tryLoopCutover.timerSkip`, or **no** `beginLoopCutover` after the last `playback.nearEnd` / `loop.pausedAtEnd`.
+**Healthy (iOS):** near end → `armLead` → `beginLoopCutover path=same-act reason=iosGesture` → `restartLoopOnAct` → further `playback.nearEnd` on `playSlot=act` (brief seek gap OK).
+
+**Bug (pre-fix mobile):** `beginLoopCutover path=play` → `tryLoopCutover liveAudible=true` → **no** further `playback.nearEnd` (twin play blocked).
 
 **Maps to:** H-a2.
 

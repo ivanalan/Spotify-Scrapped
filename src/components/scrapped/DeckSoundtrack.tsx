@@ -103,9 +103,25 @@ const LOOP_CUT_LEAD_MS = 1800;
  * twin cutover never armed.
  */
 const END_LOOP_SCHEDULE_PAD_MS = 250;
+/**
+ * After A/B cutover, if the new slot never reports progress, fall back to the
+ * gesture-unlocked act embed (iOS often blocks twin play() outside the gesture).
+ */
+const LOOP_OWNERSHIP_WATCH_MS = 800;
+/** Twin/act must pass this position before we trust ownership (ms). */
+const LOOP_PROGRESS_PROOF_MS = 500;
 
 /** Which embed owns audio for the committed URI (act pool vs loop twin). */
 type PlaySlot = "act" | "loop";
+
+/** iPhone / iPad: second Spotify iframe play() is unreliable after Continue. */
+function likelyNeedsSameActLoop(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua)) return true;
+  // iPadOS 13+ can report as Mac with touch.
+  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+}
 
 /**
  * Rapid left/right taps cross act boundaries faster than Spotify embeds honor
@@ -313,6 +329,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const enforceTimersRef = useRef<number[]>([]);
     const cutoverTimerRef = useRef<number | null>(null);
     const loopCutoverTimerRef = useRef<number | null>(null);
+    const loopWatchTimerRef = useRef<number | null>(null);
     /**
      * Audio advanced ahead of / alongside the slide `uri` prop (cutTo + setActive).
      * While set, the uri effect must not sync back to the outgoing slide.
@@ -407,6 +424,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       if (loopCutoverTimerRef.current != null) {
         window.clearTimeout(loopCutoverTimerRef.current);
         loopCutoverTimerRef.current = null;
+      }
+    }
+
+    function clearLoopWatchTimer() {
+      if (loopWatchTimerRef.current != null) {
+        window.clearTimeout(loopWatchTimerRef.current);
+        loopWatchTimerRef.current = null;
       }
     }
 
@@ -737,7 +761,6 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
       if (live) {
         live.host.className = HOST_LIVE;
-        live.audible = true;
       }
       if (dead) {
         dead.controller.pause();
@@ -770,6 +793,10 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         liveAudible: live?.audible ?? false,
         liveReady: live?.ready ?? false,
       });
+      // Twin often chirps then dies on iOS; recover to the Continue-unlocked act.
+      if (slot === "loop") {
+        scheduleLoopOwnershipWatch(trackUri, "loop");
+      }
     }
 
     /**
@@ -874,6 +901,75 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       return true;
     }
 
+    /**
+     * Restart on the act pool embed (Continue gesture-unlocked). Used on iOS
+     * instead of the loop twin, and as watchdog recovery when twin play dies.
+     */
+    function restartLoopOnAct(trackUri: string, reason: string) {
+      clearLoopCutoverTimer();
+      clearLoopWatchTimer();
+      clearAllEndTimers();
+      incomingLoopSlotRef.current = null;
+
+      const twin = loopTwinRef.current;
+      if (twin) {
+        twin.controller.pause();
+        twin.host.className = HOST_IDLE;
+      }
+      loopTwinHotRef.current = false;
+      actSlotHotRef.current = false;
+
+      const act = poolRef.current.get(trackUri);
+      if (!act) {
+        soundtrackDebug("restartLoopOnAct.skip", {
+          ...loopSnap(trackUri),
+          reason: "noAct",
+          via: reason,
+        });
+        return false;
+      }
+
+      playingUriRef.current = trackUri;
+      playingSlotRef.current = "act";
+      needsResumeRef.current = false;
+      const state = loopStateFor(trackUri);
+      state.lastPlayingPosition = 0;
+      state.seenHealthyProgress = false;
+      state.cooldownUntil = Date.now() + LOOP_COOLDOWN_MS;
+      suppressExternalPauseBriefly();
+      act.host.className = HOST_LIVE;
+      act.controller.seek(START_AT_SEC);
+      act.controller.play();
+      pauseExceptSlots([{ uri: trackUri, slot: "act" }]);
+      act.controller.play();
+      setVisibleUri(trackUri);
+      soundtrackDebug("restartLoopOnAct", {
+        ...loopSnap(trackUri),
+        reason,
+        ready: act.ready,
+      });
+      return true;
+    }
+
+    function scheduleLoopOwnershipWatch(trackUri: string, expectedSlot: PlaySlot) {
+      clearLoopWatchTimer();
+      loopWatchTimerRef.current = window.setTimeout(() => {
+        loopWatchTimerRef.current = null;
+        if (!enabledRef.current) return;
+        if (playingUriRef.current !== trackUri) return;
+        if (playingSlotRef.current !== expectedSlot) return;
+        const state = loopStateFor(trackUri);
+        if (state.seenHealthyProgress) return;
+        if (state.lastPlayingPosition >= LOOP_PROGRESS_PROOF_MS) return;
+        soundtrackDebug("loop.watchdog", {
+          ...loopSnap(trackUri),
+          expectedSlot,
+          reason: "noProgress",
+        });
+        restartLoopOnAct(trackUri, "watchdog");
+      }, LOOP_OWNERSHIP_WATCH_MS);
+    }
+
     /** Start the idle A/B slot early; cut when it reports audible. */
     function beginLoopCutover(trackUri: string) {
       const skip = canBeginLoopSkipReason(trackUri);
@@ -884,6 +980,21 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         });
         return false;
       }
+
+      // iOS: twin iframe play() outside the Continue gesture is blocked. Stay
+      // on the act embed (small seek gap) instead of digital silence.
+      if (likelyNeedsSameActLoop()) {
+        const from = playingSlotRef.current;
+        soundtrackDebug("beginLoopCutover", {
+          ...loopSnap(trackUri),
+          from,
+          to: "act",
+          path: "same-act",
+          reason: "iosGesture",
+        });
+        return restartLoopOnAct(trackUri, "iosGesture");
+      }
+
       const from = playingSlotRef.current;
       const to = otherSlot(from);
       const idle = getSlotEntry(to, trackUri);
@@ -910,6 +1021,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
       clearLoopCutoverTimer();
       clearAllEndTimers();
+      clearLoopWatchTimer();
       loopCutoverTimerRef.current = window.setTimeout(() => {
         loopCutoverTimerRef.current = null;
         if (incomingLoopSlotRef.current !== to) {
@@ -917,6 +1029,16 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             ...loopSnap(trackUri),
             expected: to,
           });
+          return;
+        }
+        const state = loopStateFor(trackUri);
+        if (state.lastPlayingPosition < LOOP_PROGRESS_PROOF_MS) {
+          soundtrackDebug("tryLoopCutover.timerRecover", {
+            ...loopSnap(trackUri),
+            to,
+            lastPos: Math.round(state.lastPlayingPosition),
+          });
+          restartLoopOnAct(trackUri, "timerNoProgress");
           return;
         }
         soundtrackDebug("tryLoopCutover.timer", {
@@ -1649,6 +1771,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         clearEnforceTimers();
         clearCutoverTimer();
         clearLoopCutoverTimer();
+        clearLoopWatchTimer();
         clearAllEndTimers();
         for (const entry of pool.values()) {
           entry.controller.destroy();
