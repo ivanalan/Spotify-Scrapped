@@ -8,6 +8,7 @@ import type {
   SoundtrackWarmState,
 } from "@/components/scrapped/DeckSoundtrack";
 import { ScrappedGate } from "@/components/scrapped/ScrappedGate";
+import { SoundtrackDebugPanel } from "@/components/scrapped/SoundtrackDebugPanel";
 import {
   API_SCRAPPED_SLIDE_COUNT,
   getApiSlideSoundtrackUri,
@@ -271,6 +272,9 @@ export function ScrappedExperience({
           onExternalResume={() => pauseApiRef.current?.resumeStory()}
         />
       ) : null}
+
+      {/* `?debug=soundtrack` only: on-device log + case checklist (no audio control changes). */}
+      <SoundtrackDebugPanel />
     </div>
   );
 }

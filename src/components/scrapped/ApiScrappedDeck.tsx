@@ -69,6 +69,7 @@ import {
   sumMs,
   type StoryCopyLines,
 } from "@/lib/scrapped-story-motion";
+import { soundtrackDebug } from "@/lib/soundtrackDebug";
 
 type Props = {
   report: ScrappedApiReport;
@@ -130,8 +131,9 @@ function subscribeShareTuneEnabled() {
 /**
  * Cancel speculative next-act prime after this hold (audio only: no story pause).
  * Short taps clear the timer on pointerup and keep the hot buffer for cutTo.
+ * 550ms: above normal mobile tap presses (~50–350ms); still cancels a deliberate hold.
  */
-const PRIME_HOLD_CANCEL_MS = 200;
+const PRIME_HOLD_CANCEL_MS = 550;
 
 function cardById(
   report: ScrappedApiReport,
@@ -308,6 +310,11 @@ export function ApiScrappedDeck({
       const next = Math.min(Math.max(index, 0), slides.length - 1);
       const prev = navigatingToRef.current ?? activeRef.current;
 
+      soundtrackDebug("goTo", {
+        from: prev,
+        next,
+        clearSticky: true,
+      });
       setPausedSticky(false);
 
       if (next === prev) {
@@ -588,19 +595,51 @@ export function ApiScrappedDeck({
   }, [active, visitKey]);
 
   const togglePaused = useCallback(() => {
-    setPausedSticky((p) => !p);
+    let next = false;
+    setPausedSticky((p) => {
+      next = !p;
+      return next;
+    });
+    soundtrackDebug("sticky", {
+      source: "togglePaused",
+      next,
+      active: activeRef.current,
+    });
   }, []);
 
   useEffect(() => {
     if (!pauseApiRef) return;
     pauseApiRef.current = {
-      pauseStory: () => setPausedSticky(true),
-      resumeStory: () => setPausedSticky(false),
+      pauseStory: () => {
+        soundtrackDebug("sticky", {
+          source: "pauseStory",
+          next: true,
+          active: activeRef.current,
+        });
+        setPausedSticky(true);
+      },
+      resumeStory: () => {
+        soundtrackDebug("sticky", {
+          source: "resumeStory",
+          next: false,
+          active: activeRef.current,
+        });
+        setPausedSticky(false);
+      },
     };
     return () => {
       pauseApiRef.current = null;
     };
   }, [pauseApiRef]);
+
+  useEffect(() => {
+    soundtrackDebug("sticky", {
+      source: "state",
+      pausedSticky,
+      userPaused,
+      active: activeRef.current,
+    });
+  }, [pausedSticky, userPaused]);
 
   const clearPrimeHoldTimer = useCallback(() => {
     if (primeHoldTimerRef.current != null) {
@@ -617,12 +656,21 @@ export function ApiScrappedDeck({
       if (e.target !== e.currentTarget) return;
       clearPrimeHoldTimer();
       const next = activeRef.current + dir;
+      soundtrackDebug("zonePointerDown", {
+        dir,
+        from: activeRef.current,
+        next,
+      });
       // Prime early so cutTo can resume hot when the tap commits.
       if (next >= 0 && next <= FINALE_INDEX) {
         primeSoundtrackFor(next);
         // Long hold: kill the speculative chirp (do not pause the story).
         primeHoldTimerRef.current = setTimeout(() => {
           primeHoldTimerRef.current = null;
+          soundtrackDebug("primeHoldCancel", {
+            ms: PRIME_HOLD_CANCEL_MS,
+            active: activeRef.current,
+          });
           cancelSoundtrackPrime();
         }, PRIME_HOLD_CANCEL_MS);
       }
@@ -634,7 +682,14 @@ export function ApiScrappedDeck({
     (dir: -1 | 1) => {
       clearPrimeHoldTimer();
       const next = activeRef.current + dir;
-      if (next < 0 || next > FINALE_INDEX) return;
+      soundtrackDebug("zoneClick", {
+        dir,
+        from: activeRef.current,
+        next,
+      });
+      // Past finale: ignore. Before 0: goTo clamps to 0 and replays the intro
+      // (same as re-tapping the current scene).
+      if (next > FINALE_INDEX) return;
       goTo(next);
     },
     [goTo, clearPrimeHoldTimer],
@@ -681,6 +736,11 @@ export function ApiScrappedDeck({
   useEffect(() => {
     function onVis() {
       if (!document.hidden) return;
+      soundtrackDebug("visibilitychange", {
+        hidden: true,
+        source: "ApiScrappedDeck",
+        active: activeRef.current,
+      });
       clearPrimeHoldTimer();
       cancelSoundtrackPrime();
       setPausedSticky(true);
