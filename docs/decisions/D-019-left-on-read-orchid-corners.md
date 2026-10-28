@@ -1,6 +1,6 @@
 # D-019: Left-on-read orchid corners + frame tune
 
-**Status:** Locked  
+**Status:** Partially superseded: field / bloom / frame opacity live in [D-049](D-049-left-on-read-rose-ocean.md). Pin place + frame geometry still locked here.  
 **Date:** 2026-10-20  
 **Surfaces:** `/scrapped` API deck scenes 5-6. Kit **B1**.
 
@@ -10,9 +10,9 @@ Promote the left-on-read pair tune for scenes 5→6:
 
 | Axis | Choice |
 |------|--------|
-| Field | Ink canvas + **B1 orchid corners** wash (orchid-deep TL · orchid-ink BR, wash op `0.75`) on both beats |
+| Field | Historical: ink canvas + **B1 orchid corners** wash (orchid-deep TL · orchid-ink BR, wash op `0.75`). Production field: [D-049](D-049-left-on-read-rose-ocean.md) |
 | Scene 5 pin | Typing bubble **horizontally centered**, below “Top artist left on read” · `100×52`: `left: calc(50% - half-width)` / `top: calc(50% + 168px)`; tail under pill + `drop-shadow` (one silhouette) |
-| Scene 6 frame | Softer / larger edge stack; col scale `0.85` @ op `0.35`, top `8%`; mirror scale `0.9` @ op `0.21`, bottom `11.5%`; skew Y `11°` / Z `-3°` |
+| Scene 6 frame | Softer / larger edge stack; col scale `0.85`, top `8%`; mirror scale `0.9`, bottom `11.5%`; skew Y `11°` / Z `-3°`. Opacity lock: [D-049](D-049-left-on-read-rose-ocean.md) |
 | Quiet→frame | Same geometry (no remount jump; keeps prior SCARS fix) |
 
 ## Why

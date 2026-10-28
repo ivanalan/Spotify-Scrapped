@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Soft close · heart iris · size + color</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f5f5f5;
+        --muted: color-mix(in oklab, #f5f5f5 58%, transparent);
+        --stage: #0c0a12;
+        --panel: color-mix(in oklab, #f5f5f5 7%, transparent);
+        --line: color-mix(in oklab, #f5f5f5 12%, transparent);
+        --accent: #e070ff;
+
+        /* Pulled stops (D-045 / scene 4) */
+        --ocean-ice: #a5f3fc;
+        --ocean-mid: #0284c7;
+        --ocean-deep: #075985;
+        --rose: #c9185b;
+        --hot: #e070ff;
+        --lilac: #c9a0f5;
+        --orchid: #9b4de8;
+        --deep-ink: #3b0764;
+        --void: #0a0810;
+        --wash: #fbeaff;
+
+        --field: var(--ocean-deep);
+        --ink: #f5f5f5;
+
+        /* Production defaults (D-047 explore lock) */
+        --s1: 0.6;
+        --s2: 0.6;
+        --s3: 1.04;
+        --s4: 0.85;
+        --s5: 0.6;
+        --c1: var(--ocean-deep);
+        --c2: var(--ocean-mid);
+        --c3: var(--ocean-deep);
+        --c4: var(--orchid);
+        --c5: var(--hot);
+        --plug-c: var(--rose);
+        --plug-from: 1.56;
+        --plug-to: 0.41;
+        --ox: 256;
+        --oy: 280;
+        --inset: 18;
+        --dur: 3.6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+        background: var(--stage);
+        color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+        gap: 1.25rem;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 3rem;
+        align-items: start;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        max-width: 42rem;
+        margin: 0 0 1rem;
+      }
+
+      .lede code {
+        font-size: 0.82em;
+        color: var(--accent);
+      }
+
+      .stage-wrap {
+        position: relative;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        overflow: hidden;
+        aspect-ratio: 9 / 16;
+        max-height: min(78dvh, 640px);
+        width: min(100%, calc(min(78dvh, 640px) * 9 / 16));
+        margin-inline: auto;
+        background: var(--field);
+        color: var(--ink);
+      }
+
+      .iris {
+        position: absolute;
+        inset: calc(var(--inset) * -1%);
+        pointer-events: none;
+      }
+
+      .iris svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .iris .ring,
+      .iris .plug {
+        transform-origin: calc(var(--ox) * 1px) calc(var(--oy) * 1px);
+      }
+
+      .iris .ring--1 {
+        transform: scale(var(--s1));
+      }
+      .iris .ring--2 {
+        transform: scale(var(--s2));
+      }
+      .iris .ring--3 {
+        transform: scale(var(--s3));
+      }
+      .iris .ring--4 {
+        transform: scale(var(--s4));
+      }
+      .iris .ring--5 {
+        transform: scale(var(--s5));
+      }
+
+      .iris .plug {
+        transform: scale(var(--plug-from));
+      }
+
+      .iris[data-animate="1"] .plug {
+        animation: plug-shrink var(--dur) cubic-bezier(0.33, 0.02, 0.2, 1)
+          forwards;
+      }
+
+      .iris[data-animate="0"] .plug {
+        transform: scale(var(--plug-to));
+      }
+
+      @keyframes plug-shrink {
+        from {
+          transform: scale(var(--plug-from));
+        }
+        to {
+          transform: scale(var(--plug-to));
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .iris .plug {
+          animation: none !important;
+          transform: scale(var(--plug-to));
+        }
+      }
+
+      .copy {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        padding: 18% 12% 22%;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      .copy h2 {
+        margin: 0;
+        font-size: clamp(1.35rem, 6.2vw, 1.85rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        text-wrap: balance;
+      }
+
+      .copy p {
+        margin: 0.55rem 0 0;
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: color-mix(in oklab, var(--ink) 88%, transparent);
+        line-height: 1.35;
+      }
+
+      .copy[data-beat="0"] .b1 {
+        display: none;
+      }
+      .copy[data-beat="1"] .b0 {
+        display: none;
+      }
+
+      .badge {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        z-index: 3;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: color-mix(in oklab, var(--ink) 72%, transparent);
+        background: color-mix(in oklab, #000 28%, transparent);
+        padding: 0.28rem 0.5rem;
+        border-radius: 999px;
+      }
+
+      aside.controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        max-height: min(86dvh, 820px);
+        overflow: auto;
+        padding-right: 0.15rem;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.85rem 0.9rem 1rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.65rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1.1fr 1.4fr auto;
+        gap: 0.45rem 0.55rem;
+        align-items: center;
+        margin-bottom: 0.55rem;
+      }
+
+      .row:last-child {
+        margin-bottom: 0;
+      }
+
+      .row label {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: color-mix(in oklab, #f5f5f5 82%, transparent);
+      }
+
+      .row .val {
+        font-size: 0.72rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+        text-align: right;
+        min-width: 2.6rem;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+      }
+
+      .swatch-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+      }
+
+      .swatch {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 2px solid transparent;
+        padding: 0;
+        cursor: pointer;
+        background: var(--sw);
+      }
+
+      .swatch[aria-pressed="true"] {
+        border-color: #fff;
+        box-shadow: 0 0 0 1px color-mix(in oklab, #000 55%, transparent);
+      }
+
+      .seg {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+
+      .seg button,
+      .actions button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: color-mix(in oklab, #f5f5f5 6%, transparent);
+        color: var(--paper);
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 560;
+        padding: 0.4rem 0.65rem;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .seg button[aria-pressed="true"],
+      .actions button.primary {
+        background: color-mix(in oklab, var(--accent) 28%, transparent);
+        border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+
+      .meta {
+        margin: 0;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .recipe {
+        margin: 0;
+        padding: 0.65rem 0.7rem;
+        border-radius: 8px;
+        background: #08060c;
+        border: 1px solid var(--line);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.68rem;
+        line-height: 1.45;
+        color: color-mix(in oklab, #f5f5f5 88%, transparent);
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 14rem;
+        overflow: auto;
+      }
+
+      .heart-head {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .heart-head .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--dot);
+        flex-shrink: 0;
+      }
+
+      .heart-head span {
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div>
+        <h1>Soft close · <em>heart iris</em></h1>
+        <p class="lede">
+          Iterate <strong>size</strong> (scale) and <strong>color</strong> per
+          heart ring + plug. Production lock (D-047): compact ocean/orchid/hot
+          rings, rose plug <code>1.56 → 0.41</code>, ocean-deep field, no void
+          fill. Light copy sits on the rose plug.
+        </p>
+
+        <div class="stage-wrap" id="stage">
+          <div class="iris" id="iris" data-animate="1" aria-hidden="true">
+            <svg viewBox="0 0 512 512" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <path
+                  id="heart"
+                  d="M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z"
+                />
+              </defs>
+              <g class="ring ring--1"><use href="#heart" fill="var(--c1)" /></g>
+              <g class="ring ring--2"><use href="#heart" fill="var(--c2)" /></g>
+              <g class="ring ring--3"><use href="#heart" fill="var(--c3)" /></g>
+              <g class="ring ring--4"><use href="#heart" fill="var(--c4)" /></g>
+              <g class="ring ring--5"><use href="#heart" fill="var(--c5)" /></g>
+              <g class="plug"><use href="#heart" fill="var(--plug-c)" /></g>
+            </svg>
+          </div>
+          <div class="copy" id="copy" data-beat="0">
+            <div>
+              <h2 class="b0">Thanks for staying.</h2>
+              <div class="b1">
+                <h2>See you next Scrapped.</h2>
+                <p>Hopefully fewer favs get ghosted.</p>
+              </div>
+            </div>
+          </div>
+          <div class="badge" id="badge">D-047 production</div>
+        </div>
+      </div>
+
+      <aside class="controls">
+        <div class="panel">
+          <h3>Presets</h3>
+          <div class="seg" id="presets" role="group" aria-label="Iris presets"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Motion</h3>
+          <div class="actions">
+            <button type="button" class="primary" id="btnReplay">Replay</button>
+            <button type="button" id="btnSettle">Jump to settled</button>
+            <button type="button" id="btnBeat">Toggle beat copy</button>
+          </div>
+          <div class="row" style="margin-top: 0.75rem">
+            <label for="dur">Duration</label>
+            <input id="dur" type="range" min="1.2" max="6" step="0.1" />
+            <span class="val" id="durVal"></span>
+          </div>
+          <div class="row">
+            <label for="plugFrom">Plug start</label>
+            <input id="plugFrom" type="range" min="0.6" max="2.4" step="0.01" />
+            <span class="val" id="plugFromVal"></span>
+          </div>
+          <div class="row">
+            <label for="plugTo">Plug end</label>
+            <input id="plugTo" type="range" min="0.2" max="1.2" step="0.01" />
+            <span class="val" id="plugToVal"></span>
+          </div>
+          <div class="row">
+            <label>Plug color</label>
+            <div class="swatch-row" id="plugColors"></div>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Field</h3>
+          <div class="seg" id="fields" role="group" aria-label="Field"></div>
+        </div>
+
+        <div class="panel" id="heartsPanel">
+          <h3>Hearts · size + color</h3>
+          <p class="meta" style="margin-bottom: 0.75rem">
+            Ring 1 = largest (behind). Ring 5 = smallest before the plug.
+          </p>
+        </div>
+
+        <div class="panel">
+          <h3>Recipe</h3>
+          <pre class="recipe" id="recipe"></pre>
+          <div class="actions" style="margin-top: 0.55rem">
+            <button type="button" id="btnCopy">Copy recipe</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      const HEART_PATH =
+        "M256 448l-35.5-32.3C132 334 48 258.6 48 168.4 48 105.1 97.5 56 160.4 56c36.3 0 70.8 17.2 95.6 46.1C280.8 73.2 315.3 56 351.6 56 414.5 56 464 105.1 464 168.4c0 90.2-84 165.6-172.5 247.3L256 448z";
+
+      const STOPS = [
+        { id: "rose", label: "Rose", hex: "#C9185B" },
+        { id: "hot", label: "Hot", hex: "#E070FF" },
+        { id: "lilac", label: "Lilac", hex: "#C9A0F5" },
+        { id: "orchid", label: "Orchid", hex: "#9B4DE8" },
+        { id: "deep", label: "Deep ink", hex: "#3B0764" },
+        { id: "wash", label: "Wash", hex: "#FBEAFF" },
+        { id: "ice", label: "Ocean ice", hex: "#A5F3FC" },
+        { id: "mid", label: "Ocean mid", hex: "#0284C7" },
+        { id: "ocean", label: "Ocean deep", hex: "#075985" },
+        { id: "void", label: "Void", hex: "#0A0810" },
+      ];
+
+      const FIELDS = [
+        {
+          id: "ocean-deep",
+          label: "Ocean deep",
+          value: "#075985",
+        },
+        {
+          id: "ocean-nest",
+          label: "Ocean nest",
+          value:
+            "linear-gradient(165deg, #A5F3FC 0%, #0284C7 48%, #075985 100%)",
+        },
+        {
+          id: "void",
+          label: "Void",
+          value: "#0A0810",
+        },
+      ];
+
+      const PRESETS = [
+        {
+          id: "d047",
+          label: "D-047 production",
+          scales: [0.6, 0.6, 1.04, 0.85, 0.6],
+          colors: ["#075985", "#0284C7", "#075985", "#9B4DE8", "#E070FF"],
+          plug: { from: 1.56, to: 0.41, color: "#C9185B" },
+          field: "ocean-deep",
+          dur: 3.6,
+        },
+        {
+          id: "full-bleed",
+          label: "Archive · full-bleed ladder",
+          scales: [2.55, 2.15, 1.78, 1.42, 1.12],
+          colors: ["#3B0764", "#9B4DE8", "#C9A0F5", "#E070FF", "#C9185B"],
+          plug: { from: 1.55, to: 0.48, color: "#075985" },
+          field: "ocean-deep",
+          dur: 3.6,
+        },
+        {
+          id: "tighter",
+          label: "Tighter bands",
+          scales: [2.2, 1.95, 1.7, 1.45, 1.2],
+          colors: ["#3B0764", "#9B4DE8", "#C9A0F5", "#E070FF", "#C9185B"],
+          plug: { from: 1.4, to: 0.55, color: "#075985" },
+          field: "ocean-deep",
+          dur: 3.6,
+        },
+        {
+          id: "wide-hole",
+          label: "Wide readable hole",
+          scales: [2.55, 2.15, 1.78, 1.42, 1.12],
+          colors: ["#3B0764", "#9B4DE8", "#C9A0F5", "#E070FF", "#C9185B"],
+          plug: { from: 1.7, to: 0.72, color: "#075985" },
+          field: "ocean-deep",
+          dur: 3.6,
+        },
+        {
+          id: "rose-out",
+          label: "Rose outer",
+          scales: [2.55, 2.15, 1.78, 1.42, 1.12],
+          colors: ["#C9185B", "#E070FF", "#C9A0F5", "#9B4DE8", "#3B0764"],
+          plug: { from: 1.55, to: 0.48, color: "#075985" },
+          field: "ocean-nest",
+          dur: 3.6,
+        },
+      ];
+
+      const root = document.documentElement;
+      const iris = document.getElementById("iris");
+      const copy = document.getElementById("copy");
+      const badge = document.getElementById("badge");
+      const recipeEl = document.getElementById("recipe");
+      const heartsPanel = document.getElementById("heartsPanel");
+
+      const state = {
+        scales: [...PRESETS[0].scales],
+        colors: [...PRESETS[0].colors],
+        plugFrom: PRESETS[0].plug.from,
+        plugTo: PRESETS[0].plug.to,
+        plugColor: PRESETS[0].plug.color,
+        fieldId: PRESETS[0].field,
+        dur: PRESETS[0].dur,
+        presetId: PRESETS[0].id,
+      };
+
+      function hexEq(a, b) {
+        return a.replace(/^#/, "").toLowerCase() === b.replace(/^#/, "").toLowerCase();
+      }
+
+      function applyCss() {
+        for (let i = 0; i < 5; i++) {
+          root.style.setProperty(`--s${i + 1}`, String(state.scales[i]));
+          root.style.setProperty(`--c${i + 1}`, state.colors[i]);
+        }
+        root.style.setProperty("--plug-from", String(state.plugFrom));
+        root.style.setProperty("--plug-to", String(state.plugTo));
+        root.style.setProperty("--plug-c", state.plugColor);
+        root.style.setProperty("--dur", `${state.dur}s`);
+        const field = FIELDS.find((f) => f.id === state.fieldId) || FIELDS[0];
+        root.style.setProperty("--field", field.value);
+      }
+
+      function recipeText() {
+        const lines = [
+          `preset: ${state.presetId}`,
+          `field: ${state.fieldId}`,
+          `duration: ${state.dur}s`,
+          `plug: ${state.plugFrom} → ${state.plugTo} · ${state.plugColor}`,
+          "rings (largest → smallest):",
+        ];
+        for (let i = 0; i < 5; i++) {
+          lines.push(
+            `  ${i + 1}. scale ${state.scales[i].toFixed(2)} · ${state.colors[i]}`,
+          );
+        }
+        return lines.join("\n");
+      }
+
+      function syncRecipe() {
+        recipeEl.textContent = recipeText();
+        const preset = PRESETS.find((p) => p.id === state.presetId);
+        badge.textContent = preset ? preset.label : "Custom";
+      }
+
+      function markCustom() {
+        state.presetId = "custom";
+        document.querySelectorAll("#presets button").forEach((btn) => {
+          btn.setAttribute("aria-pressed", "false");
+        });
+      }
+
+      function replay() {
+        iris.dataset.animate = "0";
+        void iris.offsetWidth;
+        iris.dataset.animate = "1";
+        const plug = iris.querySelector(".plug");
+        plug.style.animation = "none";
+        void plug.offsetWidth;
+        plug.style.animation = "";
+      }
+
+      function settle() {
+        iris.dataset.animate = "0";
+      }
+
+      function applyPreset(p) {
+        state.presetId = p.id;
+        state.scales = [...p.scales];
+        state.colors = [...p.colors];
+        state.plugFrom = p.plug.from;
+        state.plugTo = p.plug.to;
+        state.plugColor = p.plug.color;
+        state.fieldId = p.field;
+        state.dur = p.dur;
+        applyCss();
+        syncControls();
+        syncRecipe();
+        document.querySelectorAll("#presets button").forEach((btn) => {
+          btn.setAttribute(
+            "aria-pressed",
+            btn.dataset.id === p.id ? "true" : "false",
+          );
+        });
+        document.querySelectorAll("#fields button").forEach((btn) => {
+          btn.setAttribute(
+            "aria-pressed",
+            btn.dataset.id === state.fieldId ? "true" : "false",
+          );
+        });
+        replay();
+      }
+
+      function buildSwatches(host, currentHex, onPick) {
+        host.innerHTML = "";
+        for (const stop of STOPS) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "swatch";
+          btn.title = `${stop.label} ${stop.hex}`;
+          btn.style.setProperty("--sw", stop.hex);
+          btn.setAttribute(
+            "aria-pressed",
+            hexEq(stop.hex, currentHex) ? "true" : "false",
+          );
+          btn.addEventListener("click", () => {
+            onPick(stop.hex);
+            buildSwatches(host, stop.hex, onPick);
+          });
+          host.appendChild(btn);
+        }
+      }
+
+      function syncControls() {
+        document.getElementById("dur").value = String(state.dur);
+        document.getElementById("durVal").textContent = `${state.dur.toFixed(1)}s`;
+        document.getElementById("plugFrom").value = String(state.plugFrom);
+        document.getElementById("plugFromVal").textContent =
+          state.plugFrom.toFixed(2);
+        document.getElementById("plugTo").value = String(state.plugTo);
+        document.getElementById("plugToVal").textContent =
+          state.plugTo.toFixed(2);
+
+        buildSwatches(
+          document.getElementById("plugColors"),
+          state.plugColor,
+          (hex) => {
+            state.plugColor = hex;
+            markCustom();
+            applyCss();
+            syncRecipe();
+          },
+        );
+
+        for (let i = 0; i < 5; i++) {
+          const scaleInput = document.getElementById(`scale${i}`);
+          const scaleVal = document.getElementById(`scale${i}Val`);
+          const dot = document.getElementById(`dot${i}`);
+          if (scaleInput) {
+            scaleInput.value = String(state.scales[i]);
+            scaleVal.textContent = state.scales[i].toFixed(2);
+          }
+          if (dot) dot.style.setProperty("--dot", state.colors[i]);
+          const sw = document.getElementById(`colors${i}`);
+          if (sw) {
+            buildSwatches(sw, state.colors[i], (hex) => {
+              state.colors[i] = hex;
+              markCustom();
+              applyCss();
+              syncControls();
+              syncRecipe();
+            });
+          }
+        }
+      }
+
+      // Build heart rows
+      for (let i = 0; i < 5; i++) {
+        const block = document.createElement("div");
+        block.style.marginBottom = i < 4 ? "0.85rem" : "0";
+        block.innerHTML = `
+          <div class="heart-head">
+            <i class="dot" id="dot${i}" style="--dot:${state.colors[i]}"></i>
+            <span>Ring ${i + 1}${i === 0 ? " · largest" : i === 4 ? " · nearest plug" : ""}</span>
+          </div>
+          <div class="row">
+            <label for="scale${i}">Scale</label>
+            <input id="scale${i}" type="range" min="0.6" max="3.2" step="0.01" />
+            <span class="val" id="scale${i}Val"></span>
+          </div>
+          <div class="row">
+            <label>Color</label>
+            <div class="swatch-row" id="colors${i}"></div>
+            <span></span>
+          </div>
+        `;
+        heartsPanel.appendChild(block);
+        block.querySelector(`#scale${i}`).addEventListener("input", (e) => {
+          state.scales[i] = Number(e.target.value);
+          markCustom();
+          applyCss();
+          document.getElementById(`scale${i}Val`).textContent =
+            state.scales[i].toFixed(2);
+          syncRecipe();
+        });
+      }
+
+      // Presets
+      const presetsEl = document.getElementById("presets");
+      for (const p of PRESETS) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.id = p.id;
+        btn.textContent = p.label;
+        btn.setAttribute("aria-pressed", p.id === state.presetId ? "true" : "false");
+        btn.addEventListener("click", () => applyPreset(p));
+        presetsEl.appendChild(btn);
+      }
+
+      // Fields
+      const fieldsEl = document.getElementById("fields");
+      for (const f of FIELDS) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.id = f.id;
+        btn.textContent = f.label;
+        btn.setAttribute(
+          "aria-pressed",
+          f.id === state.fieldId ? "true" : "false",
+        );
+        btn.addEventListener("click", () => {
+          state.fieldId = f.id;
+          markCustom();
+          applyCss();
+          fieldsEl.querySelectorAll("button").forEach((b) => {
+            b.setAttribute(
+              "aria-pressed",
+              b.dataset.id === f.id ? "true" : "false",
+            );
+          });
+          syncRecipe();
+        });
+        fieldsEl.appendChild(btn);
+      }
+
+      document.getElementById("dur").addEventListener("input", (e) => {
+        state.dur = Number(e.target.value);
+        markCustom();
+        applyCss();
+        document.getElementById("durVal").textContent = `${state.dur.toFixed(1)}s`;
+        syncRecipe();
+      });
+      document.getElementById("plugFrom").addEventListener("input", (e) => {
+        state.plugFrom = Number(e.target.value);
+        markCustom();
+        applyCss();
+        document.getElementById("plugFromVal").textContent =
+          state.plugFrom.toFixed(2);
+        syncRecipe();
+      });
+      document.getElementById("plugTo").addEventListener("input", (e) => {
+        state.plugTo = Number(e.target.value);
+        markCustom();
+        applyCss();
+        document.getElementById("plugToVal").textContent =
+          state.plugTo.toFixed(2);
+        syncRecipe();
+      });
+
+      document.getElementById("btnReplay").addEventListener("click", replay);
+      document.getElementById("btnSettle").addEventListener("click", settle);
+      document.getElementById("btnBeat").addEventListener("click", () => {
+        copy.dataset.beat = copy.dataset.beat === "0" ? "1" : "0";
+      });
+      document.getElementById("btnCopy").addEventListener("click", async () => {
+        const text = recipeText();
+        try {
+          await navigator.clipboard.writeText(text);
+          const btn = document.getElementById("btnCopy");
+          btn.textContent = "Copied";
+          setTimeout(() => {
+            btn.textContent = "Copy recipe";
+          }, 1200);
+        } catch {
+          recipeEl.focus();
+        }
+      });
+
+      applyCss();
+      syncControls();
+      syncRecipe();
+      replay();
+
+      // Silence unused lint for path constant kept as reference for prod parity.
+      void HEART_PATH;
+    </script>
+  </body>
+</html>

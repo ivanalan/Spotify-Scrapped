@@ -1,6 +1,6 @@
 /**
  * Middeck metaphor chrome: promoted from middeck-metaphor-kits.html (D-016).
- * Fav locks: 4A heart · 5I chat bloom · 7L film letterbox · 8B teal iris.
+ * Fav locks: 4A heart · left-on-read ocean bloom (D-049) · 7L film · 8B iris.
  */
 
 /* ── Palette stops (Orbit Cascade) ── */
@@ -13,8 +13,21 @@
   --mm-orchid-ink: #3b0764;
   --mm-teal: #1a7a6e;
   --mm-teal-deep: #0f4c5c;
+  --mm-teal-ice: #5eead4;
   --mm-mango: #ff9f1c;
+  /** Volume / plot-twist flame mid (CARD_PALETTE.ember / EMBER_FIELD_GRADIENT). */
+  --mm-ember: #ff7a3a;
   --mm-ink: #0a0810;
+  /* One-like combo A defaults (D-045); overridden on .mm-heart-scene */
+  --mm-heart-hero-c: #c9185b;
+  --mm-bloom-1: #e070ff;
+  --mm-bloom-2: #c9a0f5;
+  --mm-bloom-3: #9b4de8;
+  --mm-floater-1: #e070ff;
+  --mm-floater-2: #c9a0f5;
+  --mm-floater-3: #9b4de8;
+  --mm-floater-4: #c9185b;
+  --mm-floater-5: #e070ff;
 }
 
 /* ── 4A · One-like heart (stamp + s03 cascade) ── */
@@ -41,7 +54,8 @@
   --mm-heart-cascade-at: 3.05s;
   --mm-heart-cascade-stagger: 0.1s;
   --mm-heart-cascade-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --mm-heart-cascade-op: 0.4;
+  /* Solid bloom peak (was 0.4 wash); still fades to 0 at layer end. */
+  --mm-heart-cascade-op: 1;
   --mm-heart-pop-dip: 0.9;
   --mm-heart-pop-peak: 1.12;
 }
@@ -63,13 +77,13 @@
 /* Pop scale wrapper: never transform the <svg> itself (hi-DPI crispness). */
 .mm-heart-pop {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   width: 128px;
   height: 128px;
   display: grid;
   place-items: center;
   transform-origin: 50% 55%;
-  color: var(--mm-pink);
+  color: var(--mm-heart-hero-c);
 }
 
 .mm-heart-glyph {
@@ -119,7 +133,7 @@
   width: 128px;
   height: 128px;
   margin: -64px 0 0 -64px;
-  color: var(--mm-pink);
+  color: var(--mm-bloom-c, var(--mm-bloom-1));
   opacity: 0;
   transform-origin: 50% 55%;
   --mm-bloom-peak: 1.25;
@@ -137,12 +151,23 @@
   stroke: none;
 }
 
-.mm-heart-bloom--rose {
-  color: var(--mm-rose);
+/*
+ * Z stack: largest (outer / --3) at bottom; next largest above; hero at 4.
+ * Matches docs/mocks/heart-bloom-solids.html.
+ */
+.mm-heart-bloom--1 {
+  z-index: 3;
+  --mm-bloom-c: var(--mm-bloom-1);
 }
 
-.mm-heart-bloom--gold {
-  color: var(--mm-gold);
+.mm-heart-bloom--2 {
+  z-index: 2;
+  --mm-bloom-c: var(--mm-bloom-2);
+}
+
+.mm-heart-bloom--3 {
+  z-index: 1;
+  --mm-bloom-c: var(--mm-bloom-3);
 }
 
 /* Idle / freeze: full outline drawn, no fill */
@@ -346,9 +371,9 @@
 .mm-heart-floater .mm-floater-ico {
   width: var(--fs, 28px);
   height: var(--fs, 28px);
-  color: var(--mm-pink);
+  color: var(--mm-floater-c, var(--mm-floater-1));
   filter: drop-shadow(
-    0 0 10px color-mix(in oklab, var(--mm-pink) 45%, transparent)
+    0 0 10px color-mix(in oklab, var(--mm-floater-c, var(--mm-floater-1)) 45%, transparent)
   );
 }
 
@@ -356,35 +381,31 @@
   left: 6%;
   --fs: 26px;
   --dx: -18px;
+  --mm-floater-c: var(--mm-floater-1);
 }
 .mm-heart-floater:nth-child(2) {
   left: 22%;
   --fs: 22px;
   --dx: -28px;
-}
-.mm-heart-floater:nth-child(2) .mm-floater-ico {
-  color: var(--mm-gold);
+  --mm-floater-c: var(--mm-floater-2);
 }
 .mm-heart-floater:nth-child(3) {
   left: 48%;
   --fs: 20px;
   --dx: 0px;
-}
-.mm-heart-floater:nth-child(3) .mm-floater-ico {
-  color: var(--mm-rose);
+  --mm-floater-c: var(--mm-floater-3);
 }
 .mm-heart-floater:nth-child(4) {
   left: 68%;
   --fs: 24px;
   --dx: 30px;
+  --mm-floater-c: var(--mm-floater-4);
 }
 .mm-heart-floater:nth-child(5) {
   left: 84%;
   --fs: 28px;
   --dx: 22px;
-}
-.mm-heart-floater:nth-child(5) .mm-floater-ico {
-  color: var(--mm-gold);
+  --mm-floater-c: var(--mm-floater-5);
 }
 
 /* Setup: floaters stay parked offstage */
@@ -480,25 +501,31 @@
   --chat-skew-y: 11deg;
   --chat-skew-z: -3deg;
   --chat-col-scale: 0.85;
-  --chat-col-opacity: 0.35;
+  /* D-049 frame opacity (geometry still D-019) */
+  --chat-col-opacity: 0.63;
   --chat-bubble-h: 30px;
   --chat-gap: 13px;
   --chat-mirror-w: 86px;
   --chat-mirror-bottom: 11.5%;
   --chat-mirror-right: 0%;
   --chat-mirror-scale: 0.9;
-  --chat-mirror-opacity: 0.21;
+  --chat-mirror-opacity: 0.58;
   --chat-bloom-x: 25%;
   --chat-bloom-y: 30%;
   --chat-bloom-w: 100%;
   --chat-bloom-h: 145%;
+  /* D-049 ocean bloom (ice → mid → deep → void) */
+  --chat-bloom-0: #a5f3fc;
+  --chat-bloom-1: #0284c7;
+  --chat-bloom-2: #075985;
+  --chat-bloom-3: #0a0810;
   --chat-bloom: radial-gradient(
     var(--chat-bloom-w) var(--chat-bloom-h) at var(--chat-bloom-x)
       var(--chat-bloom-y),
-    var(--mm-gold) 0%,
-    var(--mm-pink) 38%,
-    var(--mm-orchid) 72%,
-    var(--mm-orchid-deep) 100%
+    var(--chat-bloom-0) 0%,
+    var(--chat-bloom-1) 38%,
+    var(--chat-bloom-2) 72%,
+    var(--chat-bloom-3) 100%
   );
   /* Typing pin: horizontally centered, below cover-lead headline (D-019).
      Art-first stack is justify-center; 50% ± offsets track that mid. */
@@ -507,15 +534,18 @@
   --chat-type-x: calc(50% - (var(--chat-type-w) / 2));
   --chat-type-y: calc(50% + 168px);
   --chat-type-dot: 10px;
-  /* B1 · Orchid corners wash */
+  /* D-049 · same orchid wash TL = BR on rose canvas */
+  --chat-wash: var(--mm-orchid);
+  --chat-wash-mix: 55%;
   --chat-field-wash-op: 0.75;
+  --chat-shadow-op: 45%;
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
 }
 
-/* Soft orchid TL / orchid-ink BR: ink canvas stays under (D-019) */
+/* Matching orchid corners on rose canvas (D-049; geometry D-019) */
 .mm-chat-field {
   position: absolute;
   inset: 0;
@@ -523,12 +553,12 @@
   background:
     radial-gradient(
       120% 80% at 0% 0%,
-      color-mix(in oklab, var(--mm-orchid-deep) 55%, transparent) 0%,
+      color-mix(in oklab, var(--chat-wash) var(--chat-wash-mix), transparent) 0%,
       transparent 58%
     ),
     radial-gradient(
       100% 70% at 100% 100%,
-      color-mix(in oklab, var(--mm-orchid-ink) 45%, transparent) 0%,
+      color-mix(in oklab, var(--chat-wash) var(--chat-wash-mix), transparent) 0%,
       transparent 55%
     );
   z-index: 0;
@@ -548,7 +578,8 @@
   gap: 7px;
   /* drop-shadow follows the clipped tail so bubble + tip read as one icon */
   filter: drop-shadow(
-    0 10px 14px color-mix(in oklab, var(--mm-orchid-deep) 45%, transparent)
+    0 10px 14px
+      color-mix(in oklab, var(--chat-bloom-3) var(--chat-shadow-op), transparent)
   );
   z-index: 1;
 }
@@ -648,7 +679,7 @@
   width: 54%;
 }
 
-.mm-chat[data-animate="1"] .mm-chat-bubble {
+.mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble {
   animation: mm-skew-slide 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .mm-chat[data-animate="1"] .mm-chat-col .mm-chat-bubble:nth-child(1) {
@@ -681,10 +712,32 @@
   margin-bottom: calc(var(--chat-gap) * 0.85);
 }
 
+/* BR cascade continues after TL (same ~0.14s beat; slide in from the right). */
+.mm-chat[data-animate="1"] .mm-chat-mirror .mm-chat-bubble {
+  animation: mm-skew-slide-mirror 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mm-chat[data-animate="1"] .mm-chat-mirror .mm-chat-bubble:nth-child(1) {
+  animation-delay: 0.6s;
+}
+.mm-chat[data-animate="1"] .mm-chat-mirror .mm-chat-bubble:nth-child(2) {
+  animation-delay: 0.74s;
+}
+
 @keyframes mm-skew-slide {
   from {
     opacity: 0;
     transform: translateX(-20px);
+  }
+  to {
+    opacity: 0.92;
+    transform: translateX(0);
+  }
+}
+
+@keyframes mm-skew-slide-mirror {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
   }
   to {
     opacity: 0.92;
@@ -711,7 +764,7 @@
   --scroll-travel: -20%;
   --film-out-dur: 3.2;
   --film-out-bot-delay: 0.12;
-  --film-field: var(--mm-mango);
+  --film-field: var(--mm-ember);
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -824,53 +877,102 @@
   }
 }
 
-/* ── 8B · Soft-close mono teal iris ── */
-@property --mm-hole {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 72%;
-}
-
+/* ── 8B · Soft-close heart iris (explore lock on ocean deep; D-047) ── */
+/*
+ * Compact nested hearts + rose plug. No void fill: ocean field shows around
+ * the cluster. Plug shrinks 1.56 → 0.41 (8B). Light copy on rose plug.
+ */
 .mm-iris {
   position: absolute;
-  inset: -14%;
+  inset: -18%;
   pointer-events: none;
-  --band: 7%;
-  --mm-hole: 72%;
-  --c1: var(--mm-teal);
-  --c2: color-mix(in oklab, var(--mm-teal) 80%, #0a0810);
-  --c3: color-mix(in oklab, var(--mm-teal-deep) 70%, #0a0810);
-  --c4: color-mix(in oklab, var(--mm-teal-deep) 40%, #0a0810);
-  background: radial-gradient(
-    circle at 50% 48%,
-    transparent 0%,
-    transparent var(--mm-hole),
-    var(--c1) var(--mm-hole),
-    var(--c1) calc(var(--mm-hole) + var(--band)),
-    var(--c2) calc(var(--mm-hole) + var(--band)),
-    var(--c2) calc(var(--mm-hole) + var(--band) * 2),
-    var(--c3) calc(var(--mm-hole) + var(--band) * 2),
-    var(--c3) calc(var(--mm-hole) + var(--band) * 3),
-    var(--c4) calc(var(--mm-hole) + var(--band) * 3),
-    var(--c4) calc(var(--mm-hole) + var(--band) * 4),
-    #0a0810 calc(var(--mm-hole) + var(--band) * 4 + 6%)
-  );
+  /* Ring 1…5 (back → front); SoftCloseIrisChrome may override. */
+  --c1: #075985;
+  --c2: #0284c7;
+  --c3: #075985;
+  --c4: #9b4de8;
+  --c5: #e070ff;
+  --mm-iris-plug: #c9185b;
+  /* Heart visual center (path bias toward bottom tip). */
+  --mm-iris-ox: 256px;
+  --mm-iris-oy: 280px;
 }
 
-.mm-iris[data-animate="1"] {
-  animation: mm-iris-shrink 3.6s cubic-bezier(0.33, 0.02, 0.2, 1) forwards;
+.mm-iris-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.mm-iris[data-animate="0"] {
-  --mm-hole: 10%;
+/* Scale around heart visual center in SVG user space (512 viewBox). */
+.mm-iris-heart-ring,
+.mm-iris-hole {
+  transform-origin: var(--mm-iris-ox) var(--mm-iris-oy);
 }
 
-@keyframes mm-iris-shrink {
+.mm-iris-heart-ring--1 {
+  transform: scale(0.6);
+}
+
+.mm-iris-heart-ring--1 use {
+  fill: var(--c1);
+}
+
+.mm-iris-heart-ring--2 {
+  transform: scale(0.6);
+}
+
+.mm-iris-heart-ring--2 use {
+  fill: var(--c2);
+}
+
+.mm-iris-heart-ring--3 {
+  transform: scale(1.04);
+}
+
+.mm-iris-heart-ring--3 use {
+  fill: var(--c3);
+}
+
+.mm-iris-heart-ring--4 {
+  transform: scale(0.85);
+}
+
+.mm-iris-heart-ring--4 use {
+  fill: var(--c4);
+}
+
+.mm-iris-heart-ring--5 {
+  transform: scale(0.6);
+}
+
+.mm-iris-heart-ring--5 use {
+  fill: var(--c5);
+}
+
+.mm-iris-hole {
+  transform: scale(1.56);
+}
+
+.mm-iris-hole use {
+  fill: var(--mm-iris-plug);
+}
+
+.mm-iris[data-animate="1"] .mm-iris-hole {
+  animation: mm-iris-hole-shrink 3.6s cubic-bezier(0.33, 0.02, 0.2, 1) forwards;
+}
+
+.mm-iris[data-animate="0"] .mm-iris-hole {
+  transform: scale(0.41);
+}
+
+@keyframes mm-iris-hole-shrink {
   from {
-    --mm-hole: 72%;
+    transform: scale(1.56);
   }
   to {
-    --mm-hole: 10%;
+    transform: scale(0.41);
   }
 }
 
@@ -886,7 +988,7 @@
   .mm-chat-typing-dot,
   .mm-film-strip,
   .mm-film-perfs,
-  .mm-iris {
+  .mm-iris .mm-iris-hole {
     animation: none !important;
   }
   .mm-heart-scene[data-mode="hero"] .mm-heart-hero {
@@ -910,8 +1012,8 @@
     opacity: 0;
     visibility: hidden;
   }
-  .mm-iris {
-    --mm-hole: 10%;
+  .mm-iris .mm-iris-hole {
+    transform: scale(0.41);
   }
   .mm-film[data-mode="in"] .mm-film-strip,
   .mm-film[data-mode="settled-in"] .mm-film-strip {

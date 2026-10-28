@@ -25,8 +25,8 @@ Entity and list were related by copy only (orchid spiral → ink ghosts; full 5I
 | Scene 2 accents | Same purple→ember as slide 3 (`#5C1A7A` → `#F05A3D`) |
 | Scene 2 motifs | Moon TR · edge stars · one BL D-010 ghost; **no** clouds/grass |
 | Scene 3 | Unchanged (D-010) |
-| Scene 5 motif | Compact typing pin (T1 grammar); placement/size tuned in [D-019](D-019-left-on-read-orchid-corners.md) |
-| Scene 6 | Edge chat frame (D-016 / D-015); geometry + orchid field wash in [D-019](D-019-left-on-read-orchid-corners.md) |
+| Scene 5 motif | Compact typing pin (T1 grammar); placement/size [D-019](D-019-left-on-read-orchid-corners.md); field/bloom [D-049](D-049-left-on-read-rose-ocean.md) |
+| Scene 6 | Edge chat frame (D-016 / D-015); geometry [D-019](D-019-left-on-read-orchid-corners.md); field/bloom [D-049](D-049-left-on-read-rose-ocean.md) |
 | Kit favs | N4 · T1 |
 
 ## Displaced
@@ -36,7 +36,7 @@ Entity and list were related by copy only (orchid spiral → ink ghosts; full 5I
 
 ## Cost
 
-Opening trio is no longer ink→ember→orchid (slide 2 joins ink). Scenes 5→6 keep the ink canvas but add a shared orchid-corner wash ([D-019](D-019-left-on-read-orchid-corners.md)) so the pair is not flat ink alone.
+Opening trio is no longer ink→ember→orchid (slide 2 joins ink). Scenes 5→6 field/bloom: [D-049](D-049-left-on-read-rose-ocean.md) (rose + matched orchid wash + ocean bloom; geometry still [D-019](D-019-left-on-read-orchid-corners.md)).
 
 ## Source of truth
 

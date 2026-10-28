@@ -421,7 +421,7 @@ export function ShareRecapCard({
         }}
       >
         {/*
-          Inset share finale (D-012 IA + D-033 B2): plain teal · TR moon ·
+          Inset share finale (D-012 IA + D-051): rose · ocean TR moon ·
           hero ghosts (mixed z) · flow liked metrics under lists · brand center.
         */}
         <header

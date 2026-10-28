@@ -12,8 +12,6 @@ export type ShareAllTimeFavsTrack = {
 
 type Props = {
   tracks: ShareAllTimeFavsTrack[];
-  likedCount?: number;
-  likedThisYearCount?: number;
   heroImageUrl?: string | null;
   heroAlt?: string;
   active?: boolean;
@@ -58,20 +56,19 @@ function FilmStrip({ edge }: { edge: "top" | "bot" }) {
 }
 
 /**
- * Share finale card 1: All time favs · yellow G3 cinema · spine brand (D-043).
+ * Share finale card 1: All time favs · yellow G3 cinema · centered brand (D-043).
  * Same 300×533 design canvas as the teal minimal card (D-033 / D-012).
+ * Liked metrics removed; `myscrapped.com` sits under the list.
  */
 export function ShareAllTimeFavsCard({
   tracks,
-  likedCount = 0,
-  likedThisYearCount = 0,
   heroImageUrl = null,
   heroAlt = "",
   active = false,
   className,
 }: Props) {
-  const labelType = {
-    fontSize: `${K.metricLabelRem}rem`,
+  const listLabelType = {
+    fontSize: `${K.listLabelRem}rem`,
     lineHeight: 1.2,
   } as const;
 
@@ -89,24 +86,6 @@ export function ShareAllTimeFavsCard({
     >
       <FilmStrip edge="top" />
       <FilmStrip edge="bot" />
-
-      <div
-        className="pointer-events-none absolute z-[6] whitespace-nowrap font-sans font-bold"
-        style={{
-          left: K.spine.insetXPx,
-          top: `${K.spine.yPct}%`,
-          transform: `translateY(-50%) rotate(${K.spine.rotateDeg}deg)`,
-          transformOrigin: "center center",
-          fontSize: `${K.spine.sizeRem}rem`,
-          letterSpacing: `${K.spine.letterSpacingEm}em`,
-          lineHeight: 1.15,
-          opacity: K.spine.opacity,
-          color: K.cardInk,
-        }}
-        aria-hidden
-      >
-        {K.brandLine}
-      </div>
 
       <header
         className="relative z-[3] flex w-full shrink-0 items-center justify-center overflow-visible"
@@ -142,14 +121,11 @@ export function ShareAllTimeFavsCard({
         }}
       >
         <div className="flex w-full shrink-0 flex-col items-center">
-          <div
-            className="min-w-0"
-            style={{ width: `${K.listWidthPct}%` }}
-          >
+          <div className="min-w-0" style={{ width: `${K.listWidthPct}%` }}>
             <p
               className="truncate font-sans font-medium"
               style={{
-                ...labelType,
+                ...listLabelType,
                 color: K.cardMuted,
                 marginBottom: `${K.listLabelGapRem}rem`,
               }}
@@ -192,48 +168,17 @@ export function ShareAllTimeFavsCard({
         </div>
 
         <div
-          className="grid w-full shrink-0 grid-cols-2"
+          className="w-full shrink-0 text-center font-sans font-bold"
           style={{
-            columnGap: K.listColGapPx,
-            marginTop: K.metricsGapAfterListPx,
+            marginTop: K.brandGapAfterListPx,
+            fontSize: `${K.brand.sizeRem}rem`,
+            letterSpacing: `${K.brand.letterSpacingEm}em`,
+            lineHeight: 1.15,
+            whiteSpace: "nowrap",
+            color: K.cardInk,
           }}
         >
-          <div className="min-w-0">
-            <p
-              className="font-sans font-medium"
-              style={{ ...labelType, color: K.cardMuted }}
-            >
-              Liked songs
-            </p>
-            <p
-              className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em]"
-              style={{
-                fontSize: `${K.metricNumberRem}rem`,
-                lineHeight: 1.05,
-                color: K.cardInk,
-              }}
-            >
-              {likedCount.toLocaleString()}
-            </p>
-          </div>
-          <div className="min-w-0">
-            <p
-              className="font-sans font-medium"
-              style={{ ...labelType, color: K.cardMuted }}
-            >
-              Liked this year
-            </p>
-            <p
-              className="mt-0.5 font-sans font-extrabold tabular-nums tracking-[-0.03em]"
-              style={{
-                fontSize: `${K.metricNumberRem}rem`,
-                lineHeight: 1.05,
-                color: K.cardInk,
-              }}
-            >
-              {likedThisYearCount.toLocaleString()}
-            </p>
-          </div>
+          {K.brandLine}
         </div>
       </div>
     </div>

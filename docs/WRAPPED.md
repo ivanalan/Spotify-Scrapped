@@ -114,7 +114,7 @@ Scene 4 (3 beats): one hit wonders → 1 like artists setup → 1 like artists l
 Scene 5 (2 beats): “Now the artists” → #1 left-on-read artist
 Scene 6 (2 beats): “Get the gang back together?” → Top left-on-read artists list
 Scene 7 (2 beats): “Plot twist.” + setup → all-star reveal (song or setlist)
-Scene 8 (2 beats): “Thanks for staying.” → “Same time next year?”
+Scene 8 (2 beats): “Thanks for staying.” → “See you next Scrapped.” + fewer favs ghosted
 Scene 9: Share finale (holds; no auto-advance; swipeable share cards + dots, D-042)
 ```
 

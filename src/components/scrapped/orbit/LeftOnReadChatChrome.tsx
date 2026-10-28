@@ -12,8 +12,8 @@ type Props = {
 
 /**
  * Left-on-read chrome: typing pin on the entity beat, edge bubbles on the list.
- * Bubbles reuse the 5I bloom fill; pin is the one→many accent (like hearts / ghosts).
- * Field wash + pin/frame geometry: D-019 (B1).
+ * Bubbles reuse the ocean bloom fill (D-049); pin is the one→many accent.
+ * Field / bloom / frame opacity: D-049. Pin/frame geometry: D-019.
  */
 export function LeftOnReadChatChrome({
   mode = "pin",

@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { SHARE_FINALE_DENSITY as D } from "@/lib/scrapped-card-palette";
 
 /** Shareable posters on scene 9 (Wrapped-form multi-card finale). */
-export const SHARE_FINALE_CARD_COUNT = 2;
+export const SHARE_FINALE_CARD_COUNT = 3;
 
 /** Commit when the finger passes this fraction of the shell width. */
 const SNAP_RATIO = 0.22;
