@@ -13,6 +13,10 @@ import {
 import { volumeHighOutline, volumeMuteOutline } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
 import type { ScrappedReport } from "@/lib/scrapped";
+import {
+  shortUri,
+  soundtrackDebug,
+} from "@/lib/soundtrackDebug";
 import { cn } from "@/lib/utils";
 
 /** Call from a click handler so Safari/Chrome allow Spotify embed playback. */
@@ -121,6 +125,17 @@ const CUTOVER_FALLBACK_MS = 450;
  * playback_started / a usable update, force-finish so the current act stays solo.
  */
 const PRIME_FINISH_FALLBACK_MS = 450;
+/**
+ * After cancelPrime, ignore / force-pause late play() for this URI so a hold
+ * cannot leave the next act chirping under the current one.
+ */
+const PRIME_REJECT_MS = 700;
+/**
+ * After our own pause/play cutover, ignore mid-sample isPaused → sticky.
+ * Stale paused updates from tryFinishPrime / pauseOthers look like media keys
+ * when revisiting a URI that already has seenHealthyProgress.
+ */
+const IGNORE_EXTERNAL_PAUSE_MS = 500;
 
 type IFrameAPI = {
   createController: (
@@ -312,6 +327,10 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const primeFinishTimerRef = useRef<number | null>(null);
     /** URI that played briefly and is paused near START_AT_SEC for instant resume. */
     const hotPrimedUriRef = useRef<string | null>(null);
+    /** URI → Date.now() deadline: late Spotify play after hold-cancel. */
+    const primeRejectUntilRef = useRef<Map<string, number>>(new Map());
+    /** Suppress notifyExternalPause until this time (our cutover, not media keys). */
+    const ignoreExternalPauseUntilRef = useRef(0);
     /** Twin is paused near START_AT_SEC for instant loop resume. */
     const loopTwinHotRef = useRef(false);
     /** Act slot parked at START_AT_SEC after yielding to the twin. */
@@ -512,6 +531,27 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       },
     );
 
+    function isPrimeRejected(trackUri: string): boolean {
+      const until = primeRejectUntilRef.current.get(trackUri);
+      if (until == null) return false;
+      if (Date.now() >= until) {
+        primeRejectUntilRef.current.delete(trackUri);
+        return false;
+      }
+      return true;
+    }
+
+    function rejectPrimeUri(trackUri: string) {
+      primeRejectUntilRef.current.set(
+        trackUri,
+        Date.now() + PRIME_REJECT_MS,
+      );
+    }
+
+    function clearPrimeReject(trackUri: string) {
+      primeRejectUntilRef.current.delete(trackUri);
+    }
+
     /** Slot-aware: act URI allowed for act switch / prime / owning act slot. */
     function isActPlaybackAllowed(trackUri: string): boolean {
       // Gate arm may run before soundOn: still allow the lead chirp→pause.
@@ -522,6 +562,16 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return true;
       }
       if (!enabledRef.current) return false;
+      // Hold-cancel latch: block late play unless this URI is the committed cut.
+      if (
+        isPrimeRejected(trackUri) &&
+        primingUriRef.current !== trackUri &&
+        incomingUriRef.current !== trackUri &&
+        aheadUriRef.current !== trackUri &&
+        committedUriRef.current !== trackUri
+      ) {
+        return false;
+      }
       if (primingUriRef.current === trackUri) return true;
       if (incomingUriRef.current === trackUri) return true;
       if (playingUriRef.current !== trackUri) return false;
@@ -529,6 +579,37 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         playingSlotRef.current === "act" ||
         incomingLoopSlotRef.current === "act"
       );
+    }
+
+    function suppressExternalPauseBriefly() {
+      ignoreExternalPauseUntilRef.current =
+        Date.now() + IGNORE_EXTERNAL_PAUSE_MS;
+    }
+
+    /** Commit act ownership immediately (hot cut / audible priming). */
+    function takeActOwnershipNow(trackUri: string, entry: PoolEntry) {
+      clearPrimeReject(trackUri);
+      clearPrimeFinishTimer();
+      primingUriRef.current = null;
+      if (hotPrimedUriRef.current === trackUri) {
+        hotPrimedUriRef.current = null;
+      }
+      // Fresh act: do not inherit prior-visit progress (stale pause → sticky).
+      const loop = loopStateFor(trackUri);
+      loop.seenHealthyProgress = false;
+      loop.lastPlayingPosition = 0;
+      suppressExternalPauseBriefly();
+      playingUriRef.current = trackUri;
+      playingSlotRef.current = "act";
+      incomingUriRef.current = null;
+      needsResumeRef.current = false;
+      entry.host.className = HOST_LIVE;
+      // Parked primes were seek(0)+pause; play() is more reliable than resume().
+      entry.controller.play();
+      pauseOthersExceptUri(trackUri);
+      ensureTwinUri(trackUri);
+      setVisibleUri(trackUri);
+      resolveCutWaiters(trackUri);
     }
 
     function isTwinPlaybackAllowed(trackUri: string): boolean {
@@ -582,6 +663,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return true;
       }
       clearPrimeFinishTimer();
+      suppressExternalPauseBriefly();
       entry.controller.pause();
       // Re-park at the hook so resume() doesn't continue mid-phrase from the chirp.
       entry.controller.seek(START_AT_SEC);
@@ -590,6 +672,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       armingLeadRef.current = false;
       hotPrimedUriRef.current = trackUri;
       if (incomingUriRef.current === trackUri) incomingUriRef.current = null;
+      soundtrackDebug("tryFinishPrime", {
+        uri: shortUri(trackUri),
+        playingUri: shortUri(playingUriRef.current),
+        enabled: enabledRef.current,
+      });
       return true;
     }
 
@@ -685,6 +772,10 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       primingUriRef.current = null;
       hotPrimedUriRef.current =
         hotPrimedUriRef.current === trackUri ? null : hotPrimedUriRef.current;
+      const loop = loopStateFor(trackUri);
+      loop.seenHealthyProgress = false;
+      loop.lastPlayingPosition = 0;
+      suppressExternalPauseBriefly();
       playingUriRef.current = trackUri;
       playingSlotRef.current = "act";
       incomingLoopSlotRef.current = null;
@@ -696,6 +787,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       ensureTwinUri(trackUri);
       setVisibleUri(trackUri);
       resolveCutWaiters(trackUri);
+      soundtrackDebug("tryCutover", {
+        uri: shortUri(trackUri),
+        playingUri: shortUri(playingUriRef.current),
+        incomingUri: shortUri(incomingUriRef.current),
+      });
     }
 
     function canBeginLoop(trackUri: string) {
@@ -821,9 +917,18 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     }
 
     const notifyExternalPause = useEffectEvent(() => {
+      soundtrackDebug("notifyExternalPause", {
+        playingUri: shortUri(playingUriRef.current),
+        committedUri: shortUri(committedUriRef.current),
+        enabled: enabledRef.current,
+      });
       onExternalPause?.();
     });
     const notifyExternalResume = useEffectEvent(() => {
+      soundtrackDebug("notifyExternalResume", {
+        playingUri: shortUri(playingUriRef.current),
+        enabled: enabledRef.current,
+      });
       onExternalResume?.();
     });
 
@@ -870,6 +975,9 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
         if (!isActPlaybackAllowed(trackUri)) {
           controller.pause();
+          if (isPrimeRejected(trackUri)) {
+            controller.seek(START_AT_SEC);
+          }
           return;
         }
         if (!entry.audible) {
@@ -938,6 +1046,9 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
               return;
             }
             controller.pause();
+            if (slot === "act" && isPrimeRejected(trackUri)) {
+              controller.seek(START_AT_SEC);
+            }
             return;
           }
 
@@ -996,8 +1107,20 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           return;
         }
         // Mid-sample pause while we still wanted audio: hardware media keys.
-        if (state.seenHealthyProgress) {
+        // Skip right after our cutover/prime park: stale isPaused is not a key press.
+        if (
+          state.seenHealthyProgress &&
+          Date.now() >= ignoreExternalPauseUntilRef.current
+        ) {
           notifyExternalPause();
+        } else if (state.seenHealthyProgress) {
+          soundtrackDebug("notifyExternalPause.suppressed", {
+            uri: shortUri(trackUri),
+            msLeft: Math.max(
+              0,
+              ignoreExternalPauseUntilRef.current - Date.now(),
+            ),
+          });
         }
       });
     });
@@ -1138,13 +1261,25 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         }
 
         const entry = poolRef.current.get(target);
-        if (!entry?.ready) return;
+        if (!entry?.ready) {
+          soundtrackDebug("primeTo.skip", {
+            uri: shortUri(target),
+            reason: "not-ready",
+          });
+          return;
+        }
 
         clearEnforceTimers();
         primingUriRef.current = target;
         entry.host.className = HOST_WARM;
         entry.controller.play();
         schedulePrimeFinishFallback(target);
+        soundtrackDebug("primeTo", {
+          uri: shortUri(target),
+          playingUri: shortUri(playingUriRef.current),
+          hotPrimed: shortUri(hotPrimedUriRef.current),
+          enabled: enabledRef.current,
+        });
       },
       cancelPrime() {
         clearPrimeFinishTimer();
@@ -1156,6 +1291,12 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         ) {
           targets.add(hotPrimedUriRef.current);
         }
+        soundtrackDebug("cancelPrime", {
+          priming: shortUri(primingUriRef.current),
+          hotPrimed: shortUri(hotPrimedUriRef.current),
+          playingUri: shortUri(playingUriRef.current),
+          targetCount: targets.size,
+        });
         primingUriRef.current = null;
         if (
           hotPrimedUriRef.current &&
@@ -1163,9 +1304,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         ) {
           hotPrimedUriRef.current = null;
         }
+        if (targets.size > 0) suppressExternalPauseBriefly();
         for (const uri of targets) {
           if (uri === playingUriRef.current) continue;
           if (incomingUriRef.current === uri) continue;
+          rejectPrimeUri(uri);
           const entry = poolRef.current.get(uri);
           if (!entry) continue;
           entry.controller.pause();
@@ -1177,6 +1320,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         const target = asTrackUri(nextUri);
         if (!enabledRef.current) return Promise.resolve();
         if (!target) return Promise.resolve();
+        clearPrimeReject(target);
         if (
           playingUriRef.current === target &&
           incomingUriRef.current == null
@@ -1185,6 +1329,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           committedUriRef.current = target;
           primingUriRef.current = null;
           ensureTwinUri(target);
+          soundtrackDebug("cutTo", {
+            path: "same",
+            uri: shortUri(target),
+            playingUri: shortUri(playingUriRef.current),
+          });
           return Promise.resolve();
         }
         if (inflightCutRef.current?.uri === target) {
@@ -1212,35 +1361,53 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           clearLoopCutoverTimer();
 
           if (hotPrimedUriRef.current === target) {
-            clearPrimeFinishTimer();
-            primingUriRef.current = null;
-            hotPrimedUriRef.current = null;
             const entry = poolRef.current.get(target);
             if (entry) {
-              playingUriRef.current = target;
-              playingSlotRef.current = "act";
-              incomingUriRef.current = null;
-              needsResumeRef.current = false;
-              entry.host.className = HOST_LIVE;
-              entry.controller.resume();
-              pauseOthersExceptUri(target);
-              ensureTwinUri(target);
-              setVisibleUri(target);
-              resolveCutWaiters(target);
+              takeActOwnershipNow(target, entry);
+              soundtrackDebug("cutTo", {
+                path: "hot",
+                uri: shortUri(target),
+                playingUri: shortUri(playingUriRef.current),
+                enabled: enabledRef.current,
+              });
               return;
             }
+            hotPrimedUriRef.current = null;
           }
 
           if (primingUriRef.current === target) {
+            const entry = poolRef.current.get(target);
+            // Already audible from speculative play: own immediately (no 450ms hole).
+            if (entry?.audible) {
+              takeActOwnershipNow(target, entry);
+              soundtrackDebug("cutTo", {
+                path: "priming-hot",
+                uri: shortUri(target),
+                playingUri: shortUri(playingUriRef.current),
+              });
+              return;
+            }
             clearPrimeFinishTimer();
             primingUriRef.current = null;
             incomingUriRef.current = target;
+            soundtrackDebug("cutTo", {
+              path: "priming",
+              uri: shortUri(target),
+              playingUri: shortUri(playingUriRef.current),
+              incomingUri: shortUri(incomingUriRef.current),
+            });
             runSync(target, true);
             return;
           }
 
           clearPrimeFinishTimer();
           primingUriRef.current = null;
+          soundtrackDebug("cutTo", {
+            path: "cold",
+            uri: shortUri(target),
+            playingUri: shortUri(playingUriRef.current),
+            hotPrimed: shortUri(hotPrimedUriRef.current),
+          });
           runSync(target, true);
 
           if (
@@ -1575,6 +1742,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
      * for enabled=false via sticky pause leaves Spotify audio running (D-031).
      */
     const pauseForDocumentHide = useEffectEvent(() => {
+      soundtrackDebug("visibilitychange", {
+        hidden: true,
+        source: "DeckSoundtrack.pauseForDocumentHide",
+        playingUri: shortUri(playingUriRef.current),
+      });
       hidePauseLatchRef.current = true;
       enabledRef.current = false;
       sawPausedWhileDisabledRef.current = false;
@@ -1813,9 +1985,21 @@ function syncPlayback(
       onActOwnership?.();
       needsResumeRef.current = false;
       const entry = poolRef.current.get(trackUri);
-      if (entry) entry.host.className = HOST_LIVE;
+      if (entry) {
+        entry.host.className = HOST_LIVE;
+        // Already heard audio during prime/overlap: keep it going; do not leave a hole.
+        if (entry.audible) {
+          entry.controller.play();
+        }
+      }
       pauseExcept([{ uri: trackUri, slot: "act" }]);
       setVisibleUri(trackUri);
+      soundtrackDebug("cutoverFallback", {
+        uri: shortUri(trackUri),
+        ms: CUTOVER_FALLBACK_MS,
+        entryReady: entry?.ready === true,
+        entryAudible: entry?.audible === true,
+      });
       onCutComplete?.(trackUri);
     }, CUTOVER_FALLBACK_MS);
   }

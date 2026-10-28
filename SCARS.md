@@ -169,7 +169,14 @@ Format:
 - **Not:** Sticky pause failing, or intentional act-switch overlap cutover on a committed tap.
 - **Cause:** Zone `pointerdown` still speculative-`primeTo`s the next URI (`play()` while the current act stays solo). After hold-pause was removed, long presses no longer `cancelPrime`, and prime finish depended mainly on `playback_started` with no fallback: so an unfinished prime kept the next embed audible for the whole hold.
 - **Proof:** Press-and-hold on the right/left story tap zone (not pause chrome) layered the next slide’s sample under the current track.
-- **Avoid:** Cancel speculative prime after a short hold (`PRIME_HOLD_CANCEL_MS`) without pausing the story; finish primes from `playback_update` + a prime finish fallback timer. Do not restore zone hold-pause.
+- **Avoid:** Cancel speculative prime after a real hold (`PRIME_HOLD_CANCEL_MS` ≥ ~550ms, not 200ms) without pausing the story; `cancelPrime` sets a ~700ms reject latch so late Spotify `play()` is force-paused; finish primes from `playback_update` + a prime finish fallback timer. Do not restore zone hold-pause.
+
+## Normal tap advances with cold soundtrack / silence
+
+- **Not:** Mute chrome, sticky pause, or Spotify preview simply ending.
+- **Cause:** `PRIME_HOLD_CANCEL_MS=200` fired on ordinary mobile presses: `primeTo` → `tryFinishPrime` → `cancelPrime` cleared `hotPrimed` → `cutTo path=cold`, often with a `cutoverFallback` hole. Fast taps under 200ms kept `path=hot`.
+- **Proof:** `?debug=soundtrack` panel logs (2026-10-28): repeated cold cuts after ~200ms cancel; recordingbugs.MP4 chirp-then-silence and ~1s blackouts.
+- **Avoid:** Keep hold-cancel above typical tap length (550ms); hot `cutTo` uses `play()` on a parked prime; audible priming takes immediate ownership (`priming-hot`); fallback `play()`s an already-audible next act. See [docs/slices/soundtrack-pause-bugs.md](docs/slices/soundtrack-pause-bugs.md).
 
 ## Desktop #1 artist slide looks like a mobile-cropped background
 
