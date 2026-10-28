@@ -73,21 +73,21 @@ Key files:
 - [DeckSoundtrack.tsx](../../src/components/scrapped/DeckSoundtrack.tsx): `primeTo` / `cancelPrime` / `cutTo` / cutover fallback / loop A/B / external pause / hide latch
 - Debug helper: [soundtrackDebug.ts](../../src/lib/soundtrackDebug.ts) (`?debug=soundtrack`)
 
-## Debug logging
+## Debug logging (loop focus)
 
 Append `?debug=soundtrack` on `/` (canonical story). `/scrapped?debug=soundtrack` redirects to `/?debug=soundtrack`. Logs go to the console as `[scrapped:soundtrack] <ms> <event> {…}`.
 
-Helper: [src/lib/soundtrackDebug.ts](../../src/lib/soundtrackDebug.ts). Wired (log-only) in [DeckSoundtrack.tsx](../../src/components/scrapped/DeckSoundtrack.tsx) and [ApiScrappedDeck.tsx](../../src/components/scrapped/ApiScrappedDeck.tsx). On-device HUD: [SoundtrackDebugPanel.tsx](../../src/components/scrapped/SoundtrackDebugPanel.tsx) (mounted from [ScrappedExperience.tsx](../../src/components/scrapped/ScrappedExperience.tsx)).
+Helper: [src/lib/soundtrackDebug.ts](../../src/lib/soundtrackDebug.ts). Wired (log-only) in [DeckSoundtrack.tsx](../../src/components/scrapped/DeckSoundtrack.tsx). On-device HUD: [SoundtrackDebugPanel.tsx](../../src/components/scrapped/SoundtrackDebugPanel.tsx) (cases **E First loop** / **F Second loop**).
 
-Events include: `primeTo`, `cancelPrime`, `tryFinishPrime`, `cutTo` (path `hot` | `priming` | `cold` | `same`), `cutoverFallback`, `tryCutover`, `notifyExternalPause`, `visibilitychange`, `sticky`, `zonePointerDown`, `zoneClick`, `primeHoldCancel`, `goTo`, plus snapshot fields (`playingUri`, `incomingUri`, `hotPrimed`, `enabled`).
+Loop events: `playback.nearEnd`, `loop.schedule`, `beginLoopCutover` (+ `.skip`), `tryLoopCutover` (+ `.timer` / `.timerSkip`), `fallbackLoopRestart`, `loop.pausedAtEnd`, `ensureTwinUri`. Snapshot fields include `playSlot`, `incomingLoop`, `twinReady`, `healthy`, `coolMs`, `pos` / `dur` / `rem`.
 
-**No control-flow changes** while this flag is off or on; logging only. Panel Copy dumps the ring buffer for paste into the repro doc.
+**No control-flow changes**; logging only. Panel Copy dumps the ring buffer.
 
-## iOS Safari repro protocol
+## iOS Safari / stay-put repro protocol
 
 Full runbook + paste template: [soundtrack-pause-bugs-repro.md](soundtrack-pause-bugs-repro.md).
 
-**Agent note (2026-10-28):** Protocol and instrumentation are in-repo. Live iOS Safari + Web Inspector capture was not available in this agent session (no device attach). Human runs cases A–D and pastes `[scrapped:soundtrack]` lines into the repro doc and the table below.
+**Focus (2026-10-28):** Same-URI loop death (H-a2). Stay on one act past preview end; do not tap. Desktop often survives one loop and dies on the second.
 
 ## Preliminary hypotheses
 
@@ -96,7 +96,7 @@ Full runbook + paste template: [soundtrack-pause-bugs-repro.md](soundtrack-pause
 | ID | Hypothesis | Code anchor | Falsify if | Status |
 |----|------------|-------------|------------|--------|
 | H-a1 | `scheduleCutoverFallback` (450ms) commits ownership and pauses the old act before the new embed is audible | `scheduleCutoverFallback` | During gap, old act still reports playing until new RMS rises | **Confirmed** (log fires; see table) |
-| H-a2 | Same-URI loop cutover fails; both slots end paused with `enabled=true` | loop cutover path | Gap not near preview end; twin still advancing | **Open** |
+| H-a2 | Same-URI loop cutover fails; both slots end paused with `enabled=true` | loop cutover path | Gap not near preview end; twin still advancing | **Confirmed + fixed** (hot `resume()` after first loop; stall armed ~1.8s early) |
 | H-a3 | `cutTo` hot `resume()` no-op after `tryFinishPrime` seek+pause | `cutTo` hot path; `tryFinishPrime` | After cut, owning embed `isPaused:false` with continuous RMS | **Open** (hot path works when prime survives) |
 | H-hold200 | `PRIME_HOLD_CANCEL_MS=200` cancels a hot prime on normal slow taps (>200ms press), forcing `cutTo path=cold` | `ApiScrappedDeck` zone hold timer | Normal taps consistently `cutTo path=hot` | **Confirmed** |
 

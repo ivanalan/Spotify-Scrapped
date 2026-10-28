@@ -17,24 +17,14 @@ import { cn } from "@/lib/utils";
 
 const CASES = [
   {
-    id: "A",
-    title: "Autoplay",
-    hint: "Continue; do not tap. Watch first 3 slides for silence with || chrome.",
+    id: "E",
+    title: "First loop",
+    hint: "Stay on one act with || chrome. Do not tap. Wait past preview end (~30s). Silence with || = fail.",
   },
   {
-    id: "B",
-    title: "Long-press",
-    hint: "Hold right zone ≥500ms. Watch for primeTo → cancelPrime; no next-song bleed.",
-  },
-  {
-    id: "C",
-    title: "Control Center",
-    hint: "Open Control Center mid-slide; check visibilitychange / sticky.",
-  },
-  {
-    id: "D",
-    title: "Tap-advance",
-    hint: "Tap right each slide. Prefer cutTo path=hot; note ~1s gaps.",
+    id: "F",
+    title: "Second loop",
+    hint: "Same stay-put. Wait through two preview ends (~60s+). Cursor often dies on the second cutover.",
   },
 ] as const;
 
@@ -62,7 +52,7 @@ function getServerEnabled() {
 
 /**
  * On-device repro HUD for `?debug=soundtrack`.
- * Does not change pause / prime / cutover control flow.
+ * Focused on same-URI A/B sample loops. Log only; no audio control changes.
  */
 export function SoundtrackDebugPanel() {
   const enabled = useSyncExternalStore(
@@ -85,7 +75,7 @@ export function SoundtrackDebugPanel() {
 
   useEffect(() => {
     if (!enabled) return;
-    soundtrackDebug("panel.ready", { cases: CASES.length });
+    soundtrackDebug("panel.ready", { cases: CASES.length, focus: "loop" });
   }, [enabled]);
 
   const onCopy = useCallback(async () => {
@@ -148,7 +138,7 @@ export function SoundtrackDebugPanel() {
             className="min-h-10 flex-1 text-left text-[11px] font-semibold tracking-wide"
             onClick={() => setOpen((o) => !o)}
           >
-            soundtrack debug {open ? "▾" : "▸"} · {entries.length} · cases{" "}
+            loop debug {open ? "▾" : "▸"} · {entries.length} · cases{" "}
             {doneCount}/{CASES.length}
           </button>
           <Button
@@ -198,8 +188,8 @@ export function SoundtrackDebugPanel() {
               ))}
             </div>
             <p className="text-[9px] text-white/55">
-              Mark a case when finished. Copy dumps the buffer for the slice
-              doc. Highlighted rows: cutover, sticky, visibility, prime.
+              Stay on one act past preview end. Amber rows: loop arm / cutover /
+              near-end / pause-at-end. Copy dumps the buffer.
             </p>
             <div
               ref={listRef}

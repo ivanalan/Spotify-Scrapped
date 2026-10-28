@@ -1,60 +1,63 @@
-# Repro runbook: soundtrack / pause bugs
+# Repro runbook: soundtrack same-URI loop
 
 Companion to [soundtrack-pause-bugs.md](soundtrack-pause-bugs.md).  
 Enable: open the API story with `?debug=soundtrack`.
 
+HUD is focused on **A/B sample loop** failure (silence with `||` chrome after preview end). Prior pause/prime cases A–D are retired.
+
 ## On-device panel (preferred)
 
-With the flag on, a bottom HUD appears on `/scrapped`:
+With the flag on, a bottom HUD appears:
 
-1. Run **A Autoplay**, **B Long-press**, **C Control Center**, **D Tap-advance** (tap each chip when done).
-2. Watch the live log (amber = cutover / sticky / visibility / prime).
-3. Tap **Copy** and paste into the table below (or the investigation slice).
+1. Continue into a middeck act (volume ocean is fine). Sound on, chrome `||`.
+2. **Do not tap.** Wait past preview end (~30s from when that act’s sample started).
+3. For Cursor / desktop “dies after two loops”: wait through a second end (~60s+).
+4. Mark **E First loop** / **F Second loop** when done.
+5. Tap **Copy** and paste below.
 
-No Mac Web Inspector required. Console still gets the same `[scrapped:soundtrack]` lines.
+No Mac Web Inspector required. Console still gets `[scrapped:soundtrack]` lines.
 
 ## Environment
 
 | Field | Value |
 |-------|--------|
-| Target | iOS Safari (same class as `recordingbugs.MP4`) or desktop |
-| URL | `/?debug=soundtrack` (canonical). `/scrapped?debug=soundtrack` redirects here and keeps the query. |
-| Capture | On-device panel **Copy**, or console filter `[scrapped:soundtrack]` |
+| Target | iOS Safari (zero loops) or Cursor/desktop Safari (often 2 then stop) |
+| URL | `/?debug=soundtrack` (canonical). `/scrapped?debug=soundtrack` redirects here. |
+| Capture | Panel **Copy**, or console filter `[scrapped:soundtrack]` |
 
 ## Expected log signatures
 
-### Case A: Hands-off autoplay (first 3 slides)
+### Case E: First loop (stay-put past preview end)
 
-1. Continue from gate; do not tap zones.
-2. Watch Liked → next volume-ish slides.
+1. Clear the panel after the act is audible.
+2. Hands off until silence or until you hear the sample restart.
 
-**Healthy:** occasional `cutTo` path `cold` (or uri sync without prime); audio continuous or brief overlap.  
-**P1/P4 bug:** `cutoverFallback` then multi-second silence **without** `sticky` / `visibilitychange`. Snapshot shows `enabled: true`, `playingUri` set, but no audible progress.  
-**Maps to:** H-a1, H-c1, H-c2.
+**Healthy:** near end → `playback.nearEnd` → `loop.schedule action=armLead` (often at rem≈1–1.8s; outer window may `armEndTimer` first) → `beginLoopCutover path=play` → `tryLoopCutover` → audio continues; later `playback.nearEnd` again with rising `pos`.
 
-### Case B: Long-press right zone (≥500ms)
+**Bug (mobile class):** silence with `||`; look for `beginLoopCutover.skip`, `fallbackLoopRestart.skip`, `tryLoopCutover.timerSkip`, or **no** `beginLoopCutover` after the last `playback.nearEnd` / `loop.pausedAtEnd`.
 
-1. Mid-slide with sound on, press and hold the right tap zone.
-2. Prefer release without a click if the browser allows; also note if a click still fires.
+**Maps to:** H-a2.
 
-**Healthy (post-fix):** `zonePointerDown` → `primeTo` → (~550ms) `primeHoldCancel` → `cancelPrime` + reject latch; next URI silent after cancel; no `zoneClick`/`goTo`/`cutTo` unless a click committed.  
-**Still a bug if:** next URI stays audible after `cancelPrime`; or `zoneClick`/`cutTo` after a hold (H-d3).  
-**Maps to:** H-d1, H-d2, H-d3.
+### Case F: Second loop
 
-### Case C: Control Center mid-slide
+Same as E, but wait through two successful cutovers. Cursor often dies on the **second** arm (act→twin works; twin→act fails).
 
-1. Playing with `||` chrome; open Control Center; dismiss; look at chrome.
+**Healthy:** two `tryLoopCutover` (or fallback) pairs with continuous audio.  
+**Bug:** second `beginLoopCutover` skips / timerSkip / silence after second end.
 
-**If iOS sets `document.hidden`:** `visibilitychange` (ApiScrappedDeck + DeckSoundtrack) → `sticky` source `pauseStory` / state `pausedSticky: true`. Staying paused on return is [D-031](../decisions/D-031-pause-on-tab-hide.md) (document, not a bug).  
-**If chrome pauses without those logs:** look for `notifyExternalPause` (H-p2) or accidental `togglePaused` (H-p3).  
-**Maps to:** H-p1 (likely for recording ~37.6s), H-p2, H-p3.
+## Loop events (amber in HUD)
 
-### Case D: Tap-advance each slide
-
-1. Tap right through soft close; note gap length by ear.
-
-**Healthy (post-fix):** `zonePointerDown` → `primeTo` → `zoneClick` → `cutTo` path `hot` or `priming-hot`; no ~1s hole. Cold path rare on normal taps.  
-**Still a bug if:** most taps are `path=cold` or `priming` + `cutoverFallback` with audible silence.
+| Event | Meaning |
+|-------|---------|
+| `playback.nearEnd` | Owning slot update with rem ≲ 5s (throttled 1s) |
+| `loop.schedule` | `armLead` / `armEndTimer` / `endTimerFire` / skips |
+| `beginLoopCutover` | Armed idle slot (`path=hot\|play`) or `path=fallback` |
+| `beginLoopCutover.skip` | `canBeginLoop` blocked (`reason=…`) |
+| `tryLoopCutover` | Ownership flipped to idle slot |
+| `tryLoopCutover.timer` / `.timerSkip` | 450ms fallback cut |
+| `fallbackLoopRestart` | Same-embed seek+play when twin not ready |
+| `loop.pausedAtEnd` | Spotify paused at end; kick cutover |
+| `ensureTwinUri` | Twin loaded for committed act |
 
 ## Paste logs here
 
@@ -64,21 +67,7 @@ No Mac Web Inspector required. Console still gets the same `[scrapped:soundtrack
 (paste [scrapped:soundtrack] lines)
 ```
 
-| Case | Result | Hypothesis IDs |
-|------|--------|----------------|
-| A | | |
-| B | | |
-| C | | |
-| D | | |
-
-## Recordingbugs crosswalk (no device required)
-
-Already observed in `recordingbugs.MP4` (audio RMS + frames). Use to prioritize which cases to run first:
-
-| Recording moment | Pain | First case to run |
-|------------------|------|-------------------|
-| 5.0–10.4s silence, `\|\|` chrome | P1 | A, then D |
-| 4.1–5.0 / 10.4–11.0 chirps | P3 / P4 | B, D |
-| ~22.6s gap after restart | P2 vs P4 | D, then C |
-| ~30s AssistiveTouch / Control Center | P2 / gesture | C, B |
-| ~37.6s pause + play icon | P2 | C |
+| Case | Result | Notes |
+|------|--------|-------|
+| E | | |
+| F | | |

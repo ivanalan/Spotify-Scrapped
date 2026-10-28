@@ -178,6 +178,13 @@ Format:
 - **Proof:** `?debug=soundtrack` panel logs (2026-10-28): repeated cold cuts after ~200ms cancel; recordingbugs.MP4 chirp-then-silence and ~1s blackouts.
 - **Avoid:** Keep hold-cancel above typical tap length (550ms); hot `cutTo` uses `play()` on a parked prime; audible priming takes immediate ownership (`priming-hot`); fallback `play()`s an already-audible next act. See [docs/slices/soundtrack-pause-bugs.md](docs/slices/soundtrack-pause-bugs.md).
 
+## Sample loops stutter then die after one or two plays
+
+- **Not:** Sticky pause, mute chrome, or the slide auto-advancing off the act.
+- **Cause:** (1) Stall end-detect used a 2.5s window, so `beginLoopCutover` started the idle slot ~1.8s early (overlap stutter). (2) Second cutover used hot `resume()` on the parked act; `resume()` often no-ops (same class as prime ownership), so `tryLoopCutover` logged success then silence with no further `playback.nearEnd`.
+- **Proof:** `?debug=soundtrack` stay-put (2026-10-28): act→loop `path=play` + nearEnd continues; loop→act `path=hot` then no nearEnd; phone recording silence with `||` chrome.
+- **Avoid:** Loop A/B always `seek+play` (never hot resume); reinforce `play()` in `tryLoopCutover`; `LOOP_CUT_LEAD_MS` wide enough for sparse updates (~1800); outer near-end uses endTimer only (no stall thrash); ignore dying-slot `scheduleLoopFromPlayback` while `incomingLoop` is set.
+
 ## Desktop #1 artist slide looks like a mobile-cropped background
 
 - **Not:** `ProductMain` max-width, missing `w-screen`, or the slide canvas failing to paint edge-to-edge.
