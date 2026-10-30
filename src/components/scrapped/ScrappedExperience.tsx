@@ -208,7 +208,15 @@ export function ScrappedExperience({
   function handleWalkthroughPointerDown(e: React.PointerEvent) {
     if (!isWalkthrough || !soundOn || deckPaused) return;
     if (walkthroughUnlockedRef.current) return;
-    if ((e.target as HTMLElement).closest("button")) return;
+    // Skip chrome buttons (Back / Pause / Mute) but not the story tap zones,
+    // which are also <button>s and are the taps people actually make.
+    const button = (e.target as HTMLElement).closest("button");
+    if (
+      button &&
+      !button.matches('[aria-label="Previous slide"], [aria-label="Next slide"]')
+    ) {
+      return;
+    }
     walkthroughUnlockedRef.current = true;
     // "Audible" only means the embed reported playback_started; that can fire
     // while the browser still blocks sound (play() ran outside a gesture). So
