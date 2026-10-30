@@ -40,6 +40,7 @@ const WARM_LEAD_TTL_MS = 90_000;
 const WARM_LEAD_WRAPPER_ATTR = "data-warm-lead-wrapper";
 
 type WarmController = {
+  play: () => void;
   loadUri: (uri: string, preferVideo?: boolean, startAtSeconds?: number) => void;
   addListener: (event: string, cb: (...args: unknown[]) => void) => void;
   destroy: () => void;
@@ -149,4 +150,20 @@ export function takeWarmLead(trackUri: string): WarmLead | null {
 /** Remove the body-level wrapper of an adopted warm host (on soundtrack unmount). */
 export function removeWarmLeadWrapper(host: HTMLElement) {
   host.closest(`[${WARM_LEAD_WRAPPER_ATTR}]`)?.remove();
+}
+
+/**
+ * Call from the View example click: starts the warm lead inside a real user
+ * gesture (iOS/Chrome block play() from effects). The embed lives in <body>,
+ * so it keeps playing through the soft navigation and DeckSoundtrack adopts it.
+ */
+export function playWarmLeadFromGesture() {
+  if (typeof window === "undefined") return;
+  const lead = (window as WarmLeadWindow).__spotifyWarmLead;
+  if (!lead) return;
+  soundtrackDebug("warmLead.playFromGesture", {
+    uri: lead.uri.slice(-8),
+    ready: lead.ready,
+  });
+  lead.controller.play();
 }

@@ -17,6 +17,7 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
 import {
+  playWarmLeadFromGesture,
   preloadSpotifyEmbedApi,
   warmLeadEmbed,
 } from "@/lib/spotify-embed-api";
@@ -191,6 +192,7 @@ export function ScrappedGate({
               <p className="text-caption mt-8 w-full text-center text-[var(--wrapped-muted)]">
                 <Link
                   href="/example"
+                  onClick={playWarmLeadFromGesture}
                   className={cn(gateCaptionLinkChromeClass, "inline")}
                 >
                   View an example
@@ -214,6 +216,7 @@ export function ScrappedGate({
                     {" "}
                     <Link
                       href="/example"
+                      onClick={playWarmLeadFromGesture}
                       className={cn(gateLinkChromeClass, "inline")}
                     >
                       View example
