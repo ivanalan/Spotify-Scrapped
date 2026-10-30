@@ -66,14 +66,18 @@ export function canOriginBack(): boolean {
 
 type RouterLike = {
   back: () => void;
-  push: (href: string) => void;
+  replace: (href: string) => void;
 };
 
-/** Prefer history.back when we have an in-tab prior path; else push fallback. */
+/**
+ * Prefer history.back when we have an in-tab prior path; else replace with the
+ * fallback. Replace (not push) so cold-entry Back doesn't leave the screen we
+ * just left one browser-Back away (it took several taps to get out).
+ */
 export function originBack(router: RouterLike, fallbackHref: string) {
   if (canOriginBack()) {
     router.back();
     return;
   }
-  router.push(fallbackHref);
+  router.replace(fallbackHref);
 }

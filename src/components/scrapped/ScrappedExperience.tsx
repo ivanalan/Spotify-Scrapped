@@ -73,7 +73,9 @@ export function ScrappedExperience({
   const pauseApiRef = useRef<ApiScrappedPauseApi | null>(null);
   // Walkthrough skips the ready gate: land straight on slide 0 (D-024).
   const [phase, setPhase] = useState<Phase>(isWalkthrough ? "story" : "gate");
-  const [soundOn, setSoundOn] = useState(false);
+  // Walkthrough has no Continue gesture: start with sound on and unlock the
+  // embeds on the first non-button tap (see handleWalkthroughPointerDown).
+  const [soundOn, setSoundOn] = useState(isWalkthrough);
 
   const [deckPaused, setDeckPaused] = useState(false);
   const [artistSoundtrackUri, setArtistSoundtrackUri] = useState<string | null>(
@@ -196,6 +198,18 @@ export function ScrappedExperience({
     setPhase("story");
   }
 
+  /**
+   * Walkthrough: browsers (iOS especially) block embed play() without a
+   * gesture. Sound starts "on", so the first story tap unlocks it. Button taps
+   * are skipped so Mute / Pause keep their meaning.
+   */
+  function handleWalkthroughPointerDown(e: React.PointerEvent) {
+    if (!isWalkthrough || !soundOn || deckPaused) return;
+    if ((e.target as HTMLElement).closest("button")) return;
+    if (soundtrackRef.current?.isLeadAudible()) return;
+    enableSoundFromGesture();
+  }
+
   function primeSoundtrackTo(uri: string | null) {
     soundtrackRef.current?.primeTo(uri);
   }
@@ -217,7 +231,10 @@ export function ScrappedExperience({
     isWalkthrough || continueEnabled || phase !== "gate";
 
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full"
+      onPointerDownCapture={handleWalkthroughPointerDown}
+    >
       {!isWalkthrough && phase !== "story" ? (
         <ScrappedGate
           mode={phase === "loading" ? "loading" : "ready"}

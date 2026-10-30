@@ -14,6 +14,11 @@ import { volumeHighOutline, volumeMuteOutline } from "ionicons/icons";
 import { Icon } from "@/components/Icon";
 import type { ScrappedReport } from "@/lib/scrapped";
 import {
+  removeWarmLeadWrapper,
+  SPOTIFY_EMBED_API_SRC,
+  takeWarmLead,
+} from "@/lib/spotify-embed-api";
+import {
   shortUri,
   soundtrackDebug,
 } from "@/lib/soundtrackDebug";
@@ -108,7 +113,7 @@ const END_LOOP_SCHEDULE_PAD_MS = 250;
  * gesture-unlocked act embed (iOS often blocks twin play() outside the gesture).
  */
 const LOOP_OWNERSHIP_WATCH_MS = 800;
-/** Twin/act must pass this position before we trust ownership (ms). */
+/** Idle slot must pass this position before we pause the dying slot (ms). */
 const LOOP_PROGRESS_PROOF_MS = 500;
 
 /** Which embed owns audio for the committed URI (act pool vs loop twin). */
@@ -186,7 +191,16 @@ const HOST_LIVE =
 const HOST_IDLE =
   "absolute inset-0 w-full overflow-hidden opacity-[0.02] pointer-events-none";
 
-const SCRIPT_SRC = "https://open.spotify.com/embed/iframe-api/v1";
+const SCRIPT_SRC = SPOTIFY_EMBED_API_SRC;
+
+/**
+ * Cold embeds all load at once; the lead act competes with ten others. Hold
+ * the rest (and the loop twin) until the lead is ready or this long passes.
+ */
+const REST_RELEASE_FALLBACK_MS = 1500;
+
+/** Treat an embed as ready if its own ready event never arrives. */
+const READY_FALLBACK_MS = 2000;
 
 function asTrackUri(uri: string | null | undefined): string | null {
   if (!uri) return null;
@@ -323,6 +337,13 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const incomingUriRef = useRef<string | null>(null);
     /** Idle A/B slot already play()-ing for a same-URI sample loop cutover. */
     const incomingLoopSlotRef = useRef<PlaySlot | null>(null);
+    /** Position high-water for the incoming loop slot only (act updates must not count). */
+    const incomingLoopProgressRef = useRef(0);
+    /**
+     * After a silent twin, stay on same-act restarts (Cursor / some desktops
+     * block twin play() like iOS, which caused start→watchdog→restart stutter).
+     */
+    const sameActOnlyRef = useRef(false);
     /** Bumps on every committed sync so late embed play() can be ignored. */
     const syncGenRef = useRef(0);
     const switchTimerRef = useRef<number | null>(null);
@@ -743,12 +764,25 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       }, PRIME_FINISH_FALLBACK_MS);
     }
 
-    /** Finish same-URI A/B loop cutover when the idle slot is audible. */
+    /**
+     * Finish same-URI A/B loop cutover only after the idle slot proves progress.
+     * Early playback_started blips without position used to pause the act and
+     * hand a silent twin the stage (Cursor: start twice via watchdog).
+     */
     function tryLoopCutover(trackUri: string, slot: PlaySlot) {
       if (!enabledRef.current) return;
       if (incomingLoopSlotRef.current !== slot) return;
       if (committedUriRef.current !== trackUri) return;
       if (playingUriRef.current !== trackUri) return;
+      if (incomingLoopProgressRef.current < LOOP_PROGRESS_PROOF_MS) {
+        soundtrackDebug("tryLoopCutover.wait", {
+          ...loopSnap(trackUri),
+          to: slot,
+          progress: Math.round(incomingLoopProgressRef.current),
+          need: LOOP_PROGRESS_PROOF_MS,
+        });
+        return;
+      }
 
       const retiring = otherSlot(slot);
       const live = getSlotEntry(slot, trackUri);
@@ -756,6 +790,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       clearLoopCutoverTimer();
       clearAllEndTimers();
       incomingLoopSlotRef.current = null;
+      incomingLoopProgressRef.current = 0;
       playingSlotRef.current = slot;
       needsResumeRef.current = false;
 
@@ -793,10 +828,35 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         liveAudible: live?.audible ?? false,
         liveReady: live?.ready ?? false,
       });
-      // Twin often chirps then dies on iOS; recover to the Continue-unlocked act.
+      // Twin can still die after a progress blip; recover to act if needed.
       if (slot === "loop") {
         scheduleLoopOwnershipWatch(trackUri, "loop");
       }
+    }
+
+    function noteIncomingLoopProgress(
+      trackUri: string,
+      slot: PlaySlot,
+      position: number,
+    ) {
+      if (incomingLoopSlotRef.current !== slot) return;
+      if (playingUriRef.current !== trackUri) return;
+      if (position > incomingLoopProgressRef.current) {
+        incomingLoopProgressRef.current = position;
+      }
+      if (incomingLoopProgressRef.current >= LOOP_PROGRESS_PROOF_MS) {
+        tryLoopCutover(trackUri, slot);
+      }
+    }
+
+    function markSameActOnly(reason: string) {
+      if (sameActOnlyRef.current) return;
+      sameActOnlyRef.current = true;
+      soundtrackDebug("loop.sameActOnly", { reason });
+    }
+
+    function shouldUseSameActLoop() {
+      return likelyNeedsSameActLoop() || sameActOnlyRef.current;
     }
 
     /**
@@ -910,6 +970,15 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       clearLoopWatchTimer();
       clearAllEndTimers();
       incomingLoopSlotRef.current = null;
+      incomingLoopProgressRef.current = 0;
+      if (
+        reason === "watchdog" ||
+        reason === "timerNoProgress" ||
+        reason === "iosGesture" ||
+        reason === "sameActLatch"
+      ) {
+        markSameActOnly(reason);
+      }
 
       const twin = loopTwinRef.current;
       if (twin) {
@@ -981,18 +1050,19 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         return false;
       }
 
-      // iOS: twin iframe play() outside the Continue gesture is blocked. Stay
-      // on the act embed (small seek gap) instead of digital silence.
-      if (likelyNeedsSameActLoop()) {
+      // iOS / latched same-act: twin play() is blocked or proved silent. Stay
+      // on the act embed (small seek gap) instead of start→watchdog stutter.
+      if (shouldUseSameActLoop()) {
         const from = playingSlotRef.current;
+        const reason = likelyNeedsSameActLoop() ? "iosGesture" : "sameActLatch";
         soundtrackDebug("beginLoopCutover", {
           ...loopSnap(trackUri),
           from,
           to: "act",
           path: "same-act",
-          reason: "iosGesture",
+          reason,
         });
-        return restartLoopOnAct(trackUri, "iosGesture");
+        return restartLoopOnAct(trackUri, reason);
       }
 
       const from = playingSlotRef.current;
@@ -1010,6 +1080,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       }
 
       incomingLoopSlotRef.current = to;
+      incomingLoopProgressRef.current = 0;
       idle.host.className = HOST_LIVE;
       // Always seek+play for A/B loops. Hot resume() often no-ops on a parked
       // act/twin (same scar as takeActOwnershipNow); that reads as stutter then
@@ -1031,19 +1102,20 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           });
           return;
         }
-        const state = loopStateFor(trackUri);
-        if (state.lastPlayingPosition < LOOP_PROGRESS_PROOF_MS) {
+        if (incomingLoopProgressRef.current < LOOP_PROGRESS_PROOF_MS) {
           soundtrackDebug("tryLoopCutover.timerRecover", {
             ...loopSnap(trackUri),
             to,
-            lastPos: Math.round(state.lastPlayingPosition),
+            progress: Math.round(incomingLoopProgressRef.current),
           });
+          // Twin never proved: do not pause a still-living act via tryLoopCutover.
           restartLoopOnAct(trackUri, "timerNoProgress");
           return;
         }
         soundtrackDebug("tryLoopCutover.timer", {
           uri: shortUri(trackUri),
           to,
+          progress: Math.round(incomingLoopProgressRef.current),
         });
         tryLoopCutover(trackUri, to);
       }, CUTOVER_FALLBACK_MS);
@@ -1159,6 +1231,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       const finishReady = () => {
         if (entry.ready) return;
         entry.ready = true;
+        soundtrackDebug("embed.ready", { uri: shortUri(entry.uri), slot });
         if (pendingGesturePlayRef.current) {
           enabledRef.current = true;
         }
@@ -1176,7 +1249,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       };
 
       controller.addListener("ready", finishReady);
-      window.setTimeout(finishReady, 2000);
+      window.setTimeout(finishReady, READY_FALLBACK_MS);
 
       controller.addListener("playback_started", () => {
         const trackUri = trackUriFor();
@@ -1189,7 +1262,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             entry.audible = true;
             setPoolTick((n) => n + 1);
           }
-          tryLoopCutover(trackUri, "loop");
+          // Cut only after position proof via playback_update / noteIncoming.
           return;
         }
 
@@ -1202,10 +1275,11 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         }
         if (!entry.audible) {
           entry.audible = true;
+          soundtrackDebug("embed.audible", { uri: shortUri(trackUri) });
           setPoolTick((n) => n + 1);
         }
         if (incomingLoopSlotRef.current === "act") {
-          tryLoopCutover(trackUri, "act");
+          // Progress proof comes from playback_update.
           return;
         }
         tryCutover(trackUri);
@@ -1279,10 +1353,10 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
 
           if (slot === "loop") {
             if (incomingLoopSlotRef.current === "loop") {
-              tryLoopCutover(trackUri, "loop");
+              noteIncomingLoopProgress(trackUri, "loop", position);
             }
           } else if (incomingLoopSlotRef.current === "act") {
-            tryLoopCutover(trackUri, "act");
+            noteIncomingLoopProgress(trackUri, "act", position);
           } else if (primingUriRef.current === trackUri) {
             // Finish speculative primes here too: don't wait only on playback_started.
             tryFinishPrime(trackUri);
@@ -1373,6 +1447,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
     const [uncontrolledEnabled, setUncontrolledEnabled] = useState(false);
     const [poolTick, setPoolTick] = useState(0);
     const [visibleUri, setVisibleUri] = useState<string | null>(null);
+    /** Lead embed is ready (or timed out): safe to create the rest + twin. */
+    const [restReleased, setRestReleased] = useState(false);
 
     const controlled = enabledProp !== undefined;
     const enabled = controlled ? enabledProp : uncontrolledEnabled;
@@ -1775,6 +1851,8 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         clearAllEndTimers();
         for (const entry of pool.values()) {
           entry.controller.destroy();
+          // Adopted warm leads live in a body-level wrapper, not the shell.
+          removeWarmLeadWrapper(entry.host);
         }
         pool.clear();
         creating.clear();
@@ -1784,9 +1862,25 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
       };
     }, []);
 
+    // Lead-first: release the other embeds once the lead is ready or after a cap.
+    useEffect(() => {
+      if (restReleased || !apiReady) return;
+      const lead = asTrackUri(uri);
+      if (!lead || poolRef.current.get(lead)?.ready) {
+        soundtrackDebug("restReleased", { reason: lead ? "leadReady" : "noLead" });
+        setRestReleased(true);
+        return;
+      }
+      const timer = window.setTimeout(() => {
+        soundtrackDebug("restReleased", { reason: "timeout" });
+        setRestReleased(true);
+      }, REST_RELEASE_FALLBACK_MS);
+      return () => window.clearTimeout(timer);
+    }, [apiReady, restReleased, uri, poolTick]);
+
     // Mount the single loop twin once the IFrame API is ready.
     useEffect(() => {
-      if (!apiReady) return;
+      if (!apiReady || !restReleased) return;
       if (loopTwinRef.current || loopTwinCreatingRef.current) return;
       const api = apiRef.current;
       const shell = poolShellRef.current;
@@ -1828,17 +1922,50 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           setPoolTick((n) => n + 1);
         },
       );
-    }, [apiReady, uri, wantedUris]);
+    }, [apiReady, restReleased, uri, wantedUris]);
 
     // Warm a controller per unique act URI as soon as the IFrame API is ready.
+    // Lead first; the rest wait for restReleased.
     useEffect(() => {
       if (!apiReady) return;
       const api = apiRef.current;
       const shell = poolShellRef.current;
       if (!api || !shell) return;
+      const lead = asTrackUri(uri);
 
       for (const trackUri of wantedUris) {
         if (poolRef.current.has(trackUri) || creatingRef.current.has(trackUri)) {
+          continue;
+        }
+        if (!restReleased && trackUri !== lead) continue;
+
+        // Gate already started this embed (~2s head start): adopt, don't recreate.
+        const warm = trackUri === lead ? takeWarmLead(trackUri) : null;
+        if (warm) {
+          const entry: PoolEntry = {
+            uri: trackUri,
+            controller: warm.controller as EmbedController,
+            host: warm.host,
+            ready: false,
+            audible: false,
+            slot: "act",
+          };
+          poolRef.current.set(trackUri, entry);
+          attachEntryListeners(entry);
+          // Same assumption as attachEntryListeners' 2s fallback, but counted
+          // from when the gate created the embed, not from adoption.
+          const warmAgeMs = performance.now() - warm.createdAt;
+          soundtrackDebug("embed.adopted", {
+            uri: shortUri(trackUri),
+            alreadyReady: warm.ready,
+            warmAgeMs: Math.round(warmAgeMs),
+          });
+          if (warm.ready || warmAgeMs >= READY_FALLBACK_MS) {
+            entry.ready = true;
+            soundtrackDebug("embed.ready", { uri: shortUri(trackUri), slot: "act" });
+          }
+          setPoolTick((n) => n + 1);
+          runSync(committedUriRef.current, enabledRef.current);
           continue;
         }
 
@@ -1878,7 +2005,7 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           },
         );
       }
-    }, [apiReady, wantedUris]);
+    }, [apiReady, restReleased, uri, wantedUris]);
 
     // Keep twin loaded for the committed act.
     useEffect(() => {

@@ -10,7 +10,7 @@ About and the example walkthrough used hardcoded Back targets (`/` and `/about`)
 ## Decision
 
 1. **Chrome labeled Back** (About `← Back`, walkthrough toolbar back) returns to the **prior in-tab App Router path** via `history.back()` when this tab already visited another Scrapped path.
-2. **Cold entry** (direct open / new tab with no prior path in the session stack) uses a **fallback**: `/` for About and the example walkthrough.
+2. **Cold entry** (direct open / new tab with no prior path in the session stack) uses a **fallback**: `/` for About and the example walkthrough, via `router.replace` (not `push`) so browser Back doesn't return to the screen the user just left.
 3. **Not Back:** intentional destination controls stay fixed (`Go home` on 404, logo → `/`, Sign in, forward CTAs). Those are not origin-back chrome.
 4. **Implementation:** `trackOriginBackPath` in `ProductMain` (pathname commits); `OriginBackButton` + `originBack()` in `src/lib/origin-back.ts`. No `backHref` prop on the walkthrough deck.
 

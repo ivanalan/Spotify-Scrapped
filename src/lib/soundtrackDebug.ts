@@ -36,11 +36,19 @@ const EMPTY_SNAPSHOT: readonly SoundtrackDebugEntry[] = [];
 const listeners = new Set<Listener>();
 let nextId = 1;
 
+const STICKY_KEY = "scrapped:debug-soundtrack";
+
+/** Sticky for the tab so `/?debug=soundtrack` still logs after View example. */
 function readFlag(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return new URLSearchParams(window.location.search).get("debug") ===
-      "soundtrack";
+    if (
+      new URLSearchParams(window.location.search).get("debug") === "soundtrack"
+    ) {
+      sessionStorage.setItem(STICKY_KEY, "1");
+      return true;
+    }
+    return sessionStorage.getItem(STICKY_KEY) === "1";
   } catch {
     return false;
   }
@@ -162,6 +170,8 @@ export function isSoundtrackDebugHighlight(event: string): boolean {
     event === "fallbackLoopRestart" ||
     event === "restartLoopOnAct" ||
     event === "loop.watchdog" ||
+    event === "loop.sameActOnly" ||
+    event === "tryLoopCutover.wait" ||
     event === "loop.schedule" ||
     event === "loop.pausedAtEnd" ||
     event === "playback.nearEnd" ||
