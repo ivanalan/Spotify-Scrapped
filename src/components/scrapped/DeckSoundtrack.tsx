@@ -33,6 +33,12 @@ export type DeckSoundtrackHandle = {
    * Call from Continue pointerdown; playFromUserGesture resume()s the hot buffer.
    */
   armLeadFromGesture: () => void;
+  /**
+   * Re-issue resume() on whichever embed owns audio. Call inside a real tap:
+   * the embed can report playback_started on iOS/Chrome while sound is still
+   * blocked because the original play() ran outside a gesture.
+   */
+  nudgeFromGesture: () => void;
   /** Sync read: true when the lead URI has produced audio (not React-warm lag). */
   isLeadAudible: () => boolean;
   /**
@@ -181,6 +187,9 @@ type PoolEntry = {
   audible: boolean;
   /** Act pool entry vs the single long-lived loop twin. */
   slot: PlaySlot;
+  /** Debug-only throttle state for `embed.update` logging. */
+  lastLoggedPaused?: boolean;
+  lastUpdateLogAt?: number;
 };
 
 /** Hidden but still painted: opacity:0 iframes often won't buffer on iOS. */
@@ -1295,6 +1304,23 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
           position = 0,
         } = event.data ?? {};
 
+        // Diagnostic: "audible" can fire while a browser still blocks sound.
+        // Log paused flips and ~2s progress so a bad first slide is visible.
+        const nowMs = Date.now();
+        if (
+          entry.lastLoggedPaused !== isPaused ||
+          nowMs - (entry.lastUpdateLogAt ?? 0) >= 2000
+        ) {
+          entry.lastLoggedPaused = isPaused;
+          entry.lastUpdateLogAt = nowMs;
+          soundtrackDebug("embed.update", {
+            uri: shortUri(trackUri),
+            slot,
+            paused: isPaused,
+            pos: Math.round(position),
+          });
+        }
+
         if (!isPaused) {
           const state = loopStateFor(trackUri);
           if (position > state.lastPlayingPosition) {
@@ -1485,6 +1511,20 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
         entry.host.className = HOST_WARM;
         entry.controller.seek(START_AT_SEC);
         entry.controller.play();
+      },
+      nudgeFromGesture() {
+        if (!enabledRef.current) return;
+        const target = playingUriRef.current ?? asTrackUri(activeUriRef.current);
+        if (!target) return;
+        const live =
+          playingSlotRef.current === "loop" && loopTwinRef.current?.uri === target
+            ? loopTwinRef.current
+            : poolRef.current.get(target);
+        soundtrackDebug("nudgeFromGesture", {
+          uri: shortUri(target),
+          found: Boolean(live),
+        });
+        live?.controller.resume();
       },
       playFromUserGesture() {
         pendingGesturePlayRef.current = true;

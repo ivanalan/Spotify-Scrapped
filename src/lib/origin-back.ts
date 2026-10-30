@@ -69,15 +69,37 @@ type RouterLike = {
   replace: (href: string) => void;
 };
 
+/** How long to wait for history.back() to take effect before assuming it was swallowed. */
+const BACK_SETTLE_MS = 400;
+
 /**
  * Prefer history.back when we have an in-tab prior path; else replace with the
  * fallback. Replace (not push) so cold-entry Back doesn't leave the screen we
  * just left one browser-Back away (it took several taps to get out).
+ *
+ * history.back() can be swallowed: in WebKit, iframe navigations (the Spotify
+ * embeds) add joint-session-history entries, so a Back tap may only step
+ * through those and leave the page unchanged (iOS needed ~3 taps). If no
+ * popstate arrives and the path is unchanged, replace to the prior path.
  */
 export function originBack(router: RouterLike, fallbackHref: string) {
-  if (canOriginBack()) {
-    router.back();
+  if (!canOriginBack()) {
+    router.replace(fallbackHref);
     return;
   }
-  router.replace(fallbackHref);
+
+  const stack = readStack();
+  const prior = stack[stack.length - 2] ?? fallbackHref;
+  const startPath = window.location.pathname;
+  let popped = false;
+  const onPop = () => {
+    popped = true;
+  };
+  window.addEventListener("popstate", onPop, { once: true });
+  router.back();
+  window.setTimeout(() => {
+    window.removeEventListener("popstate", onPop);
+    if (popped || window.location.pathname !== startPath) return;
+    router.replace(prior);
+  }, BACK_SETTLE_MS);
 }
