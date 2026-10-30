@@ -70,6 +70,8 @@ export function ScrappedExperience({
 }: Props) {
   const isWalkthrough = chromeMode === "walkthrough";
   const soundtrackRef = useRef<DeckSoundtrackHandle>(null);
+  /** Walkthrough: first story tap has already re-issued play in a gesture. */
+  const walkthroughUnlockedRef = useRef(false);
   const pauseApiRef = useRef<ApiScrappedPauseApi | null>(null);
   // Walkthrough skips the ready gate: land straight on slide 0 (D-024).
   const [phase, setPhase] = useState<Phase>(isWalkthrough ? "story" : "gate");
@@ -205,9 +207,17 @@ export function ScrappedExperience({
    */
   function handleWalkthroughPointerDown(e: React.PointerEvent) {
     if (!isWalkthrough || !soundOn || deckPaused) return;
+    if (walkthroughUnlockedRef.current) return;
     if ((e.target as HTMLElement).closest("button")) return;
-    if (soundtrackRef.current?.isLeadAudible()) return;
-    enableSoundFromGesture();
+    walkthroughUnlockedRef.current = true;
+    // "Audible" only means the embed reported playback_started; that can fire
+    // while the browser still blocks sound (play() ran outside a gesture). So
+    // the first tap always re-issues play inside the gesture.
+    if (soundtrackRef.current?.isLeadAudible()) {
+      soundtrackRef.current.nudgeFromGesture();
+    } else {
+      enableSoundFromGesture();
+    }
   }
 
   function primeSoundtrackTo(uri: string | null) {
