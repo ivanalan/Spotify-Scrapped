@@ -2004,6 +2004,30 @@ export const DeckSoundtrack = forwardRef<DeckSoundtrackHandle, Props>(
             entry.ready = true;
             soundtrackDebug("embed.ready", { uri: shortUri(trackUri), slot: "act" });
           }
+          // Already playing from the View example click: claim the act slot
+          // here. syncPlayback's first-start branch would call play() again and
+          // the embed restarts from 0 (audible stutter ~1s into the track).
+          if (
+            warm.playStarted &&
+            enabledRef.current &&
+            !playingUriRef.current &&
+            trackUri === asTrackUri(uri)
+          ) {
+            // Like playFromUserGesture: commit first so runSync below targets
+            // this URI (a null commit would pauseExcept([]) the live lead).
+            committedUriRef.current = trackUri;
+            playingUriRef.current = trackUri;
+            playingSlotRef.current = "act";
+            incomingUriRef.current = null;
+            incomingLoopSlotRef.current = null;
+            clearLoopCutoverTimer();
+            loopTwinHotRef.current = false;
+            actSlotHotRef.current = false;
+            needsResumeRef.current = false;
+            entry.host.className = HOST_LIVE;
+            entry.audible = true;
+            soundtrackDebug("embed.adopted.claimed", { uri: shortUri(trackUri) });
+          }
           setPoolTick((n) => n + 1);
           runSync(committedUriRef.current, enabledRef.current);
           continue;

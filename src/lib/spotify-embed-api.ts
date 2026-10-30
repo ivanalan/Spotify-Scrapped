@@ -63,6 +63,8 @@ export type WarmLead = {
   ready: boolean;
   /** `performance.now()` when the controller was created. */
   createdAt: number;
+  /** play() already ran inside a user gesture (View example click). */
+  playStarted: boolean;
 };
 
 type WarmLeadWindow = Window & { __spotifyWarmLead?: WarmLead };
@@ -117,6 +119,7 @@ export function warmLeadEmbed(trackUri: string) {
           host,
           ready: false,
           createdAt: performance.now(),
+          playStarted: false,
         };
         win.__spotifyWarmLead = lead;
         controller.loadUri(trackUri, false, 0);
@@ -165,5 +168,6 @@ export function playWarmLeadFromGesture() {
     uri: lead.uri.slice(-8),
     ready: lead.ready,
   });
+  lead.playStarted = true;
   lead.controller.play();
 }
