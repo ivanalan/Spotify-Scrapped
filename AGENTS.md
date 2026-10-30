@@ -66,7 +66,7 @@ See **[docs/DATA.md](docs/DATA.md)** and **[docs/WRAPPED.md](docs/WRAPPED.md)** 
 - Button tap height is **40px** (`h-10` / `size-10`) everywhere; no one-off height overrides ([D-026](docs/decisions/D-026-button-tap-target-40.md)).
 - Auth copy is **sign in** / **sign out** only; not log in/out or connect/disconnect ([D-004](docs/decisions/D-004-sign-in-sign-out-copy.md)).
 - API story deck copy is **handwritten** and locked; don’t regenerate lines casually ([D-005](docs/decisions/D-005-handwritten-api-story-copy.md)).
-- API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)).
+- API story headlines: ≤6 words, open compounds, **favs**, **1 like** ([D-006](docs/decisions/D-006-api-story-headline-style.md)); in **sublines** write **favorite(s)**, and scene 7 / share card 1 is **All star setlist** ([D-053](docs/decisions/D-053-all-star-setlist-fav-vs-favorite.md)).
 - API deck look: Orbit Cascade palette + peripheral ovals / volume ocean ([D-007](docs/decisions/D-007-orbit-cascade-api-deck.md)); each story is dark or light; deck chrome follows the active slide.
 - #1 artist oval ladder ([D-008](docs/decisions/D-008-entity-artist-opaque-orbit-ovals.md)) remains as grammar; live left-on-read entity uses TL typing pin ([D-017](docs/decisions/D-017-entity-list-pair-rhymes.md)).
 - Wide viewport orbit art: corner-pinned motifs; phone keeps legacy `MotifStage` slice except intro + soft-close / middeck full-bleed layers ([D-009](docs/decisions/D-009-responsive-motif-pins.md), [D-016](docs/decisions/D-016-middeck-metaphor-promote.md)).

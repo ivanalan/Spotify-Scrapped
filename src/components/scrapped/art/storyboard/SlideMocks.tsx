@@ -145,7 +145,7 @@ export function SlideMock({ pattern, slideIndex, ink, muted }: Props) {
         >
           <p className="text-title font-extrabold leading-tight">Plot twist.</p>
           <h2 className="mt-3 font-sans text-[1.25rem] font-extrabold leading-tight">
-            The all-star setlist
+            All star setlist
           </h2>
           <ul className="mt-6 space-y-3">
             {LIST_ROWS.slice(0, 3).map((r) => (

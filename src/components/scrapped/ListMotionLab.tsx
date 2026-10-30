@@ -41,7 +41,7 @@ const MOCK_ROWS = [
   },
 ];
 
-const HEADLINE = "The all-star setlist";
+const HEADLINE = "All star setlist";
 const SUBLINE =
   "Old multi-year favorites; or old likes; back in your 4-week tops after a gap.";
 

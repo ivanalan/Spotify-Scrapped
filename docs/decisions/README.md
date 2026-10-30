@@ -49,3 +49,4 @@ What we give up, or what agents must remember forever.
 | [D-031](D-031-pause-on-tab-hide.md) | Pause story on tab / app hide; stay paused on return | Locked |
 | [D-042](D-042-share-finale-card-pager.md) | Share finale multi-card pager + dots | Locked |
 | [D-043](D-043-share-all-time-favs-g3-spine.md) | Share card 1 All time favs G3 spine left | Locked |
+| [D-053](D-053-all-star-setlist-fav-vs-favorite.md) | All star setlist copy; fav in titles, favorite in subtitles | Locked |

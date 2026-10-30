@@ -183,7 +183,7 @@ export const SHARE_FINALE_KIT = {
 } as const;
 
 /**
- * Share finale card 1: All time favs · G3 cinema film · centered brand (D-043).
+ * Share finale card 1: All star setlist · G3 cinema film · centered brand (D-043).
  * Same 300×533 canvas as D-033; yellow field; black letterbox; cover above film.
  * Explore: `docs/mocks/share-all-time-favs.html`.
  */
@@ -194,7 +194,7 @@ export const SHARE_ALL_TIME_FAVS_KIT = {
   cardMuted: "color-mix(in oklab, #1c1c1c 72%, transparent)",
   cardPanel: "color-mix(in oklab, #1c1c1c 10%, transparent)",
   brandLine: "myscrapped.com",
-  listLabel: "All time favs",
+  listLabel: "All star setlist",
   /** Match card 0 (D-033) cover size + centered hero band. */
   heroBandPct: SHARE_FINALE_DENSITY.heroBandPct,
   heroSizePct: SHARE_FINALE_DENSITY.heroSizePct,
