@@ -10,7 +10,7 @@
 | H-b2 / hot | `cutTo` hot uses `play()` via `takeActOwnershipNow`; audible priming → `path=priming-hot` immediate ownership |
 | H-a1 / H-c1 | `scheduleCutoverFallback` calls `play()` when next entry is already audible |
 | H-d1 | `cancelPrime` sets ~700ms reject latch; late `playback_started` / `playback_update` pause+seek |
-| H-a2 | Loop A/B always `seek+play` (no hot `resume`); `tryLoopCutover` reinforces `play()`; `LOOP_CUT_LEAD_MS` 1800; outer window endTimer only; iOS `path=same-act` / `restartLoopOnAct`; twin silence → `loop.watchdog` recover; ignore dying-slot schedules while `incomingLoop` set |
+| H-a2 | Loop A/B `seek+play`; cut only after idle progress proof; iOS / latched `path=same-act`; silent twin → timer/watchdog → `restartLoopOnAct` + `sameActOnly` latch (avoids Cursor start×2 stutter); `LOOP_CUT_LEAD_MS` 1800 |
 
 ## By design (not a code bug)
 

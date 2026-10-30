@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { preloadIonIcon } from "@/components/Icon";
 import { GateWaitlistForm } from "@/components/scrapped/GateWaitlistForm";
 import { ScrappedOrbitArt } from "@/components/scrapped/orbit/ScrappedOrbitArt";
@@ -15,6 +16,10 @@ import {
 } from "@/components/scrapped/gateChrome";
 import { buttonVariants } from "@/components/ui/button";
 import { SCRAPPED_API_YEAR } from "@/lib/scrapped-api-year";
+import {
+  preloadSpotifyEmbedApi,
+  warmLeadEmbed,
+} from "@/lib/spotify-embed-api";
 import { cn } from "@/lib/utils";
 
 // Warm ion-icon while the user is on Sign in (and on return) so Load’s
@@ -80,6 +85,31 @@ export function ScrappedGate({
   warmReady = 0,
   warmTotal = 0,
 }: Props) {
+  // Unsigned gate links to the example walkthrough: have the embed API in
+  // flight before the visitor taps View example.
+  useEffect(() => {
+    if (mode !== "auth") return;
+    preloadSpotifyEmbedApi();
+
+    // Start the walkthrough's lead embed now; DeckSoundtrack adopts it.
+    let cancelled = false;
+    void Promise.all([
+      import("@/data/walkthrough-report.json"),
+      import("@/lib/api-scrapped-soundtrack"),
+      import("@/lib/scrapped-api"),
+    ]).then(([fixture, soundtrack, api]) => {
+      if (cancelled) return;
+      const report = api.ensureApiReportSummary(
+        structuredClone(fixture.default) as import("@/lib/scrapped-api").ScrappedApiReport,
+      );
+      const lead = soundtrack.getApiSlideSoundtrackUri(report, 0);
+      if (lead) warmLeadEmbed(lead);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode]);
+
   const connected = mode !== "auth";
   const name = displayName?.trim() || null;
   const showSeatsFull = mode === "auth" && seatsFull && !offWaitlist;
