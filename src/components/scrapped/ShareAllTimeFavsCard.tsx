@@ -56,7 +56,7 @@ function FilmStrip({ edge }: { edge: "top" | "bot" }) {
 }
 
 /**
- * Share finale card 1: All time favs · yellow G3 cinema · centered brand (D-043).
+ * Share finale card 1: All star setlist · yellow G3 cinema · centered brand (D-043).
  * Same 300×533 design canvas as the teal minimal card (D-033 / D-012).
  * Liked metrics removed; `myscrapped.com` sits under the list.
  */

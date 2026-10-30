@@ -762,7 +762,7 @@ export function buildScrappedApiReport(
       title: "All-star staples",
       calculated:
         "From your multi-year top 50, pick one tier (whole pool, not mixed). Prefer tracks also in both the 6-month and 4-week top 50s. If that set is empty, use multi-year tracks that appear only in the 4-week list (not 6-month). If that is empty too, use multi-year tracks that appear only in the 6-month list (not 4-week). Sorted by multi-year rank.",
-      means: "All-time favs that never fully ghosted: still showing up in recent tops.",
+      means: "All-time favorites that never fully ghosted: still showing up in recent tops.",
       bar: "Multi-year rank. Higher all-time rank, longer bar.",
       source: "Top tracks (all three windows)",
       items: allStars.slice(0, TOP_N).map(({ track, longRank: rank, tier }) =>

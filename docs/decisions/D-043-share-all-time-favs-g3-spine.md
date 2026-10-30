@@ -14,7 +14,7 @@ Author share poster 1 as **All time favs** (G3 cinema):
 | Field | `#F0B429` · dark ink `#1C1C1C` |
 | Film | Black rails `#0A0A0A` · 64px · sprockets 16px · holes match field · slow scroll 36s / 42s |
 | Cover | Same as card 0 (D-033): hero 46% · size 54% · centered · **z above film** |
-| List | Horizontally centered · width 64% · 5 titles · type `0.85rem` · pull-up under cover · label `All time favs` |
+| List | Horizontally centered · width 64% · 5 titles · type `0.85rem` · pull-up under cover · label `All star setlist` ([D-053](D-053-all-star-setlist-fav-vs-favorite.md); was `All time favs`) |
 | Metrics | **Hidden** (no Liked songs / Liked this year) |
 | Brand | `myscrapped.com` · **centered under list** (replaces the metrics slot) · size `0.72rem` · track −0.015em · gap after list `55px` (same place as card 2; [D-044](D-044-share-one-like-artists-b1.md)) |
 | Data | `second-chance` top 5 (all-time favs still in rotation); hero prefers reunion art |

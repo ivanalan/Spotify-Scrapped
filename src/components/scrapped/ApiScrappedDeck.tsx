@@ -401,8 +401,8 @@ export function ApiScrappedDeck({
             subline: "Not everyone got ghosted.",
           },
           {
-            headline: "The all-star setlist",
-            subline: "All-time favs still in rotation",
+            headline: "All star setlist",
+            subline: "All time favorites still in rotation",
             hasSupport: true,
           },
         ]
@@ -414,7 +414,7 @@ export function ApiScrappedDeck({
           {
             headline: reunionLabel ?? "No all-stars on the board.",
             subline: hasReunionSong
-              ? "All-time favs still in rotation"
+              ? "All time favorites still in rotation"
               : "The long window went quiet. For now.",
             hasSupport: hasReunionSong,
           },
@@ -474,18 +474,18 @@ export function ApiScrappedDeck({
         {
           headline: "Most ghosted song",
           subline: hasTopSong
-            ? "A multi year fav that fell out of the recent rotation."
-            : "Wow. You actually still talk to your old favs.",
+            ? "A multi year favorite that fell out of the recent rotation."
+            : "Wow. You actually still talk to your old favorites.",
         },
       ],
       [
         {
           headline: "It wasn’t a one ghost town",
-          subline: "A few more favs went quiet.",
+          subline: "A few more favorites went quiet.",
         },
         {
           headline: "Your ghosted songs",
-          subline: "Multi year favs missing from your recent tops.",
+          subline: "Multi year favorites missing from your recent tops.",
           hasSupport: true,
         },
       ],
@@ -509,7 +509,7 @@ export function ApiScrappedDeck({
         {
           headline: "Top artist left on read",
           subline: hasTopArtist
-            ? "Highest multi year fav missing from latest activity."
+            ? "Highest multi year favorite missing from latest activity."
             : "Your loyalty program is weirdly intact.",
         },
       ],
@@ -520,7 +520,7 @@ export function ApiScrappedDeck({
         },
         {
           headline: "Top artists you left on read",
-          subline: "Highest multi year favs missing from latest activity.",
+          subline: "Highest multi year favorites missing from latest activity.",
           hasSupport: true,
         },
       ],
@@ -529,7 +529,7 @@ export function ApiScrappedDeck({
         { headline: "Thanks for staying." },
         {
           headline: "See you next Scrapped.",
-          subline: "Hopefully fewer favs get ghosted.",
+          subline: "Hopefully fewer favorites get ghosted.",
         },
       ],
       [{ headline: "Share" }],
@@ -1066,8 +1066,8 @@ export function ApiScrappedDeck({
             {
               headline: "Most ghosted song",
               subline: topSong
-                ? "A multi year fav that fell out of the recent rotation."
-                : "Wow. You actually still talk to your old favs.",
+                ? "A multi year favorite that fell out of the recent rotation."
+                : "Wow. You actually still talk to your old favorites.",
               lead: topSong ? (
                 <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
                   {topSong.imageUrl ? (
@@ -1105,12 +1105,12 @@ export function ApiScrappedDeck({
           beats={[
             {
               headline: "It wasn’t a one ghost town",
-              subline: "A few more favs went quiet.",
+              subline: "A few more favorites went quiet.",
               display: "hero",
             },
             {
               headline: "Your ghosted songs",
-              subline: "Multi year favs missing from your recent tops.",
+              subline: "Multi year favorites missing from your recent tops.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -1190,7 +1190,7 @@ export function ApiScrappedDeck({
             {
               headline: "Top artist left on read",
               subline: topArtist
-                ? "Highest multi year fav missing from latest activity."
+                ? "Highest multi year favorite missing from latest activity."
                 : "Your loyalty program is weirdly intact.",
               lead: topArtist ? (
                 <div className="relative mx-auto size-[160px] shrink-0 overflow-hidden rounded-sm bg-[var(--wrapped-panel)]">
@@ -1234,7 +1234,7 @@ export function ApiScrappedDeck({
             {
               headline: "Top artists you left on read",
               subline:
-                "Highest multi year favs missing from latest activity.",
+                "Highest multi year favorites missing from latest activity.",
               display: "sentence",
               children: (
                 <WrappedEntityList
@@ -1266,8 +1266,8 @@ export function ApiScrappedDeck({
                     display: "hero",
                   },
                   {
-                    headline: "The all-star setlist",
-                    subline: "All-time favs still in rotation",
+                    headline: "All star setlist",
+                    subline: "All time favorites still in rotation",
                     display: "sentence",
                     children: (
                       <WrappedEntityList
@@ -1294,7 +1294,7 @@ export function ApiScrappedDeck({
                     headline:
                       reunionSong?.label ?? "No all-stars on the board.",
                     subline: reunionSong
-                      ? "All-time favs still in rotation"
+                      ? "All time favorites still in rotation"
                       : "The long window went quiet. For now.",
                     display: "hero",
                     footer: reunionSong ? (
@@ -1324,7 +1324,7 @@ export function ApiScrappedDeck({
             },
             {
               headline: "See you next Scrapped.",
-              subline: "Hopefully fewer favs get ghosted.",
+              subline: "Hopefully fewer favorites get ghosted.",
               align: "center",
               display: "hero",
             },
