@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Nav } from "@/components/Nav";
 import { ProductMain, ProductNavShell } from "@/components/ProductChrome";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Nav />
         </ProductNavShell>
         <ProductMain>{children}</ProductMain>
+        <Analytics />
       </body>
     </html>
   );
